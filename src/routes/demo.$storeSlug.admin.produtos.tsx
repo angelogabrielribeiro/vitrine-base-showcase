@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, FileSpreadsheet } from "lucide-react";
 import { useState } from "react";
 import { useRepo } from "@/hooks/use-repo";
 import { getStore } from "@/config/stores";
@@ -33,9 +33,16 @@ function ProductsAdmin() {
           <h1 className="font-display text-3xl font-semibold">Produtos</h1>
           <p className="text-sm text-muted-foreground">{products.length} itens no catálogo</p>
         </div>
-        <Button asChild>
-          <Link to="/demo/$storeSlug/admin/produtos/novo" params={{ storeSlug }}><Plus className="mr-2 h-4 w-4" />Novo produto</Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline">
+            <Link to="/demo/$storeSlug/admin/importar-exportar" params={{ storeSlug }}>
+              <FileSpreadsheet className="mr-2 h-4 w-4" />Importar / Exportar
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link to="/demo/$storeSlug/admin/produtos/novo" params={{ storeSlug }}><Plus className="mr-2 h-4 w-4" />Novo produto</Link>
+          </Button>
+        </div>
       </div>
 
       <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar por nome..." className="max-w-sm" />
