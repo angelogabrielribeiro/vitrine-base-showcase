@@ -19,6 +19,8 @@ function Settings() {
   const repo = useRepo();
   const current = repo.getConfig(storeSlug) ?? getStore(storeSlug)!;
   const [cfg, setCfg] = useState<StoreConfig>(current);
+  const products = repo.listProducts(storeSlug).filter((p) => p.active);
+  const services = cfg.niche === "barber" ? repo.listServices(storeSlug).filter((s) => s.active) : [];
 
   const update = <K extends keyof StoreConfig>(k: K, v: StoreConfig[K]) => setCfg((c) => ({ ...c, [k]: v }));
 
