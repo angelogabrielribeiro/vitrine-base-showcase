@@ -1,4 +1,4 @@
-import type { Product } from "@/types/commerce";
+import type { Product, Service, Professional } from "@/types/commerce";
 
 // Helpers
 const img = (id: string, w = 900) =>
