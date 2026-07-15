@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, notFound, Link, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Outlet, notFound, Link, useRouterState, redirect } from "@tanstack/react-router";
 import { getStore } from "@/config/stores";
 import { StoreThemeStyle, themeScopeClass } from "@/components/storefront/store-theme";
 import { StoreHeader } from "@/components/storefront/store-header";
@@ -10,6 +10,10 @@ import { seedAllStores } from "@/services/local-repository";
 
 export const Route = createFileRoute("/demo/$storeSlug")({
   beforeLoad: ({ params }) => {
+    // Redirect legado: /demo/mercado[/...] -> /demo/barbearia
+    if (params.storeSlug === "mercado") {
+      throw redirect({ to: "/demo/$storeSlug", params: { storeSlug: "barbearia" } });
+    }
     if (!getStore(params.storeSlug)) throw notFound();
   },
   head: ({ params }) => {
