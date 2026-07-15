@@ -93,6 +93,7 @@ export interface Product {
   id: string;
   slug: string;
   name: string;
+  sku?: string;
   category: string; // category slug
   description: string;
   price: number;
