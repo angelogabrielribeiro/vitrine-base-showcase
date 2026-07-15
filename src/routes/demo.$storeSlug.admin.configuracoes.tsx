@@ -90,6 +90,41 @@ function Settings() {
         </div>
       </section>
 
+      <section className="rounded-[var(--radius)] border border-border bg-card p-5">
+        <h2 className="font-semibold">Spotlight e WhatsApp</h2>
+        <div className="mt-4 grid gap-3">
+          <div>
+            <Label>Item em destaque no Spotlight</Label>
+            <select
+              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+              value={cfg.spotlightItemId ?? ""}
+              onChange={(e) => update("spotlightItemId", e.target.value || undefined)}
+            >
+              <option value="">Automático (primeiro em destaque)</option>
+              {services.length > 0 && (
+                <optgroup label="Serviços">
+                  {services.map((s) => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
+                </optgroup>
+              )}
+              <optgroup label="Produtos">
+                {products.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </optgroup>
+            </select>
+          </div>
+          <label className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2 text-sm">
+            <span>Abrir WhatsApp obrigatoriamente após pedido/agendamento</span>
+            <Switch
+              checked={cfg.whatsappRequiredAfterCheckout}
+              onCheckedChange={(v) => update("whatsappRequiredAfterCheckout", Boolean(v))}
+            />
+          </label>
+        </div>
+      </section>
+
       <div className="flex justify-end">
         <Button onClick={save} size="lg">Salvar alterações</Button>
       </div>
