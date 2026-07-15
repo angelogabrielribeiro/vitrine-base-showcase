@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CheckCircle2, MessageCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, MessageCircle } from "lucide-react";
 import { getStore } from "@/config/stores";
 import { useRepo } from "@/hooks/use-repo";
 import { brl } from "@/lib/format";
 import { Button } from "@/components/ui/button";
-import { waOrderFollowup } from "@/lib/whatsapp";
+import { waOrderFollowup, waOrderSummaryToStore, whatsappUrl, consumeWhatsappPending } from "@/lib/whatsapp";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/demo/$storeSlug/pedido-confirmado/$orderId")({
   component: OrderConfirmed,
@@ -17,6 +18,10 @@ function OrderConfirmed() {
   const repo = useRepo();
   const hydrated = useHydrated();
   const order = repo.getOrder(storeSlug, orderId);
+  const [waPending, setWaPending] = useState(false);
+  useEffect(() => {
+    if (hydrated) setWaPending(consumeWhatsappPending(orderId));
+  }, [hydrated, orderId]);
 
   if (!hydrated) return <div className="mx-auto max-w-2xl px-4 py-10">Carregando...</div>;
 
@@ -76,14 +81,39 @@ function OrderConfirmed() {
 
       <section className="mt-4 rounded-[var(--radius)] border border-border bg-card p-5">
         <h2 className="font-semibold">Próximos passos</h2>
+        {store.whatsappRequiredAfterCheckout && waPending && (
+          <div className="mt-3 flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-xs">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+            <p>
+              <strong>Abra o WhatsApp para concluir o contato.</strong> A janela automática pode ter sido
+              bloqueada pelo navegador — toque no botão abaixo para abrir a conversa com a mensagem pronta.
+            </p>
+          </div>
+        )}
+        {store.whatsappRequiredAfterCheckout && (
+          <p className="mt-3 text-xs text-muted-foreground">
+            O WhatsApp será aberto com a mensagem pronta; confirme o envio no aplicativo.
+          </p>
+        )}
         <ol className="mt-3 list-inside list-decimal space-y-1 text-sm text-muted-foreground">
           <li>A loja entrará em contato pelo WhatsApp para confirmar detalhes.</li>
           <li>Você receberá atualizações do status do pedido.</li>
           <li>Guarde o número {order.number} para referência.</li>
         </ol>
         <Button asChild className="mt-5 w-full bg-green-500 text-white hover:bg-green-600">
-          <a href={waOrderFollowup(store, order.number)} target="_blank" rel="noreferrer">
-            <MessageCircle className="mr-2 h-4 w-4" /> Falar com a loja sobre este pedido
+          <a
+            href={
+              store.whatsappRequiredAfterCheckout
+                ? whatsappUrl(store.whatsapp, waOrderSummaryToStore(store, order))
+                : waOrderFollowup(store, order.number)
+            }
+            target="_blank"
+            rel="noreferrer"
+          >
+            <MessageCircle className="mr-2 h-4 w-4" />
+            {store.whatsappRequiredAfterCheckout
+              ? "Abrir WhatsApp com a mensagem pronta"
+              : "Falar com a loja sobre este pedido"}
           </a>
         </Button>
         <Button asChild variant="outline" className="mt-2 w-full">

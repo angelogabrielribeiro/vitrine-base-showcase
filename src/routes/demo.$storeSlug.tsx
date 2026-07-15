@@ -5,6 +5,7 @@ import { StoreHeader } from "@/components/storefront/store-header";
 import { StoreFooter } from "@/components/storefront/store-footer";
 import { WhatsappFab } from "@/components/storefront/whatsapp-fab";
 import { DemoBanner } from "@/components/storefront/demo-banner";
+import { LiquidMobileMenu } from "@/components/storefront/liquid-mobile-menu";
 import { useEffect } from "react";
 import { seedAllStores } from "@/services/local-repository";
 
@@ -49,6 +50,8 @@ function StoreLayout() {
       </div>
     );
   }
+  // Esconde o menu flutuante no formulário final do checkout para não cobrir o botão.
+  const hideFloatingMenu = pathname.endsWith(`/demo/${storeSlug}/checkout`);
   return (
     <div className={themeScopeClass(store.slug) + " min-h-screen"}>
       <StoreThemeStyle store={store} />
@@ -59,6 +62,7 @@ function StoreLayout() {
       </main>
       <StoreFooter store={store} />
       <WhatsappFab store={store} />
+      <LiquidMobileMenu store={store} hide={hideFloatingMenu} />
     </div>
   );
 }

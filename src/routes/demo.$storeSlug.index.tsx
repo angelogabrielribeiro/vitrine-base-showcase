@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { brl } from "@/lib/format";
 import { Clock, Scissors, CalendarDays } from "lucide-react";
+import { SpotlightItemHero } from "@/components/storefront/spotlight-item-hero";
 
 export const Route = createFileRoute("/demo/$storeSlug/")({
   component: StoreHome,
@@ -31,8 +32,26 @@ function StoreHome() {
   const services = isBarber ? repo.listServices(storeSlug).filter((s) => s.active) : [];
   const professionals = isBarber ? repo.listProfessionals(storeSlug).filter((p) => p.active) : [];
 
+  // Escolha do Spotlight: config → serviço (barbearia) ou produto; fallback: primeiro featured/active.
+  const spotlightId = store.spotlightItemId;
+  let spotlight: React.ComponentProps<typeof SpotlightItemHero>["item"] | null = null;
+  if (isBarber && spotlightId) {
+    const s = services.find((x) => x.id === spotlightId);
+    if (s) spotlight = { kind: "service", service: s, image: banner?.image ?? "" };
+  }
+  if (!spotlight && spotlightId) {
+    const p = products.find((x) => x.id === spotlightId);
+    if (p) spotlight = { kind: "product", product: p };
+  }
+  if (!spotlight) {
+    const p = featured[0] ?? products[0];
+    if (p) spotlight = { kind: "product", product: p };
+    else if (isBarber && services[0]) spotlight = { kind: "service", service: services[0], image: banner?.image ?? "" };
+  }
+
   return (
     <div>
+      {spotlight && <SpotlightItemHero store={store} item={spotlight} />}
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div

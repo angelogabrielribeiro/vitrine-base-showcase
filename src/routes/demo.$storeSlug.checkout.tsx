@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import type { Order, PaymentMethod } from "@/types/commerce";
 import { toast } from "sonner";
+import { waOrderSummaryToStore, whatsappUrl, markWhatsappPending } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/demo/$storeSlug/checkout")({
   component: CheckoutPage,
@@ -95,6 +96,17 @@ function CheckoutPage() {
       return;
     }
     setSubmitting(true);
+
+    // Abrir aba/janela provisória AINDA dentro do gesto do usuário para evitar bloqueio de popup.
+    let waWindow: Window | null = null;
+    if (store.whatsappRequiredAfterCheckout) {
+      try {
+        waWindow = window.open("", "_blank");
+      } catch {
+        waWindow = null;
+      }
+    }
+
     const num = orderNumber();
     const order: Order = {
       id: num,
@@ -120,6 +132,19 @@ function CheckoutPage() {
     repo.createOrder(storeSlug, order);
     clear();
     setSubmitting(false);
+
+    if (store.whatsappRequiredAfterCheckout) {
+      const waHref = whatsappUrl(store.whatsapp, waOrderSummaryToStore(store, order));
+      if (waWindow && !waWindow.closed) {
+        try {
+          waWindow.location.href = waHref;
+        } catch {
+          markWhatsappPending(num);
+        }
+      } else {
+        markWhatsappPending(num);
+      }
+    }
     navigate({ to: "/demo/$storeSlug/pedido-confirmado/$orderId", params: { storeSlug, orderId: num } });
   };
 
