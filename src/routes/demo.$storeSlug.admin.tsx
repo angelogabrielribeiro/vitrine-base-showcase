@@ -39,19 +39,21 @@ function AdminLayout() {
   }
 
   const isBarber = store.niche === "barber";
-  const items = [
+  const items: Array<{ to: string; icon: typeof LayoutDashboard; label: string; exact: boolean }> = [
     { to: "/demo/$storeSlug/admin", icon: LayoutDashboard, label: "Dashboard", exact: true },
-    ...(isBarber
-      ? ([
-          { to: "/demo/$storeSlug/admin/agendamentos", icon: CalendarDays, label: "Agendamentos", exact: false },
-          { to: "/demo/$storeSlug/admin/servicos", icon: Scissors, label: "Serviços", exact: false },
-          { to: "/demo/$storeSlug/admin/profissionais", icon: Users, label: "Profissionais", exact: false },
-        ] as const)
-      : ([] as const)),
+  ];
+  if (isBarber) {
+    items.push(
+      { to: "/demo/$storeSlug/admin/agendamentos", icon: CalendarDays, label: "Agendamentos", exact: false },
+      { to: "/demo/$storeSlug/admin/servicos", icon: Scissors, label: "Serviços", exact: false },
+      { to: "/demo/$storeSlug/admin/profissionais", icon: Users, label: "Profissionais", exact: false },
+    );
+  }
+  items.push(
     { to: "/demo/$storeSlug/admin/produtos", icon: Package, label: "Produtos", exact: false },
     { to: "/demo/$storeSlug/admin/pedidos", icon: ShoppingCart, label: "Pedidos", exact: false },
     { to: "/demo/$storeSlug/admin/configuracoes", icon: Settings, label: "Configurações", exact: false },
-  ] as const;
+  );
 
   return (
     <div className="min-h-screen bg-muted/40">
