@@ -10,33 +10,98 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DemoStoreSlugRouteImport } from './routes/demo.$storeSlug'
+import { Route as DemoStoreSlugIndexRouteImport } from './routes/demo.$storeSlug.index'
+import { Route as DemoStoreSlugProdutosRouteImport } from './routes/demo.$storeSlug.produtos'
+import { Route as DemoStoreSlugProdutoProductSlugRouteImport } from './routes/demo.$storeSlug.produto.$productSlug'
+import { Route as DemoStoreSlugCategoriaCategorySlugRouteImport } from './routes/demo.$storeSlug.categoria.$categorySlug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoStoreSlugRoute = DemoStoreSlugRouteImport.update({
+  id: '/demo/$storeSlug',
+  path: '/demo/$storeSlug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoStoreSlugIndexRoute = DemoStoreSlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DemoStoreSlugRoute,
+} as any)
+const DemoStoreSlugProdutosRoute = DemoStoreSlugProdutosRouteImport.update({
+  id: '/produtos',
+  path: '/produtos',
+  getParentRoute: () => DemoStoreSlugRoute,
+} as any)
+const DemoStoreSlugProdutoProductSlugRoute =
+  DemoStoreSlugProdutoProductSlugRouteImport.update({
+    id: '/produto/$productSlug',
+    path: '/produto/$productSlug',
+    getParentRoute: () => DemoStoreSlugRoute,
+  } as any)
+const DemoStoreSlugCategoriaCategorySlugRoute =
+  DemoStoreSlugCategoriaCategorySlugRouteImport.update({
+    id: '/categoria/$categorySlug',
+    path: '/categoria/$categorySlug',
+    getParentRoute: () => DemoStoreSlugRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/demo/$storeSlug': typeof DemoStoreSlugRouteWithChildren
+  '/demo/$storeSlug/produtos': typeof DemoStoreSlugProdutosRoute
+  '/demo/$storeSlug/': typeof DemoStoreSlugIndexRoute
+  '/demo/$storeSlug/categoria/$categorySlug': typeof DemoStoreSlugCategoriaCategorySlugRoute
+  '/demo/$storeSlug/produto/$productSlug': typeof DemoStoreSlugProdutoProductSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/demo/$storeSlug/produtos': typeof DemoStoreSlugProdutosRoute
+  '/demo/$storeSlug': typeof DemoStoreSlugIndexRoute
+  '/demo/$storeSlug/categoria/$categorySlug': typeof DemoStoreSlugCategoriaCategorySlugRoute
+  '/demo/$storeSlug/produto/$productSlug': typeof DemoStoreSlugProdutoProductSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/demo/$storeSlug': typeof DemoStoreSlugRouteWithChildren
+  '/demo/$storeSlug/produtos': typeof DemoStoreSlugProdutosRoute
+  '/demo/$storeSlug/': typeof DemoStoreSlugIndexRoute
+  '/demo/$storeSlug/categoria/$categorySlug': typeof DemoStoreSlugCategoriaCategorySlugRoute
+  '/demo/$storeSlug/produto/$productSlug': typeof DemoStoreSlugProdutoProductSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/demo/$storeSlug'
+    | '/demo/$storeSlug/produtos'
+    | '/demo/$storeSlug/'
+    | '/demo/$storeSlug/categoria/$categorySlug'
+    | '/demo/$storeSlug/produto/$productSlug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/demo/$storeSlug/produtos'
+    | '/demo/$storeSlug'
+    | '/demo/$storeSlug/categoria/$categorySlug'
+    | '/demo/$storeSlug/produto/$productSlug'
+  id:
+    | '__root__'
+    | '/'
+    | '/demo/$storeSlug'
+    | '/demo/$storeSlug/produtos'
+    | '/demo/$storeSlug/'
+    | '/demo/$storeSlug/categoria/$categorySlug'
+    | '/demo/$storeSlug/produto/$productSlug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DemoStoreSlugRoute: typeof DemoStoreSlugRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +113,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo/$storeSlug': {
+      id: '/demo/$storeSlug'
+      path: '/demo/$storeSlug'
+      fullPath: '/demo/$storeSlug'
+      preLoaderRoute: typeof DemoStoreSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/$storeSlug/': {
+      id: '/demo/$storeSlug/'
+      path: '/'
+      fullPath: '/demo/$storeSlug/'
+      preLoaderRoute: typeof DemoStoreSlugIndexRouteImport
+      parentRoute: typeof DemoStoreSlugRoute
+    }
+    '/demo/$storeSlug/produtos': {
+      id: '/demo/$storeSlug/produtos'
+      path: '/produtos'
+      fullPath: '/demo/$storeSlug/produtos'
+      preLoaderRoute: typeof DemoStoreSlugProdutosRouteImport
+      parentRoute: typeof DemoStoreSlugRoute
+    }
+    '/demo/$storeSlug/produto/$productSlug': {
+      id: '/demo/$storeSlug/produto/$productSlug'
+      path: '/produto/$productSlug'
+      fullPath: '/demo/$storeSlug/produto/$productSlug'
+      preLoaderRoute: typeof DemoStoreSlugProdutoProductSlugRouteImport
+      parentRoute: typeof DemoStoreSlugRoute
+    }
+    '/demo/$storeSlug/categoria/$categorySlug': {
+      id: '/demo/$storeSlug/categoria/$categorySlug'
+      path: '/categoria/$categorySlug'
+      fullPath: '/demo/$storeSlug/categoria/$categorySlug'
+      preLoaderRoute: typeof DemoStoreSlugCategoriaCategorySlugRouteImport
+      parentRoute: typeof DemoStoreSlugRoute
+    }
   }
 }
 
+interface DemoStoreSlugRouteChildren {
+  DemoStoreSlugProdutosRoute: typeof DemoStoreSlugProdutosRoute
+  DemoStoreSlugIndexRoute: typeof DemoStoreSlugIndexRoute
+  DemoStoreSlugCategoriaCategorySlugRoute: typeof DemoStoreSlugCategoriaCategorySlugRoute
+  DemoStoreSlugProdutoProductSlugRoute: typeof DemoStoreSlugProdutoProductSlugRoute
+}
+
+const DemoStoreSlugRouteChildren: DemoStoreSlugRouteChildren = {
+  DemoStoreSlugProdutosRoute: DemoStoreSlugProdutosRoute,
+  DemoStoreSlugIndexRoute: DemoStoreSlugIndexRoute,
+  DemoStoreSlugCategoriaCategorySlugRoute:
+    DemoStoreSlugCategoriaCategorySlugRoute,
+  DemoStoreSlugProdutoProductSlugRoute: DemoStoreSlugProdutoProductSlugRoute,
+}
+
+const DemoStoreSlugRouteWithChildren = DemoStoreSlugRoute._addFileChildren(
+  DemoStoreSlugRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DemoStoreSlugRoute: DemoStoreSlugRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
