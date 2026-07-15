@@ -1,7 +1,7 @@
 // Tipos centrais da plataforma white-label.
 // Toda página deve tipar seus dados por aqui.
 
-export type StoreNiche = "fashion" | "grocery" | "restaurant";
+export type StoreNiche = "fashion" | "barber" | "restaurant";
 
 export interface StoreConfig {
   id: string;
@@ -175,5 +175,67 @@ export interface DemoSession {
   storeSlug: string;
   label: string;
   createdAt: string;
+  demo: true;
+}
+
+// ============= Barbearia — serviços, profissionais e agendamentos =============
+
+export interface Service {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  price: number;
+  durationMinutes: number;
+  image?: string;
+  active: boolean;
+  featured?: boolean;
+}
+
+export interface Professional {
+  id: string;
+  name: string;
+  role: string;
+  bio?: string;
+  avatar?: string;
+  active: boolean;
+  /** Ids de serviços que executa. Vazio = executa todos. */
+  serviceIds?: string[];
+  /** 0=Dom .. 6=Sáb. Default: seg-sáb. */
+  workingDays?: number[];
+  workStart?: string; // "09:00"
+  workEnd?: string; // "19:00"
+}
+
+export type AppointmentStatus =
+  | "pendente"
+  | "confirmado"
+  | "concluido"
+  | "cancelado"
+  | "faltou";
+
+export interface Appointment {
+  id: string;
+  number: string;
+  storeSlug: string;
+  createdAt: string;
+  status: AppointmentStatus;
+  serviceId: string;
+  serviceName: string;
+  price: number;
+  durationMinutes: number;
+  professionalId: string;
+  professionalName: string;
+  /** ISO date YYYY-MM-DD */
+  date: string;
+  /** HH:mm 24h */
+  time: string;
+  customer: {
+    name: string;
+    whatsapp: string;
+    email?: string;
+  };
+  notes?: string;
+  consents: { terms: boolean; marketing: boolean };
   demo: true;
 }
