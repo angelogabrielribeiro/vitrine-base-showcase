@@ -3,7 +3,7 @@ import { getStore } from "@/config/stores";
 import { repo } from "@/services/local-repository";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Package, ShoppingCart, Settings, LogOut, Store, AlertTriangle } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Settings, LogOut, Store, AlertTriangle, CalendarDays, Scissors, Users } from "lucide-react";
 import { useEffect } from "react";
 import { seedAllStores } from "@/services/local-repository";
 
@@ -38,8 +38,16 @@ function AdminLayout() {
     return <div className="p-10 text-sm text-muted-foreground">Verificando sessão...</div>;
   }
 
+  const isBarber = store.niche === "barber";
   const items = [
     { to: "/demo/$storeSlug/admin", icon: LayoutDashboard, label: "Dashboard", exact: true },
+    ...(isBarber
+      ? ([
+          { to: "/demo/$storeSlug/admin/agendamentos", icon: CalendarDays, label: "Agendamentos", exact: false },
+          { to: "/demo/$storeSlug/admin/servicos", icon: Scissors, label: "Serviços", exact: false },
+          { to: "/demo/$storeSlug/admin/profissionais", icon: Users, label: "Profissionais", exact: false },
+        ] as const)
+      : ([] as const)),
     { to: "/demo/$storeSlug/admin/produtos", icon: Package, label: "Produtos", exact: false },
     { to: "/demo/$storeSlug/admin/pedidos", icon: ShoppingCart, label: "Pedidos", exact: false },
     { to: "/demo/$storeSlug/admin/configuracoes", icon: Settings, label: "Configurações", exact: false },
