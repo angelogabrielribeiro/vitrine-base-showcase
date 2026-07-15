@@ -19,6 +19,7 @@ import { Route as DemoStoreSlugPrivacidadeRouteImport } from './routes/demo.$sto
 import { Route as DemoStoreSlugLoginRouteImport } from './routes/demo.$storeSlug.login'
 import { Route as DemoStoreSlugCheckoutRouteImport } from './routes/demo.$storeSlug.checkout'
 import { Route as DemoStoreSlugCarrinhoRouteImport } from './routes/demo.$storeSlug.carrinho'
+import { Route as DemoStoreSlugAgendarRouteImport } from './routes/demo.$storeSlug.agendar'
 import { Route as DemoStoreSlugAdminRouteImport } from './routes/demo.$storeSlug.admin'
 import { Route as DemoStoreSlugAdminIndexRouteImport } from './routes/demo.$storeSlug.admin.index'
 import { Route as DemoStoreSlugProdutoProductSlugRouteImport } from './routes/demo.$storeSlug.produto.$productSlug'
@@ -81,6 +82,11 @@ const DemoStoreSlugCheckoutRoute = DemoStoreSlugCheckoutRouteImport.update({
 const DemoStoreSlugCarrinhoRoute = DemoStoreSlugCarrinhoRouteImport.update({
   id: '/carrinho',
   path: '/carrinho',
+  getParentRoute: () => DemoStoreSlugRoute,
+} as any)
+const DemoStoreSlugAgendarRoute = DemoStoreSlugAgendarRouteImport.update({
+  id: '/agendar',
+  path: '/agendar',
   getParentRoute: () => DemoStoreSlugRoute,
 } as any)
 const DemoStoreSlugAdminRoute = DemoStoreSlugAdminRouteImport.update({
@@ -157,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/demo/$storeSlug': typeof DemoStoreSlugRouteWithChildren
   '/demo/$storeSlug/admin': typeof DemoStoreSlugAdminRouteWithChildren
+  '/demo/$storeSlug/agendar': typeof DemoStoreSlugAgendarRoute
   '/demo/$storeSlug/carrinho': typeof DemoStoreSlugCarrinhoRoute
   '/demo/$storeSlug/checkout': typeof DemoStoreSlugCheckoutRoute
   '/demo/$storeSlug/login': typeof DemoStoreSlugLoginRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/demo/$storeSlug/agendar': typeof DemoStoreSlugAgendarRoute
   '/demo/$storeSlug/carrinho': typeof DemoStoreSlugCarrinhoRoute
   '/demo/$storeSlug/checkout': typeof DemoStoreSlugCheckoutRoute
   '/demo/$storeSlug/login': typeof DemoStoreSlugLoginRoute
@@ -204,6 +212,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/demo/$storeSlug': typeof DemoStoreSlugRouteWithChildren
   '/demo/$storeSlug/admin': typeof DemoStoreSlugAdminRouteWithChildren
+  '/demo/$storeSlug/agendar': typeof DemoStoreSlugAgendarRoute
   '/demo/$storeSlug/carrinho': typeof DemoStoreSlugCarrinhoRoute
   '/demo/$storeSlug/checkout': typeof DemoStoreSlugCheckoutRoute
   '/demo/$storeSlug/login': typeof DemoStoreSlugLoginRoute
@@ -230,6 +239,7 @@ export interface FileRouteTypes {
     | '/'
     | '/demo/$storeSlug'
     | '/demo/$storeSlug/admin'
+    | '/demo/$storeSlug/agendar'
     | '/demo/$storeSlug/carrinho'
     | '/demo/$storeSlug/checkout'
     | '/demo/$storeSlug/login'
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/demo/$storeSlug/agendar'
     | '/demo/$storeSlug/carrinho'
     | '/demo/$storeSlug/checkout'
     | '/demo/$storeSlug/login'
@@ -276,6 +287,7 @@ export interface FileRouteTypes {
     | '/'
     | '/demo/$storeSlug'
     | '/demo/$storeSlug/admin'
+    | '/demo/$storeSlug/agendar'
     | '/demo/$storeSlug/carrinho'
     | '/demo/$storeSlug/checkout'
     | '/demo/$storeSlug/login'
@@ -372,6 +384,13 @@ declare module '@tanstack/react-router' {
       path: '/carrinho'
       fullPath: '/demo/$storeSlug/carrinho'
       preLoaderRoute: typeof DemoStoreSlugCarrinhoRouteImport
+      parentRoute: typeof DemoStoreSlugRoute
+    }
+    '/demo/$storeSlug/agendar': {
+      id: '/demo/$storeSlug/agendar'
+      path: '/agendar'
+      fullPath: '/demo/$storeSlug/agendar'
+      preLoaderRoute: typeof DemoStoreSlugAgendarRouteImport
       parentRoute: typeof DemoStoreSlugRoute
     }
     '/demo/$storeSlug/admin': {
@@ -512,6 +531,7 @@ const DemoStoreSlugAdminRouteWithChildren =
 
 interface DemoStoreSlugRouteChildren {
   DemoStoreSlugAdminRoute: typeof DemoStoreSlugAdminRouteWithChildren
+  DemoStoreSlugAgendarRoute: typeof DemoStoreSlugAgendarRoute
   DemoStoreSlugCarrinhoRoute: typeof DemoStoreSlugCarrinhoRoute
   DemoStoreSlugCheckoutRoute: typeof DemoStoreSlugCheckoutRoute
   DemoStoreSlugLoginRoute: typeof DemoStoreSlugLoginRoute
@@ -527,6 +547,7 @@ interface DemoStoreSlugRouteChildren {
 
 const DemoStoreSlugRouteChildren: DemoStoreSlugRouteChildren = {
   DemoStoreSlugAdminRoute: DemoStoreSlugAdminRouteWithChildren,
+  DemoStoreSlugAgendarRoute: DemoStoreSlugAgendarRoute,
   DemoStoreSlugCarrinhoRoute: DemoStoreSlugCarrinhoRoute,
   DemoStoreSlugCheckoutRoute: DemoStoreSlugCheckoutRoute,
   DemoStoreSlugLoginRoute: DemoStoreSlugLoginRoute,
