@@ -83,6 +83,7 @@ export const STORES: StoreConfig[] = [
       aboutBody:
         "A Maison Belle nasceu para vestir mulheres que amam moda com propósito. Cada peça é desenvolvida em pequenos lotes, com atenção artesanal.",
     },
+    whatsappRequiredAfterCheckout: true,
     checkout: {
       payments: ["pix", "credit", "debit"],
       allowCoupon: true,
@@ -170,6 +171,7 @@ export const STORES: StoreConfig[] = [
       aboutBody:
         "Na Barber Noir cada visita é um ritual. Do café ao pós-barba, cuidamos de cada etapa para você sair renovado.",
     },
+    whatsappRequiredAfterCheckout: true,
     checkout: {
       payments: ["pix", "credit", "debit"],
       allowCoupon: true,
@@ -255,6 +257,7 @@ export const STORES: StoreConfig[] = [
       aboutBody:
         "Somos apaixonados por carne bem-feita. Selecionamos cortes, moemos nossos blends e cuidamos de cada detalhe da chapa até a mesa.",
     },
+    whatsappRequiredAfterCheckout: true,
     checkout: {
       payments: ["pix", "credit", "debit", "cash"],
       allowCoupon: true,
