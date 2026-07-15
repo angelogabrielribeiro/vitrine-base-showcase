@@ -62,6 +62,10 @@ export interface StoreConfig {
     allowCoupon: boolean;
     marketingConsentDefault: boolean;
   };
+  /** Item destacado no Spotlight da home. Produto (por padrão) ou serviço (barbearia). */
+  spotlightItemId?: string;
+  /** Abrir WhatsApp obrigatoriamente após checkout/agendamento. */
+  whatsappRequiredAfterCheckout: boolean;
 }
 
 export type PaymentMethod = "pix" | "credit" | "debit" | "cash";
