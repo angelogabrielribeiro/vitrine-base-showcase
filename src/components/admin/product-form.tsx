@@ -22,6 +22,7 @@ export function ProductForm({
 }) {
   const store = getStore(storeSlug)!;
   const [name, setName] = useState(initial?.name ?? "");
+  const [sku, setSku] = useState(initial?.sku ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [category, setCategory] = useState(initial?.category ?? store.categories[0].slug);
   const [price, setPrice] = useState(String(initial?.price ?? ""));
@@ -39,6 +40,7 @@ export function ProductForm({
       id: initial?.id ?? `p-${Date.now().toString(36)}`,
       slug: initial?.slug ?? slugify(name),
       name: name.trim(),
+      sku: sku.trim() || undefined,
       category,
       description: description.trim(),
       price: Number(price) || 0,
@@ -62,6 +64,7 @@ export function ProductForm({
     <form onSubmit={handle} className="space-y-4">
       <div className="grid gap-3 sm:grid-cols-2">
         <div><Label>Nome</Label><Input value={name} onChange={(e) => setName(e.target.value)} required /></div>
+        <div><Label>SKU (opcional)</Label><Input value={sku} onChange={(e) => setSku(e.target.value)} placeholder="Ex.: MB-VS-001" /></div>
         <div>
           <Label>Categoria</Label>
           <Select value={category} onValueChange={setCategory}>
