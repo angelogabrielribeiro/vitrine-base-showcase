@@ -71,7 +71,7 @@ function AdminLayout() {
               return (
                 <Link
                   key={it.label}
-                  to={it.to}
+                  to={it.to as "/demo/$storeSlug/admin"}
                   params={{ storeSlug }}
                   className={
                     "inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium " +
