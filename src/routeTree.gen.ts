@@ -25,6 +25,7 @@ import { Route as DemoStoreSlugAdminIndexRouteImport } from './routes/demo.$stor
 import { Route as DemoStoreSlugProdutoProductSlugRouteImport } from './routes/demo.$storeSlug.produto.$productSlug'
 import { Route as DemoStoreSlugPedidoConfirmadoOrderIdRouteImport } from './routes/demo.$storeSlug.pedido-confirmado.$orderId'
 import { Route as DemoStoreSlugCategoriaCategorySlugRouteImport } from './routes/demo.$storeSlug.categoria.$categorySlug'
+import { Route as DemoStoreSlugAgendamentoConfirmadoAppointmentIdRouteImport } from './routes/demo.$storeSlug.agendamento-confirmado.$appointmentId'
 import { Route as DemoStoreSlugAdminProdutosRouteImport } from './routes/demo.$storeSlug.admin.produtos'
 import { Route as DemoStoreSlugAdminPedidosRouteImport } from './routes/demo.$storeSlug.admin.pedidos'
 import { Route as DemoStoreSlugAdminLoginRouteImport } from './routes/demo.$storeSlug.admin.login'
@@ -117,6 +118,12 @@ const DemoStoreSlugCategoriaCategorySlugRoute =
     path: '/categoria/$categorySlug',
     getParentRoute: () => DemoStoreSlugRoute,
   } as any)
+const DemoStoreSlugAgendamentoConfirmadoAppointmentIdRoute =
+  DemoStoreSlugAgendamentoConfirmadoAppointmentIdRouteImport.update({
+    id: '/agendamento-confirmado/$appointmentId',
+    path: '/agendamento-confirmado/$appointmentId',
+    getParentRoute: () => DemoStoreSlugRoute,
+  } as any)
 const DemoStoreSlugAdminProdutosRoute =
   DemoStoreSlugAdminProdutosRouteImport.update({
     id: '/produtos',
@@ -176,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/demo/$storeSlug/admin/login': typeof DemoStoreSlugAdminLoginRoute
   '/demo/$storeSlug/admin/pedidos': typeof DemoStoreSlugAdminPedidosRouteWithChildren
   '/demo/$storeSlug/admin/produtos': typeof DemoStoreSlugAdminProdutosRouteWithChildren
+  '/demo/$storeSlug/agendamento-confirmado/$appointmentId': typeof DemoStoreSlugAgendamentoConfirmadoAppointmentIdRoute
   '/demo/$storeSlug/categoria/$categorySlug': typeof DemoStoreSlugCategoriaCategorySlugRoute
   '/demo/$storeSlug/pedido-confirmado/$orderId': typeof DemoStoreSlugPedidoConfirmadoOrderIdRoute
   '/demo/$storeSlug/produto/$productSlug': typeof DemoStoreSlugProdutoProductSlugRoute
@@ -199,6 +207,7 @@ export interface FileRoutesByTo {
   '/demo/$storeSlug/admin/login': typeof DemoStoreSlugAdminLoginRoute
   '/demo/$storeSlug/admin/pedidos': typeof DemoStoreSlugAdminPedidosRouteWithChildren
   '/demo/$storeSlug/admin/produtos': typeof DemoStoreSlugAdminProdutosRouteWithChildren
+  '/demo/$storeSlug/agendamento-confirmado/$appointmentId': typeof DemoStoreSlugAgendamentoConfirmadoAppointmentIdRoute
   '/demo/$storeSlug/categoria/$categorySlug': typeof DemoStoreSlugCategoriaCategorySlugRoute
   '/demo/$storeSlug/pedido-confirmado/$orderId': typeof DemoStoreSlugPedidoConfirmadoOrderIdRoute
   '/demo/$storeSlug/produto/$productSlug': typeof DemoStoreSlugProdutoProductSlugRoute
@@ -225,6 +234,7 @@ export interface FileRoutesById {
   '/demo/$storeSlug/admin/login': typeof DemoStoreSlugAdminLoginRoute
   '/demo/$storeSlug/admin/pedidos': typeof DemoStoreSlugAdminPedidosRouteWithChildren
   '/demo/$storeSlug/admin/produtos': typeof DemoStoreSlugAdminProdutosRouteWithChildren
+  '/demo/$storeSlug/agendamento-confirmado/$appointmentId': typeof DemoStoreSlugAgendamentoConfirmadoAppointmentIdRoute
   '/demo/$storeSlug/categoria/$categorySlug': typeof DemoStoreSlugCategoriaCategorySlugRoute
   '/demo/$storeSlug/pedido-confirmado/$orderId': typeof DemoStoreSlugPedidoConfirmadoOrderIdRoute
   '/demo/$storeSlug/produto/$productSlug': typeof DemoStoreSlugProdutoProductSlugRoute
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
     | '/demo/$storeSlug/admin/login'
     | '/demo/$storeSlug/admin/pedidos'
     | '/demo/$storeSlug/admin/produtos'
+    | '/demo/$storeSlug/agendamento-confirmado/$appointmentId'
     | '/demo/$storeSlug/categoria/$categorySlug'
     | '/demo/$storeSlug/pedido-confirmado/$orderId'
     | '/demo/$storeSlug/produto/$productSlug'
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
     | '/demo/$storeSlug/admin/login'
     | '/demo/$storeSlug/admin/pedidos'
     | '/demo/$storeSlug/admin/produtos'
+    | '/demo/$storeSlug/agendamento-confirmado/$appointmentId'
     | '/demo/$storeSlug/categoria/$categorySlug'
     | '/demo/$storeSlug/pedido-confirmado/$orderId'
     | '/demo/$storeSlug/produto/$productSlug'
@@ -300,6 +312,7 @@ export interface FileRouteTypes {
     | '/demo/$storeSlug/admin/login'
     | '/demo/$storeSlug/admin/pedidos'
     | '/demo/$storeSlug/admin/produtos'
+    | '/demo/$storeSlug/agendamento-confirmado/$appointmentId'
     | '/demo/$storeSlug/categoria/$categorySlug'
     | '/demo/$storeSlug/pedido-confirmado/$orderId'
     | '/demo/$storeSlug/produto/$productSlug'
@@ -428,6 +441,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStoreSlugCategoriaCategorySlugRouteImport
       parentRoute: typeof DemoStoreSlugRoute
     }
+    '/demo/$storeSlug/agendamento-confirmado/$appointmentId': {
+      id: '/demo/$storeSlug/agendamento-confirmado/$appointmentId'
+      path: '/agendamento-confirmado/$appointmentId'
+      fullPath: '/demo/$storeSlug/agendamento-confirmado/$appointmentId'
+      preLoaderRoute: typeof DemoStoreSlugAgendamentoConfirmadoAppointmentIdRouteImport
+      parentRoute: typeof DemoStoreSlugRoute
+    }
     '/demo/$storeSlug/admin/produtos': {
       id: '/demo/$storeSlug/admin/produtos'
       path: '/produtos'
@@ -540,6 +560,7 @@ interface DemoStoreSlugRouteChildren {
   DemoStoreSlugTermosRoute: typeof DemoStoreSlugTermosRoute
   DemoStoreSlugTrocasRoute: typeof DemoStoreSlugTrocasRoute
   DemoStoreSlugIndexRoute: typeof DemoStoreSlugIndexRoute
+  DemoStoreSlugAgendamentoConfirmadoAppointmentIdRoute: typeof DemoStoreSlugAgendamentoConfirmadoAppointmentIdRoute
   DemoStoreSlugCategoriaCategorySlugRoute: typeof DemoStoreSlugCategoriaCategorySlugRoute
   DemoStoreSlugPedidoConfirmadoOrderIdRoute: typeof DemoStoreSlugPedidoConfirmadoOrderIdRoute
   DemoStoreSlugProdutoProductSlugRoute: typeof DemoStoreSlugProdutoProductSlugRoute
@@ -556,6 +577,8 @@ const DemoStoreSlugRouteChildren: DemoStoreSlugRouteChildren = {
   DemoStoreSlugTermosRoute: DemoStoreSlugTermosRoute,
   DemoStoreSlugTrocasRoute: DemoStoreSlugTrocasRoute,
   DemoStoreSlugIndexRoute: DemoStoreSlugIndexRoute,
+  DemoStoreSlugAgendamentoConfirmadoAppointmentIdRoute:
+    DemoStoreSlugAgendamentoConfirmadoAppointmentIdRoute,
   DemoStoreSlugCategoriaCategorySlugRoute:
     DemoStoreSlugCategoriaCategorySlugRoute,
   DemoStoreSlugPedidoConfirmadoOrderIdRoute:
