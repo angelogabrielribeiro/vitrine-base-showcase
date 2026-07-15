@@ -39,6 +39,15 @@ export function StoreHeader({ store }: { store: StoreConfig }) {
               <Link to="/demo/$storeSlug" params={{ storeSlug: store.slug }} className="rounded-md px-3 py-2 text-sm font-medium hover:bg-muted">
                 Início
               </Link>
+              {store.niche === "barber" && (
+                <Link
+                  to="/demo/$storeSlug/agendar"
+                  params={{ storeSlug: store.slug }}
+                  className="rounded-md px-3 py-2 text-sm font-semibold text-primary hover:bg-muted"
+                >
+                  Agendar horário
+                </Link>
+              )}
               <Link
                 to="/demo/$storeSlug/produtos"
                 params={{ storeSlug: store.slug }}
@@ -73,6 +82,15 @@ export function StoreHeader({ store }: { store: StoreConfig }) {
         </Link>
 
         <nav className="ml-6 hidden items-center gap-4 text-sm md:flex">
+          {store.niche === "barber" && (
+            <Link
+              to="/demo/$storeSlug/agendar"
+              params={{ storeSlug: store.slug }}
+              className="font-semibold text-primary hover:underline"
+            >
+              Agendar
+            </Link>
+          )}
           <Link
             to="/demo/$storeSlug/produtos"
             params={{ storeSlug: store.slug }}
