@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
@@ -775,9 +775,6 @@ function ExportOnlyPanel({
           Exportar CSV
         </Button>
       </div>
-      <p className="mt-3 text-xs text-muted-foreground">
-        <Link to="/demo/$storeSlug/admin" params={{ storeSlug: "" }} className="hidden" />
-      </p>
     </section>
   );
 }
