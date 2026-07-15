@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { brl } from "@/lib/format";
 import { ArrowLeft, ArrowRight, Check, Clock, Scissors, User2, CalendarDays } from "lucide-react";
-import type { Appointment, Professional, Service } from "@/types/commerce";
+import type { Appointment, Professional } from "@/types/commerce";
+import { waAppointmentSummaryToStore, whatsappUrl, markWhatsappPending } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/demo/$storeSlug/agendar")({
   beforeLoad: ({ params }) => {
@@ -83,6 +84,16 @@ function AgendarPage() {
   const submit = () => {
     if (!service || !professional) return;
     setSubmitting(true);
+
+    let waWindow: Window | null = null;
+    if (store.whatsappRequiredAfterCheckout) {
+      try {
+        waWindow = window.open("", "_blank");
+      } catch {
+        waWindow = null;
+      }
+    }
+
     const now = new Date();
     const id = `apt-${now.getTime().toString(36)}`;
     const number = "AG-" + String(now.getTime()).slice(-6);
@@ -110,6 +121,20 @@ function AgendarPage() {
       demo: true,
     };
     repo.createAppointment(storeSlug, appointment);
+
+    if (store.whatsappRequiredAfterCheckout) {
+      const waHref = whatsappUrl(store.whatsapp, waAppointmentSummaryToStore(store, appointment));
+      if (waWindow && !waWindow.closed) {
+        try {
+          waWindow.location.href = waHref;
+        } catch {
+          markWhatsappPending(id);
+        }
+      } else {
+        markWhatsappPending(id);
+      }
+    }
+
     setStep(5);
     setSubmitting(false);
     setTimeout(() => {
