@@ -12,8 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoStoreSlugRouteImport } from './routes/demo.$storeSlug'
 import { Route as DemoStoreSlugIndexRouteImport } from './routes/demo.$storeSlug.index'
+import { Route as DemoStoreSlugTrocasRouteImport } from './routes/demo.$storeSlug.trocas'
+import { Route as DemoStoreSlugTermosRouteImport } from './routes/demo.$storeSlug.termos'
 import { Route as DemoStoreSlugProdutosRouteImport } from './routes/demo.$storeSlug.produtos'
+import { Route as DemoStoreSlugPrivacidadeRouteImport } from './routes/demo.$storeSlug.privacidade'
+import { Route as DemoStoreSlugLoginRouteImport } from './routes/demo.$storeSlug.login'
+import { Route as DemoStoreSlugCheckoutRouteImport } from './routes/demo.$storeSlug.checkout'
+import { Route as DemoStoreSlugCarrinhoRouteImport } from './routes/demo.$storeSlug.carrinho'
 import { Route as DemoStoreSlugProdutoProductSlugRouteImport } from './routes/demo.$storeSlug.produto.$productSlug'
+import { Route as DemoStoreSlugPedidoConfirmadoOrderIdRouteImport } from './routes/demo.$storeSlug.pedido-confirmado.$orderId'
 import { Route as DemoStoreSlugCategoriaCategorySlugRouteImport } from './routes/demo.$storeSlug.categoria.$categorySlug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -31,15 +38,52 @@ const DemoStoreSlugIndexRoute = DemoStoreSlugIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DemoStoreSlugRoute,
 } as any)
+const DemoStoreSlugTrocasRoute = DemoStoreSlugTrocasRouteImport.update({
+  id: '/trocas',
+  path: '/trocas',
+  getParentRoute: () => DemoStoreSlugRoute,
+} as any)
+const DemoStoreSlugTermosRoute = DemoStoreSlugTermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => DemoStoreSlugRoute,
+} as any)
 const DemoStoreSlugProdutosRoute = DemoStoreSlugProdutosRouteImport.update({
   id: '/produtos',
   path: '/produtos',
+  getParentRoute: () => DemoStoreSlugRoute,
+} as any)
+const DemoStoreSlugPrivacidadeRoute =
+  DemoStoreSlugPrivacidadeRouteImport.update({
+    id: '/privacidade',
+    path: '/privacidade',
+    getParentRoute: () => DemoStoreSlugRoute,
+  } as any)
+const DemoStoreSlugLoginRoute = DemoStoreSlugLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => DemoStoreSlugRoute,
+} as any)
+const DemoStoreSlugCheckoutRoute = DemoStoreSlugCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => DemoStoreSlugRoute,
+} as any)
+const DemoStoreSlugCarrinhoRoute = DemoStoreSlugCarrinhoRouteImport.update({
+  id: '/carrinho',
+  path: '/carrinho',
   getParentRoute: () => DemoStoreSlugRoute,
 } as any)
 const DemoStoreSlugProdutoProductSlugRoute =
   DemoStoreSlugProdutoProductSlugRouteImport.update({
     id: '/produto/$productSlug',
     path: '/produto/$productSlug',
+    getParentRoute: () => DemoStoreSlugRoute,
+  } as any)
+const DemoStoreSlugPedidoConfirmadoOrderIdRoute =
+  DemoStoreSlugPedidoConfirmadoOrderIdRouteImport.update({
+    id: '/pedido-confirmado/$orderId',
+    path: '/pedido-confirmado/$orderId',
     getParentRoute: () => DemoStoreSlugRoute,
   } as any)
 const DemoStoreSlugCategoriaCategorySlugRoute =
@@ -52,25 +96,46 @@ const DemoStoreSlugCategoriaCategorySlugRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/demo/$storeSlug': typeof DemoStoreSlugRouteWithChildren
+  '/demo/$storeSlug/carrinho': typeof DemoStoreSlugCarrinhoRoute
+  '/demo/$storeSlug/checkout': typeof DemoStoreSlugCheckoutRoute
+  '/demo/$storeSlug/login': typeof DemoStoreSlugLoginRoute
+  '/demo/$storeSlug/privacidade': typeof DemoStoreSlugPrivacidadeRoute
   '/demo/$storeSlug/produtos': typeof DemoStoreSlugProdutosRoute
+  '/demo/$storeSlug/termos': typeof DemoStoreSlugTermosRoute
+  '/demo/$storeSlug/trocas': typeof DemoStoreSlugTrocasRoute
   '/demo/$storeSlug/': typeof DemoStoreSlugIndexRoute
   '/demo/$storeSlug/categoria/$categorySlug': typeof DemoStoreSlugCategoriaCategorySlugRoute
+  '/demo/$storeSlug/pedido-confirmado/$orderId': typeof DemoStoreSlugPedidoConfirmadoOrderIdRoute
   '/demo/$storeSlug/produto/$productSlug': typeof DemoStoreSlugProdutoProductSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/demo/$storeSlug/carrinho': typeof DemoStoreSlugCarrinhoRoute
+  '/demo/$storeSlug/checkout': typeof DemoStoreSlugCheckoutRoute
+  '/demo/$storeSlug/login': typeof DemoStoreSlugLoginRoute
+  '/demo/$storeSlug/privacidade': typeof DemoStoreSlugPrivacidadeRoute
   '/demo/$storeSlug/produtos': typeof DemoStoreSlugProdutosRoute
+  '/demo/$storeSlug/termos': typeof DemoStoreSlugTermosRoute
+  '/demo/$storeSlug/trocas': typeof DemoStoreSlugTrocasRoute
   '/demo/$storeSlug': typeof DemoStoreSlugIndexRoute
   '/demo/$storeSlug/categoria/$categorySlug': typeof DemoStoreSlugCategoriaCategorySlugRoute
+  '/demo/$storeSlug/pedido-confirmado/$orderId': typeof DemoStoreSlugPedidoConfirmadoOrderIdRoute
   '/demo/$storeSlug/produto/$productSlug': typeof DemoStoreSlugProdutoProductSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/demo/$storeSlug': typeof DemoStoreSlugRouteWithChildren
+  '/demo/$storeSlug/carrinho': typeof DemoStoreSlugCarrinhoRoute
+  '/demo/$storeSlug/checkout': typeof DemoStoreSlugCheckoutRoute
+  '/demo/$storeSlug/login': typeof DemoStoreSlugLoginRoute
+  '/demo/$storeSlug/privacidade': typeof DemoStoreSlugPrivacidadeRoute
   '/demo/$storeSlug/produtos': typeof DemoStoreSlugProdutosRoute
+  '/demo/$storeSlug/termos': typeof DemoStoreSlugTermosRoute
+  '/demo/$storeSlug/trocas': typeof DemoStoreSlugTrocasRoute
   '/demo/$storeSlug/': typeof DemoStoreSlugIndexRoute
   '/demo/$storeSlug/categoria/$categorySlug': typeof DemoStoreSlugCategoriaCategorySlugRoute
+  '/demo/$storeSlug/pedido-confirmado/$orderId': typeof DemoStoreSlugPedidoConfirmadoOrderIdRoute
   '/demo/$storeSlug/produto/$productSlug': typeof DemoStoreSlugProdutoProductSlugRoute
 }
 export interface FileRouteTypes {
@@ -78,24 +143,45 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/demo/$storeSlug'
+    | '/demo/$storeSlug/carrinho'
+    | '/demo/$storeSlug/checkout'
+    | '/demo/$storeSlug/login'
+    | '/demo/$storeSlug/privacidade'
     | '/demo/$storeSlug/produtos'
+    | '/demo/$storeSlug/termos'
+    | '/demo/$storeSlug/trocas'
     | '/demo/$storeSlug/'
     | '/demo/$storeSlug/categoria/$categorySlug'
+    | '/demo/$storeSlug/pedido-confirmado/$orderId'
     | '/demo/$storeSlug/produto/$productSlug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/demo/$storeSlug/carrinho'
+    | '/demo/$storeSlug/checkout'
+    | '/demo/$storeSlug/login'
+    | '/demo/$storeSlug/privacidade'
     | '/demo/$storeSlug/produtos'
+    | '/demo/$storeSlug/termos'
+    | '/demo/$storeSlug/trocas'
     | '/demo/$storeSlug'
     | '/demo/$storeSlug/categoria/$categorySlug'
+    | '/demo/$storeSlug/pedido-confirmado/$orderId'
     | '/demo/$storeSlug/produto/$productSlug'
   id:
     | '__root__'
     | '/'
     | '/demo/$storeSlug'
+    | '/demo/$storeSlug/carrinho'
+    | '/demo/$storeSlug/checkout'
+    | '/demo/$storeSlug/login'
+    | '/demo/$storeSlug/privacidade'
     | '/demo/$storeSlug/produtos'
+    | '/demo/$storeSlug/termos'
+    | '/demo/$storeSlug/trocas'
     | '/demo/$storeSlug/'
     | '/demo/$storeSlug/categoria/$categorySlug'
+    | '/demo/$storeSlug/pedido-confirmado/$orderId'
     | '/demo/$storeSlug/produto/$productSlug'
   fileRoutesById: FileRoutesById
 }
@@ -127,6 +213,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStoreSlugIndexRouteImport
       parentRoute: typeof DemoStoreSlugRoute
     }
+    '/demo/$storeSlug/trocas': {
+      id: '/demo/$storeSlug/trocas'
+      path: '/trocas'
+      fullPath: '/demo/$storeSlug/trocas'
+      preLoaderRoute: typeof DemoStoreSlugTrocasRouteImport
+      parentRoute: typeof DemoStoreSlugRoute
+    }
+    '/demo/$storeSlug/termos': {
+      id: '/demo/$storeSlug/termos'
+      path: '/termos'
+      fullPath: '/demo/$storeSlug/termos'
+      preLoaderRoute: typeof DemoStoreSlugTermosRouteImport
+      parentRoute: typeof DemoStoreSlugRoute
+    }
     '/demo/$storeSlug/produtos': {
       id: '/demo/$storeSlug/produtos'
       path: '/produtos'
@@ -134,11 +234,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStoreSlugProdutosRouteImport
       parentRoute: typeof DemoStoreSlugRoute
     }
+    '/demo/$storeSlug/privacidade': {
+      id: '/demo/$storeSlug/privacidade'
+      path: '/privacidade'
+      fullPath: '/demo/$storeSlug/privacidade'
+      preLoaderRoute: typeof DemoStoreSlugPrivacidadeRouteImport
+      parentRoute: typeof DemoStoreSlugRoute
+    }
+    '/demo/$storeSlug/login': {
+      id: '/demo/$storeSlug/login'
+      path: '/login'
+      fullPath: '/demo/$storeSlug/login'
+      preLoaderRoute: typeof DemoStoreSlugLoginRouteImport
+      parentRoute: typeof DemoStoreSlugRoute
+    }
+    '/demo/$storeSlug/checkout': {
+      id: '/demo/$storeSlug/checkout'
+      path: '/checkout'
+      fullPath: '/demo/$storeSlug/checkout'
+      preLoaderRoute: typeof DemoStoreSlugCheckoutRouteImport
+      parentRoute: typeof DemoStoreSlugRoute
+    }
+    '/demo/$storeSlug/carrinho': {
+      id: '/demo/$storeSlug/carrinho'
+      path: '/carrinho'
+      fullPath: '/demo/$storeSlug/carrinho'
+      preLoaderRoute: typeof DemoStoreSlugCarrinhoRouteImport
+      parentRoute: typeof DemoStoreSlugRoute
+    }
     '/demo/$storeSlug/produto/$productSlug': {
       id: '/demo/$storeSlug/produto/$productSlug'
       path: '/produto/$productSlug'
       fullPath: '/demo/$storeSlug/produto/$productSlug'
       preLoaderRoute: typeof DemoStoreSlugProdutoProductSlugRouteImport
+      parentRoute: typeof DemoStoreSlugRoute
+    }
+    '/demo/$storeSlug/pedido-confirmado/$orderId': {
+      id: '/demo/$storeSlug/pedido-confirmado/$orderId'
+      path: '/pedido-confirmado/$orderId'
+      fullPath: '/demo/$storeSlug/pedido-confirmado/$orderId'
+      preLoaderRoute: typeof DemoStoreSlugPedidoConfirmadoOrderIdRouteImport
       parentRoute: typeof DemoStoreSlugRoute
     }
     '/demo/$storeSlug/categoria/$categorySlug': {
@@ -152,17 +287,32 @@ declare module '@tanstack/react-router' {
 }
 
 interface DemoStoreSlugRouteChildren {
+  DemoStoreSlugCarrinhoRoute: typeof DemoStoreSlugCarrinhoRoute
+  DemoStoreSlugCheckoutRoute: typeof DemoStoreSlugCheckoutRoute
+  DemoStoreSlugLoginRoute: typeof DemoStoreSlugLoginRoute
+  DemoStoreSlugPrivacidadeRoute: typeof DemoStoreSlugPrivacidadeRoute
   DemoStoreSlugProdutosRoute: typeof DemoStoreSlugProdutosRoute
+  DemoStoreSlugTermosRoute: typeof DemoStoreSlugTermosRoute
+  DemoStoreSlugTrocasRoute: typeof DemoStoreSlugTrocasRoute
   DemoStoreSlugIndexRoute: typeof DemoStoreSlugIndexRoute
   DemoStoreSlugCategoriaCategorySlugRoute: typeof DemoStoreSlugCategoriaCategorySlugRoute
+  DemoStoreSlugPedidoConfirmadoOrderIdRoute: typeof DemoStoreSlugPedidoConfirmadoOrderIdRoute
   DemoStoreSlugProdutoProductSlugRoute: typeof DemoStoreSlugProdutoProductSlugRoute
 }
 
 const DemoStoreSlugRouteChildren: DemoStoreSlugRouteChildren = {
+  DemoStoreSlugCarrinhoRoute: DemoStoreSlugCarrinhoRoute,
+  DemoStoreSlugCheckoutRoute: DemoStoreSlugCheckoutRoute,
+  DemoStoreSlugLoginRoute: DemoStoreSlugLoginRoute,
+  DemoStoreSlugPrivacidadeRoute: DemoStoreSlugPrivacidadeRoute,
   DemoStoreSlugProdutosRoute: DemoStoreSlugProdutosRoute,
+  DemoStoreSlugTermosRoute: DemoStoreSlugTermosRoute,
+  DemoStoreSlugTrocasRoute: DemoStoreSlugTrocasRoute,
   DemoStoreSlugIndexRoute: DemoStoreSlugIndexRoute,
   DemoStoreSlugCategoriaCategorySlugRoute:
     DemoStoreSlugCategoriaCategorySlugRoute,
+  DemoStoreSlugPedidoConfirmadoOrderIdRoute:
+    DemoStoreSlugPedidoConfirmadoOrderIdRoute,
   DemoStoreSlugProdutoProductSlugRoute: DemoStoreSlugProdutoProductSlugRoute,
 }
 
