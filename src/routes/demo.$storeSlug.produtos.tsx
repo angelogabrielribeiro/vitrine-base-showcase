@@ -48,7 +48,7 @@ function ProdutosPage() {
   }, [all, q, cat, sort]);
 
   const setSearch = (patch: Partial<{ q: string; cat: string; sort: string }>) => {
-    navigate({ to: ".", search: (prev) => ({ ...prev, ...patch }) });
+    navigate({ to: ".", search: { q, cat, sort, ...patch } });
   };
 
   return (
