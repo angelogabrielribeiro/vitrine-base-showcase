@@ -3,7 +3,7 @@ import { getStore } from "@/config/stores";
 import { repo } from "@/services/local-repository";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Package, ShoppingCart, Settings, LogOut, Store, AlertTriangle, CalendarDays, Scissors, Users } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Settings, LogOut, Store, AlertTriangle, CalendarDays, Scissors, Users, FileSpreadsheet } from "lucide-react";
 import { useEffect } from "react";
 import { seedAllStores } from "@/services/local-repository";
 
@@ -52,6 +52,7 @@ function AdminLayout() {
   items.push(
     { to: "/demo/$storeSlug/admin/produtos", icon: Package, label: "Produtos", exact: false },
     { to: "/demo/$storeSlug/admin/pedidos", icon: ShoppingCart, label: "Pedidos", exact: false },
+    { to: "/demo/$storeSlug/admin/importar-exportar", icon: FileSpreadsheet, label: "Importar / Exportar", exact: false },
     { to: "/demo/$storeSlug/admin/configuracoes", icon: Settings, label: "Configurações", exact: false },
   );
 
