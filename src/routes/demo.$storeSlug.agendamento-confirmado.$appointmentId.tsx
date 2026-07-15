@@ -4,8 +4,9 @@ import { useRepo } from "@/hooks/use-repo";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { Button } from "@/components/ui/button";
 import { brl } from "@/lib/format";
-import { whatsappUrl } from "@/lib/whatsapp";
-import { CalendarDays, Check, Clock, MessageCircle, Scissors, User2 } from "lucide-react";
+import { whatsappUrl, waAppointmentSummaryToStore, consumeWhatsappPending } from "@/lib/whatsapp";
+import { AlertTriangle, CalendarDays, Check, Clock, MessageCircle, Scissors, User2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/demo/$storeSlug/agendamento-confirmado/$appointmentId")({
   beforeLoad: ({ params }) => {
@@ -22,6 +23,10 @@ function Page() {
   const repo = useRepo();
   const hydrated = useHydrated();
   const appt = hydrated ? repo.getAppointment(storeSlug, appointmentId) : undefined;
+  const [waPending, setWaPending] = useState(false);
+  useEffect(() => {
+    if (hydrated) setWaPending(consumeWhatsappPending(appointmentId));
+  }, [hydrated, appointmentId]);
 
   if (!hydrated) return <div className="p-10 text-sm text-muted-foreground">Carregando…</div>;
   if (!appt) {
@@ -39,17 +44,7 @@ function Page() {
     weekday: "long", day: "2-digit", month: "long",
   });
 
-  const waMsg = [
-    `Olá, ${store.name}!`,
-    `Confirmação de agendamento ${appt.number}:`,
-    `• Serviço: ${appt.serviceName} (${appt.durationMinutes}min) — ${brl(appt.price)}`,
-    `• Profissional: ${appt.professionalName}`,
-    `• Data: ${dateHuman} às ${appt.time}`,
-    `• Cliente: ${appt.customer.name}`,
-    appt.notes ? `• Obs.: ${appt.notes}` : "",
-  ].filter(Boolean).join("\n");
-
-  const waHref = whatsappUrl(store.whatsapp, waMsg);
+  const waHref = whatsappUrl(store.whatsapp, waAppointmentSummaryToStore(store, appt));
 
   return (
     <div className="mx-auto max-w-xl px-4 py-12">
@@ -68,6 +63,20 @@ function Page() {
           <Row icon={<CalendarDays className="h-4 w-4" />} label="Data" value={dateHuman} />
           <Row icon={<Clock className="h-4 w-4" />} label="Horário" value={`${appt.time} (${appt.durationMinutes}min)`} />
         </div>
+
+        {store.whatsappRequiredAfterCheckout && waPending && (
+          <div className="mt-6 flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-left text-xs">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+            <p>
+              <strong>Abra o WhatsApp para concluir o contato.</strong> A janela automática pode ter sido bloqueada — use o botão abaixo.
+            </p>
+          </div>
+        )}
+        {store.whatsappRequiredAfterCheckout && (
+          <p className="mt-3 text-xs text-muted-foreground">
+            O WhatsApp será aberto com a mensagem pronta; confirme o envio no aplicativo.
+          </p>
+        )}
 
         <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
           <Button asChild>
