@@ -30,6 +30,7 @@ import { Route as DemoStoreSlugAdminProfissionaisRouteImport } from './routes/de
 import { Route as DemoStoreSlugAdminProdutosRouteImport } from './routes/demo.$storeSlug.admin.produtos'
 import { Route as DemoStoreSlugAdminPedidosRouteImport } from './routes/demo.$storeSlug.admin.pedidos'
 import { Route as DemoStoreSlugAdminLoginRouteImport } from './routes/demo.$storeSlug.admin.login'
+import { Route as DemoStoreSlugAdminImportarExportarRouteImport } from './routes/demo.$storeSlug.admin.importar-exportar'
 import { Route as DemoStoreSlugAdminConfiguracoesRouteImport } from './routes/demo.$storeSlug.admin.configuracoes'
 import { Route as DemoStoreSlugAdminAgendamentosRouteImport } from './routes/demo.$storeSlug.admin.agendamentos'
 import { Route as DemoStoreSlugAdminProdutosNovoRouteImport } from './routes/demo.$storeSlug.admin.produtos.novo'
@@ -149,6 +150,12 @@ const DemoStoreSlugAdminLoginRoute = DemoStoreSlugAdminLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => DemoStoreSlugAdminRoute,
 } as any)
+const DemoStoreSlugAdminImportarExportarRoute =
+  DemoStoreSlugAdminImportarExportarRouteImport.update({
+    id: '/importar-exportar',
+    path: '/importar-exportar',
+    getParentRoute: () => DemoStoreSlugAdminRoute,
+  } as any)
 const DemoStoreSlugAdminConfiguracoesRoute =
   DemoStoreSlugAdminConfiguracoesRouteImport.update({
     id: '/configuracoes',
@@ -195,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/demo/$storeSlug/': typeof DemoStoreSlugIndexRoute
   '/demo/$storeSlug/admin/agendamentos': typeof DemoStoreSlugAdminAgendamentosRoute
   '/demo/$storeSlug/admin/configuracoes': typeof DemoStoreSlugAdminConfiguracoesRoute
+  '/demo/$storeSlug/admin/importar-exportar': typeof DemoStoreSlugAdminImportarExportarRoute
   '/demo/$storeSlug/admin/login': typeof DemoStoreSlugAdminLoginRoute
   '/demo/$storeSlug/admin/pedidos': typeof DemoStoreSlugAdminPedidosRouteWithChildren
   '/demo/$storeSlug/admin/produtos': typeof DemoStoreSlugAdminProdutosRouteWithChildren
@@ -221,6 +229,7 @@ export interface FileRoutesByTo {
   '/demo/$storeSlug': typeof DemoStoreSlugIndexRoute
   '/demo/$storeSlug/admin/agendamentos': typeof DemoStoreSlugAdminAgendamentosRoute
   '/demo/$storeSlug/admin/configuracoes': typeof DemoStoreSlugAdminConfiguracoesRoute
+  '/demo/$storeSlug/admin/importar-exportar': typeof DemoStoreSlugAdminImportarExportarRoute
   '/demo/$storeSlug/admin/login': typeof DemoStoreSlugAdminLoginRoute
   '/demo/$storeSlug/admin/pedidos': typeof DemoStoreSlugAdminPedidosRouteWithChildren
   '/demo/$storeSlug/admin/produtos': typeof DemoStoreSlugAdminProdutosRouteWithChildren
@@ -250,6 +259,7 @@ export interface FileRoutesById {
   '/demo/$storeSlug/': typeof DemoStoreSlugIndexRoute
   '/demo/$storeSlug/admin/agendamentos': typeof DemoStoreSlugAdminAgendamentosRoute
   '/demo/$storeSlug/admin/configuracoes': typeof DemoStoreSlugAdminConfiguracoesRoute
+  '/demo/$storeSlug/admin/importar-exportar': typeof DemoStoreSlugAdminImportarExportarRoute
   '/demo/$storeSlug/admin/login': typeof DemoStoreSlugAdminLoginRoute
   '/demo/$storeSlug/admin/pedidos': typeof DemoStoreSlugAdminPedidosRouteWithChildren
   '/demo/$storeSlug/admin/produtos': typeof DemoStoreSlugAdminProdutosRouteWithChildren
@@ -280,6 +290,7 @@ export interface FileRouteTypes {
     | '/demo/$storeSlug/'
     | '/demo/$storeSlug/admin/agendamentos'
     | '/demo/$storeSlug/admin/configuracoes'
+    | '/demo/$storeSlug/admin/importar-exportar'
     | '/demo/$storeSlug/admin/login'
     | '/demo/$storeSlug/admin/pedidos'
     | '/demo/$storeSlug/admin/produtos'
@@ -306,6 +317,7 @@ export interface FileRouteTypes {
     | '/demo/$storeSlug'
     | '/demo/$storeSlug/admin/agendamentos'
     | '/demo/$storeSlug/admin/configuracoes'
+    | '/demo/$storeSlug/admin/importar-exportar'
     | '/demo/$storeSlug/admin/login'
     | '/demo/$storeSlug/admin/pedidos'
     | '/demo/$storeSlug/admin/produtos'
@@ -334,6 +346,7 @@ export interface FileRouteTypes {
     | '/demo/$storeSlug/'
     | '/demo/$storeSlug/admin/agendamentos'
     | '/demo/$storeSlug/admin/configuracoes'
+    | '/demo/$storeSlug/admin/importar-exportar'
     | '/demo/$storeSlug/admin/login'
     | '/demo/$storeSlug/admin/pedidos'
     | '/demo/$storeSlug/admin/produtos'
@@ -502,6 +515,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStoreSlugAdminLoginRouteImport
       parentRoute: typeof DemoStoreSlugAdminRoute
     }
+    '/demo/$storeSlug/admin/importar-exportar': {
+      id: '/demo/$storeSlug/admin/importar-exportar'
+      path: '/importar-exportar'
+      fullPath: '/demo/$storeSlug/admin/importar-exportar'
+      preLoaderRoute: typeof DemoStoreSlugAdminImportarExportarRouteImport
+      parentRoute: typeof DemoStoreSlugAdminRoute
+    }
     '/demo/$storeSlug/admin/configuracoes': {
       id: '/demo/$storeSlug/admin/configuracoes'
       path: '/configuracoes'
@@ -573,6 +593,7 @@ const DemoStoreSlugAdminProdutosRouteWithChildren =
 interface DemoStoreSlugAdminRouteChildren {
   DemoStoreSlugAdminAgendamentosRoute: typeof DemoStoreSlugAdminAgendamentosRoute
   DemoStoreSlugAdminConfiguracoesRoute: typeof DemoStoreSlugAdminConfiguracoesRoute
+  DemoStoreSlugAdminImportarExportarRoute: typeof DemoStoreSlugAdminImportarExportarRoute
   DemoStoreSlugAdminLoginRoute: typeof DemoStoreSlugAdminLoginRoute
   DemoStoreSlugAdminPedidosRoute: typeof DemoStoreSlugAdminPedidosRouteWithChildren
   DemoStoreSlugAdminProdutosRoute: typeof DemoStoreSlugAdminProdutosRouteWithChildren
@@ -583,6 +604,8 @@ interface DemoStoreSlugAdminRouteChildren {
 const DemoStoreSlugAdminRouteChildren: DemoStoreSlugAdminRouteChildren = {
   DemoStoreSlugAdminAgendamentosRoute: DemoStoreSlugAdminAgendamentosRoute,
   DemoStoreSlugAdminConfiguracoesRoute: DemoStoreSlugAdminConfiguracoesRoute,
+  DemoStoreSlugAdminImportarExportarRoute:
+    DemoStoreSlugAdminImportarExportarRoute,
   DemoStoreSlugAdminLoginRoute: DemoStoreSlugAdminLoginRoute,
   DemoStoreSlugAdminPedidosRoute: DemoStoreSlugAdminPedidosRouteWithChildren,
   DemoStoreSlugAdminProdutosRoute: DemoStoreSlugAdminProdutosRouteWithChildren,

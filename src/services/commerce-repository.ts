@@ -18,6 +18,7 @@ export interface CommerceRepository {
   getProduct(slug: string, productSlug: string): Product | undefined;
   getProductById(slug: string, id: string): Product | undefined;
   saveProduct(slug: string, product: Product): void;
+  saveProducts(slug: string, products: Product[]): void;
   deleteProduct(slug: string, id: string): void;
   getCart(slug: string): CartItem[];
   saveCart(slug: string, cart: CartItem[]): void;

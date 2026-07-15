@@ -92,6 +92,17 @@ export const localRepository: CommerceRepository = {
     writeJSON(key(slug, "products"), all);
     emit();
   },
+  saveProducts(slug, products) {
+    if (!products.length) return;
+    const all = this.listProducts(slug);
+    for (const p of products) {
+      const idx = all.findIndex((x) => x.id === p.id);
+      if (idx >= 0) all[idx] = p;
+      else all.unshift(p);
+    }
+    writeJSON(key(slug, "products"), all);
+    emit();
+  },
   deleteProduct(slug, id) {
     const all = this.listProducts(slug).filter((p) => p.id !== id);
     writeJSON(key(slug, "products"), all);
