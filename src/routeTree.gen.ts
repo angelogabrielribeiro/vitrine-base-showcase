@@ -26,6 +26,7 @@ import { Route as DemoStoreSlugProdutoProductSlugRouteImport } from './routes/de
 import { Route as DemoStoreSlugPedidoConfirmadoOrderIdRouteImport } from './routes/demo.$storeSlug.pedido-confirmado.$orderId'
 import { Route as DemoStoreSlugCategoriaCategorySlugRouteImport } from './routes/demo.$storeSlug.categoria.$categorySlug'
 import { Route as DemoStoreSlugAgendamentoConfirmadoAppointmentIdRouteImport } from './routes/demo.$storeSlug.agendamento-confirmado.$appointmentId'
+import { Route as DemoStoreSlugAdminProfissionaisRouteImport } from './routes/demo.$storeSlug.admin.profissionais'
 import { Route as DemoStoreSlugAdminProdutosRouteImport } from './routes/demo.$storeSlug.admin.produtos'
 import { Route as DemoStoreSlugAdminPedidosRouteImport } from './routes/demo.$storeSlug.admin.pedidos'
 import { Route as DemoStoreSlugAdminLoginRouteImport } from './routes/demo.$storeSlug.admin.login'
@@ -125,6 +126,12 @@ const DemoStoreSlugAgendamentoConfirmadoAppointmentIdRoute =
     path: '/agendamento-confirmado/$appointmentId',
     getParentRoute: () => DemoStoreSlugRoute,
   } as any)
+const DemoStoreSlugAdminProfissionaisRoute =
+  DemoStoreSlugAdminProfissionaisRouteImport.update({
+    id: '/profissionais',
+    path: '/profissionais',
+    getParentRoute: () => DemoStoreSlugAdminRoute,
+  } as any)
 const DemoStoreSlugAdminProdutosRoute =
   DemoStoreSlugAdminProdutosRouteImport.update({
     id: '/produtos',
@@ -191,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/demo/$storeSlug/admin/login': typeof DemoStoreSlugAdminLoginRoute
   '/demo/$storeSlug/admin/pedidos': typeof DemoStoreSlugAdminPedidosRouteWithChildren
   '/demo/$storeSlug/admin/produtos': typeof DemoStoreSlugAdminProdutosRouteWithChildren
+  '/demo/$storeSlug/admin/profissionais': typeof DemoStoreSlugAdminProfissionaisRoute
   '/demo/$storeSlug/agendamento-confirmado/$appointmentId': typeof DemoStoreSlugAgendamentoConfirmadoAppointmentIdRoute
   '/demo/$storeSlug/categoria/$categorySlug': typeof DemoStoreSlugCategoriaCategorySlugRoute
   '/demo/$storeSlug/pedido-confirmado/$orderId': typeof DemoStoreSlugPedidoConfirmadoOrderIdRoute
@@ -216,6 +224,7 @@ export interface FileRoutesByTo {
   '/demo/$storeSlug/admin/login': typeof DemoStoreSlugAdminLoginRoute
   '/demo/$storeSlug/admin/pedidos': typeof DemoStoreSlugAdminPedidosRouteWithChildren
   '/demo/$storeSlug/admin/produtos': typeof DemoStoreSlugAdminProdutosRouteWithChildren
+  '/demo/$storeSlug/admin/profissionais': typeof DemoStoreSlugAdminProfissionaisRoute
   '/demo/$storeSlug/agendamento-confirmado/$appointmentId': typeof DemoStoreSlugAgendamentoConfirmadoAppointmentIdRoute
   '/demo/$storeSlug/categoria/$categorySlug': typeof DemoStoreSlugCategoriaCategorySlugRoute
   '/demo/$storeSlug/pedido-confirmado/$orderId': typeof DemoStoreSlugPedidoConfirmadoOrderIdRoute
@@ -244,6 +253,7 @@ export interface FileRoutesById {
   '/demo/$storeSlug/admin/login': typeof DemoStoreSlugAdminLoginRoute
   '/demo/$storeSlug/admin/pedidos': typeof DemoStoreSlugAdminPedidosRouteWithChildren
   '/demo/$storeSlug/admin/produtos': typeof DemoStoreSlugAdminProdutosRouteWithChildren
+  '/demo/$storeSlug/admin/profissionais': typeof DemoStoreSlugAdminProfissionaisRoute
   '/demo/$storeSlug/agendamento-confirmado/$appointmentId': typeof DemoStoreSlugAgendamentoConfirmadoAppointmentIdRoute
   '/demo/$storeSlug/categoria/$categorySlug': typeof DemoStoreSlugCategoriaCategorySlugRoute
   '/demo/$storeSlug/pedido-confirmado/$orderId': typeof DemoStoreSlugPedidoConfirmadoOrderIdRoute
@@ -273,6 +283,7 @@ export interface FileRouteTypes {
     | '/demo/$storeSlug/admin/login'
     | '/demo/$storeSlug/admin/pedidos'
     | '/demo/$storeSlug/admin/produtos'
+    | '/demo/$storeSlug/admin/profissionais'
     | '/demo/$storeSlug/agendamento-confirmado/$appointmentId'
     | '/demo/$storeSlug/categoria/$categorySlug'
     | '/demo/$storeSlug/pedido-confirmado/$orderId'
@@ -298,6 +309,7 @@ export interface FileRouteTypes {
     | '/demo/$storeSlug/admin/login'
     | '/demo/$storeSlug/admin/pedidos'
     | '/demo/$storeSlug/admin/produtos'
+    | '/demo/$storeSlug/admin/profissionais'
     | '/demo/$storeSlug/agendamento-confirmado/$appointmentId'
     | '/demo/$storeSlug/categoria/$categorySlug'
     | '/demo/$storeSlug/pedido-confirmado/$orderId'
@@ -325,6 +337,7 @@ export interface FileRouteTypes {
     | '/demo/$storeSlug/admin/login'
     | '/demo/$storeSlug/admin/pedidos'
     | '/demo/$storeSlug/admin/produtos'
+    | '/demo/$storeSlug/admin/profissionais'
     | '/demo/$storeSlug/agendamento-confirmado/$appointmentId'
     | '/demo/$storeSlug/categoria/$categorySlug'
     | '/demo/$storeSlug/pedido-confirmado/$orderId'
@@ -461,6 +474,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStoreSlugAgendamentoConfirmadoAppointmentIdRouteImport
       parentRoute: typeof DemoStoreSlugRoute
     }
+    '/demo/$storeSlug/admin/profissionais': {
+      id: '/demo/$storeSlug/admin/profissionais'
+      path: '/profissionais'
+      fullPath: '/demo/$storeSlug/admin/profissionais'
+      preLoaderRoute: typeof DemoStoreSlugAdminProfissionaisRouteImport
+      parentRoute: typeof DemoStoreSlugAdminRoute
+    }
     '/demo/$storeSlug/admin/produtos': {
       id: '/demo/$storeSlug/admin/produtos'
       path: '/produtos'
@@ -556,6 +576,7 @@ interface DemoStoreSlugAdminRouteChildren {
   DemoStoreSlugAdminLoginRoute: typeof DemoStoreSlugAdminLoginRoute
   DemoStoreSlugAdminPedidosRoute: typeof DemoStoreSlugAdminPedidosRouteWithChildren
   DemoStoreSlugAdminProdutosRoute: typeof DemoStoreSlugAdminProdutosRouteWithChildren
+  DemoStoreSlugAdminProfissionaisRoute: typeof DemoStoreSlugAdminProfissionaisRoute
   DemoStoreSlugAdminIndexRoute: typeof DemoStoreSlugAdminIndexRoute
 }
 
@@ -565,6 +586,7 @@ const DemoStoreSlugAdminRouteChildren: DemoStoreSlugAdminRouteChildren = {
   DemoStoreSlugAdminLoginRoute: DemoStoreSlugAdminLoginRoute,
   DemoStoreSlugAdminPedidosRoute: DemoStoreSlugAdminPedidosRouteWithChildren,
   DemoStoreSlugAdminProdutosRoute: DemoStoreSlugAdminProdutosRouteWithChildren,
+  DemoStoreSlugAdminProfissionaisRoute: DemoStoreSlugAdminProfissionaisRoute,
   DemoStoreSlugAdminIndexRoute: DemoStoreSlugAdminIndexRoute,
 }
 
