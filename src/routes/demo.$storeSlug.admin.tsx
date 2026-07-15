@@ -3,7 +3,7 @@ import { getStore } from "@/config/stores";
 import { repo } from "@/services/local-repository";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Package, ShoppingCart, Settings, LogOut, Store, AlertTriangle } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Settings, LogOut, Store, AlertTriangle, CalendarDays, Scissors, Users } from "lucide-react";
 import { useEffect } from "react";
 import { seedAllStores } from "@/services/local-repository";
 
@@ -38,12 +38,22 @@ function AdminLayout() {
     return <div className="p-10 text-sm text-muted-foreground">Verificando sessão...</div>;
   }
 
-  const items = [
+  const isBarber = store.niche === "barber";
+  const items: Array<{ to: string; icon: typeof LayoutDashboard; label: string; exact: boolean }> = [
     { to: "/demo/$storeSlug/admin", icon: LayoutDashboard, label: "Dashboard", exact: true },
+  ];
+  if (isBarber) {
+    items.push(
+      { to: "/demo/$storeSlug/admin/agendamentos", icon: CalendarDays, label: "Agendamentos", exact: false },
+      { to: "/demo/$storeSlug/admin/servicos", icon: Scissors, label: "Serviços", exact: false },
+      { to: "/demo/$storeSlug/admin/profissionais", icon: Users, label: "Profissionais", exact: false },
+    );
+  }
+  items.push(
     { to: "/demo/$storeSlug/admin/produtos", icon: Package, label: "Produtos", exact: false },
     { to: "/demo/$storeSlug/admin/pedidos", icon: ShoppingCart, label: "Pedidos", exact: false },
     { to: "/demo/$storeSlug/admin/configuracoes", icon: Settings, label: "Configurações", exact: false },
-  ] as const;
+  );
 
   return (
     <div className="min-h-screen bg-muted/40">
@@ -61,7 +71,7 @@ function AdminLayout() {
               return (
                 <Link
                   key={it.label}
-                  to={it.to}
+                  to={it.to as "/demo/$storeSlug/admin"}
                   params={{ storeSlug }}
                   className={
                     "inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium " +

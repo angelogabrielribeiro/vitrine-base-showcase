@@ -1,5 +1,9 @@
 import { STORES, getStore } from "@/config/stores";
-import { DEMO_PRODUCTS_BY_STORE } from "@/data/demo-data";
+import {
+  DEMO_PRODUCTS_BY_STORE,
+  DEMO_SERVICES_BY_STORE,
+  DEMO_PROFESSIONALS_BY_STORE,
+} from "@/data/demo-data";
 import type {
   CartItem,
   DemoSession,
@@ -7,6 +11,10 @@ import type {
   OrderStatus,
   Product,
   StoreConfig,
+  Service,
+  Professional,
+  Appointment,
+  AppointmentStatus,
 } from "@/types/commerce";
 import type { CommerceRepository } from "./commerce-repository";
 
@@ -46,6 +54,14 @@ function seedIfNeeded(slug: string) {
   if (!cfg) {
     const found = getStore(slug);
     if (found) writeJSON(key(slug, "config"), found);
+  }
+  const services = readJSON<Service[] | null>(key(slug, "services"), null);
+  if (!services) {
+    writeJSON(key(slug, "services"), DEMO_SERVICES_BY_STORE[slug] ?? []);
+  }
+  const pros = readJSON<Professional[] | null>(key(slug, "professionals"), null);
+  if (!pros) {
+    writeJSON(key(slug, "professionals"), DEMO_PROFESSIONALS_BY_STORE[slug] ?? []);
   }
 }
 
@@ -128,6 +144,68 @@ export const localRepository: CommerceRepository = {
     return () => {
       listeners.delete(fn);
     };
+  },
+  listServices(slug) {
+    seedIfNeeded(slug);
+    return readJSON<Service[]>(key(slug, "services"), DEMO_SERVICES_BY_STORE[slug] ?? []);
+  },
+  getService(slug, id) {
+    return this.listServices(slug).find((s) => s.id === id);
+  },
+  saveService(slug, service) {
+    const all = this.listServices(slug);
+    const idx = all.findIndex((s) => s.id === service.id);
+    if (idx >= 0) all[idx] = service;
+    else all.unshift(service);
+    writeJSON(key(slug, "services"), all);
+    emit();
+  },
+  deleteService(slug, id) {
+    const all = this.listServices(slug).filter((s) => s.id !== id);
+    writeJSON(key(slug, "services"), all);
+    emit();
+  },
+  listProfessionals(slug) {
+    seedIfNeeded(slug);
+    return readJSON<Professional[]>(
+      key(slug, "professionals"),
+      DEMO_PROFESSIONALS_BY_STORE[slug] ?? [],
+    );
+  },
+  getProfessional(slug, id) {
+    return this.listProfessionals(slug).find((p) => p.id === id);
+  },
+  saveProfessional(slug, professional) {
+    const all = this.listProfessionals(slug);
+    const idx = all.findIndex((p) => p.id === professional.id);
+    if (idx >= 0) all[idx] = professional;
+    else all.unshift(professional);
+    writeJSON(key(slug, "professionals"), all);
+    emit();
+  },
+  deleteProfessional(slug, id) {
+    const all = this.listProfessionals(slug).filter((p) => p.id !== id);
+    writeJSON(key(slug, "professionals"), all);
+    emit();
+  },
+  listAppointments(slug) {
+    return readJSON<Appointment[]>(key(slug, "appointments"), []);
+  },
+  getAppointment(slug, id) {
+    return this.listAppointments(slug).find((a) => a.id === id);
+  },
+  createAppointment(slug, appointment) {
+    const all = this.listAppointments(slug);
+    all.unshift(appointment);
+    writeJSON(key(slug, "appointments"), all);
+    emit();
+  },
+  updateAppointmentStatus(slug, id, status: AppointmentStatus) {
+    const all = this.listAppointments(slug).map((a) =>
+      a.id === id ? { ...a, status } : a,
+    );
+    writeJSON(key(slug, "appointments"), all);
+    emit();
   },
 };
 

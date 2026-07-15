@@ -5,6 +5,10 @@ import type {
   OrderStatus,
   Product,
   StoreConfig,
+  Service,
+  Professional,
+  Appointment,
+  AppointmentStatus,
 } from "@/types/commerce";
 
 export interface CommerceRepository {
@@ -25,4 +29,17 @@ export interface CommerceRepository {
   getSession(slug: string): DemoSession | undefined;
   setSession(session: DemoSession | undefined): void;
   subscribe(fn: () => void): () => void;
+  // Barbearia — serviços, profissionais e agendamentos
+  listServices(slug: string): Service[];
+  getService(slug: string, id: string): Service | undefined;
+  saveService(slug: string, service: Service): void;
+  deleteService(slug: string, id: string): void;
+  listProfessionals(slug: string): Professional[];
+  getProfessional(slug: string, id: string): Professional | undefined;
+  saveProfessional(slug: string, professional: Professional): void;
+  deleteProfessional(slug: string, id: string): void;
+  listAppointments(slug: string): Appointment[];
+  getAppointment(slug: string, id: string): Appointment | undefined;
+  createAppointment(slug: string, appointment: Appointment): void;
+  updateAppointmentStatus(slug: string, id: string, status: AppointmentStatus): void;
 }
