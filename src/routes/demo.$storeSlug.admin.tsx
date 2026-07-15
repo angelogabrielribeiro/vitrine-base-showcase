@@ -40,9 +40,9 @@ function AdminLayout() {
 
   const items = [
     { to: "/demo/$storeSlug/admin", icon: LayoutDashboard, label: "Dashboard", exact: true },
-    { to: "/demo/$storeSlug/admin/produtos", icon: Package, label: "Produtos" },
-    { to: "/demo/$storeSlug/admin/pedidos", icon: ShoppingCart, label: "Pedidos" },
-    { to: "/demo/$storeSlug/admin/configuracoes", icon: Settings, label: "Configurações" },
+    { to: "/demo/$storeSlug/admin/produtos", icon: Package, label: "Produtos", exact: false },
+    { to: "/demo/$storeSlug/admin/pedidos", icon: ShoppingCart, label: "Pedidos", exact: false },
+    { to: "/demo/$storeSlug/admin/configuracoes", icon: Settings, label: "Configurações", exact: false },
   ] as const;
 
   return (
