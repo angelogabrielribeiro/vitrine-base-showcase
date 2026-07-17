@@ -52,7 +52,8 @@ function StoreHome() {
   return (
     <div>
       {spotlight && <SpotlightItemHero store={store} item={spotlight} />}
-      {/* HERO */}
+      {/* HERO secundário — oculto na barbearia quando o Spotlight já cumpre o papel de CTA principal */}
+      {!(isBarber && spotlight) && (
       <section className="relative overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-30"
@@ -86,16 +87,10 @@ function StoreHome() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            {isBarber && (
-              <Button asChild size="lg" variant="outline">
-                <Link to="/demo/$storeSlug/agendar" params={{ storeSlug }}>
-                  <CalendarDays className="mr-2 h-4 w-4" /> Agendar horário
-                </Link>
-              </Button>
-            )}
           </div>
         </div>
       </section>
+      )}
 
       {/* BENEFICIOS */}
       <section className="border-y border-border/60 bg-muted/40">
