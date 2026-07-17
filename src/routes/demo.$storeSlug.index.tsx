@@ -7,7 +7,7 @@ import { ProductCard } from "@/components/storefront/product-card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { brl } from "@/lib/format";
-import { Clock, Scissors, CalendarDays } from "lucide-react";
+import { Clock, Scissors } from "lucide-react";
 import { SpotlightItemHero } from "@/components/storefront/spotlight-item-hero";
 
 export const Route = createFileRoute("/demo/$storeSlug/")({
