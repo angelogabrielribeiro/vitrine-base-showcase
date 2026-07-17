@@ -135,8 +135,8 @@ function Index() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mt-6 max-w-2xl text-base text-neutral-300 sm:text-lg"
           >
-            Três lojas demonstrativas — moda, barbearia e restaurante — sobre o mesmo núcleo,
-            adaptadas visual e comercialmente ao segmento de cada lojista.
+            Quatro lojas demonstrativas — moda, barbearia, restaurante e eletrônicos — sobre o
+            mesmo núcleo, adaptadas visual e comercialmente ao segmento de cada lojista.
           </motion.p>
 
           {/* Seletor interativo */}
@@ -218,15 +218,13 @@ function Index() {
           <div className="flex items-end justify-between">
             <div>
               <div className="text-xs uppercase tracking-widest text-amber-300">Demos</div>
-              <h2 className="text-2xl font-semibold sm:text-3xl">Três lojas, um núcleo</h2>
+              <h2 className="text-2xl font-semibold sm:text-3xl">Quatro lojas, um núcleo</h2>
             </div>
           </div>
-          <div className="mt-8 grid gap-4 sm:grid-cols-6 sm:grid-rows-2">
+          <div className="mt-8 grid gap-4 sm:grid-cols-6">
             {STORES.map((s, i) => {
               const Icon = NICHE_ICON[s.niche] ?? ShoppingBag;
-              const spans = i === 0
-                ? "sm:col-span-3 sm:row-span-2"
-                : "sm:col-span-3 sm:row-span-1";
+              const spans = i === 0 ? "sm:col-span-6 lg:col-span-3" : "sm:col-span-3 lg:col-span-3";
               return (
                 <InteractiveTiltCard key={s.slug} className={"rounded-2xl " + spans}>
                   <Link
