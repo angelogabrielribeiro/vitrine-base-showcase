@@ -74,6 +74,42 @@ function nicheExamples(niche: StoreNiche): (string | number)[][] {
       ],
     ];
   }
+  if (niche === "electronics") {
+    return [
+      [
+        "NC-XPRO-256",
+        "NovaCore X Pro 5G",
+        "Flagship 6.7\" AMOLED 120Hz, chip Fusion e câmera 200MP.",
+        "smartphones",
+        8999,
+        7499,
+        40,
+        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9",
+        "256GB; 512GB",
+        "Grafite; Prata",
+        "Sim",
+        "Sim",
+        "",
+        "",
+      ],
+      [
+        "NC-HST-TTN",
+        "Headset Gamer Nova Titan",
+        "Áudio 7.1, drivers 50mm, RGB dinâmico.",
+        "gamer",
+        899,
+        699,
+        60,
+        "https://images.unsplash.com/photo-1599669454699-248893623440",
+        "",
+        "",
+        "Sim",
+        "Sim",
+        "",
+        "",
+      ],
+    ];
+  }
   // barber
   return [
     [
