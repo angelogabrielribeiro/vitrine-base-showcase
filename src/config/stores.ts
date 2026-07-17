@@ -264,6 +264,95 @@ export const STORES: StoreConfig[] = [
       marketingConsentDefault: false,
     },
   },
+  {
+    id: "eletronicos",
+    slug: "eletronicos",
+    name: "NovaCore Electronics",
+    tagline: "Tecnologia de alta performance",
+    description:
+      "Curadoria premium de eletrônicos, gaming e áudio com garantia estendida e envio expresso.",
+    niche: "electronics",
+    logoText: "NOVACORE",
+    theme: {
+      background: "oklch(0.14 0.02 265)",
+      foreground: "oklch(0.97 0.01 260)",
+      card: "oklch(0.19 0.025 265)",
+      cardForeground: "oklch(0.97 0.01 260)",
+      primary: "oklch(0.72 0.19 245)",
+      primaryForeground: "oklch(0.12 0.02 265)",
+      secondary: "oklch(0.24 0.03 265)",
+      secondaryForeground: "oklch(0.97 0.01 260)",
+      muted: "oklch(0.22 0.025 265)",
+      mutedForeground: "oklch(0.72 0.03 260)",
+      accent: "oklch(0.78 0.18 300)",
+      accentForeground: "oklch(0.12 0.02 265)",
+      border: "oklch(0.3 0.03 265)",
+      ring: "oklch(0.72 0.19 245)",
+      radius: "0.9rem",
+    },
+    fonts: {
+      display: '"Space Grotesk", sans-serif',
+      body: '"Inter", sans-serif',
+      linkHref:
+        "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap",
+    },
+    cardStyle: "editorial",
+    whatsapp: "5511955554444",
+    instagram: "@novacore.tech",
+    address: "Av. Paulista, 1500 — Bela Vista, São Paulo/SP",
+    hours: [
+      { label: "Seg a Sex", value: "09h — 21h" },
+      { label: "Sábado", value: "10h — 20h" },
+      { label: "Domingo", value: "12h — 18h" },
+    ],
+    fulfillment: { pickup: true, localDelivery: false, shipping: true },
+    deliveryFee: 0,
+    minOrder: 0,
+    categories: [
+      { slug: "smartphones", name: "Smartphones" },
+      { slug: "computadores", name: "Computadores" },
+      { slug: "gamer", name: "Gamer" },
+      { slug: "audio", name: "Áudio" },
+      { slug: "wearables", name: "Wearables" },
+      { slug: "acessorios", name: "Acessórios" },
+    ],
+    banners: [
+      {
+        title: "NovaCore X Series",
+        subtitle: "Performance que redefine o padrão. Reserve agora.",
+        ctaLabel: "Explorar",
+        ctaHref: "produtos",
+        image:
+          "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80",
+      },
+    ],
+    benefits: [
+      { title: "Frete expresso grátis", description: "Entregas em 24h nas capitais.", icon: "truck" },
+      { title: "Garantia estendida", description: "12 meses de cobertura NovaCore.", icon: "sparkles" },
+      { title: "Parcelamento em 12x", description: "Sem juros no cartão.", icon: "gift" },
+    ],
+    faq: [
+      { q: "A garantia cobre defeito de fabricação?", a: "Sim, cobertura total por 12 meses." },
+      { q: "Qual o prazo de entrega?", a: "Expresso 24h nas capitais e até 5 dias úteis nas demais regiões." },
+      { q: "Posso retirar na loja?", a: "Sim, retirada express em até 2 horas após o pedido." },
+    ],
+    messages: {
+      heroKicker: "NEXT GEN · 2026",
+      heroTitle: "Tecnologia sem compromissos.",
+      heroSubtitle:
+        "Curadoria absoluta de smartphones, notebooks, gaming e áudio — com performance verificada e suporte especialista.",
+      heroCta: "Explorar catálogo",
+      aboutTitle: "Feito para quem exige o máximo",
+      aboutBody:
+        "NovaCore seleciona apenas dispositivos que passam por bancada de testes própria. Nada entra no catálogo sem entregar o que promete.",
+    },
+    whatsappRequiredAfterCheckout: true,
+    checkout: {
+      payments: ["pix", "credit", "debit"],
+      allowCoupon: true,
+      marketingConsentDefault: false,
+    },
+  },
 ];
 
 export function getStore(slug: string): StoreConfig | undefined {

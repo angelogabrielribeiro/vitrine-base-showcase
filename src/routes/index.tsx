@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight, ShoppingBag, Utensils, Scissors, Sparkles, ShieldCheck,
-  MessageCircle, Smartphone, LayoutDashboard, CalendarDays,
+  MessageCircle, Smartphone, LayoutDashboard, CalendarDays, Cpu,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { STORES } from "@/config/stores";
@@ -19,13 +19,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Plataforma white-label pronta para apresentação: 3 lojas demonstrativas (moda, barbearia e restaurante) com catálogo, agendamento, checkout e painel administrativo.",
+          "Plataforma white-label pronta para apresentação: 4 lojas demonstrativas (moda, barbearia, restaurante e eletrônicos) com catálogo, agendamento, checkout e painel administrativo.",
       },
       { property: "og:title", content: "Vitrine Base — E-commerce White Label" },
       {
         property: "og:description",
         content:
-          "Uma base sólida e reutilizável de e-commerce, com 3 lojas de demonstração (moda, barbearia, restaurante) e painel administrativo completo.",
+          "Base sólida e reutilizável de e-commerce, com 4 lojas de demonstração (moda, barbearia, restaurante e eletrônicos) e painel administrativo completo.",
       },
     ],
   }),
@@ -36,6 +36,7 @@ const NICHE_ICON: Record<string, typeof ShoppingBag> = {
   fashion: ShoppingBag,
   barber: Scissors,
   restaurant: Utensils,
+  electronics: Cpu,
 };
 
 const FEATURES = [
@@ -134,8 +135,8 @@ function Index() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mt-6 max-w-2xl text-base text-neutral-300 sm:text-lg"
           >
-            Três lojas demonstrativas — moda, barbearia e restaurante — sobre o mesmo núcleo,
-            adaptadas visual e comercialmente ao segmento de cada lojista.
+            Quatro lojas demonstrativas — moda, barbearia, restaurante e eletrônicos — sobre o
+            mesmo núcleo, adaptadas visual e comercialmente ao segmento de cada lojista.
           </motion.p>
 
           {/* Seletor interativo */}
@@ -217,15 +218,13 @@ function Index() {
           <div className="flex items-end justify-between">
             <div>
               <div className="text-xs uppercase tracking-widest text-amber-300">Demos</div>
-              <h2 className="text-2xl font-semibold sm:text-3xl">Três lojas, um núcleo</h2>
+              <h2 className="text-2xl font-semibold sm:text-3xl">Quatro lojas, um núcleo</h2>
             </div>
           </div>
-          <div className="mt-8 grid gap-4 sm:grid-cols-6 sm:grid-rows-2">
+          <div className="mt-8 grid gap-4 sm:grid-cols-6">
             {STORES.map((s, i) => {
               const Icon = NICHE_ICON[s.niche] ?? ShoppingBag;
-              const spans = i === 0
-                ? "sm:col-span-3 sm:row-span-2"
-                : "sm:col-span-3 sm:row-span-1";
+              const spans = i === 0 ? "sm:col-span-6 lg:col-span-3" : "sm:col-span-3 lg:col-span-3";
               return (
                 <InteractiveTiltCard key={s.slug} className={"rounded-2xl " + spans}>
                   <Link

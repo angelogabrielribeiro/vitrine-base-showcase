@@ -1,7 +1,7 @@
 // Tipos centrais da plataforma white-label.
 // Toda página deve tipar seus dados por aqui.
 
-export type StoreNiche = "fashion" | "barber" | "restaurant";
+export type StoreNiche = "fashion" | "barber" | "restaurant" | "electronics";
 
 export interface StoreConfig {
   id: string;
