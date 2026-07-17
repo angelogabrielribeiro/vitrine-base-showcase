@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight, ShoppingBag, Utensils, Scissors, Sparkles, ShieldCheck,
-  MessageCircle, Smartphone, LayoutDashboard, CalendarDays,
+  MessageCircle, Smartphone, LayoutDashboard, CalendarDays, Cpu,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { STORES } from "@/config/stores";
@@ -19,13 +19,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Plataforma white-label pronta para apresentação: 3 lojas demonstrativas (moda, barbearia e restaurante) com catálogo, agendamento, checkout e painel administrativo.",
+          "Plataforma white-label pronta para apresentação: 4 lojas demonstrativas (moda, barbearia, restaurante e eletrônicos) com catálogo, agendamento, checkout e painel administrativo.",
       },
       { property: "og:title", content: "Vitrine Base — E-commerce White Label" },
       {
         property: "og:description",
         content:
-          "Uma base sólida e reutilizável de e-commerce, com 3 lojas de demonstração (moda, barbearia, restaurante) e painel administrativo completo.",
+          "Base sólida e reutilizável de e-commerce, com 4 lojas de demonstração (moda, barbearia, restaurante e eletrônicos) e painel administrativo completo.",
       },
     ],
   }),
@@ -36,6 +36,7 @@ const NICHE_ICON: Record<string, typeof ShoppingBag> = {
   fashion: ShoppingBag,
   barber: Scissors,
   restaurant: Utensils,
+  electronics: Cpu,
 };
 
 const FEATURES = [
