@@ -1,5 +1,5 @@
 import { motion, useReducedMotion, useScroll, useTransform, type Variants } from "framer-motion";
-import { useEffect, useRef, useState, type ReactNode, type ComponentPropsWithoutRef } from "react";
+import { useEffect, useRef, useState, type ReactNode, type ComponentPropsWithoutRef, type ElementType } from "react";
 
 /**
  * Tokens de motion compartilhados entre nichos. Manter enxuto: só transform/opacity.
