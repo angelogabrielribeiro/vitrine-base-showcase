@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Truck, RefreshCcw, Sparkles, Gift } from "lucide-react";
+import { Truck, RefreshCcw, Sparkles, Gift } from "lucide-react";
 import { getStore } from "@/config/stores";
 import { repo } from "@/services/local-repository";
 import { ProductCard } from "@/components/storefront/product-card";
@@ -8,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { brl } from "@/lib/format";
 import { Clock, Scissors } from "lucide-react";
-import { SpotlightItemHero } from "@/components/storefront/spotlight-item-hero";
+import { NicheHero, type HeroSpotlight } from "@/components/storefront/hero/niche-hero";
 
 export const Route = createFileRoute("/demo/$storeSlug/")({
   component: StoreHome,
@@ -27,14 +26,13 @@ function StoreHome() {
   const products = repo.listProducts(storeSlug).filter((p) => p.active);
   const featured = products.filter((p) => p.featured).slice(0, 8);
   const banner = store.banners[0];
-  const reduce = useReducedMotion();
   const isBarber = store.niche === "barber";
   const services = isBarber ? repo.listServices(storeSlug).filter((s) => s.active) : [];
   const professionals = isBarber ? repo.listProfessionals(storeSlug).filter((p) => p.active) : [];
 
   // Escolha do Spotlight: config → serviço (barbearia) ou produto; fallback: primeiro featured/active.
   const spotlightId = store.spotlightItemId;
-  let spotlight: React.ComponentProps<typeof SpotlightItemHero>["item"] | null = null;
+  let spotlight: HeroSpotlight = null;
   if (isBarber && spotlightId) {
     const s = services.find((x) => x.id === spotlightId);
     if (s) spotlight = { kind: "service", service: s, image: banner?.image ?? "" };
@@ -46,51 +44,13 @@ function StoreHome() {
   if (!spotlight) {
     const p = featured[0] ?? products[0];
     if (p) spotlight = { kind: "product", product: p };
-    else if (isBarber && services[0]) spotlight = { kind: "service", service: services[0], image: banner?.image ?? "" };
+    else if (isBarber && services[0])
+      spotlight = { kind: "service", service: services[0], image: banner?.image ?? "" };
   }
 
   return (
     <div>
-      {spotlight && <SpotlightItemHero store={store} item={spotlight} />}
-      {/* HERO secundário — oculto na barbearia quando o Spotlight já cumpre o papel de CTA principal */}
-      {!(isBarber && spotlight) && (
-      <section className="relative overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-30"
-          style={{ backgroundImage: `url(${banner?.image})` }}
-          aria-hidden
-        />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 sm:py-28">
-          <motion.p
-            initial={reduce ? {} : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="text-xs font-semibold uppercase tracking-[0.3em] text-primary"
-          >
-            {store.messages.heroKicker}
-          </motion.p>
-          <motion.h1
-            initial={reduce ? {} : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.05 }}
-            className="font-display mt-4 max-w-3xl text-4xl font-semibold leading-tight sm:text-6xl"
-          >
-            {store.messages.heroTitle}
-          </motion.h1>
-          <p className="mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">
-            {store.messages.heroSubtitle}
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild size="lg">
-              <Link to="/demo/$storeSlug/produtos" params={{ storeSlug }} search={{ q: "", cat: "", sort: "" }}>
-                {store.messages.heroCta}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-      )}
+      <NicheHero store={store} spotlight={spotlight} featured={featured} />
 
       {/* BENEFICIOS */}
       <section className="border-y border-border/60 bg-muted/40">
