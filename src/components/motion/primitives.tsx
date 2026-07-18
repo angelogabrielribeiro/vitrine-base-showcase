@@ -24,7 +24,7 @@ export function SectionReveal({
   children: ReactNode;
   delay?: number;
   y?: number;
-  as?: keyof JSX.IntrinsicElements;
+  as?: ElementType;
   className?: string;
   amount?: number;
 }) {
@@ -92,7 +92,7 @@ export function StaggerItem({
 }: {
   children: ReactNode;
   className?: string;
-  as?: keyof JSX.IntrinsicElements;
+  as?: ElementType;
 }) {
   const MotionTag = motion(As as any);
   return (
@@ -113,7 +113,7 @@ export function WordReveal({
 }: {
   text: string;
   className?: string;
-  as?: keyof JSX.IntrinsicElements;
+  as?: ElementType;
   delay?: number;
 }) {
   const reduce = useReducedMotion();
