@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Truck, RefreshCcw, Sparkles, Gift } from "lucide-react";
+import { Truck, RefreshCcw, Sparkles, Gift } from "lucide-react";
 import { getStore } from "@/config/stores";
 import { repo } from "@/services/local-repository";
 import { ProductCard } from "@/components/storefront/product-card";
@@ -27,7 +26,6 @@ function StoreHome() {
   const products = repo.listProducts(storeSlug).filter((p) => p.active);
   const featured = products.filter((p) => p.featured).slice(0, 8);
   const banner = store.banners[0];
-  const reduce = useReducedMotion();
   const isBarber = store.niche === "barber";
   const services = isBarber ? repo.listServices(storeSlug).filter((s) => s.active) : [];
   const professionals = isBarber ? repo.listProfessionals(storeSlug).filter((p) => p.active) : [];
