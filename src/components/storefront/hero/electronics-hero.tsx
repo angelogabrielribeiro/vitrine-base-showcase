@@ -55,7 +55,7 @@ export function ElectronicsHero({ store, spotlight, featured }: NicheHeroProps) 
               <span
                 className="block bg-gradient-to-r from-cyan-300 via-sky-400 to-fuchsia-400 bg-clip-text text-transparent"
               >
-                Verificado em bancada.
+                {store.tagline}
               </span>
             </SectionReveal>
           </h1>
@@ -88,16 +88,16 @@ export function ElectronicsHero({ store, spotlight, featured }: NicheHeroProps) 
             </div>
           </SectionReveal>
 
-          {/* Faixa de garantias técnicas */}
+          {/* Faixa de destaques neutros */}
           <Stagger className="mt-10 grid grid-cols-3 gap-4 border-t border-white/10 pt-6">
             <StaggerItem>
-              <SpecPill icon={<Zap className="h-3.5 w-3.5" />} label="Envio 24h" />
+              <SpecPill icon={<Cpu className="h-3.5 w-3.5" />} label="Catálogo técnico" />
             </StaggerItem>
             <StaggerItem>
-              <SpecPill icon={<ShieldCheck className="h-3.5 w-3.5" />} label="Garantia 12 meses" />
+              <SpecPill icon={<Zap className="h-3.5 w-3.5" />} label="Lançamentos" />
             </StaggerItem>
             <StaggerItem>
-              <SpecPill icon={<Cpu className="h-3.5 w-3.5" />} label="Bancada NovaCore" />
+              <SpecPill icon={<ShieldCheck className="h-3.5 w-3.5" />} label="Curadoria NovaCore" />
             </StaggerItem>
           </Stagger>
         </div>
@@ -130,20 +130,14 @@ export function ElectronicsHero({ store, spotlight, featured }: NicheHeroProps) 
                 />
               </div>
 
-              {/* Hotspots com specs */}
+              {/* Hotspots com dados reais */}
               {hero && (
                 <>
                   <SpecTag
                     className="left-[-10%] top-[18%]"
-                    label="Performance"
-                    value="Top tier"
+                    label="Modelo"
+                    value={hero.name}
                     delay={0.4}
-                  />
-                  <SpecTag
-                    className="right-[-6%] top-[50%]"
-                    label="Garantia"
-                    value="12 meses"
-                    delay={0.55}
                   />
                   {price != null && (
                     <SpecTag
