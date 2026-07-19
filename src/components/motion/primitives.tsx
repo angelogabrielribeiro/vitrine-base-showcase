@@ -1,5 +1,10 @@
 import { motion, useReducedMotion, useScroll, useTransform, type Variants } from "framer-motion";
-import { useEffect, useRef, useState, type ReactNode, type ComponentPropsWithoutRef, type ElementType } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode, type ComponentPropsWithoutRef, type ElementType } from "react";
+
+// framer-motion v12 exige motion.create(Tag) para tags dinâmicas — evita warning "motion() is deprecated".
+function useMotionTag(As: ElementType) {
+  return useMemo(() => motion.create(As as any), [As]);
+}
 
 /**
  * Tokens de motion compartilhados entre nichos. Manter enxuto: só transform/opacity.
@@ -29,7 +34,7 @@ export function SectionReveal({
   amount?: number;
 }) {
   const reduce = useReducedMotion();
-  const MotionTag = motion(As as any);
+  const MotionTag = useMotionTag(As);
   return (
     <MotionTag
       className={className}
@@ -94,7 +99,7 @@ export function StaggerItem({
   className?: string;
   as?: ElementType;
 }) {
-  const MotionTag = motion(As as any);
+  const MotionTag = useMotionTag(As);
   return (
     <MotionTag className={className} variants={staggerItemVariants}>
       {children}
@@ -122,14 +127,13 @@ export function WordReveal({
     const Tag = As as any;
     return <Tag className={className}>{text}</Tag>;
   }
-  const MotionTag = motion(As as any);
+  const MotionTag = useMotionTag(As);
   return (
     <MotionTag
       className={className}
       aria-label={text}
       initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.4 }}
+      animate="show"
       variants={{
         hidden: {},
         show: { transition: { staggerChildren: 0.05, delayChildren: delay } },
@@ -197,6 +201,20 @@ export function ImageReveal({
   eager?: boolean;
 }) {
   const reduce = useReducedMotion();
+  // Eager/first-fold: anima on-mount e nunca esconde a imagem se o IO falhar.
+  // Below-fold: whileInView com fallback de opacidade (nunca clip-path total, que deixaria oculto se o gatilho falhar).
+  const commonAnim = reduce
+    ? { initial: { opacity: 1 } as const, animate: { opacity: 1 } as const }
+    : eager
+    ? {
+        initial: { opacity: 0.001, scale: 1.06 } as const,
+        animate: { opacity: 1, scale: 1 } as const,
+      }
+    : {
+        initial: { opacity: 0.001, scale: 1.06 } as const,
+        whileInView: { opacity: 1, scale: 1 } as const,
+        viewport: { once: true, amount: 0.2 } as const,
+      };
   return (
     <div className={"relative overflow-hidden " + (className ?? "")}>
       <motion.img
@@ -205,9 +223,7 @@ export function ImageReveal({
         loading={eager ? "eager" : "lazy"}
         decoding="async"
         className={"h-full w-full object-cover " + (imgClassName ?? "")}
-        initial={reduce ? { opacity: 1 } : { clipPath: "inset(0 0 100% 0)", scale: 1.08 }}
-        whileInView={{ clipPath: "inset(0 0 0% 0)", scale: 1 }}
-        viewport={{ once: true, amount: 0.3 }}
+        {...commonAnim}
         transition={{ duration: 1.05, ease: MOTION.ease }}
       />
     </div>
