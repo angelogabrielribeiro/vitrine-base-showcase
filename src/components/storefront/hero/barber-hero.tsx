@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { CalendarDays, Clock, MapPin, Scissors } from "lucide-react";
+import { CalendarDays, MapPin } from "lucide-react";
 import type { NicheHeroProps } from "./niche-hero";
 import { Button } from "@/components/ui/button";
 import { SectionReveal, WordReveal, Stagger, StaggerItem, MOTION } from "@/components/motion/primitives";
@@ -93,28 +93,7 @@ export function BarberHero({ store }: NicheHeroProps) {
             </Link>
           </StaggerItem>
         </Stagger>
-
-        {/* Faixa ritual */}
-        <Stagger className="mt-6 grid grid-cols-3 gap-6 border-t border-white/10 pt-8 sm:gap-10">
-          <RitualItem icon={<Scissors className="h-4 w-4" />} label="Corte" value="45 min" />
-          <RitualItem icon={<Clock className="h-4 w-4" />} label="Ritual completo" value="1h15" />
-          <RitualItem icon={<CalendarDays className="h-4 w-4" />} label="Agenda" value="Ter · Sáb" />
-        </Stagger>
       </div>
     </section>
-  );
-}
-
-function RitualItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <StaggerItem className="min-w-0">
-      <div className="flex items-center gap-3 text-amber-200/80">
-        <span className="grid h-8 w-8 place-items-center border border-amber-200/40">{icon}</span>
-        <div className="min-w-0">
-          <div className="text-[10px] uppercase tracking-[0.35em] text-neutral-400">{label}</div>
-          <div className="truncate font-display text-xl uppercase text-white">{value}</div>
-        </div>
-      </div>
-    </StaggerItem>
   );
 }

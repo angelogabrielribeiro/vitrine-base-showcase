@@ -67,9 +67,14 @@ export function RestaurantHero({ store, spotlight, featured }: NicheHeroProps) {
                   Pedir agora <ChevronRight className="ml-1 h-4 w-4" />
                 </Link>
               </Button>
-              <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-neutral-400">
-                <Clock className="h-3 w-3 text-orange-300" /> Entrega ~40min
-              </div>
+              <Link
+                to="/demo/$storeSlug/produtos"
+                params={{ storeSlug: store.slug }}
+                search={{ q: "", cat: "", sort: "" }}
+                className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-neutral-300 transition hover:text-orange-200"
+              >
+                <Clock className="h-3 w-3 text-orange-300" /> Ver cardápio completo
+              </Link>
             </div>
           </SectionReveal>
 
