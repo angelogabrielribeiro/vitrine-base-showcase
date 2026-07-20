@@ -45,7 +45,6 @@ function AdminLayout() {
   if (isBarber) {
     items.push(
       { to: "/demo/$storeSlug/admin/agendamentos", icon: CalendarDays, label: "Agendamentos", exact: false },
-      { to: "/demo/$storeSlug/admin/servicos", icon: Scissors, label: "Serviços", exact: false },
       { to: "/demo/$storeSlug/admin/profissionais", icon: Users, label: "Profissionais", exact: false },
     );
   }
