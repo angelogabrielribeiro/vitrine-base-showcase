@@ -3,7 +3,7 @@ import { getStore } from "@/config/stores";
 import { repo } from "@/services/local-repository";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Package, ShoppingCart, Settings, LogOut, Store, AlertTriangle, CalendarDays, Scissors, Users, FileSpreadsheet } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Settings, LogOut, Store, AlertTriangle, CalendarDays, Users, FileSpreadsheet } from "lucide-react";
 import { useEffect } from "react";
 import { seedAllStores } from "@/services/local-repository";
 
@@ -45,7 +45,6 @@ function AdminLayout() {
   if (isBarber) {
     items.push(
       { to: "/demo/$storeSlug/admin/agendamentos", icon: CalendarDays, label: "Agendamentos", exact: false },
-      { to: "/demo/$storeSlug/admin/servicos", icon: Scissors, label: "Serviços", exact: false },
       { to: "/demo/$storeSlug/admin/profissionais", icon: Users, label: "Profissionais", exact: false },
     );
   }
