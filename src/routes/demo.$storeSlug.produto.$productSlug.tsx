@@ -45,7 +45,10 @@ function ProductPage() {
   const [notes, setNotes] = useState("");
   const [activeImage, setActiveImage] = useState(0);
 
-  const stock = variant ? variant.stock : product.stock;
+  // Se o produto declara variantes mas a combinação selecionada não existe,
+  // não herdar o estoque geral — a combinação é indisponível.
+  const hasVariants = !!(product.variants && product.variants.length);
+  const stock = hasVariants ? (variant ? variant.stock : 0) : product.stock;
   const inStock = stock > 0;
 
   const basePrice = product.salePrice ?? product.price;
