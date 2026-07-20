@@ -356,7 +356,19 @@ export const STORES: StoreConfig[] = [
 ];
 
 export function getStore(slug: string): StoreConfig | undefined {
-  return STORES.find((s) => s.slug === slug);
+  const base = STORES.find((s) => s.slug === slug);
+  if (typeof window === "undefined") return base;
+  try {
+    const raw = window.localStorage.getItem(`vitrine:${slug}:config`);
+    if (raw) {
+      const persisted = JSON.parse(raw) as StoreConfig;
+      // Mescla: preserva chaves estáticas ausentes na versão persistida.
+      return { ...(base ?? persisted), ...persisted };
+    }
+  } catch {
+    // ignora e cai no fallback estático
+  }
+  return base;
 }
 
 export function requireStore(slug: string): StoreConfig {
