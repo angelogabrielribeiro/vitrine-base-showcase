@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { MessageCircle, Minus, Plus, ShoppingBag, Star } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { getStore } from "@/config/stores";
 import { useRepo } from "@/hooks/use-repo";
 import { useCart } from "@/hooks/use-cart";
@@ -80,9 +81,26 @@ function ProductPage() {
 
       <div className="mt-6 grid gap-10 lg:grid-cols-2">
         <div>
-          <div className="overflow-hidden rounded-[var(--radius)] bg-muted">
-            <div className="aspect-[4/5] w-full bg-cover bg-center" style={{ backgroundImage: `url(${product.images[activeImage]})` }} />
-          </div>
+          {store.niche === "fashion" ? (
+            <div className="relative aspect-[4/5] w-full overflow-hidden bg-neutral-100">
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.img
+                  key={activeImage}
+                  src={product.images[activeImage]}
+                  alt={product.name}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  initial={{ opacity: 0, scale: 1.04 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.02 }}
+                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                />
+              </AnimatePresence>
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-[var(--radius)] bg-muted">
+              <div className="aspect-[4/5] w-full bg-cover bg-center" style={{ backgroundImage: `url(${product.images[activeImage]})` }} />
+            </div>
+          )}
           {product.images.length > 1 && (
             <div className="mt-3 flex gap-2">
               {product.images.map((src, i) => (
