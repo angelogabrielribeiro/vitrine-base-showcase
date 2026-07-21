@@ -8,6 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { brl } from "@/lib/format";
 import { Clock, Scissors } from "lucide-react";
 import { NicheHero, type HeroSpotlight } from "@/components/storefront/hero/niche-hero";
+import { FashionStorefront } from "@/components/storefront/fashion-storefront";
 
 export const Route = createFileRoute("/demo/$storeSlug/")({
   component: StoreHome,
@@ -46,6 +47,18 @@ function StoreHome() {
     if (p) spotlight = { kind: "product", product: p };
     else if (isBarber && services[0])
       spotlight = { kind: "service", service: services[0], image: banner?.image ?? "" };
+  }
+
+  // Maison Belle: composição editorial própria, fora do template genérico.
+  if (store.niche === "fashion") {
+    return (
+      <FashionStorefront
+        store={store}
+        spotlight={spotlight}
+        featured={featured}
+        products={products}
+      />
+    );
   }
 
   return (
