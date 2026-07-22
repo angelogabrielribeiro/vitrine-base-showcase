@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
+import { useRef } from "react";
 import type { Product } from "@/types/commerce";
 import { brl } from "@/lib/format";
 
@@ -18,6 +19,7 @@ export function EditorialProductCard({
   aspect?: "portrait" | "tall" | "square";
 }) {
   const reduce = useReducedMotion();
+  const cardRef = useRef<HTMLAnchorElement>(null);
   const inStock =
     product.variants && product.variants.length
       ? product.variants.some((v) => v.stock > 0)
@@ -25,12 +27,28 @@ export function EditorialProductCard({
   const primary = product.images[0];
   const secondary = product.images[1] ?? product.images[0];
   const aspectClass =
-    aspect === "tall" ? "aspect-[3/5]" : aspect === "square" ? "aspect-square" : "aspect-[4/5]";
+    aspect === "tall" ? "aspect-[4/5]" : aspect === "square" ? "aspect-square" : "aspect-[4/5]";
+
+  const onMove = (e: React.PointerEvent<HTMLAnchorElement>) => {
+    if (reduce) return;
+    if (e.pointerType !== "mouse") return;
+    const el = cardRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    el.style.setProperty("--mx", `${x}%`);
+    el.style.setProperty("--my", `${y}%`);
+  };
+
   return (
     <Link
+      ref={cardRef}
       to="/demo/$storeSlug/produto/$productSlug"
       params={{ storeSlug, productSlug: product.slug }}
-      className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+      onPointerMove={onMove}
+      style={{ ["--mx" as string]: "50%", ["--my" as string]: "50%" }}
+      className="ep-card group relative block transition duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 md:hover:-translate-y-1"
     >
       <motion.div
         className={"relative w-full overflow-hidden bg-neutral-100 " + aspectClass}
@@ -43,14 +61,34 @@ export function EditorialProductCard({
           src={primary}
           alt={product.name}
           loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.04]"
+          className="absolute inset-0 h-full w-full object-cover transition duration-700 ease-out md:group-hover:scale-[1.03]"
         />
         <img
           src={secondary}
           alt=""
           aria-hidden
           loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover opacity-0 transition duration-700 ease-out group-hover:opacity-100"
+          className="absolute inset-0 h-full w-full object-cover opacity-0 transition duration-700 ease-out md:group-hover:opacity-100"
+        />
+        {/* Iluminação sutil seguindo o cursor — apenas desktop, dentro do card */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 hidden opacity-0 transition duration-300 ease-out md:block md:group-hover:opacity-100"
+          style={{
+            background:
+              "radial-gradient(220px circle at var(--mx) var(--my), rgba(255,255,255,0.18), transparent 60%)",
+          }}
+        />
+        {/* Borda fina que acompanha o cursor */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 hidden opacity-0 ring-1 ring-inset ring-white/40 transition duration-300 md:block md:group-hover:opacity-100"
+          style={{
+            WebkitMaskImage:
+              "radial-gradient(260px circle at var(--mx) var(--my), #000 0%, transparent 70%)",
+            maskImage:
+              "radial-gradient(260px circle at var(--mx) var(--my), #000 0%, transparent 70%)",
+          }}
         />
         {product.salePrice && inStock && (
           <span className="absolute left-3 top-3 bg-amber-200 px-2 py-1 text-[10px] uppercase tracking-widest text-neutral-900">
