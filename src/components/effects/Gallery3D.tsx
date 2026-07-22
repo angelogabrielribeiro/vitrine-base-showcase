@@ -106,13 +106,13 @@ export default function Gallery3D({ images, title, eyebrow }: Gallery3DProps) {
           <h2 className="font-display mt-3 text-3xl sm:text-5xl">{title}</h2>
         )}
       </div>
-      <div className="h-[80vh] w-full">
+      <div className="h-[62vh] w-full sm:h-[64vh]">
         {supportsWebGL && (
           <Canvas
             dpr={dpr}
-            camera={{ position: [0, 0, 6], fov: 45 }}
+            camera={{ position: [0, 0, 4.6], fov: 42 }}
             gl={{ antialias: true, powerPreference: "high-performance" }}
-            frameloop={inView ? "always" : "demand"}
+            frameloop={inView ? "always" : "never"}
           >
             <ambientLight intensity={0.9} />
             <GalleryScene
@@ -153,7 +153,7 @@ function GalleryScene({
   }, [textures]);
 
   const count = images.length;
-  const spacing = 3.2;
+  const spacing = 2.2;
   // scroll offset ao longo do "trilho" (0..count-1, wrap)
   const offset = useRef(0);
   const velocity = useRef(0);
@@ -235,8 +235,8 @@ function GalleryScene({
       let z = ((i - offset.current) % count + count) % count;
       if (z > count / 2) z -= count;
       mesh.position.z = -z * spacing;
-      mesh.position.x = Math.sin(z * 0.4 + planes[i].base) * 0.6;
-      mesh.position.y = Math.cos(z * 0.35 + planes[i].base) * 0.4;
+      mesh.position.x = Math.sin(z * 0.4 + planes[i].base) * 0.45;
+      mesh.position.y = Math.cos(z * 0.35 + planes[i].base) * 0.28;
       mesh.rotation.y = z * 0.06;
       // deformação sutil no hover
       const hovered = hoverIndex.current === i;
@@ -261,7 +261,7 @@ function GalleryScene({
           onPointerOver={() => (hoverIndex.current = i)}
           onPointerOut={() => (hoverIndex.current = null)}
         >
-          <planeGeometry args={[2.2, 2.8, 32, 32]} />
+          <planeGeometry args={[1.9, 2.4, 24, 24]} />
           <meshBasicMaterial map={tex} transparent toneMapped={false} side={THREE.DoubleSide} />
         </mesh>
       ))}
