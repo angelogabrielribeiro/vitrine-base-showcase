@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from "framer-motion";
 
 export type ZoomImage = {
@@ -27,6 +27,16 @@ export function ZoomParallax({
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const on = () => setIsDesktop(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  const maxScale = isDesktop ? 4.5 : 3;
+  const sectionHeight = isDesktop ? "200vh" : "150vh";
 
   if (reduce) {
     return (
@@ -44,24 +54,26 @@ export function ZoomParallax({
     <section
       ref={ref}
       className="relative bg-neutral-950 text-neutral-50"
-      style={{ height: "280vh" }}
+      style={{ height: sectionHeight }}
       aria-label={title ?? "Campanha"}
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center">
+        {images.map((im, i) => (
+          <ZoomLayer key={i} image={{ ...im, scale: Math.min(im.scale, maxScale) }} progress={scrollYProgress} />
+        ))}
+        {/* Overlay para legibilidade do título */}
+        <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-neutral-950/70 via-neutral-950/30 to-neutral-950/70" />
+        <div className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center">
           {eyebrow && (
-            <span className="text-[10px] uppercase tracking-[0.5em] text-white/70">{eyebrow}</span>
+            <span className="text-[10px] uppercase tracking-[0.5em] text-white/85 drop-shadow">{eyebrow}</span>
           )}
           {title && (
-            <h2 className="font-display mt-4 text-4xl leading-tight sm:text-6xl md:text-7xl">
+            <h2 className="font-display mt-4 text-4xl leading-tight text-white drop-shadow-[0_2px_18px_rgba(0,0,0,0.65)] sm:text-6xl md:text-7xl">
               {title}
             </h2>
           )}
-          {caption && <p className="mt-4 max-w-md text-sm text-white/70">{caption}</p>}
+          {caption && <p className="mt-4 max-w-md text-sm text-white/80">{caption}</p>}
         </div>
-        {images.map((im, i) => (
-          <ZoomLayer key={i} image={im} progress={scrollYProgress} />
-        ))}
       </div>
     </section>
   );
