@@ -41,14 +41,13 @@ export function FashionStorefront({
   }, [products]);
 
   const zoomImages: ZoomImage[] = useMemo(() => {
+    // Composição compacta com 5 camadas — legibilidade acima de tudo.
     const layout: Omit<ZoomImage, "src">[] = [
-      { alt: "Campanha", className: "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[28vh] w-[22vw] min-w-[220px]", scale: 8 },
-      { alt: "", className: "left-[6%] top-[10%] h-[26vh] w-[18vw] min-w-[160px]", scale: 5.5 },
-      { alt: "", className: "right-[8%] top-[8%] h-[22vh] w-[16vw] min-w-[140px]", scale: 6 },
-      { alt: "", className: "left-[4%] bottom-[8%] h-[24vh] w-[20vw] min-w-[180px]", scale: 5 },
-      { alt: "", className: "right-[4%] bottom-[10%] h-[26vh] w-[18vw] min-w-[160px]", scale: 6.5 },
-      { alt: "", className: "left-[38%] top-[6%] h-[16vh] w-[12vw] min-w-[120px]", scale: 7 },
-      { alt: "", className: "right-[36%] bottom-[6%] h-[18vh] w-[14vw] min-w-[130px]", scale: 6 },
+      { alt: "Campanha", className: "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[30vh] w-[24vw] min-w-[220px]", scale: 4.5 },
+      { alt: "", className: "left-[6%] top-[10%] h-[26vh] w-[18vw] min-w-[160px]", scale: 3.2 },
+      { alt: "", className: "right-[8%] top-[8%] h-[22vh] w-[16vw] min-w-[140px]", scale: 3.6 },
+      { alt: "", className: "left-[4%] bottom-[8%] h-[24vh] w-[20vw] min-w-[180px]", scale: 3 },
+      { alt: "", className: "right-[4%] bottom-[10%] h-[26vh] w-[18vw] min-w-[160px]", scale: 3.8 },
     ];
     return layout.map((l, i) => ({ ...l, src: catalogImages[i % catalogImages.length] ?? "" }));
   }, [catalogImages]);
@@ -80,14 +79,14 @@ export function FashionStorefront({
       <FashionHero store={store} spotlight={spotlight} featured={featured} />
 
       {/* MANIFESTO cinético */}
-      <section className="relative overflow-hidden bg-neutral-50 px-6 py-24 sm:py-32">
+      <section className="relative overflow-hidden bg-neutral-50 px-6 py-16 sm:py-22">
         <div className="mx-auto max-w-5xl">
           <SectionReveal>
             <span className="text-[10px] font-semibold uppercase tracking-[0.5em] text-neutral-500">
               Manifesto — {new Date().getFullYear()}
             </span>
           </SectionReveal>
-          <h2 className="font-display mt-6 text-[clamp(2rem,5.5vw,4.5rem)] leading-[1.05] tracking-tight">
+          <h2 className="font-display mt-6 text-[clamp(1.55rem,4.1vw,3.4rem)] leading-[1.05] tracking-tight">
             <WordReveal
               text="Roupas que respiram. Tecidos que duram. Silhuetas que permanecem."
               as="span"
@@ -95,7 +94,7 @@ export function FashionStorefront({
             />
           </h2>
           <SectionReveal delay={0.2}>
-            <p className="mt-8 max-w-2xl text-base leading-relaxed text-neutral-600">
+            <p className="mt-6 max-w-2xl text-base leading-relaxed text-neutral-600">
               A Maison Belle é uma curadoria autoral de moda feminina contemporânea. Cada peça é
               desenhada em pequenos lotes, com atenção a caimento, matéria-prima e presença.
             </p>
@@ -122,11 +121,10 @@ export function FashionStorefront({
         <FlowingMenu items={flowingItems} />
       </section>
 
-      {/* GALERIA 3D LOOKBOOK */}
       {hydrated && lookbook.length > 3 ? (
         <Suspense
           fallback={
-            <div className="grid h-[80vh] place-items-center bg-neutral-950 text-white/60">
+            <div className="grid h-[62vh] place-items-center bg-neutral-950 text-white/60">
               <span className="text-xs uppercase tracking-[0.4em]">Carregando lookbook…</span>
             </div>
           }
@@ -134,14 +132,14 @@ export function FashionStorefront({
           <Gallery3D images={lookbook} title="Lookbook Alta Primavera" eyebrow="Coleção" />
         </Suspense>
       ) : (
-        <div className="grid h-[60vh] place-items-center bg-neutral-950 text-white/60">
+        <div className="grid h-[50vh] place-items-center bg-neutral-950 text-white/60">
           <span className="text-xs uppercase tracking-[0.4em]">Carregando lookbook…</span>
         </div>
       )}
 
       {/* GRID EDITORIAL ASSIMÉTRICO */}
-      <section className="mx-auto max-w-[110rem] px-6 py-24">
-        <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
+      <section className="mx-auto max-w-[100rem] px-6 py-16 sm:py-20">
+        <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
           <div>
             <span className="text-[10px] uppercase tracking-[0.5em] text-neutral-500">
               Seleção da estação
@@ -160,22 +158,22 @@ export function FashionStorefront({
         </div>
 
         {editorialGrid.length > 0 && (
-          <div className="grid grid-cols-12 gap-x-6 gap-y-16">
+          <div className="grid grid-cols-12 gap-x-6 gap-y-10 md:gap-y-12">
             {editorialGrid[0] && (
-              <div className="col-span-12 md:col-span-7">
+              <div className="col-span-12 md:col-span-6">
                 <EditorialProductCard
                   product={editorialGrid[0]}
                   storeSlug={store.slug}
-                  aspect="tall"
+                  aspect="portrait"
                 />
               </div>
             )}
             {editorialGrid[1] && (
-              <div className="col-span-12 md:col-span-5 md:pt-24">
+              <div className="col-span-12 md:col-span-5 md:col-start-8 md:pt-16">
                 <EditorialProductCard
                   product={editorialGrid[1]}
                   storeSlug={store.slug}
-                  aspect="portrait"
+                  aspect="square"
                 />
               </div>
             )}
@@ -189,7 +187,7 @@ export function FashionStorefront({
               </div>
             )}
             {editorialGrid[3] && (
-              <div className="col-span-6 md:col-span-4 md:pt-16">
+              <div className="col-span-6 md:col-span-4 md:pt-10">
                 <EditorialProductCard
                   product={editorialGrid[3]}
                   storeSlug={store.slug}
@@ -202,16 +200,16 @@ export function FashionStorefront({
                 <EditorialProductCard
                   product={editorialGrid[4]}
                   storeSlug={store.slug}
-                  aspect="tall"
+                  aspect="portrait"
                 />
               </div>
             )}
             {editorialGrid[5] && (
-              <div className="col-span-12 md:col-span-8 md:col-start-3">
+              <div className="col-span-12 md:col-span-7 md:col-start-4">
                 <EditorialProductCard
                   product={editorialGrid[5]}
                   storeSlug={store.slug}
-                  aspect="portrait"
+                  aspect="square"
                 />
               </div>
             )}
