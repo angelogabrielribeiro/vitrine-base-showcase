@@ -71,7 +71,7 @@ export function FashionStorefront({
 
   const lookbook = useMemo(() => catalogImages.slice(0, 10), [catalogImages]);
 
-  // Grid editorial assimétrico
+  // Grid comercial compacto — 3 por linha em desktop, com stagger sutil
   const editorialGrid = useMemo(() => featured.slice(0, 6), [featured]);
 
   return (
@@ -137,14 +137,14 @@ export function FashionStorefront({
         </div>
       )}
 
-      {/* GRID EDITORIAL ASSIMÉTRICO */}
-      <section className="mx-auto max-w-[100rem] px-6 py-16 sm:py-20">
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
+      {/* GRID COMPACTO — Peças em destaque */}
+      <section className="mx-auto max-w-[82rem] px-6 py-14 sm:py-18">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-6">
           <div>
             <span className="text-[10px] uppercase tracking-[0.5em] text-neutral-500">
               Seleção da estação
             </span>
-            <h2 className="font-display mt-3 text-3xl sm:text-5xl">Peças em destaque</h2>
+            <h2 className="font-display mt-3 text-2xl sm:text-4xl">Peças em destaque</h2>
           </div>
           <Link
             to="/demo/$storeSlug/produtos"
@@ -158,61 +158,21 @@ export function FashionStorefront({
         </div>
 
         {editorialGrid.length > 0 && (
-          <div className="grid grid-cols-12 gap-x-6 gap-y-10 md:gap-y-12">
-            {editorialGrid[0] && (
-              <div className="col-span-12 md:col-span-6">
-                <EditorialProductCard
-                  product={editorialGrid[0]}
-                  storeSlug={store.slug}
-                  aspect="portrait"
-                />
-              </div>
-            )}
-            {editorialGrid[1] && (
-              <div className="col-span-12 md:col-span-5 md:col-start-8 md:pt-16">
-                <EditorialProductCard
-                  product={editorialGrid[1]}
-                  storeSlug={store.slug}
-                  aspect="square"
-                />
-              </div>
-            )}
-            {editorialGrid[2] && (
-              <div className="col-span-6 md:col-span-4">
-                <EditorialProductCard
-                  product={editorialGrid[2]}
-                  storeSlug={store.slug}
-                  aspect="square"
-                />
-              </div>
-            )}
-            {editorialGrid[3] && (
-              <div className="col-span-6 md:col-span-4 md:pt-10">
-                <EditorialProductCard
-                  product={editorialGrid[3]}
-                  storeSlug={store.slug}
-                  aspect="portrait"
-                />
-              </div>
-            )}
-            {editorialGrid[4] && (
-              <div className="col-span-12 md:col-span-4">
-                <EditorialProductCard
-                  product={editorialGrid[4]}
-                  storeSlug={store.slug}
-                  aspect="portrait"
-                />
-              </div>
-            )}
-            {editorialGrid[5] && (
-              <div className="col-span-12 md:col-span-7 md:col-start-4">
-                <EditorialProductCard
-                  product={editorialGrid[5]}
-                  storeSlug={store.slug}
-                  aspect="square"
-                />
-              </div>
-            )}
+          <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {editorialGrid.map((p, i) => {
+              // stagger vertical sutil apenas em desktop, máx 24px
+              const offset =
+                i % 3 === 1 ? "lg:mt-6" : i % 3 === 2 ? "lg:mt-3" : "";
+              return (
+                <div key={p.id} className={offset}>
+                  <EditorialProductCard
+                    product={p}
+                    storeSlug={store.slug}
+                    aspect="portrait"
+                  />
+                </div>
+              );
+            })}
           </div>
         )}
       </section>
