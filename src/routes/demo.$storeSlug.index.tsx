@@ -9,6 +9,7 @@ import { brl } from "@/lib/format";
 import { Clock, Scissors } from "lucide-react";
 import { NicheHero, type HeroSpotlight } from "@/components/storefront/hero/niche-hero";
 import { FashionStorefront } from "@/components/storefront/fashion-storefront";
+import { BarberStorefront } from "@/components/storefront/barber-storefront";
 
 export const Route = createFileRoute("/demo/$storeSlug/")({
   component: StoreHome,
@@ -56,6 +57,18 @@ function StoreHome() {
         store={store}
         spotlight={spotlight}
         featured={featured}
+        products={products}
+      />
+    );
+  }
+
+  // Barber Noir: home cinematográfica dedicada, fora do template genérico.
+  if (store.niche === "barber") {
+    return (
+      <BarberStorefront
+        store={store}
+        services={services}
+        professionals={professionals}
         products={products}
       />
     );
