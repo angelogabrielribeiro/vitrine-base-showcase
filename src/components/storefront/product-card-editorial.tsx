@@ -32,10 +32,10 @@ export function EditorialProductCard({
     <Link
       to="/demo/$storeSlug/produto/$productSlug"
       params={{ storeSlug, productSlug: product.slug }}
-      className="ep-card group relative block focus:outline-none focus-visible:outline-none"
+      className="ep-card group relative block focus:outline-none focus-visible:outline-none focus-visible:[&_.ep-card-frame]:ring-2 focus-visible:[&_.ep-card-frame]:ring-neutral-900 focus-visible:[&_.ep-card-frame]:ring-offset-2 focus-visible:[&_.ep-card-frame]:ring-offset-neutral-50"
     >
       <motion.div
-        className={"relative w-full overflow-hidden bg-neutral-100 " + aspectClass}
+        className={"ep-card-frame relative w-full overflow-hidden bg-neutral-100 " + aspectClass}
         initial={reduce ? { opacity: 1 } : { opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.2 }}
