@@ -79,7 +79,7 @@ export function FashionStorefront({
       <FashionHero store={store} spotlight={spotlight} featured={featured} />
 
       {/* MANIFESTO cinético */}
-      <section className="relative overflow-hidden bg-neutral-50 px-6 py-16 sm:py-22">
+      <section className="relative overflow-hidden bg-neutral-50 px-6 py-16 sm:py-[5.5rem]">
         <div className="mx-auto max-w-5xl">
           <SectionReveal>
             <span className="text-[10px] font-semibold uppercase tracking-[0.5em] text-neutral-500">
@@ -138,7 +138,7 @@ export function FashionStorefront({
       )}
 
       {/* GRID COMPACTO — Peças em destaque */}
-      <section className="mx-auto max-w-[82rem] px-6 py-14 sm:py-18">
+      <section className="mx-auto max-w-[72rem] px-6 py-14 sm:py-[4.5rem]">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-6">
           <div>
             <span className="text-[10px] uppercase tracking-[0.5em] text-neutral-500">
@@ -158,13 +158,13 @@ export function FashionStorefront({
         </div>
 
         {editorialGrid.length > 0 && (
-          <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 place-items-center gap-x-6 gap-y-10 sm:grid-cols-2 sm:place-items-stretch lg:grid-cols-3">
             {editorialGrid.map((p, i) => {
               // stagger vertical sutil apenas em desktop, máx 24px
               const offset =
                 i % 3 === 1 ? "lg:mt-6" : i % 3 === 2 ? "lg:mt-3" : "";
               return (
-                <div key={p.id} className={offset}>
+                <div key={p.id} className={`w-full max-w-[22rem] sm:max-w-none ${offset}`}>
                   <EditorialProductCard
                     product={p}
                     storeSlug={store.slug}

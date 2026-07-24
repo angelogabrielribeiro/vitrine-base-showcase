@@ -69,9 +69,9 @@ function FashionProductCard({
     <Link
       to="/demo/$storeSlug/produto/$productSlug"
       params={{ storeSlug, productSlug: product.slug }}
-      className="epc-card group relative block focus:outline-none"
+      className="epc-card group relative block focus:outline-none focus-visible:outline-none focus-visible:[&_.epc-frame]:ring-2 focus-visible:[&_.epc-frame]:ring-neutral-900 focus-visible:[&_.epc-frame]:ring-offset-2 focus-visible:[&_.epc-frame]:ring-offset-neutral-50"
     >
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-neutral-100">
+      <div className="epc-frame relative aspect-[4/5] w-full overflow-hidden bg-neutral-100">
         <img
           src={primary}
           alt={product.name}
