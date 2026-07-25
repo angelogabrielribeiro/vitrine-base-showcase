@@ -532,9 +532,10 @@ function GroomingGrid({ products, storeSlug }: { products: Product[]; storeSlug:
             className="group block border border-neutral-800 bg-neutral-900/40 transition hover:border-amber-300/50"
           >
             <div className="aspect-square w-full overflow-hidden bg-neutral-800">
-              <img
+              <SafeImage
                 src={p.images[0]}
                 alt={p.name}
+                fallbackLabel={p.name}
                 loading="lazy"
                 className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.05]"
               />
