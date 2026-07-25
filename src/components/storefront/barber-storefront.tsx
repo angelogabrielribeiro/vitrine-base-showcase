@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import {
@@ -24,6 +24,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { brl } from "@/lib/format";
+import { SafeImage } from "@/components/storefront/safe-image";
 
 const ICONS: Record<string, typeof Sparkles> = {
   truck: Truck,
@@ -56,8 +57,6 @@ export function BarberStorefront({ store, services, professionals, products }: P
       <ResultsEditorial services={services} />
       <GroomingGrid products={products} storeSlug={store.slug} />
       <ClosingBlock store={store} />
-
-      <MobileStickyCTA storeSlug={store.slug} />
     </div>
   );
 }
