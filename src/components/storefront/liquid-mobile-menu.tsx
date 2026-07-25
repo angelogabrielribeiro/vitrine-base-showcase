@@ -63,23 +63,51 @@ export function LiquidMobileMenu({ store, hide = false }: { store: StoreConfig; 
       >
         <div className="liquid-blob" aria-hidden />
         {!open ? (
-          <button
-            type="button"
-            aria-expanded={false}
-            aria-controls={panelId}
-            onClick={() => setOpen(true)}
-            className="relative flex items-center gap-2 px-5 py-3 text-sm font-semibold"
-          >
-            <span className="grid h-6 w-6 place-items-center rounded-full bg-primary-foreground/15">
-              <ListingIcon className="h-3.5 w-3.5" />
-            </span>
-            <span>Menu</span>
-            {hydrated && count > 0 && (
-              <span className="ml-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary-foreground px-1 text-[10px] font-bold text-primary">
-                {count}
+          isBarber ? (
+            <div className="relative flex items-stretch">
+              <Link
+                to="/demo/$storeSlug/agendar"
+                params={{ storeSlug: store.slug }}
+                className="flex items-center gap-2 px-5 py-3 text-sm font-semibold"
+              >
+                <span className="grid h-6 w-6 place-items-center rounded-full bg-primary-foreground/15">
+                  <CalendarDays className="h-3.5 w-3.5" />
+                </span>
+                <span>Agendar</span>
+              </Link>
+              <span aria-hidden className="my-2 w-px bg-primary-foreground/25" />
+              <button
+                type="button"
+                aria-expanded={false}
+                aria-controls={panelId}
+                onClick={() => setOpen(true)}
+                className="flex items-center gap-2 px-5 py-3 text-sm font-semibold"
+              >
+                <span className="grid h-6 w-6 place-items-center rounded-full bg-primary-foreground/15">
+                  <ListingIcon className="h-3.5 w-3.5" />
+                </span>
+                <span>Menu</span>
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              aria-expanded={false}
+              aria-controls={panelId}
+              onClick={() => setOpen(true)}
+              className="relative flex items-center gap-2 px-5 py-3 text-sm font-semibold"
+            >
+              <span className="grid h-6 w-6 place-items-center rounded-full bg-primary-foreground/15">
+                <ListingIcon className="h-3.5 w-3.5" />
               </span>
-            )}
-          </button>
+              <span>Menu</span>
+              {hydrated && count > 0 && (
+                <span className="ml-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary-foreground px-1 text-[10px] font-bold text-primary">
+                  {count}
+                </span>
+              )}
+            </button>
+          )
         ) : (
           <div
             id={panelId}
