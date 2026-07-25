@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import type { Product } from "@/types/commerce";
 import { brl } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
+import { SafeImage } from "@/components/storefront/safe-image";
 
 export function ProductCard({ product, storeSlug }: { product: Product; storeSlug: string }) {
   const inStock =
@@ -12,6 +13,46 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
 
   if (storeSlug === "moda") {
     return <FashionProductCard product={product} storeSlug={storeSlug} inStock={inStock} />;
+  }
+
+  if (storeSlug === "barbearia") {
+    return (
+      <Link
+        to="/demo/$storeSlug/produto/$productSlug"
+        params={{ storeSlug, productSlug: product.slug }}
+        className="group block"
+      >
+        <div className="aspect-[4/5] w-full overflow-hidden rounded-[var(--radius)] bg-neutral-900">
+          <SafeImage
+            src={product.images[0]}
+            alt={product.name}
+            fallbackLabel={product.name}
+            loading="lazy"
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+          />
+        </div>
+        <div className="mt-3 space-y-1">
+          <h3 className="line-clamp-1 text-sm font-medium">{product.name}</h3>
+          <div className="flex items-baseline gap-2">
+            {product.salePrice ? (
+              <>
+                <span className="text-sm font-semibold">{brl(product.salePrice)}</span>
+                <span className="text-xs text-muted-foreground line-through">{brl(product.price)}</span>
+              </>
+            ) : (
+              <span className="text-sm font-semibold">{brl(product.price)}</span>
+            )}
+            {product.unit && <span className="text-xs text-muted-foreground">/{product.unit}</span>}
+          </div>
+          {!inStock && (
+            <Badge variant="secondary" className="mt-1">
+              Esgotado
+            </Badge>
+          )}
+          {inStock && product.salePrice && <Badge className="mt-1">Oferta</Badge>}
+        </div>
+      </Link>
+    );
   }
 
   return (

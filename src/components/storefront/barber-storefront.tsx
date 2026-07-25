@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import {
@@ -7,7 +7,6 @@ import {
   MapPin,
   ArrowRight,
   ChevronRight,
-  Scissors,
   Sparkles,
   Gift,
   Truck,
@@ -24,6 +23,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { brl } from "@/lib/format";
+import { SafeImage } from "@/components/storefront/safe-image";
 
 const ICONS: Record<string, typeof Sparkles> = {
   truck: Truck,
@@ -56,8 +56,6 @@ export function BarberStorefront({ store, services, professionals, products }: P
       <ResultsEditorial services={services} />
       <GroomingGrid products={products} storeSlug={store.slug} />
       <ClosingBlock store={store} />
-
-      <MobileStickyCTA storeSlug={store.slug} />
     </div>
   );
 }
@@ -97,6 +95,9 @@ function TrustStrip({ store }: { store: StoreConfig }) {
 /* -------------------------------------------------------------------------- */
 function ServicesEditorial({ services, storeSlug }: { services: Service[]; storeSlug: string }) {
   const items = services.slice(0, 6);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const reduce = useReducedMotion();
+  const active = items[activeIdx];
   return (
     <section className="mx-auto max-w-7xl px-6 py-16">
       <div className="mb-8 flex items-end justify-between gap-6">
@@ -119,11 +120,67 @@ function ServicesEditorial({ services, storeSlug }: { services: Service[]; store
         </Button>
       </div>
 
-      <ul className="divide-y divide-neutral-800/80 border-y border-neutral-800/80">
-        {items.map((s, i) => (
-          <ServiceRow key={s.id} service={s} index={i} storeSlug={storeSlug} />
-        ))}
-      </ul>
+      <div className="grid gap-8 lg:grid-cols-[1fr_minmax(300px,420px)] lg:items-start">
+        <ul className="divide-y divide-neutral-800/80 border-y border-neutral-800/80">
+          {items.map((s, i) => (
+            <ServiceRow
+              key={s.id}
+              service={s}
+              index={i}
+              storeSlug={storeSlug}
+              onActivate={() => setActiveIdx(i)}
+              isActive={i === activeIdx}
+            />
+          ))}
+        </ul>
+
+        {active && (
+          <aside className="sticky top-24 hidden h-[460px] w-full overflow-hidden border border-neutral-800 bg-neutral-900/40 lg:block">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={active.id}
+                initial={reduce ? { opacity: 1 } : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduce ? { opacity: 1 } : { opacity: 0, y: -8 }}
+                transition={{ duration: 0.35, ease: MOTION.ease }}
+                className="relative flex h-full flex-col"
+              >
+                <div className="relative h-3/5 w-full overflow-hidden bg-neutral-900">
+                  <SafeImage
+                    src={active.image}
+                    alt={active.name}
+                    fallbackLabel={active.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent" />
+                  <div className="absolute left-4 top-4 font-mono text-xs text-amber-200/80">
+                    {String(activeIdx + 1).padStart(2, "0")}
+                  </div>
+                </div>
+                <div className="flex flex-1 flex-col justify-between gap-4 p-5">
+                  <div>
+                    <h3 className="font-display text-2xl uppercase tracking-tight text-white">
+                      {active.name}
+                    </h3>
+                    <p className="mt-2 line-clamp-3 text-sm text-neutral-400">
+                      {active.description}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.25em] text-neutral-400">
+                      <Clock className="h-3.5 w-3.5" /> {active.durationMinutes} min
+                    </span>
+                    <span className="font-display text-2xl text-amber-200">
+                      {brl(active.price)}
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </aside>
+        )}
+      </div>
     </section>
   );
 }
@@ -132,10 +189,14 @@ function ServiceRow({
   service,
   index,
   storeSlug,
+  onActivate,
+  isActive,
 }: {
   service: Service;
   index: number;
   storeSlug: string;
+  onActivate?: () => void;
+  isActive?: boolean;
 }) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState(false);
@@ -143,18 +204,25 @@ function ServiceRow({
 
   return (
     <li
-      onMouseEnter={() => setActive(true)}
+      onMouseEnter={() => {
+        setActive(true);
+        onActivate?.();
+      }}
       onMouseLeave={() => setActive(false)}
-      onFocus={() => setActive(true)}
+      onFocus={() => {
+        setActive(true);
+        onActivate?.();
+      }}
       onBlur={() => setActive(false)}
       className="group relative"
+      data-active={isActive || undefined}
     >
       <Link
         to="/demo/$storeSlug/agendar"
         params={{ storeSlug }}
-        className="relative flex items-center gap-6 overflow-hidden px-2 py-6 outline-none focus-visible:bg-neutral-900/40 sm:px-4 sm:py-7"
+        className="relative flex items-center gap-6 overflow-hidden px-2 py-6 outline-none focus-visible:bg-neutral-900/40 sm:px-4 sm:py-7 lg:py-6"
       >
-        <div aria-hidden className="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-0 overflow-hidden lg:hidden">
           <motion.div
             initial={false}
             animate={
@@ -278,10 +346,12 @@ function ProfessionalsStack({ professionals }: { professionals: Professional[] }
   const reduce = useReducedMotion();
 
   if (list.length === 0) return null;
+  const activePro = list[active];
+  const firstName = activePro?.name.split(" ")[0] ?? "";
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-16">
-      <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
+      <div className="grid gap-10 lg:grid-cols-[1fr_minmax(320px,380px)] lg:items-center">
         <div>
           <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">Time</div>
           <h2 className="mt-2 font-display text-3xl uppercase tracking-tight text-white sm:text-4xl">
@@ -310,9 +380,22 @@ function ProfessionalsStack({ professionals }: { professionals: Professional[] }
               </button>
             ))}
           </div>
+
+          {activePro && (
+            <div className="mt-8">
+              <Button
+                asChild
+                className="rounded-none bg-amber-300 px-6 py-5 text-[11px] font-semibold uppercase tracking-[0.3em] text-neutral-950 hover:bg-amber-200"
+              >
+                <Link to="/demo/$storeSlug/agendar" params={{ storeSlug: "barbearia" }}>
+                  <CalendarDays className="mr-2 h-4 w-4" /> Agendar com {firstName}
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
 
-        <div className="relative mx-auto h-[420px] w-full max-w-[360px]">
+        <div className="relative mx-auto h-[440px] w-full max-w-[360px]">
           {list.map((p, i) => {
             const offset = i - active;
             const isActive = i === active;
@@ -324,29 +407,27 @@ function ProfessionalsStack({ professionals }: { professionals: Professional[] }
                   reduce
                     ? { opacity: isActive ? 1 : 0.3 }
                     : {
-                        x: offset * 18,
-                        y: Math.abs(offset) * 16,
-                        rotate: offset * 3,
-                        scale: isActive ? 1 : 0.94,
-                        opacity: Math.abs(offset) > 2 ? 0 : isActive ? 1 : 0.55,
-                        zIndex: 10 - Math.abs(offset),
+                        x: isActive ? 0 : offset * 22,
+                        y: isActive ? 0 : Math.abs(offset) * 18,
+                        rotate: isActive ? 0 : offset * 2.5,
+                        scale: isActive ? 1 : 0.92,
+                        opacity: isActive ? 1 : Math.abs(offset) > 2 ? 0 : 0.35,
+                        filter: isActive ? "none" : "brightness(0.55)",
                       }
                 }
                 transition={{ duration: 0.5, ease: MOTION.ease }}
-                className="absolute inset-0 overflow-hidden border border-neutral-800 bg-neutral-900"
+                style={{ zIndex: isActive ? 30 : 10 - Math.abs(offset) }}
+                className="absolute inset-0 w-full overflow-hidden border border-neutral-800 bg-neutral-900 shadow-2xl shadow-black/40"
               >
-                {p.avatar ? (
-                  <img
+                <div className="h-2/3 w-full overflow-hidden">
+                  <SafeImage
                     src={p.avatar}
                     alt={p.name}
+                    fallbackLabel={p.name}
                     loading="lazy"
-                    className="h-2/3 w-full object-cover grayscale-[0.2]"
+                    className="h-full w-full object-cover grayscale-[0.15]"
                   />
-                ) : (
-                  <div className="grid h-2/3 w-full place-items-center bg-neutral-800 text-neutral-500">
-                    <Scissors className="h-8 w-8" />
-                  </div>
-                )}
+                </div>
                 <div className="flex h-1/3 flex-col justify-center gap-1 border-t border-neutral-800 px-5">
                   <div className="text-[10px] uppercase tracking-[0.3em] text-amber-200/80">
                     {p.role}
@@ -377,13 +458,13 @@ function ResultsEditorial({ services }: { services: Service[] }) {
       <div className="mx-auto max-w-7xl px-6 py-16">
         <div className="mb-8 flex items-end justify-between gap-6">
           <div>
-            <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">Portfólio</div>
+            <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">Atmosfera</div>
             <h2 className="mt-2 font-display text-3xl uppercase tracking-tight text-white sm:text-4xl">
-              Trabalhos recentes
+              Atmosfera Barber Noir
             </h2>
           </div>
           <p className="hidden max-w-xs text-sm text-neutral-400 sm:block">
-            Um recorte do que sai da cadeira. Nenhuma foto retocada.
+            Um recorte visual dos serviços e da atmosfera Barber Noir.
           </p>
         </div>
 
@@ -392,9 +473,10 @@ function ResultsEditorial({ services }: { services: Service[] }) {
             <SectionReveal key={s.id} delay={i * 0.06} y={12}>
               <figure className="group relative overflow-hidden border border-neutral-800">
                 <div className="aspect-[3/4] w-full overflow-hidden">
-                  <img
+                  <SafeImage
                     src={s.image}
                     alt={s.name}
+                    fallbackLabel={s.name}
                     loading="lazy"
                     className="h-full w-full object-cover grayscale transition duration-[550ms] ease-out group-hover:scale-[1.04] group-hover:grayscale-0"
                   />
@@ -449,9 +531,10 @@ function GroomingGrid({ products, storeSlug }: { products: Product[]; storeSlug:
             className="group block border border-neutral-800 bg-neutral-900/40 transition hover:border-amber-300/50"
           >
             <div className="aspect-square w-full overflow-hidden bg-neutral-800">
-              <img
+              <SafeImage
                 src={p.images[0]}
                 alt={p.name}
+                fallbackLabel={p.name}
                 loading="lazy"
                 className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.05]"
               />
@@ -553,46 +636,4 @@ function ClosingBlock({ store }: { store: StoreConfig }) {
 /* -------------------------------------------------------------------------- */
 /* Mobile sticky CTA — discreto, aparece após scroll                           */
 /* -------------------------------------------------------------------------- */
-function MobileStickyCTA({ storeSlug }: { storeSlug: string }) {
-  const [show, setShow] = useState(false);
-
-  useEffect(() => {
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        setShow(window.scrollY > 480);
-        ticking = false;
-      });
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          initial={{ y: 80, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 80, opacity: 0 }}
-          transition={{ duration: 0.35, ease: MOTION.ease }}
-          className="fixed inset-x-3 bottom-3 z-40 sm:hidden"
-        >
-          <Link
-            to="/demo/$storeSlug/agendar"
-            params={{ storeSlug }}
-            className="flex items-center justify-between gap-3 border border-amber-300/60 bg-neutral-950/90 px-4 py-3 text-xs uppercase tracking-[0.3em] text-amber-200 shadow-lg backdrop-blur"
-          >
-            <span className="inline-flex items-center gap-2">
-              <CalendarDays className="h-4 w-4" /> Agendar horário
-            </span>
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
+// (MobileStickyCTA removido — dock unificado agora vive no LiquidMobileMenu quando niche === "barber")
