@@ -347,10 +347,12 @@ function ProfessionalsStack({ professionals }: { professionals: Professional[] }
   const reduce = useReducedMotion();
 
   if (list.length === 0) return null;
+  const activePro = list[active];
+  const firstName = activePro?.name.split(" ")[0] ?? "";
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-16">
-      <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
+      <div className="grid gap-10 lg:grid-cols-[1fr_minmax(320px,380px)] lg:items-center">
         <div>
           <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">Time</div>
           <h2 className="mt-2 font-display text-3xl uppercase tracking-tight text-white sm:text-4xl">
@@ -379,9 +381,22 @@ function ProfessionalsStack({ professionals }: { professionals: Professional[] }
               </button>
             ))}
           </div>
+
+          {activePro && (
+            <div className="mt-8">
+              <Button
+                asChild
+                className="rounded-none bg-amber-300 px-6 py-5 text-[11px] font-semibold uppercase tracking-[0.3em] text-neutral-950 hover:bg-amber-200"
+              >
+                <Link to="/demo/$storeSlug/agendar" params={{ storeSlug: "barbearia" }}>
+                  <CalendarDays className="mr-2 h-4 w-4" /> Agendar com {firstName}
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
 
-        <div className="relative mx-auto h-[420px] w-full max-w-[360px]">
+        <div className="relative mx-auto h-[440px] w-full max-w-[360px]">
           {list.map((p, i) => {
             const offset = i - active;
             const isActive = i === active;
@@ -393,29 +408,27 @@ function ProfessionalsStack({ professionals }: { professionals: Professional[] }
                   reduce
                     ? { opacity: isActive ? 1 : 0.3 }
                     : {
-                        x: offset * 18,
-                        y: Math.abs(offset) * 16,
-                        rotate: offset * 3,
-                        scale: isActive ? 1 : 0.94,
-                        opacity: Math.abs(offset) > 2 ? 0 : isActive ? 1 : 0.55,
-                        zIndex: 10 - Math.abs(offset),
+                        x: isActive ? 0 : offset * 22,
+                        y: isActive ? 0 : Math.abs(offset) * 18,
+                        rotate: isActive ? 0 : offset * 2.5,
+                        scale: isActive ? 1 : 0.92,
+                        opacity: isActive ? 1 : Math.abs(offset) > 2 ? 0 : 0.35,
+                        filter: isActive ? "none" : "brightness(0.55)",
                       }
                 }
                 transition={{ duration: 0.5, ease: MOTION.ease }}
-                className="absolute inset-0 overflow-hidden border border-neutral-800 bg-neutral-900"
+                style={{ zIndex: isActive ? 30 : 10 - Math.abs(offset) }}
+                className="absolute inset-0 w-full overflow-hidden border border-neutral-800 bg-neutral-900 shadow-2xl shadow-black/40"
               >
-                {p.avatar ? (
-                  <img
+                <div className="h-2/3 w-full overflow-hidden">
+                  <SafeImage
                     src={p.avatar}
                     alt={p.name}
+                    fallbackLabel={p.name}
                     loading="lazy"
-                    className="h-2/3 w-full object-cover grayscale-[0.2]"
+                    className="h-full w-full object-cover grayscale-[0.15]"
                   />
-                ) : (
-                  <div className="grid h-2/3 w-full place-items-center bg-neutral-800 text-neutral-500">
-                    <Scissors className="h-8 w-8" />
-                  </div>
-                )}
+                </div>
                 <div className="flex h-1/3 flex-col justify-center gap-1 border-t border-neutral-800 px-5">
                   <div className="text-[10px] uppercase tracking-[0.3em] text-amber-200/80">
                     {p.role}
@@ -446,13 +459,13 @@ function ResultsEditorial({ services }: { services: Service[] }) {
       <div className="mx-auto max-w-7xl px-6 py-16">
         <div className="mb-8 flex items-end justify-between gap-6">
           <div>
-            <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">Portfólio</div>
+            <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">Atmosfera</div>
             <h2 className="mt-2 font-display text-3xl uppercase tracking-tight text-white sm:text-4xl">
-              Trabalhos recentes
+              Atmosfera Barber Noir
             </h2>
           </div>
           <p className="hidden max-w-xs text-sm text-neutral-400 sm:block">
-            Um recorte do que sai da cadeira. Nenhuma foto retocada.
+            Um recorte visual dos serviços e da atmosfera Barber Noir.
           </p>
         </div>
 
@@ -461,9 +474,10 @@ function ResultsEditorial({ services }: { services: Service[] }) {
             <SectionReveal key={s.id} delay={i * 0.06} y={12}>
               <figure className="group relative overflow-hidden border border-neutral-800">
                 <div className="aspect-[3/4] w-full overflow-hidden">
-                  <img
+                  <SafeImage
                     src={s.image}
                     alt={s.name}
+                    fallbackLabel={s.name}
                     loading="lazy"
                     className="h-full w-full object-cover grayscale transition duration-[550ms] ease-out group-hover:scale-[1.04] group-hover:grayscale-0"
                   />
