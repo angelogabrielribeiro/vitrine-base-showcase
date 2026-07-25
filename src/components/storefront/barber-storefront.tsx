@@ -96,6 +96,9 @@ function TrustStrip({ store }: { store: StoreConfig }) {
 /* -------------------------------------------------------------------------- */
 function ServicesEditorial({ services, storeSlug }: { services: Service[]; storeSlug: string }) {
   const items = services.slice(0, 6);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const reduce = useReducedMotion();
+  const active = items[activeIdx];
   return (
     <section className="mx-auto max-w-7xl px-6 py-16">
       <div className="mb-8 flex items-end justify-between gap-6">
@@ -118,11 +121,67 @@ function ServicesEditorial({ services, storeSlug }: { services: Service[]; store
         </Button>
       </div>
 
-      <ul className="divide-y divide-neutral-800/80 border-y border-neutral-800/80">
-        {items.map((s, i) => (
-          <ServiceRow key={s.id} service={s} index={i} storeSlug={storeSlug} />
-        ))}
-      </ul>
+      <div className="grid gap-8 lg:grid-cols-[1fr_minmax(300px,420px)] lg:items-start">
+        <ul className="divide-y divide-neutral-800/80 border-y border-neutral-800/80">
+          {items.map((s, i) => (
+            <ServiceRow
+              key={s.id}
+              service={s}
+              index={i}
+              storeSlug={storeSlug}
+              onActivate={() => setActiveIdx(i)}
+              isActive={i === activeIdx}
+            />
+          ))}
+        </ul>
+
+        {active && (
+          <aside className="sticky top-24 hidden h-[460px] w-full overflow-hidden border border-neutral-800 bg-neutral-900/40 lg:block">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={active.id}
+                initial={reduce ? { opacity: 1 } : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduce ? { opacity: 1 } : { opacity: 0, y: -8 }}
+                transition={{ duration: 0.35, ease: MOTION.ease }}
+                className="relative flex h-full flex-col"
+              >
+                <div className="relative h-3/5 w-full overflow-hidden bg-neutral-900">
+                  <SafeImage
+                    src={active.image}
+                    alt={active.name}
+                    fallbackLabel={active.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent" />
+                  <div className="absolute left-4 top-4 font-mono text-xs text-amber-200/80">
+                    {String(activeIdx + 1).padStart(2, "0")}
+                  </div>
+                </div>
+                <div className="flex flex-1 flex-col justify-between gap-4 p-5">
+                  <div>
+                    <h3 className="font-display text-2xl uppercase tracking-tight text-white">
+                      {active.name}
+                    </h3>
+                    <p className="mt-2 line-clamp-3 text-sm text-neutral-400">
+                      {active.description}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.25em] text-neutral-400">
+                      <Clock className="h-3.5 w-3.5" /> {active.durationMinutes} min
+                    </span>
+                    <span className="font-display text-2xl text-amber-200">
+                      {brl(active.price)}
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </aside>
+        )}
+      </div>
     </section>
   );
 }
@@ -131,10 +190,14 @@ function ServiceRow({
   service,
   index,
   storeSlug,
+  onActivate,
+  isActive,
 }: {
   service: Service;
   index: number;
   storeSlug: string;
+  onActivate?: () => void;
+  isActive?: boolean;
 }) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState(false);
@@ -142,18 +205,25 @@ function ServiceRow({
 
   return (
     <li
-      onMouseEnter={() => setActive(true)}
+      onMouseEnter={() => {
+        setActive(true);
+        onActivate?.();
+      }}
       onMouseLeave={() => setActive(false)}
-      onFocus={() => setActive(true)}
+      onFocus={() => {
+        setActive(true);
+        onActivate?.();
+      }}
       onBlur={() => setActive(false)}
       className="group relative"
+      data-active={isActive || undefined}
     >
       <Link
         to="/demo/$storeSlug/agendar"
         params={{ storeSlug }}
-        className="relative flex items-center gap-6 overflow-hidden px-2 py-6 outline-none focus-visible:bg-neutral-900/40 sm:px-4 sm:py-7"
+        className="relative flex items-center gap-6 overflow-hidden px-2 py-6 outline-none focus-visible:bg-neutral-900/40 sm:px-4 sm:py-7 lg:py-6"
       >
-        <div aria-hidden className="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-0 overflow-hidden lg:hidden">
           <motion.div
             initial={false}
             animate={
