@@ -7,7 +7,6 @@ import {
   MapPin,
   ArrowRight,
   ChevronRight,
-  Scissors,
   Sparkles,
   Gift,
   Truck,
