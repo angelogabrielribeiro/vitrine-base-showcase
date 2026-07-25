@@ -552,46 +552,4 @@ function ClosingBlock({ store }: { store: StoreConfig }) {
 /* -------------------------------------------------------------------------- */
 /* Mobile sticky CTA — discreto, aparece após scroll                           */
 /* -------------------------------------------------------------------------- */
-function MobileStickyCTA({ storeSlug }: { storeSlug: string }) {
-  const [show, setShow] = useState(false);
-
-  useEffect(() => {
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        setShow(window.scrollY > 480);
-        ticking = false;
-      });
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          initial={{ y: 80, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 80, opacity: 0 }}
-          transition={{ duration: 0.35, ease: MOTION.ease }}
-          className="fixed inset-x-3 bottom-3 z-40 sm:hidden"
-        >
-          <Link
-            to="/demo/$storeSlug/agendar"
-            params={{ storeSlug }}
-            className="flex items-center justify-between gap-3 border border-amber-300/60 bg-neutral-950/90 px-4 py-3 text-xs uppercase tracking-[0.3em] text-amber-200 shadow-lg backdrop-blur"
-          >
-            <span className="inline-flex items-center gap-2">
-              <CalendarDays className="h-4 w-4" /> Agendar horário
-            </span>
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
+// (MobileStickyCTA removido — dock unificado agora vive no LiquidMobileMenu quando niche === "barber")
