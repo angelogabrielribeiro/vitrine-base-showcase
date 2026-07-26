@@ -1,61 +1,99 @@
-import { useState, type ImgHTMLAttributes } from "react";
-import { Scissors } from "lucide-react";
+import { useEffect, useState, type ImgHTMLAttributes } from "react";
 
-type Props = Omit<ImgHTMLAttributes<HTMLImageElement>, "onError"> & {
+type Props = Omit<ImgHTMLAttributes<HTMLImageElement>, "onError" | "src"> & {
   src?: string;
   alt: string;
+  /** Imagem secundária tentada apenas uma vez se `src` falhar. */
+  fallbackSrc?: string;
+  /** Rótulo opcional exibido de forma discreta no fallback neutro. */
   fallbackLabel?: string;
-  monogram?: string;
 };
 
+type Stage = "primary" | "fallback" | "neutral";
+
 /**
- * Imagem com fallback dark (Barber Noir). Se `src` for vazia ou falhar ao
- * carregar, renderiza um bloco escuro com monograma + rótulo curto no lugar,
- * evitando o "vazio branco/cinza" que aparecia quando URLs quebravam.
+ * Imagem com fallback em camadas:
+ *   1. tenta `src`;
+ *   2. se falhar (ou vazio), tenta `fallbackSrc` UMA vez;
+ *   3. se ambas falharem, renderiza um bloco abstrato sofisticado.
+ *
+ * O bloco neutro NÃO usa tesoura ou monograma "BN" como elemento
+ * principal — é uma superfície discreta com textura sutil, para não
+ * roubar atenção nem parecer uma imagem real.
+ * O estado interno é resetado quando `src` ou `fallbackSrc` mudam.
  */
 export function SafeImage({
   src,
   alt,
+  fallbackSrc,
   fallbackLabel,
-  monogram = "BN",
   className = "",
   ...rest
 }: Props) {
-  const [failed, setFailed] = useState(false);
-  const showFallback = !src || failed;
+  const initial: Stage = src ? "primary" : fallbackSrc ? "fallback" : "neutral";
+  const [stage, setStage] = useState<Stage>(initial);
 
-  if (showFallback) {
+  useEffect(() => {
+    setStage(src ? "primary" : fallbackSrc ? "fallback" : "neutral");
+  }, [src, fallbackSrc]);
+
+  const handleError = () => {
+    if (stage === "primary" && fallbackSrc) setStage("fallback");
+    else setStage("neutral");
+  };
+
+  if (stage !== "neutral") {
+    const currentSrc = stage === "primary" ? src : fallbackSrc;
     return (
-      <div
-        role="img"
-        aria-label={alt}
-        className={
-          "flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-900 text-neutral-500 " +
-          className
-        }
-      >
-        <div className="grid h-10 w-10 place-items-center rounded-full border border-amber-300/30 bg-neutral-950 text-amber-200/80">
-          <Scissors className="h-4 w-4" />
-        </div>
-        <div className="font-display text-[10px] uppercase tracking-[0.35em] text-amber-200/70">
-          {monogram}
-        </div>
-        {fallbackLabel && (
-          <div className="max-w-[80%] truncate text-center text-[10px] uppercase tracking-[0.25em] text-neutral-500">
-            {fallbackLabel}
-          </div>
-        )}
-      </div>
+      <img
+        src={currentSrc}
+        alt={alt}
+        onError={handleError}
+        className={className}
+        {...rest}
+      />
     );
   }
 
+  // Fallback neutro abstrato — sem tesoura, sem monograma proeminente.
   return (
-    <img
-      src={src}
-      alt={alt}
-      onError={() => setFailed(true)}
-      className={className}
-      {...rest}
-    />
+    <div
+      role="img"
+      aria-label={alt}
+      className={
+        "relative flex h-full w-full items-center justify-center overflow-hidden bg-neutral-900 " +
+        className
+      }
+    >
+      <span
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(120% 80% at 30% 20%, rgba(255,255,255,0.05), transparent 60%), radial-gradient(80% 60% at 80% 90%, rgba(217,177,102,0.06), transparent 65%), linear-gradient(135deg, #0f0f10 0%, #17161a 50%, #0b0b0d 100%)",
+        }}
+      />
+      <span
+        aria-hidden
+        className="absolute inset-0 opacity-[0.06]"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(45deg, rgba(255,255,255,0.6) 0 1px, transparent 1px 8px)",
+        }}
+      />
+      <span
+        aria-hidden
+        className="absolute left-4 right-4 top-4 h-px bg-white/10"
+      />
+      <span
+        aria-hidden
+        className="absolute bottom-4 left-4 right-4 h-px bg-white/10"
+      />
+      {fallbackLabel && (
+        <span className="relative z-10 max-w-[70%] truncate text-center text-[9px] uppercase tracking-[0.4em] text-neutral-600">
+          {fallbackLabel}
+        </span>
+      )}
+    </div>
   );
 }
