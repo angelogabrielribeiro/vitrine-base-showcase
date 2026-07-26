@@ -14,6 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ProductCard } from "@/components/storefront/product-card";
 import { toast } from "sonner";
+import { SafeImage } from "@/components/storefront/safe-image";
+import { barberCategoryFallback } from "@/lib/barber-media";
 
 export const Route = createFileRoute("/demo/$storeSlug/produto/$productSlug")({
   component: ProductPage,
@@ -45,6 +47,8 @@ function ProductPage() {
   const [selectedAddons, setSelectedAddons] = useState<Set<string>>(new Set());
   const [notes, setNotes] = useState("");
   const [activeImage, setActiveImage] = useState(0);
+  const isBarber = storeSlug === "barbearia" || store.niche === "barber";
+  const barberFallback = isBarber ? barberCategoryFallback(product.category) : undefined;
 
   // Se o produto declara variantes mas a combinação selecionada não existe,
   // não herdar o estoque geral — a combinação é indisponível.
@@ -96,6 +100,27 @@ function ProductPage() {
                 />
               </AnimatePresence>
             </div>
+          ) : isBarber ? (
+            <div className="relative aspect-[4/5] w-full overflow-hidden border border-neutral-800 bg-neutral-900">
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={activeImage}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute inset-0"
+                >
+                  <SafeImage
+                    src={product.images[activeImage]}
+                    fallbackSrc={barberFallback}
+                    alt={product.name}
+                    fallbackLabel={product.name}
+                    className="h-full w-full object-cover"
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </div>
           ) : (
             <div className="overflow-hidden rounded-[var(--radius)] bg-muted">
               <div className="aspect-[4/5] w-full bg-cover bg-center" style={{ backgroundImage: `url(${product.images[activeImage]})` }} />
@@ -103,18 +128,41 @@ function ProductPage() {
           )}
           {product.images.length > 1 && (
             <div className="mt-3 flex gap-2">
-              {product.images.map((src, i) => (
-                <button
-                  key={i}
-                  aria-label={`Imagem ${i + 1}`}
-                  onClick={() => setActiveImage(i)}
-                  className={
-                    "h-16 w-16 overflow-hidden rounded-md border-2 bg-cover bg-center " +
-                    (activeImage === i ? "border-primary" : "border-transparent")
-                  }
-                  style={{ backgroundImage: `url(${src})` }}
-                />
-              ))}
+              {product.images.map((src, i) =>
+                isBarber ? (
+                  <button
+                    key={i}
+                    type="button"
+                    aria-label={`Imagem ${i + 1}`}
+                    aria-pressed={activeImage === i}
+                    onClick={() => setActiveImage(i)}
+                    className={
+                      "h-16 w-16 overflow-hidden border-2 transition " +
+                      (activeImage === i
+                        ? "border-amber-300"
+                        : "border-neutral-800 hover:border-amber-300/50")
+                    }
+                  >
+                    <SafeImage
+                      src={src}
+                      fallbackSrc={barberFallback}
+                      alt={`${product.name} ${i + 1}`}
+                      className="h-full w-full object-cover"
+                    />
+                  </button>
+                ) : (
+                  <button
+                    key={i}
+                    aria-label={`Imagem ${i + 1}`}
+                    onClick={() => setActiveImage(i)}
+                    className={
+                      "h-16 w-16 overflow-hidden rounded-md border-2 bg-cover bg-center " +
+                      (activeImage === i ? "border-primary" : "border-transparent")
+                    }
+                    style={{ backgroundImage: `url(${src})` }}
+                  />
+                ),
+              )}
             </div>
           )}
         </div>
