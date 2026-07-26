@@ -22,6 +22,64 @@ const isBrowser = () => typeof window !== "undefined";
 const key = (slug: string, part: string) => `vitrine:${slug}:${part}`;
 const SESSION_KEY = "vitrine:session";
 
+/**
+ * Migração versionada de mídia da Barber Noir.
+ *
+ * Atualiza APENAS `images` de produtos e `image` de serviços conhecidos
+ * (match por id/slug), preservando preços, estoques, variantes, carrinho,
+ * pedidos, agendamentos, sessão e edições administrativas. Roda uma única
+ * vez por versão, no browser. Nunca limpa outras chaves.
+ */
+const BARBER_MEDIA_VERSION_KEY = "vitrine:barbearia:media-version";
+const BARBER_MEDIA_VERSION = 1;
+let barberMediaMigrated = false;
+
+function migrateBarberMediaIfNeeded(): void {
+  if (!isBrowser() || barberMediaMigrated) return;
+  try {
+    const current = Number(
+      localStorage.getItem(BARBER_MEDIA_VERSION_KEY) ?? "0",
+    );
+    if (current >= BARBER_MEDIA_VERSION) {
+      barberMediaMigrated = true;
+      return;
+    }
+
+    const rawProducts = localStorage.getItem(key("barbearia", "products"));
+    if (rawProducts) {
+      const stored = JSON.parse(rawProducts) as Product[];
+      const seed = DEMO_PRODUCTS_BY_STORE["barbearia"] ?? [];
+      const byId = new Map(seed.map((p) => [p.id, p]));
+      const bySlug = new Map(seed.map((p) => [p.slug, p]));
+      const updated = stored.map((p) => {
+        const s = byId.get(p.id) ?? bySlug.get(p.slug);
+        if (!s) return p;
+        return { ...p, images: [...s.images] };
+      });
+      localStorage.setItem(key("barbearia", "products"), JSON.stringify(updated));
+    }
+
+    const rawServices = localStorage.getItem(key("barbearia", "services"));
+    if (rawServices) {
+      const stored = JSON.parse(rawServices) as Service[];
+      const seed = DEMO_SERVICES_BY_STORE["barbearia"] ?? [];
+      const byId = new Map(seed.map((s) => [s.id, s]));
+      const bySlug = new Map(seed.map((s) => [s.slug, s]));
+      const updated = stored.map((s) => {
+        const src = byId.get(s.id) ?? bySlug.get(s.slug);
+        if (!src) return s;
+        return { ...s, image: src.image };
+      });
+      localStorage.setItem(key("barbearia", "services"), JSON.stringify(updated));
+    }
+
+    localStorage.setItem(BARBER_MEDIA_VERSION_KEY, String(BARBER_MEDIA_VERSION));
+    barberMediaMigrated = true;
+  } catch {
+    // Migração é best-effort; qualquer erro não deve quebrar o app.
+  }
+}
+
 function readJSON<T>(k: string, fallback: T): T {
   if (!isBrowser()) return fallback;
   try {
@@ -63,6 +121,7 @@ function seedIfNeeded(slug: string) {
   if (!pros) {
     writeJSON(key(slug, "professionals"), DEMO_PROFESSIONALS_BY_STORE[slug] ?? []);
   }
+  if (slug === "barbearia") migrateBarberMediaIfNeeded();
 }
 
 export const localRepository: CommerceRepository = {

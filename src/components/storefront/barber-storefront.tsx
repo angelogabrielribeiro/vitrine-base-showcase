@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/accordion";
 import { brl } from "@/lib/format";
 import { SafeImage } from "@/components/storefront/safe-image";
+import { ProductCard } from "@/components/storefront/product-card";
+import { barberServiceFallback, BARBER_PROFESSIONAL_FALLBACK } from "@/lib/barber-media";
 
 const ICONS: Record<string, typeof Sparkles> = {
   truck: Truck,
@@ -148,6 +150,7 @@ function ServicesEditorial({ services, storeSlug }: { services: Service[]; store
                 <div className="relative h-3/5 w-full overflow-hidden bg-neutral-900">
                   <SafeImage
                     src={active.image}
+                    fallbackSrc={barberServiceFallback(active.slug)}
                     alt={active.name}
                     fallbackLabel={active.name}
                     loading="lazy"
@@ -422,6 +425,7 @@ function ProfessionalsStack({ professionals }: { professionals: Professional[] }
                 <div className="h-2/3 w-full overflow-hidden">
                   <SafeImage
                     src={p.avatar}
+                    fallbackSrc={BARBER_PROFESSIONAL_FALLBACK}
                     alt={p.name}
                     fallbackLabel={p.name}
                     loading="lazy"
@@ -475,6 +479,7 @@ function ResultsEditorial({ services }: { services: Service[] }) {
                 <div className="aspect-[3/4] w-full overflow-hidden">
                   <SafeImage
                     src={s.image}
+                    fallbackSrc={barberServiceFallback(s.slug)}
                     alt={s.name}
                     fallbackLabel={s.name}
                     loading="lazy"
@@ -522,35 +527,9 @@ function GroomingGrid({ products, storeSlug }: { products: Product[]; storeSlug:
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
         {list.map((p) => (
-          <Link
-            key={p.id}
-            to="/demo/$storeSlug/produto/$productSlug"
-            params={{ storeSlug, productSlug: p.slug }}
-            className="group block border border-neutral-800 bg-neutral-900/40 transition hover:border-amber-300/50"
-          >
-            <div className="aspect-square w-full overflow-hidden bg-neutral-800">
-              <SafeImage
-                src={p.images[0]}
-                alt={p.name}
-                fallbackLabel={p.name}
-                loading="lazy"
-                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.05]"
-              />
-            </div>
-            <div className="px-3 py-3">
-              <div className="line-clamp-1 text-sm text-neutral-200">{p.name}</div>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="font-display text-base text-amber-200">
-                  {brl(p.salePrice ?? p.price)}
-                </span>
-                {p.salePrice && (
-                  <span className="text-[11px] text-neutral-500 line-through">{brl(p.price)}</span>
-                )}
-              </div>
-            </div>
-          </Link>
+          <ProductCard key={p.id} product={p} storeSlug={storeSlug} />
         ))}
       </div>
     </section>
