@@ -51,9 +51,21 @@ function AdminLayout() {
   items.push(
     { to: "/demo/$storeSlug/admin/produtos", icon: Package, label: "Produtos", exact: false },
     { to: "/demo/$storeSlug/admin/pedidos", icon: ShoppingCart, label: "Pedidos", exact: false },
-    { to: "/demo/$storeSlug/admin/importar-exportar", icon: FileSpreadsheet, label: "Importar / Exportar", exact: false },
-    { to: "/demo/$storeSlug/admin/configuracoes", icon: Settings, label: "Configurações", exact: false },
   );
+  if (!isBarber) {
+    items.push({
+      to: "/demo/$storeSlug/admin/importar-exportar",
+      icon: FileSpreadsheet,
+      label: "Importar / Exportar",
+      exact: false,
+    });
+  }
+  items.push({
+    to: "/demo/$storeSlug/admin/configuracoes",
+    icon: Settings,
+    label: "Configurações",
+    exact: false,
+  });
 
   return (
     <div className="min-h-screen bg-muted/40">
