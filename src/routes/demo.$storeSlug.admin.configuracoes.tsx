@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { getStore } from "@/config/stores";
 import { useRepo } from "@/hooks/use-repo";
@@ -21,6 +21,7 @@ function Settings() {
   const [cfg, setCfg] = useState<StoreConfig>(current);
   const products = repo.listProducts(storeSlug).filter((p) => p.active);
   const services = cfg.niche === "barber" ? repo.listServices(storeSlug).filter((s) => s.active) : [];
+  const isBarber = cfg.niche === "barber";
 
   const update = <K extends keyof StoreConfig>(k: K, v: StoreConfig[K]) => setCfg((c) => ({ ...c, [k]: v }));
 
@@ -128,6 +129,30 @@ function Settings() {
       <div className="flex justify-end">
         <Button onClick={save} size="lg">Salvar alterações</Button>
       </div>
+
+      {isBarber && (
+        <section className="rounded-[var(--radius)] border border-dashed border-border bg-card/60 p-5">
+          <div className="flex items-center gap-2">
+            <h2 className="font-semibold">Dados e backups</h2>
+            <span className="rounded-full border border-border px-2 py-0.5 text-[10px] uppercase tracking-widest text-muted-foreground">
+              Avançado
+            </span>
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Importe um catálogo existente ou baixe cópias dos produtos, serviços e agendamentos.
+          </p>
+          <div className="mt-4">
+            <Button asChild variant="outline">
+              <Link
+                to="/demo/$storeSlug/admin/importar-exportar"
+                params={{ storeSlug }}
+              >
+                Abrir dados e backups
+              </Link>
+            </Button>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

@@ -1,12 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRepo } from "@/hooks/use-repo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Trash2, User2 } from "lucide-react";
+import { Plus, Trash2, User2, Upload, Camera, X, Link2 } from "lucide-react";
+import { toast } from "sonner";
+import { BARBER_PROFESSIONAL_FALLBACK } from "@/lib/barber-media";
+import { SafeImage } from "@/components/storefront/safe-image";
 import type { Professional } from "@/types/commerce";
 
 export const Route = createFileRoute("/demo/$storeSlug/admin/profissionais")({
@@ -54,13 +57,15 @@ function Page() {
         {pros.map((p) => (
           <div key={p.id} className="rounded-[var(--radius)] border border-border bg-card p-4">
             <div className="flex items-start gap-3">
-              {p.avatar ? (
-                <img src={p.avatar} alt={p.name} className="h-12 w-12 rounded-full object-cover" />
-              ) : (
-                <div className="grid h-12 w-12 place-items-center rounded-full bg-muted text-muted-foreground">
-                  <User2 className="h-5 w-5" />
-                </div>
-              )}
+              <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted">
+                <SafeImage
+                  src={p.avatar}
+                  fallbackSrc={BARBER_PROFESSIONAL_FALLBACK}
+                  alt={p.name}
+                  fallbackLabel={p.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate font-semibold">{p.name}</div>
                 <div className="text-xs text-muted-foreground">{p.role}</div>
@@ -101,8 +106,11 @@ function Page() {
                 <Textarea value={editing.bio ?? ""} onChange={(e) => setEditing({ ...editing, bio: e.target.value })} />
               </div>
               <div>
-                <Label>Avatar (URL)</Label>
-                <Input value={editing.avatar ?? ""} onChange={(e) => setEditing({ ...editing, avatar: e.target.value })} />
+                <Label>Foto do profissional</Label>
+                <AvatarPicker
+                  value={editing.avatar}
+                  onChange={(v) => setEditing({ ...editing, avatar: v })}
+                />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -126,6 +134,233 @@ function Page() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* AvatarPicker — arquivo, câmera (mobile), drag & drop, paste, URL opcional. */
+/* -------------------------------------------------------------------------- */
+
+const ACCEPT = "image/jpeg,image/png,image/webp";
+const MAX_BYTES = 8 * 1024 * 1024;
+const MAX_DIM = 900;
+
+function isTouchMobile(): boolean {
+  if (typeof window === "undefined") return false;
+  return (
+    window.matchMedia?.("(hover: none) and (pointer: coarse)").matches ?? false
+  );
+}
+
+async function resizeToDataUrl(file: File): Promise<string> {
+  if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
+    throw new Error("Formato inválido. Use JPEG, PNG ou WebP.");
+  }
+  if (file.size > MAX_BYTES) {
+    throw new Error("Imagem grande demais. Máximo 8 MB.");
+  }
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error("Não foi possível ler a imagem."));
+      el.src = url;
+    });
+    const scale = Math.min(1, MAX_DIM / Math.max(img.width, img.height));
+    const w = Math.max(1, Math.round(img.width * scale));
+    const h = Math.max(1, Math.round(img.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Canvas indisponível neste navegador.");
+    ctx.drawImage(img, 0, 0, w, h);
+    let out = canvas.toDataURL("image/webp", 0.82);
+    if (!out.startsWith("data:image/webp")) {
+      out = canvas.toDataURL("image/jpeg", 0.85);
+    }
+    return out;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+function AvatarPicker({
+  value,
+  onChange,
+}: {
+  value?: string;
+  onChange: (v: string | undefined) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [showUrl, setShowUrl] = useState(false);
+  const [drag, setDrag] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const dropRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsMobile(isTouchMobile());
+  }, []);
+
+  const handleFile = async (file: File | null | undefined) => {
+    if (!file) return;
+    setBusy(true);
+    try {
+      const dataUrl = await resizeToDataUrl(file);
+      onChange(dataUrl);
+      toast.success("Foto atualizada");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao carregar imagem.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // Paste local à área de upload (sem listener global).
+  const onPaste: React.ClipboardEventHandler<HTMLDivElement> = (e) => {
+    const item = Array.from(e.clipboardData?.items ?? []).find((it) =>
+      it.type.startsWith("image/"),
+    );
+    if (!item) return;
+    const file = item.getAsFile();
+    if (file) {
+      e.preventDefault();
+      void handleFile(file);
+    }
+  };
+
+  return (
+    <div className="mt-2 space-y-3">
+      <div className="flex items-start gap-4">
+        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full border border-border bg-muted">
+          {value ? (
+            <SafeImage
+              src={value}
+              fallbackSrc={BARBER_PROFESSIONAL_FALLBACK}
+              alt="Foto do profissional"
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="grid h-full w-full place-items-center text-muted-foreground">
+              <User2 className="h-7 w-7" />
+            </div>
+          )}
+        </div>
+
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => fileRef.current?.click()}
+              disabled={busy}
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              {value ? "Trocar imagem" : "Escolher imagem"}
+            </Button>
+            {isMobile && (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => cameraRef.current?.click()}
+                disabled={busy}
+              >
+                <Camera className="mr-2 h-4 w-4" />
+                Tirar foto
+              </Button>
+            )}
+            {value && (
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() => onChange(undefined)}
+                disabled={busy}
+              >
+                <X className="mr-2 h-4 w-4" />
+                Remover
+              </Button>
+            )}
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            JPEG, PNG ou WebP · até 8 MB · a imagem é redimensionada para até
+            {" "}
+            {MAX_DIM}px no seu navegador.
+          </p>
+        </div>
+      </div>
+
+      {!isMobile && (
+        <div
+          ref={dropRef}
+          tabIndex={0}
+          onPaste={onPaste}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDrag(true);
+          }}
+          onDragLeave={() => setDrag(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDrag(false);
+            void handleFile(e.dataTransfer.files?.[0]);
+          }}
+          className={
+            "rounded-md border-2 border-dashed p-4 text-center text-xs outline-none transition " +
+            (drag
+              ? "border-primary bg-primary/5 text-primary"
+              : "border-border text-muted-foreground focus:border-primary/60")
+          }
+        >
+          Arraste um arquivo aqui ou clique nesta área e cole com Ctrl+V.
+        </div>
+      )}
+
+      <input
+        ref={fileRef}
+        type="file"
+        accept={ACCEPT}
+        className="hidden"
+        onChange={(e) => {
+          void handleFile(e.target.files?.[0]);
+          if (fileRef.current) fileRef.current.value = "";
+        }}
+      />
+      <input
+        ref={cameraRef}
+        type="file"
+        accept="image/*"
+        capture="user"
+        className="hidden"
+        onChange={(e) => {
+          void handleFile(e.target.files?.[0]);
+          if (cameraRef.current) cameraRef.current.value = "";
+        }}
+      />
+
+      <div>
+        <button
+          type="button"
+          onClick={() => setShowUrl((s) => !s)}
+          className="inline-flex items-center gap-1 text-[11px] uppercase tracking-widest text-muted-foreground hover:text-foreground"
+        >
+          <Link2 className="h-3 w-3" />
+          {showUrl ? "Ocultar URL" : "Usar URL em vez de arquivo"}
+        </button>
+        {showUrl && (
+          <Input
+            className="mt-2"
+            placeholder="https://..."
+            value={value && value.startsWith("http") ? value : ""}
+            onChange={(e) => onChange(e.target.value || undefined)}
+          />
+        )}
+      </div>
     </div>
   );
 }

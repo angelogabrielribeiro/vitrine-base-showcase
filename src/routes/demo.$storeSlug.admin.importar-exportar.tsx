@@ -50,9 +50,13 @@ function ImportExportPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-3xl font-semibold">Importação assistida</h1>
+        <h1 className="font-display text-3xl font-semibold">
+          {isBarber ? "Dados e backups" : "Importação assistida"}
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Reconhecemos automaticamente as colunas e você confirma antes de importar.
+          {isBarber
+            ? "Recursos opcionais para migrar catálogo ou baixar relatórios. Você não precisa usar esta área no dia a dia."
+            : "Reconhecemos automaticamente as colunas e você confirma antes de importar."}
         </p>
         <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
           <Info className="h-3.5 w-3.5" />
@@ -68,12 +72,12 @@ function ImportExportPage() {
             <TabsTrigger value="agendamentos">Agendamentos</TabsTrigger>
           </TabsList>
           <TabsContent value="produtos" className="mt-4">
-            <ProductsPanel storeSlug={storeSlug} />
+            <ProductsPanel storeSlug={storeSlug} isBarber />
           </TabsContent>
           <TabsContent value="servicos" className="mt-4">
             <ExportOnlyPanel
-              title="Serviços"
-              description="Exporte os serviços cadastrados."
+              title="Baixar backup de serviços"
+              description="Guarde uma cópia dos serviços cadastrados ou envie ao contador/equipe. Não é uma tarefa do dia a dia."
               onCsv={async () => {
                 const { exportServicesCsv } = await import("@/lib/catalog-import/export");
                 await exportServicesCsv(store, repo.listServices(storeSlug));
@@ -86,8 +90,8 @@ function ImportExportPage() {
           </TabsContent>
           <TabsContent value="agendamentos" className="mt-4">
             <ExportOnlyPanel
-              title="Agendamentos"
-              description="Exporte a lista de agendamentos (sem dados sensíveis desnecessários)."
+              title="Baixar relatório de agendamentos"
+              description="Exporta o período/dados atuais da demonstração para acompanhamento externo."
               onCsv={async () => {
                 const { exportAppointmentsCsv } = await import("@/lib/catalog-import/export");
                 await exportAppointmentsCsv(store, repo.listAppointments(storeSlug));
@@ -106,7 +110,7 @@ function ImportExportPage() {
   );
 }
 
-function ProductsPanel({ storeSlug }: { storeSlug: string }) {
+function ProductsPanel({ storeSlug, isBarber = false }: { storeSlug: string; isBarber?: boolean }) {
   const store = getStore(storeSlug)!;
   const repo = useRepo();
   const navigate = useNavigate();
@@ -213,67 +217,227 @@ function ProductsPanel({ storeSlug }: { storeSlug: string }) {
 
   return (
     <div className="space-y-6">
-      <ExportBar
-        onExportCsv={async () => {
-          const { exportProductsCsv } = await import("@/lib/catalog-import/export");
-          await exportProductsCsv(store, repo.listProducts(storeSlug));
-        }}
-        onExportXlsx={async () => {
-          const { exportXlsx } = await import("@/lib/catalog-import/export");
-          await exportXlsx(store, { products: repo.listProducts(storeSlug) });
-        }}
-        onTemplateCsv={async () => {
-          const { downloadCsvTemplate } = await import("@/lib/catalog-import/templates");
-          await downloadCsvTemplate(store.niche, store.slug);
-        }}
-        onTemplateXlsx={async () => {
-          const { downloadXlsxTemplate } = await import("@/lib/catalog-import/templates");
-          await downloadXlsxTemplate(store.niche, store.slug);
-        }}
-      />
+      {isBarber ? (
+        <>
+          <BackupCard
+            onExportXlsx={async () => {
+              const { exportXlsx } = await import("@/lib/catalog-import/export");
+              await exportXlsx(store, { products: repo.listProducts(storeSlug) });
+            }}
+            onExportCsv={async () => {
+              const { exportProductsCsv } = await import("@/lib/catalog-import/export");
+              await exportProductsCsv(store, repo.listProducts(storeSlug));
+            }}
+          />
 
-      <Stepper step={step} />
+          <details className="group rounded-[var(--radius)] border border-dashed border-border bg-card/60 p-4 open:bg-card">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+              <span>
+                <span className="text-sm font-semibold">
+                  Importar produtos por planilha (avançado)
+                </span>
+                <span className="ml-2 rounded-full border border-border px-2 py-0.5 text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Avançado
+                </span>
+                <span className="mt-1 block text-xs text-muted-foreground">
+                  Use somente se você já controla muitos produtos em Excel/CSV ou está migrando de outro sistema.
+                </span>
+              </span>
+              <span
+                aria-hidden
+                className="text-muted-foreground transition group-open:rotate-90"
+              >
+                ▸
+              </span>
+            </summary>
 
-      {step === 1 && (
-        <StepUpload
-          busy={busy}
-          fileInputRef={fileInputRef}
-          onFile={(f) => void onFile(f)}
-        />
+            <div className="mt-4 space-y-4">
+              <TemplatesBar
+                onTemplateCsv={async () => {
+                  const { downloadCsvTemplate } = await import("@/lib/catalog-import/templates");
+                  await downloadCsvTemplate(store.niche, store.slug);
+                }}
+                onTemplateXlsx={async () => {
+                  const { downloadXlsxTemplate } = await import("@/lib/catalog-import/templates");
+                  await downloadXlsxTemplate(store.niche, store.slug);
+                }}
+              />
+
+              {step !== 1 && <Stepper step={step} />}
+
+              {step === 1 && (
+                <StepUpload busy={busy} fileInputRef={fileInputRef} onFile={(f) => void onFile(f)} />
+              )}
+
+              {step === 2 && table && (
+                <StepMap
+                  table={table}
+                  mapping={mapping}
+                  setMapping={setMapping}
+                  onBack={reset}
+                  onNext={runValidation}
+                />
+              )}
+
+              {step === 3 && result && (
+                <StepReview
+                  result={result}
+                  policy={policy}
+                  setPolicy={setPolicy}
+                  importOnlyValid={importOnlyValid}
+                  setImportOnlyValid={setImportOnlyValid}
+                  busy={busy}
+                  onBack={() => setStep(2)}
+                  onImport={runImport}
+                />
+              )}
+
+              {step === 4 && summary && (
+                <StepDone
+                  summary={summary}
+                  onReset={reset}
+                  onSeeProducts={() =>
+                    navigate({ to: "/demo/$storeSlug/admin/produtos", params: { storeSlug } })
+                  }
+                />
+              )}
+            </div>
+          </details>
+        </>
+      ) : (
+        <>
+          <ExportBar
+            onExportCsv={async () => {
+              const { exportProductsCsv } = await import("@/lib/catalog-import/export");
+              await exportProductsCsv(store, repo.listProducts(storeSlug));
+            }}
+            onExportXlsx={async () => {
+              const { exportXlsx } = await import("@/lib/catalog-import/export");
+              await exportXlsx(store, { products: repo.listProducts(storeSlug) });
+            }}
+            onTemplateCsv={async () => {
+              const { downloadCsvTemplate } = await import("@/lib/catalog-import/templates");
+              await downloadCsvTemplate(store.niche, store.slug);
+            }}
+            onTemplateXlsx={async () => {
+              const { downloadXlsxTemplate } = await import("@/lib/catalog-import/templates");
+              await downloadXlsxTemplate(store.niche, store.slug);
+            }}
+          />
+
+          <Stepper step={step} />
+
+          {step === 1 && (
+            <StepUpload busy={busy} fileInputRef={fileInputRef} onFile={(f) => void onFile(f)} />
+          )}
+
+          {step === 2 && table && (
+            <StepMap
+              table={table}
+              mapping={mapping}
+              setMapping={setMapping}
+              onBack={reset}
+              onNext={runValidation}
+            />
+          )}
+
+          {step === 3 && result && (
+            <StepReview
+              result={result}
+              policy={policy}
+              setPolicy={setPolicy}
+              importOnlyValid={importOnlyValid}
+              setImportOnlyValid={setImportOnlyValid}
+              busy={busy}
+              onBack={() => setStep(2)}
+              onImport={runImport}
+            />
+          )}
+
+          {step === 4 && summary && (
+            <StepDone
+              summary={summary}
+              onReset={reset}
+              onSeeProducts={() =>
+                navigate({ to: "/demo/$storeSlug/admin/produtos", params: { storeSlug } })
+              }
+            />
+          )}
+        </>
       )}
+    </div>
+  );
+}
 
-      {step === 2 && table && (
-        <StepMap
-          table={table}
-          mapping={mapping}
-          setMapping={setMapping}
-          onBack={reset}
-          onNext={runValidation}
-        />
-      )}
+function BackupCard({
+  onExportXlsx,
+  onExportCsv,
+}: {
+  onExportXlsx: () => Promise<void>;
+  onExportCsv: () => Promise<void>;
+}) {
+  const [busy, setBusy] = useState<string | null>(null);
+  const wrap = (key: string, fn: () => Promise<void>) => async () => {
+    setBusy(key);
+    try {
+      await fn();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha.");
+    } finally {
+      setBusy(null);
+    }
+  };
+  return (
+    <section className="rounded-[var(--radius)] border border-border bg-card p-5">
+      <h2 className="font-semibold">Baixar backup do catálogo</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Guarde uma cópia dos seus produtos ou envie para sua equipe/contador.
+      </p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Button onClick={wrap("x", onExportXlsx)} disabled={!!busy}>
+          <Download className="mr-2 h-4 w-4" />
+          Baixar em Excel
+        </Button>
+        <Button variant="outline" size="sm" onClick={wrap("c", onExportCsv)} disabled={!!busy}>
+          <Download className="mr-2 h-4 w-4" />
+          Baixar em CSV
+        </Button>
+      </div>
+    </section>
+  );
+}
 
-      {step === 3 && result && (
-        <StepReview
-          result={result}
-          policy={policy}
-          setPolicy={setPolicy}
-          importOnlyValid={importOnlyValid}
-          setImportOnlyValid={setImportOnlyValid}
-          busy={busy}
-          onBack={() => setStep(2)}
-          onImport={runImport}
-        />
-      )}
-
-      {step === 4 && summary && (
-        <StepDone
-          summary={summary}
-          onReset={reset}
-          onSeeProducts={() =>
-            navigate({ to: "/demo/$storeSlug/admin/produtos", params: { storeSlug } })
-          }
-        />
-      )}
+function TemplatesBar({
+  onTemplateCsv,
+  onTemplateXlsx,
+}: {
+  onTemplateCsv: () => Promise<void>;
+  onTemplateXlsx: () => Promise<void>;
+}) {
+  const [busy, setBusy] = useState<string | null>(null);
+  const wrap = (key: string, fn: () => Promise<void>) => async () => {
+    setBusy(key);
+    try {
+      await fn();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha.");
+    } finally {
+      setBusy(null);
+    }
+  };
+  return (
+    <div className="rounded-[var(--radius)] border border-border bg-background p-3 text-sm">
+      <div className="font-medium">Modelos para começar</div>
+      <div className="mt-2 flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" onClick={wrap("x", onTemplateXlsx)} disabled={!!busy}>
+          <FileSpreadsheet className="mr-2 h-4 w-4" />
+          Modelo Excel
+        </Button>
+        <Button variant="outline" size="sm" onClick={wrap("c", onTemplateCsv)} disabled={!!busy}>
+          <Download className="mr-2 h-4 w-4" />
+          Modelo CSV
+        </Button>
+      </div>
     </div>
   );
 }
