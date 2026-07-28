@@ -89,10 +89,18 @@ function Page() {
       </div>
 
       {editing && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4" onClick={() => setEditing(null)}>
-          <div className="w-full max-w-lg rounded-[var(--radius)] border border-border bg-background p-6" onClick={(e) => e.stopPropagation()}>
-            <h2 className="mb-4 font-display text-xl font-semibold">Editar profissional</h2>
-            <div className="space-y-3">
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-3 sm:p-4"
+          onClick={() => setEditing(null)}
+        >
+          <div
+            className="flex max-h-[90dvh] w-full max-w-lg flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-background shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <header className="border-b border-border px-5 py-4 sm:px-6">
+              <h2 className="font-display text-xl font-semibold">Editar profissional</h2>
+            </header>
+            <div className="flex-1 space-y-3 overflow-y-auto px-5 py-4 sm:px-6">
               <div>
                 <Label>Nome</Label>
                 <Input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} />
@@ -127,10 +135,10 @@ function Page() {
                 Ativo
               </label>
             </div>
-            <div className="mt-6 flex justify-end gap-2">
+            <footer className="flex justify-end gap-2 border-t border-border bg-background px-5 py-3 sm:px-6">
               <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
               <Button onClick={save}>Salvar</Button>
-            </div>
+            </footer>
           </div>
         </div>
       )}
