@@ -4,6 +4,9 @@ import type { Product, Service, Professional } from "@/types/commerce";
 const img = (id: string, w = 900) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
 
+// Local media (Barber Noir) — arquivos servidos por /public/media/barber-noir.
+const bimg = (name: string) => `/media/barber-noir/${name}.webp`;
+
 // ============================================================
 // MODA — Maison Belle
 // ============================================================
