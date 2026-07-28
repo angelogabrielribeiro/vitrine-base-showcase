@@ -927,16 +927,16 @@ function ExportOnlyPanel({
   };
   return (
     <section className="rounded-[var(--radius)] border border-border bg-card p-4">
-      <h2 className="font-semibold">Exportar {title.toLowerCase()}</h2>
+      <h2 className="font-semibold">{title}</h2>
       <p className="text-xs text-muted-foreground">{description}</p>
       <div className="mt-3 flex flex-wrap gap-2">
         <Button size="sm" onClick={wrap(onXlsx)} disabled={busy}>
           <Download className="mr-2 h-4 w-4" />
-          Exportar Excel
+          Baixar Excel
         </Button>
         <Button size="sm" variant="secondary" onClick={wrap(onCsv)} disabled={busy}>
           <Download className="mr-2 h-4 w-4" />
-          Exportar CSV
+          Baixar CSV
         </Button>
       </div>
     </section>
