@@ -1,31 +1,24 @@
 /**
  * Mapa central de mídia da Barber Noir.
  *
- * Objetivo: garantir que produtos e serviços tenham SEMPRE uma imagem
- * coerente com a categoria mesmo quando a imagem principal falhar
- * (URL quebrada, hotlink bloqueado ou id de Unsplash trocado).
- *
- * Uso: SafeImage recebe `src={image}` e `fallbackSrc={barberCategoryFallback(cat)}`.
- * Somente se ambas falharem cai no fallback neutro abstrato do SafeImage.
+ * Todas as imagens são arquivos locais em `public/media/barber-noir/`,
+ * eliminando dependência de hotlink em runtime. SafeImage usa
+ * `src={image}` + `fallbackSrc={barberCategoryFallback(cat)}` e só cai
+ * no fallback neutro se ambas falharem.
  */
 
-const u = (id: string, w = 900) =>
-  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
+const local = (name: string) => `/media/barber-noir/${name}.webp`;
 
-/**
- * Fallback por categoria de PRODUTO da Barber Noir. Cada categoria aponta
- * para uma imagem coerente com o item (frasco de óleo, pomada, aftershave,
- * pente, kit) — nunca interior de barbearia como fallback de produto.
- */
+/** Fallback por categoria de PRODUTO da Barber Noir. */
 export const BARBER_CATEGORY_FALLBACK: Record<string, string> = {
-  barba: u("1775127596288-9249a530cab7"),
-  cabelo: u("1775127741095-86ee33b6b385"),
-  "pos-barba": u("1553265393-2055017658a2"),
-  acessorios: u("1680670500665-22e480bcb0fa"),
-  kits: u("1775126251074-cd5f4cfdf7c9"),
+  barba: local("produto-oleo-barba-noir"),
+  cabelo: local("produto-pomada-cabelo-matte"),
+  "pos-barba": local("produto-pos-barba-locao"),
+  acessorios: local("produto-pente-madeira"),
+  kits: local("produto-kit-barba-completo"),
 };
 
-/** Último recurso: imagem genérica de produto de grooming (frasco). */
+/** Último recurso: imagem genérica de produto de grooming. */
 export const BARBER_DEFAULT_FALLBACK = BARBER_CATEGORY_FALLBACK.barba;
 
 export function barberCategoryFallback(category?: string): string {
@@ -33,21 +26,18 @@ export function barberCategoryFallback(category?: string): string {
   return BARBER_CATEGORY_FALLBACK[category] ?? BARBER_DEFAULT_FALLBACK;
 }
 
-/**
- * Fallback por SLUG de serviço. Cada serviço tem uma imagem própria e
- * distinta, para não reutilizar a mesma foto em toda a carta.
- */
+/** Fallback por SLUG de serviço, com imagem local distinta por item. */
 export const BARBER_SERVICE_FALLBACK: Record<string, string> = {
-  "corte-classico": u("1585747860715-2ba37e788b70"),
-  "corte-degrade": u("1639511177364-0866c0da16fa"),
-  "barba-desenhada": u("1621605815971-fbc98d665033"),
-  "ritual-completo": u("1761148438883-e34e0289a214"),
-  pigmentacao: u("1747352690408-0381bf50ec95"),
-  sobrancelha: u("1764269724210-2dee78f4fb09"),
+  "corte-classico": local("servico-corte-classico"),
+  "corte-degrade": local("servico-corte-degrade"),
+  "barba-desenhada": local("servico-barba-desenhada"),
+  "ritual-completo": local("servico-ritual-completo"),
+  pigmentacao: local("servico-pigmentacao"),
+  sobrancelha: local("servico-sobrancelha"),
 };
 
 /** Fallback genérico caso o slug não esteja mapeado. */
-const BARBER_SERVICE_DEFAULT = u("1585747860715-2ba37e788b70");
+const BARBER_SERVICE_DEFAULT = local("servico-corte-classico");
 
 export function barberServiceFallback(slug?: string): string {
   if (!slug) return BARBER_SERVICE_DEFAULT;
@@ -55,4 +45,5 @@ export function barberServiceFallback(slug?: string): string {
 }
 
 /** Fallback para avatares de profissionais. */
-export const BARBER_PROFESSIONAL_FALLBACK = u("1500648767791-00dcc994a43e", 600);
+export const BARBER_PROFESSIONAL_FALLBACK =
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80";
