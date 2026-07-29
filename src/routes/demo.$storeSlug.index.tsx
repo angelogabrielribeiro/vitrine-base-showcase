@@ -16,6 +16,7 @@ import { NicheHero, type HeroSpotlight } from "@/components/storefront/hero/nich
 import { FashionStorefront } from "@/components/storefront/fashion-storefront";
 import { BarberStorefront } from "@/components/storefront/barber-storefront";
 import { RestaurantStorefront } from "@/components/storefront/restaurant-storefront";
+import { ElectronicsStorefront } from "@/components/storefront/electronics-storefront";
 
 export const Route = createFileRoute("/demo/$storeSlug/")({
   component: StoreHome,
@@ -83,6 +84,11 @@ function StoreHome() {
   // Brasa Urbana: home gastronômica dedicada, orientada a produto e conversão.
   if (store.niche === "restaurant") {
     return <RestaurantStorefront store={store} products={products} featured={featured} />;
+  }
+
+  // NovaCore: laboratório visual próprio, com showroom técnico e atmosfera WebGL.
+  if (store.niche === "electronics") {
+    return <ElectronicsStorefront store={store} products={products} featured={featured} />;
   }
 
   return (
