@@ -241,7 +241,11 @@ function NovaHero({ store, product }: { store: StoreConfig; product?: Product })
                   )}
                 </div>
               </div>
-              <div className="absolute -right-4 top-1/3 hidden border border-violet-300/30 bg-violet-400/10 px-3 py-2 text-[9px] uppercase tracking-[0.28em] text-violet-100 backdrop-blur sm:block">
+              <div className="absolute right-2 top-1/3 z-20 flex items-center gap-2 border border-cyan-300/70 bg-[#050714]/95 px-3 py-2.5 text-[9px] font-semibold uppercase tracking-[0.28em] text-cyan-50 shadow-[0_12px_40px_-12px_rgba(34,211,238,.9)] backdrop-blur-md sm:-right-4">
+                <span
+                  aria-hidden="true"
+                  className="h-2 w-2 border border-violet-300 bg-violet-400/30 shadow-[0_0_12px_rgba(196,181,253,.85)]"
+                />
                 Curadoria NC
               </div>
             </motion.div>
