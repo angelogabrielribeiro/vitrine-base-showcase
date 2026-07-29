@@ -7,6 +7,9 @@ const img = (id: string, w = 900) =>
 // Local media (Barber Noir) — arquivos servidos por /public/media/barber-noir.
 const bimg = (name: string) => `/media/barber-noir/${name}.webp`;
 
+// Local media (Brasa Urbana) — catálogo independente de hotlinks externos.
+const rimg = (name: string) => `/media/brasa-urbana/produtos/${name}.webp`;
+
 // ============================================================
 // MODA — Maison Belle
 // ============================================================
@@ -488,7 +491,7 @@ export const RESTAURANTE_PRODUCTS: Product[] = [
     category: "entradas",
     description: "Batatas assadas com alecrim, servidas com maionese da casa.",
     price: 28,
-    images: [img("1518977676601-b53f82aba655")],
+    images: [rimg("batata-rustica-v2")],
     active: true,
     stock: 999,
     addons: [
@@ -504,7 +507,7 @@ export const RESTAURANTE_PRODUCTS: Product[] = [
     category: "entradas",
     description: "Anéis de cebola empanados na cerveja preta, molho barbecue.",
     price: 32,
-    images: [img("1573080496219-bb080dd4f877")],
+    images: [rimg("onion-rings-v2")],
     active: true,
     stock: 999,
     allowNotes: true,
@@ -516,7 +519,7 @@ export const RESTAURANTE_PRODUCTS: Product[] = [
     category: "hamburgueres",
     description: "180g de blend bovino, queijo, alface, tomate e maionese defumada.",
     price: 39,
-    images: [img("1568901346375-23c9450c58cd")],
+    images: [rimg("burger-classico")],
     active: true,
     featured: true,
     stock: 999,
@@ -536,7 +539,7 @@ export const RESTAURANTE_PRODUCTS: Product[] = [
     description: "Duplo 180g, cheddar, bacon crocante, cebola roxa e molho da casa.",
     price: 52,
     salePrice: 47,
-    images: [img("1550547660-d9450f859349")],
+    images: [rimg("burger-brasa")],
     active: true,
     featured: true,
     stock: 999,
@@ -558,7 +561,7 @@ export const RESTAURANTE_PRODUCTS: Product[] = [
     category: "hamburgueres",
     description: "Hambúrguer de grão-de-bico, queijo brie, rúcula e geleia de pimenta.",
     price: 42,
-    images: [img("1585238342024-78d387f4a707")],
+    images: [rimg("veggie-burger-v2")],
     active: true,
     stock: 999,
     addons: [{ id: "queijo-extra", name: "Queijo extra", price: 6 }],
@@ -571,7 +574,7 @@ export const RESTAURANTE_PRODUCTS: Product[] = [
     category: "pratos",
     description: "300g de picanha, arroz, farofa, vinagrete e batata rústica.",
     price: 89,
-    images: [img("1544025162-d76694265947")],
+    images: [rimg("picanha-brasa-v2")],
     active: true,
     featured: true,
     stock: 999,
@@ -589,7 +592,7 @@ export const RESTAURANTE_PRODUCTS: Product[] = [
     category: "pratos",
     description: "Costela desfiada assada por 24h, purê rústico e cebola caramelizada.",
     price: 79,
-    images: [img("1544025162-d76694265947")],
+    images: [rimg("costela-24h")],
     active: true,
     stock: 999,
     allowNotes: true,
@@ -601,7 +604,7 @@ export const RESTAURANTE_PRODUCTS: Product[] = [
     category: "bebidas",
     description: "Pilsen leve e refrescante, produzida por cervejaria parceira.",
     price: 18,
-    images: [img("1608270586620-248524c67de9")],
+    images: [rimg("chopp-artesanal")],
     active: true,
     stock: 999,
     variantOptions: [{ name: "Tamanho", values: ["300ml", "500ml"] }],
@@ -613,7 +616,7 @@ export const RESTAURANTE_PRODUCTS: Product[] = [
     category: "bebidas",
     description: "Coca-Cola, Guaraná ou Sprite, 350ml.",
     price: 8,
-    images: [img("1622483767028-3f66f32aef97")],
+    images: [rimg("refrigerante-lata")],
     active: true,
     stock: 999,
     variantOptions: [{ name: "Sabor", values: ["Coca-Cola", "Guaraná", "Sprite"] }],
@@ -625,7 +628,7 @@ export const RESTAURANTE_PRODUCTS: Product[] = [
     category: "bebidas",
     description: "Suco 300ml feito na hora.",
     price: 14,
-    images: [img("1600271886742-f049cd451bba")],
+    images: [rimg("suco-natural")],
     active: true,
     stock: 999,
     variantOptions: [{ name: "Sabor", values: ["Laranja", "Abacaxi c/ Hortelã", "Maracujá"] }],
@@ -637,7 +640,7 @@ export const RESTAURANTE_PRODUCTS: Product[] = [
     category: "sobremesas",
     description: "Bolo quente de chocolate meio amargo com sorvete de creme.",
     price: 28,
-    images: [img("1551024506-0bccd828d307")],
+    images: [rimg("petit-gateau")],
     active: true,
     featured: true,
     stock: 999,
@@ -650,7 +653,7 @@ export const RESTAURANTE_PRODUCTS: Product[] = [
     category: "sobremesas",
     description: "Base crocante, cream cheese e calda quente de frutas vermelhas.",
     price: 24,
-    images: [img("1567327613485-fbc7bf196198")],
+    images: [rimg("cheesecake-frutas-vermelhas")],
     active: true,
     stock: 999,
   },
@@ -664,7 +667,7 @@ export const ELETRONICOS_PRODUCTS: Product[] = [
     sku: "NC-XPRO-256",
     category: "smartphones",
     description:
-      "Flagship com tela AMOLED 6.7\" 120Hz, chip NovaCore Fusion e câmera tripla 200MP com estabilização óptica.",
+      'Flagship com tela AMOLED 6.7" 120Hz, chip NovaCore Fusion e câmera tripla 200MP com estabilização óptica.',
     price: 8999,
     salePrice: 7499,
     images: [img("1511707171634-5f897ff02aa9"), img("1512499617640-c74ae3a79d37")],
@@ -677,9 +680,19 @@ export const ELETRONICOS_PRODUCTS: Product[] = [
     ],
     variants: [
       { id: "e1-256-g", attributes: { Armazenamento: "256GB", Cor: "Grafite" }, stock: 12 },
-      { id: "e1-512-g", attributes: { Armazenamento: "512GB", Cor: "Grafite" }, stock: 8, priceDelta: 800 },
+      {
+        id: "e1-512-g",
+        attributes: { Armazenamento: "512GB", Cor: "Grafite" },
+        stock: 8,
+        priceDelta: 800,
+      },
       { id: "e1-256-p", attributes: { Armazenamento: "256GB", Cor: "Prata" }, stock: 10 },
-      { id: "e1-512-p", attributes: { Armazenamento: "512GB", Cor: "Prata" }, stock: 6, priceDelta: 800 },
+      {
+        id: "e1-512-p",
+        attributes: { Armazenamento: "512GB", Cor: "Prata" },
+        stock: 6,
+        priceDelta: 800,
+      },
     ],
     tags: ["lancamento", "top"],
   },
@@ -690,7 +703,7 @@ export const ELETRONICOS_PRODUCTS: Product[] = [
     sku: "NC-STD-16",
     category: "computadores",
     description:
-      "Notebook profissional 16\" 3K, CPU 14 núcleos, 32GB RAM, SSD 1TB. Ideal para criadores e devs.",
+      'Notebook profissional 16" 3K, CPU 14 núcleos, 32GB RAM, SSD 1TB. Ideal para criadores e devs.',
     price: 14990,
     salePrice: 12990,
     images: [img("1517336714731-489689fd1ca8"), img("1496181133206-80ce9b88a853")],
@@ -719,8 +732,7 @@ export const ELETRONICOS_PRODUCTS: Product[] = [
     name: "NovaFit Watch 3",
     sku: "NC-WCH-3",
     category: "wearables",
-    description:
-      "Tela AMOLED, GPS, oxímetro, ECG e bateria de 14 dias. Resistente à água até 50m.",
+    description: "Tela AMOLED, GPS, oxímetro, ECG e bateria de 14 dias. Resistente à água até 50m.",
     price: 1899,
     images: [img("1523275335684-37898b6baf30"), img("1508685096489-7aacd43bd3b1")],
     active: true,
@@ -753,8 +765,7 @@ export const ELETRONICOS_PRODUCTS: Product[] = [
     name: "Teclado Mecânico Nova Strike",
     sku: "NC-KBD-STK",
     category: "gamer",
-    description:
-      "Switches ópticos, layout ABNT2, RGB per-key, corpo em alumínio anodizado.",
+    description: "Switches ópticos, layout ABNT2, RGB per-key, corpo em alumínio anodizado.",
     price: 1299,
     images: [img("1587829741301-dc798b83add3"), img("1541140532154-b024d705b90a")],
     active: true,
@@ -766,8 +777,7 @@ export const ELETRONICOS_PRODUCTS: Product[] = [
     name: "Mouse Gamer Nova Flux",
     sku: "NC-MSE-FLX",
     category: "gamer",
-    description:
-      "Sensor 30K DPI, 8 botões programáveis, 60g. Precisão competitiva.",
+    description: "Sensor 30K DPI, 8 botões programáveis, 60g. Precisão competitiva.",
     price: 599,
     salePrice: 499,
     images: [img("1527814050087-3793815479db"), img("1615663245857-ac93bb7c39e7")],
@@ -777,11 +787,10 @@ export const ELETRONICOS_PRODUCTS: Product[] = [
   {
     id: "e8",
     slug: "monitor-nova-vision-27",
-    name: "Monitor Nova Vision 27\" QHD 165Hz",
+    name: 'Monitor Nova Vision 27" QHD 165Hz',
     sku: "NC-MON-27Q",
     category: "computadores",
-    description:
-      "IPS QHD 165Hz 1ms, HDR400 e cobertura 100% sRGB. Suporte ergonômico incluso.",
+    description: "IPS QHD 165Hz 1ms, HDR400 e cobertura 100% sRGB. Suporte ergonômico incluso.",
     price: 2790,
     images: [img("1527443224154-c4a3942d3acf"), img("1616763355548-1b606f439f86")],
     active: true,
@@ -793,8 +802,7 @@ export const ELETRONICOS_PRODUCTS: Product[] = [
     name: "Câmera NovaShot R Mirrorless",
     sku: "NC-CAM-R",
     category: "acessorios",
-    description:
-      "Sensor full-frame 33MP, gravação 6K, estabilização IBIS 7 stops.",
+    description: "Sensor full-frame 33MP, gravação 6K, estabilização IBIS 7 stops.",
     price: 12490,
     images: [img("1495707902641-75cac588d2e9"), img("1502920917128-1aa500764cbd")],
     active: true,
@@ -806,8 +814,7 @@ export const ELETRONICOS_PRODUCTS: Product[] = [
     name: "Power Bank NovaCharge 20K",
     sku: "NC-PWB-20",
     category: "acessorios",
-    description:
-      "20.000mAh, saída 100W USB-C PD. Carrega notebook, celular e tablet.",
+    description: "20.000mAh, saída 100W USB-C PD. Carrega notebook, celular e tablet.",
     price: 449,
     salePrice: 379,
     images: [img("1609091839311-d5365f9ff1c5"), img("1583863788434-e58a36330cf0")],
@@ -820,8 +827,7 @@ export const ELETRONICOS_PRODUCTS: Product[] = [
     name: "NovaBuds Pro TWS",
     sku: "NC-BUD-PRO",
     category: "audio",
-    description:
-      "Cancelamento ativo adaptativo, áudio Hi-Res e 32h com case.",
+    description: "Cancelamento ativo adaptativo, áudio Hi-Res e 32h com case.",
     price: 1299,
     salePrice: 999,
     images: [img("1590658268037-6bf12165a8df"), img("1606220588913-b3aacb4d2f37")],
@@ -835,8 +841,7 @@ export const ELETRONICOS_PRODUCTS: Product[] = [
     name: "Hub USB-C NovaLink 8-em-1",
     sku: "NC-HUB-8",
     category: "acessorios",
-    description:
-      "HDMI 4K60, 2x USB-A, USB-C PD 100W, leitor SD/microSD e Gigabit Ethernet.",
+    description: "HDMI 4K60, 2x USB-A, USB-C PD 100W, leitor SD/microSD e Gigabit Ethernet.",
     price: 349,
     images: [img("1625948515291-69613efd103f"), img("1618410320928-25228d811631")],
     active: true,

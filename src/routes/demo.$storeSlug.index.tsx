@@ -4,12 +4,18 @@ import { getStore } from "@/config/stores";
 import { repo } from "@/services/local-repository";
 import { ProductCard } from "@/components/storefront/product-card";
 import { Button } from "@/components/ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { brl } from "@/lib/format";
 import { Clock, Scissors } from "lucide-react";
 import { NicheHero, type HeroSpotlight } from "@/components/storefront/hero/niche-hero";
 import { FashionStorefront } from "@/components/storefront/fashion-storefront";
 import { BarberStorefront } from "@/components/storefront/barber-storefront";
+import { RestaurantStorefront } from "@/components/storefront/restaurant-storefront";
 
 export const Route = createFileRoute("/demo/$storeSlug/")({
   component: StoreHome,
@@ -74,6 +80,11 @@ function StoreHome() {
     );
   }
 
+  // Brasa Urbana: home gastronômica dedicada, orientada a produto e conversão.
+  if (store.niche === "restaurant") {
+    return <RestaurantStorefront store={store} products={products} featured={featured} />;
+  }
+
   return (
     <div>
       <NicheHero store={store} spotlight={spotlight} featured={featured} />
@@ -120,9 +131,15 @@ function StoreHome() {
           <div className="mb-6 flex items-end justify-between">
             <div>
               <div className="text-xs uppercase tracking-widest text-primary">Serviços</div>
-              <h2 className="font-display text-2xl font-semibold sm:text-3xl">Nossa carta de serviços</h2>
+              <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+                Nossa carta de serviços
+              </h2>
             </div>
-            <Button asChild variant="outline"><Link to="/demo/$storeSlug/agendar" params={{ storeSlug }}>Agendar</Link></Button>
+            <Button asChild variant="outline">
+              <Link to="/demo/$storeSlug/agendar" params={{ storeSlug }}>
+                Agendar
+              </Link>
+            </Button>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {services.map((s) => (
@@ -144,7 +161,9 @@ function StoreHome() {
                   </div>
                 </div>
                 <div className="mt-3 font-semibold group-hover:text-primary">{s.name}</div>
-                <div className="mt-1 line-clamp-2 text-sm text-muted-foreground">{s.description}</div>
+                <div className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                  {s.description}
+                </div>
               </Link>
             ))}
           </div>
@@ -157,11 +176,20 @@ function StoreHome() {
           <h2 className="font-display text-2xl font-semibold sm:text-3xl">Barbeiros da casa</h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {professionals.map((p) => (
-              <div key={p.id} className="rounded-[var(--radius)] border border-border/60 bg-card p-4 text-center">
+              <div
+                key={p.id}
+                className="rounded-[var(--radius)] border border-border/60 bg-card p-4 text-center"
+              >
                 {p.avatar ? (
-                  <img src={p.avatar} alt={p.name} className="mx-auto h-24 w-24 rounded-full object-cover" />
+                  <img
+                    src={p.avatar}
+                    alt={p.name}
+                    className="mx-auto h-24 w-24 rounded-full object-cover"
+                  />
                 ) : (
-                  <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-muted text-muted-foreground">?</div>
+                  <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-muted text-muted-foreground">
+                    ?
+                  </div>
                 )}
                 <div className="mt-3 font-semibold">{p.name}</div>
                 <div className="text-xs text-muted-foreground">{p.role}</div>
@@ -195,13 +223,17 @@ function StoreHome() {
 
       {/* SOBRE */}
       <section className="mx-auto max-w-4xl px-4 py-16 text-center">
-        <h2 className="font-display text-2xl font-semibold sm:text-3xl">{store.messages.aboutTitle}</h2>
+        <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+          {store.messages.aboutTitle}
+        </h2>
         <p className="mt-4 text-muted-foreground">{store.messages.aboutBody}</p>
       </section>
 
       {/* FAQ */}
       <section className="mx-auto max-w-3xl px-4 pb-16">
-        <h2 className="font-display mb-6 text-2xl font-semibold sm:text-3xl">Perguntas frequentes</h2>
+        <h2 className="font-display mb-6 text-2xl font-semibold sm:text-3xl">
+          Perguntas frequentes
+        </h2>
         <Accordion type="single" collapsible>
           {store.faq.map((f, i) => (
             <AccordionItem key={i} value={`f${i}`}>
