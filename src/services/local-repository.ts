@@ -37,9 +37,7 @@ let barberMediaMigrated = false;
 function migrateBarberMediaIfNeeded(): void {
   if (!isBrowser() || barberMediaMigrated) return;
   try {
-    const current = Number(
-      localStorage.getItem(BARBER_MEDIA_VERSION_KEY) ?? "0",
-    );
+    const current = Number(localStorage.getItem(BARBER_MEDIA_VERSION_KEY) ?? "0");
     if (current >= BARBER_MEDIA_VERSION) {
       barberMediaMigrated = true;
       return;
@@ -80,6 +78,45 @@ function migrateBarberMediaIfNeeded(): void {
   }
 }
 
+/**
+ * Migração versionada das imagens da Brasa Urbana.
+ *
+ * Troca somente a mídia dos produtos conhecidos para os arquivos locais,
+ * mantendo personalizações administrativas, estoque, preços e pedidos.
+ */
+const RESTAURANT_MEDIA_VERSION_KEY = "vitrine:restaurante:media-version";
+const RESTAURANT_MEDIA_VERSION = 1;
+let restaurantMediaMigrated = false;
+
+function migrateRestaurantMediaIfNeeded(): void {
+  if (!isBrowser() || restaurantMediaMigrated) return;
+  try {
+    const current = Number(localStorage.getItem(RESTAURANT_MEDIA_VERSION_KEY) ?? "0");
+    if (current >= RESTAURANT_MEDIA_VERSION) {
+      restaurantMediaMigrated = true;
+      return;
+    }
+
+    const rawProducts = localStorage.getItem(key("restaurante", "products"));
+    if (rawProducts) {
+      const stored = JSON.parse(rawProducts) as Product[];
+      const seed = DEMO_PRODUCTS_BY_STORE["restaurante"] ?? [];
+      const byId = new Map(seed.map((product) => [product.id, product]));
+      const bySlug = new Map(seed.map((product) => [product.slug, product]));
+      const updated = stored.map((product) => {
+        const source = byId.get(product.id) ?? bySlug.get(product.slug);
+        return source ? { ...product, images: [...source.images] } : product;
+      });
+      localStorage.setItem(key("restaurante", "products"), JSON.stringify(updated));
+    }
+
+    localStorage.setItem(RESTAURANT_MEDIA_VERSION_KEY, String(RESTAURANT_MEDIA_VERSION));
+    restaurantMediaMigrated = true;
+  } catch {
+    // Migração é best-effort; qualquer erro não deve quebrar o app.
+  }
+}
+
 function readJSON<T>(k: string, fallback: T): T {
   if (!isBrowser()) return fallback;
   try {
@@ -93,7 +130,9 @@ function writeJSON(k: string, value: unknown): void {
   if (!isBrowser()) return;
   try {
     localStorage.setItem(k, JSON.stringify(value));
-  } catch {}
+  } catch {
+    // O modo demonstrativo continua funcional mesmo sem quota de localStorage.
+  }
 }
 
 const listeners = new Set<() => void>();
@@ -122,6 +161,7 @@ function seedIfNeeded(slug: string) {
     writeJSON(key(slug, "professionals"), DEMO_PROFESSIONALS_BY_STORE[slug] ?? []);
   }
   if (slug === "barbearia") migrateBarberMediaIfNeeded();
+  if (slug === "restaurante") migrateRestaurantMediaIfNeeded();
 }
 
 export const localRepository: CommerceRepository = {
@@ -271,9 +311,7 @@ export const localRepository: CommerceRepository = {
     emit();
   },
   updateAppointmentStatus(slug, id, status: AppointmentStatus) {
-    const all = this.listAppointments(slug).map((a) =>
-      a.id === id ? { ...a, status } : a,
-    );
+    const all = this.listAppointments(slug).map((a) => (a.id === id ? { ...a, status } : a));
     writeJSON(key(slug, "appointments"), all);
     emit();
   },
