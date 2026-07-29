@@ -17,6 +17,7 @@ import { FashionStorefront } from "@/components/storefront/fashion-storefront";
 import { BarberStorefront } from "@/components/storefront/barber-storefront";
 import { RestaurantStorefront } from "@/components/storefront/restaurant-storefront";
 import { ElectronicsStorefront } from "@/components/storefront/electronics-storefront";
+import { CinematicStorefront } from "@/components/motion/cinematic-motion-system";
 
 export const Route = createFileRoute("/demo/$storeSlug/")({
   component: StoreHome,
@@ -60,195 +61,209 @@ function StoreHome() {
   // Maison Belle: composição editorial própria, fora do template genérico.
   if (store.niche === "fashion") {
     return (
-      <FashionStorefront
-        store={store}
-        spotlight={spotlight}
-        featured={featured}
-        products={products}
-      />
+      <CinematicStorefront tone={store.niche}>
+        <FashionStorefront
+          store={store}
+          spotlight={spotlight}
+          featured={featured}
+          products={products}
+        />
+      </CinematicStorefront>
     );
   }
 
   // Barber Noir: home cinematográfica dedicada, fora do template genérico.
   if (store.niche === "barber") {
     return (
-      <BarberStorefront
-        store={store}
-        services={services}
-        professionals={professionals}
-        products={products}
-      />
+      <CinematicStorefront tone={store.niche}>
+        <BarberStorefront
+          store={store}
+          services={services}
+          professionals={professionals}
+          products={products}
+        />
+      </CinematicStorefront>
     );
   }
 
   // Brasa Urbana: home gastronômica dedicada, orientada a produto e conversão.
   if (store.niche === "restaurant") {
-    return <RestaurantStorefront store={store} products={products} featured={featured} />;
+    return (
+      <CinematicStorefront tone={store.niche}>
+        <RestaurantStorefront store={store} products={products} featured={featured} />
+      </CinematicStorefront>
+    );
   }
 
   // NovaCore: laboratório visual próprio, com showroom técnico e atmosfera WebGL.
   if (store.niche === "electronics") {
-    return <ElectronicsStorefront store={store} products={products} featured={featured} />;
+    return (
+      <CinematicStorefront tone={store.niche}>
+        <ElectronicsStorefront store={store} products={products} featured={featured} />
+      </CinematicStorefront>
+    );
   }
 
   return (
-    <div>
-      <NicheHero store={store} spotlight={spotlight} featured={featured} />
+    <CinematicStorefront tone={store.niche}>
+      <div>
+        <NicheHero store={store} spotlight={spotlight} featured={featured} />
 
-      {/* BENEFICIOS */}
-      <section className="border-y border-border/60 bg-muted/40">
-        <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 sm:grid-cols-3">
-          {store.benefits.map((b) => {
-            const Icon = ICONS[b.icon] ?? Sparkles;
-            return (
-              <div key={b.title} className="flex items-start gap-3">
-                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-                  <Icon className="h-5 w-5" />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold">{b.title}</div>
-                  <div className="text-xs text-muted-foreground">{b.description}</div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* CATEGORIAS */}
-      <section className="mx-auto max-w-6xl px-4 py-14">
-        <h2 className="font-display text-2xl font-semibold sm:text-3xl">Categorias</h2>
-        <div className="mt-6 grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {store.categories.map((c) => (
-            <Link
-              key={c.slug}
-              to="/demo/$storeSlug/categoria/$categorySlug"
-              params={{ storeSlug, categorySlug: c.slug }}
-              className="rounded-[var(--radius)] border border-border/60 bg-card p-4 text-center text-sm font-medium transition hover:border-primary hover:bg-accent hover:text-accent-foreground"
-            >
-              {c.name}
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {isBarber && services.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 py-6">
-          <div className="mb-6 flex items-end justify-between">
-            <div>
-              <div className="text-xs uppercase tracking-widest text-primary">Serviços</div>
-              <h2 className="font-display text-2xl font-semibold sm:text-3xl">
-                Nossa carta de serviços
-              </h2>
-            </div>
-            <Button asChild variant="outline">
-              <Link to="/demo/$storeSlug/agendar" params={{ storeSlug }}>
-                Agendar
-              </Link>
-            </Button>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((s) => (
-              <Link
-                key={s.id}
-                to="/demo/$storeSlug/agendar"
-                params={{ storeSlug }}
-                className="group rounded-[var(--radius)] border border-border/60 bg-card p-5 transition hover:border-primary"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
-                    <Scissors className="h-4 w-4" />
+        {/* BENEFICIOS */}
+        <section className="border-y border-border/60 bg-muted/40">
+          <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 sm:grid-cols-3">
+            {store.benefits.map((b) => {
+              const Icon = ICONS[b.icon] ?? Sparkles;
+              return (
+                <div key={b.title} className="flex items-start gap-3">
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                    <Icon className="h-5 w-5" />
                   </div>
-                  <div className="text-right">
-                    <div className="text-lg font-semibold">{brl(s.price)}</div>
-                    <div className="text-[11px] text-muted-foreground inline-flex items-center gap-1">
-                      <Clock className="h-3 w-3" /> {s.durationMinutes} min
+                  <div>
+                    <div className="text-sm font-semibold">{b.title}</div>
+                    <div className="text-xs text-muted-foreground">{b.description}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* CATEGORIAS */}
+        <section className="mx-auto max-w-6xl px-4 py-14">
+          <h2 className="font-display text-2xl font-semibold sm:text-3xl">Categorias</h2>
+          <div className="mt-6 grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {store.categories.map((c) => (
+              <Link
+                key={c.slug}
+                to="/demo/$storeSlug/categoria/$categorySlug"
+                params={{ storeSlug, categorySlug: c.slug }}
+                className="rounded-[var(--radius)] border border-border/60 bg-card p-4 text-center text-sm font-medium transition hover:border-primary hover:bg-accent hover:text-accent-foreground"
+              >
+                {c.name}
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {isBarber && services.length > 0 && (
+          <section className="mx-auto max-w-6xl px-4 py-6">
+            <div className="mb-6 flex items-end justify-between">
+              <div>
+                <div className="text-xs uppercase tracking-widest text-primary">Serviços</div>
+                <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+                  Nossa carta de serviços
+                </h2>
+              </div>
+              <Button asChild variant="outline">
+                <Link to="/demo/$storeSlug/agendar" params={{ storeSlug }}>
+                  Agendar
+                </Link>
+              </Button>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {services.map((s) => (
+                <Link
+                  key={s.id}
+                  to="/demo/$storeSlug/agendar"
+                  params={{ storeSlug }}
+                  className="group rounded-[var(--radius)] border border-border/60 bg-card p-5 transition hover:border-primary"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
+                      <Scissors className="h-4 w-4" />
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-semibold">{brl(s.price)}</div>
+                      <div className="text-[11px] text-muted-foreground inline-flex items-center gap-1">
+                        <Clock className="h-3 w-3" /> {s.durationMinutes} min
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="mt-3 font-semibold group-hover:text-primary">{s.name}</div>
-                <div className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                  {s.description}
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {isBarber && professionals.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 py-10">
-          <div className="text-xs uppercase tracking-widest text-primary">Time</div>
-          <h2 className="font-display text-2xl font-semibold sm:text-3xl">Barbeiros da casa</h2>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {professionals.map((p) => (
-              <div
-                key={p.id}
-                className="rounded-[var(--radius)] border border-border/60 bg-card p-4 text-center"
-              >
-                {p.avatar ? (
-                  <img
-                    src={p.avatar}
-                    alt={p.name}
-                    className="mx-auto h-24 w-24 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-muted text-muted-foreground">
-                    ?
+                  <div className="mt-3 font-semibold group-hover:text-primary">{s.name}</div>
+                  <div className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                    {s.description}
                   </div>
-                )}
-                <div className="mt-3 font-semibold">{p.name}</div>
-                <div className="text-xs text-muted-foreground">{p.role}</div>
-              </div>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {isBarber && professionals.length > 0 && (
+          <section className="mx-auto max-w-6xl px-4 py-10">
+            <div className="text-xs uppercase tracking-widest text-primary">Time</div>
+            <h2 className="font-display text-2xl font-semibold sm:text-3xl">Barbeiros da casa</h2>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {professionals.map((p) => (
+                <div
+                  key={p.id}
+                  className="rounded-[var(--radius)] border border-border/60 bg-card p-4 text-center"
+                >
+                  {p.avatar ? (
+                    <img
+                      src={p.avatar}
+                      alt={p.name}
+                      className="mx-auto h-24 w-24 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-muted text-muted-foreground">
+                      ?
+                    </div>
+                  )}
+                  <div className="mt-3 font-semibold">{p.name}</div>
+                  <div className="text-xs text-muted-foreground">{p.role}</div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* DESTAQUES */}
+        {featured.length > 0 && (
+          <section className="mx-auto max-w-6xl px-4 py-6">
+            <div className="mb-6 flex items-end justify-between">
+              <h2 className="font-display text-2xl font-semibold sm:text-3xl">Destaques</h2>
+              <Link
+                to="/demo/$storeSlug/produtos"
+                params={{ storeSlug }}
+                search={{ q: "", cat: "", sort: "" }}
+                className="text-sm text-primary hover:underline"
+              >
+                Ver todos
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
+              {featured.map((p) => (
+                <ProductCard key={p.id} product={p} storeSlug={storeSlug} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* SOBRE */}
+        <section className="mx-auto max-w-4xl px-4 py-16 text-center">
+          <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+            {store.messages.aboutTitle}
+          </h2>
+          <p className="mt-4 text-muted-foreground">{store.messages.aboutBody}</p>
         </section>
-      )}
 
-      {/* DESTAQUES */}
-      {featured.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 py-6">
-          <div className="mb-6 flex items-end justify-between">
-            <h2 className="font-display text-2xl font-semibold sm:text-3xl">Destaques</h2>
-            <Link
-              to="/demo/$storeSlug/produtos"
-              params={{ storeSlug }}
-              search={{ q: "", cat: "", sort: "" }}
-              className="text-sm text-primary hover:underline"
-            >
-              Ver todos
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
-            {featured.map((p) => (
-              <ProductCard key={p.id} product={p} storeSlug={storeSlug} />
+        {/* FAQ */}
+        <section className="mx-auto max-w-3xl px-4 pb-16">
+          <h2 className="font-display mb-6 text-2xl font-semibold sm:text-3xl">
+            Perguntas frequentes
+          </h2>
+          <Accordion type="single" collapsible>
+            {store.faq.map((f, i) => (
+              <AccordionItem key={i} value={`f${i}`}>
+                <AccordionTrigger className="text-left">{f.q}</AccordionTrigger>
+                <AccordionContent>{f.a}</AccordionContent>
+              </AccordionItem>
             ))}
-          </div>
+          </Accordion>
         </section>
-      )}
-
-      {/* SOBRE */}
-      <section className="mx-auto max-w-4xl px-4 py-16 text-center">
-        <h2 className="font-display text-2xl font-semibold sm:text-3xl">
-          {store.messages.aboutTitle}
-        </h2>
-        <p className="mt-4 text-muted-foreground">{store.messages.aboutBody}</p>
-      </section>
-
-      {/* FAQ */}
-      <section className="mx-auto max-w-3xl px-4 pb-16">
-        <h2 className="font-display mb-6 text-2xl font-semibold sm:text-3xl">
-          Perguntas frequentes
-        </h2>
-        <Accordion type="single" collapsible>
-          {store.faq.map((f, i) => (
-            <AccordionItem key={i} value={`f${i}`}>
-              <AccordionTrigger className="text-left">{f.q}</AccordionTrigger>
-              <AccordionContent>{f.a}</AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </section>
-    </div>
+      </div>
+    </CinematicStorefront>
   );
 }

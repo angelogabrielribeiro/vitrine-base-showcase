@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { motion, useTransform, type MotionValue } from "framer-motion";
+import {
+  useCinematicMotion,
+  useInertialScrollProgress,
+} from "@/components/motion/cinematic-motion-system";
 
 export type ZoomImage = {
   src: string;
@@ -24,9 +28,12 @@ export function ZoomParallax({
   eyebrow?: string;
   caption?: string;
 }) {
-  const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
+  const { capabilities } = useCinematicMotion();
+  const reduce = capabilities.reducedMotion || capabilities.quality === "static";
+  const scrollYProgress = useInertialScrollProgress(ref, {
+    offset: ["start start", "end end"],
+  });
   const [isDesktop, setIsDesktop] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
@@ -43,7 +50,13 @@ export function ZoomParallax({
       <section className="relative bg-neutral-950 text-neutral-50" aria-label={title ?? "Campanha"}>
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-3 px-4 py-24 sm:grid-cols-3">
           {images.slice(0, 6).map((im, i) => (
-            <img key={i} src={im.src} alt={im.alt ?? ""} className="aspect-[4/5] w-full object-cover" loading="lazy" />
+            <img
+              key={i}
+              src={im.src}
+              alt={im.alt ?? ""}
+              className="aspect-[4/5] w-full object-cover"
+              loading="lazy"
+            />
           ))}
         </div>
       </section>
@@ -59,13 +72,19 @@ export function ZoomParallax({
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         {images.map((im, i) => (
-          <ZoomLayer key={i} image={{ ...im, scale: Math.min(im.scale, maxScale) }} progress={scrollYProgress} />
+          <ZoomLayer
+            key={i}
+            image={{ ...im, scale: Math.min(im.scale, maxScale) }}
+            progress={scrollYProgress}
+          />
         ))}
         {/* Overlay para legibilidade do título */}
         <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-neutral-950/70 via-neutral-950/30 to-neutral-950/70" />
         <div className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center">
           {eyebrow && (
-            <span className="text-[10px] uppercase tracking-[0.5em] text-white/85 drop-shadow">{eyebrow}</span>
+            <span className="text-[10px] uppercase tracking-[0.5em] text-white/85 drop-shadow">
+              {eyebrow}
+            </span>
           )}
           {title && (
             <h2 className="font-display mt-4 text-4xl leading-tight text-white drop-shadow-[0_2px_18px_rgba(0,0,0,0.65)] sm:text-6xl md:text-7xl">
@@ -83,7 +102,9 @@ function ZoomLayer({ image, progress }: { image: ZoomImage; progress: MotionValu
   const scale = useTransform(progress, [0, 1], [1, image.scale]);
   return (
     <motion.div
-      className={"absolute flex items-center justify-center will-change-transform " + image.className}
+      className={
+        "absolute flex items-center justify-center will-change-transform " + image.className
+      }
       style={{ scale }}
     >
       <div className="h-full w-full overflow-hidden">

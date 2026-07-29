@@ -8,7 +8,7 @@ import { ZoomParallax, type ZoomImage } from "@/components/effects/ZoomParallax"
 import { FlowingMenu, type FlowingItem } from "@/components/effects/FlowingMenu";
 import { EditorialProductCard } from "@/components/storefront/product-card-editorial";
 import { SectionReveal, WordReveal, Marquee } from "@/components/motion/primitives";
-import { useHydrated } from "@/hooks/use-hydrated";
+import { DeferredScene } from "@/components/motion/cinematic-motion-system";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -19,6 +19,32 @@ import {
 
 // Galeria 3D é carregada apenas no browser após a hidratação para não quebrar SSR.
 const Gallery3D = lazy(() => import("@/components/effects/Gallery3D"));
+
+function StaticLookbook({ images, title }: { images: string[]; title: string }) {
+  return (
+    <section className="bg-neutral-950 px-6 py-20 text-neutral-50" aria-label={title}>
+      <div className="mx-auto max-w-6xl">
+        <span className="text-[10px] uppercase tracking-[0.5em] text-amber-200/80">Coleção</span>
+        <h2 className="font-display mt-3 text-3xl sm:text-5xl">{title}</h2>
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {images.slice(0, 10).map((src, index) => (
+            <img
+              key={`${src}-${index}`}
+              src={src}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="aspect-[3/4] w-full object-cover"
+            />
+          ))}
+        </div>
+        <p className="mt-6 text-xs text-white/50">
+          Lookbook editorial otimizado para este dispositivo.
+        </p>
+      </div>
+    </section>
+  );
+}
 
 export function FashionStorefront({
   store,
@@ -31,8 +57,6 @@ export function FashionStorefront({
   featured: Product[];
   products: Product[];
 }) {
-  const hydrated = useHydrated();
-
   // Pool de imagens autênticas do próprio catálogo Maison Belle
   const catalogImages = useMemo(() => {
     const all = products.flatMap((p) => p.images).filter(Boolean);
@@ -43,7 +67,12 @@ export function FashionStorefront({
   const zoomImages: ZoomImage[] = useMemo(() => {
     // Composição compacta com 5 camadas — legibilidade acima de tudo.
     const layout: Omit<ZoomImage, "src">[] = [
-      { alt: "Campanha", className: "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[30vh] w-[24vw] min-w-[220px]", scale: 4.5 },
+      {
+        alt: "Campanha",
+        className:
+          "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[30vh] w-[24vw] min-w-[220px]",
+        scale: 4.5,
+      },
       { alt: "", className: "left-[6%] top-[10%] h-[26vh] w-[18vw] min-w-[160px]", scale: 3.2 },
       { alt: "", className: "right-[8%] top-[8%] h-[22vh] w-[16vw] min-w-[140px]", scale: 3.6 },
       { alt: "", className: "left-[4%] bottom-[8%] h-[24vh] w-[20vw] min-w-[180px]", scale: 3 },
@@ -121,7 +150,11 @@ export function FashionStorefront({
         <FlowingMenu items={flowingItems} />
       </section>
 
-      {hydrated && lookbook.length > 3 ? (
+      <DeferredScene
+        require3D
+        className="bg-neutral-950"
+        fallback={<StaticLookbook images={lookbook} title="Lookbook Alta Primavera" />}
+      >
         <Suspense
           fallback={
             <div className="grid h-[62vh] place-items-center bg-neutral-950 text-white/60">
@@ -131,11 +164,7 @@ export function FashionStorefront({
         >
           <Gallery3D images={lookbook} title="Lookbook Alta Primavera" eyebrow="Coleção" />
         </Suspense>
-      ) : (
-        <div className="grid h-[50vh] place-items-center bg-neutral-950 text-white/60">
-          <span className="text-xs uppercase tracking-[0.4em]">Carregando lookbook…</span>
-        </div>
-      )}
+      </DeferredScene>
 
       {/* GRID COMPACTO — Peças em destaque */}
       <section className="mx-auto max-w-[72rem] px-6 py-14 sm:py-[4.5rem]">
@@ -161,15 +190,10 @@ export function FashionStorefront({
           <div className="grid grid-cols-1 place-items-center gap-x-6 gap-y-10 sm:grid-cols-2 sm:place-items-stretch lg:grid-cols-3">
             {editorialGrid.map((p, i) => {
               // stagger vertical sutil apenas em desktop, máx 24px
-              const offset =
-                i % 3 === 1 ? "lg:mt-6" : i % 3 === 2 ? "lg:mt-3" : "";
+              const offset = i % 3 === 1 ? "lg:mt-6" : i % 3 === 2 ? "lg:mt-3" : "";
               return (
                 <div key={p.id} className={`w-full max-w-[22rem] sm:max-w-none ${offset}`}>
-                  <EditorialProductCard
-                    product={p}
-                    storeSlug={store.slug}
-                    aspect="portrait"
-                  />
+                  <EditorialProductCard product={p} storeSlug={store.slug} aspect="portrait" />
                 </div>
               );
             })}

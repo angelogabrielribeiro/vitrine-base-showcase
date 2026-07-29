@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import { useReducedMotion } from "framer-motion";
 import * as THREE from "three";
+import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 
 type TechnologyShaderProps = {
   className?: string;
@@ -14,11 +14,11 @@ type TechnologyShaderProps = {
  */
 export function TechnologyShader({ className }: TechnologyShaderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const reduceMotion = useReducedMotion();
+  const { capabilities } = useCinematicMotion();
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container || !capabilities.hydrated || !capabilities.allow3D) return;
 
     let animationId = 0;
     let visible = true;
@@ -108,7 +108,7 @@ export function TechnologyShader({ className }: TechnologyShaderProps) {
       return;
     }
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setPixelRatio(capabilities.dpr);
     renderer.domElement.setAttribute("aria-hidden", "true");
     renderer.domElement.style.width = "100%";
     renderer.domElement.style.height = "100%";
@@ -133,10 +133,10 @@ export function TechnologyShader({ className }: TechnologyShaderProps) {
     const render = () => {
       if (!renderer) return;
       if (visible) {
-        if (!reduceMotion) uniforms.time.value += 0.045;
+        uniforms.time.value += 0.045;
         renderer.render(scene, camera);
       }
-      if (!reduceMotion) animationId = window.requestAnimationFrame(render);
+      animationId = window.requestAnimationFrame(render);
     };
     render();
 
@@ -151,7 +151,7 @@ export function TechnologyShader({ className }: TechnologyShaderProps) {
       geometry.dispose();
       material.dispose();
     };
-  }, [reduceMotion]);
+  }, [capabilities.allow3D, capabilities.dpr, capabilities.hydrated]);
 
   return (
     <div
