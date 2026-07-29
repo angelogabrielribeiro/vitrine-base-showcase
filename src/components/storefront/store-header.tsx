@@ -88,8 +88,8 @@ export function StoreHeader({ store }: { store: StoreConfig }) {
             {open ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
           </Button>
           <StoreSwitcher currentSlug={store.slug} />
-          <Button asChild variant="ghost" size="icon" aria-label="Entrar">
-            <Link to="/demo/$storeSlug/login" params={{ storeSlug: store.slug }}>
+          <Button asChild variant="ghost" size="icon" aria-label="Meus pedidos">
+            <Link to="/demo/$storeSlug/meus-pedidos" params={{ storeSlug: store.slug }}>
               <User className="h-5 w-5" />
             </Link>
           </Button>
