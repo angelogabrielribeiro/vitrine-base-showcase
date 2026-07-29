@@ -31,7 +31,7 @@ const SESSION_KEY = "vitrine:session";
  * vez por versão, no browser. Nunca limpa outras chaves.
  */
 const BARBER_MEDIA_VERSION_KEY = "vitrine:barbearia:media-version";
-const BARBER_MEDIA_VERSION = 3;
+const BARBER_MEDIA_VERSION = 4;
 let barberMediaMigrated = false;
 
 function migrateBarberMediaIfNeeded(): void {

@@ -1,6 +1,16 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useId, useRef, useState } from "react";
-import { CalendarDays, Home, MessageCircle, ShoppingBag, User2, UtensilsCrossed, X, Scissors, ShoppingBasket } from "lucide-react";
+import {
+  CalendarDays,
+  Home,
+  MessageCircle,
+  ShoppingBag,
+  User2,
+  UtensilsCrossed,
+  X,
+  Scissors,
+  ShoppingBasket,
+} from "lucide-react";
 import type { StoreConfig } from "@/types/commerce";
 import { useCart } from "@/hooks/use-cart";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -116,7 +126,9 @@ export function LiquidMobileMenu({ store, hide = false }: { store: StoreConfig; 
             className="relative flex w-[min(92vw,22rem)] flex-col p-3"
           >
             <div className="mb-2 flex items-center justify-between px-1">
-              <div className="text-xs font-semibold uppercase tracking-widest opacity-80">{store.logoText}</div>
+              <div className="text-xs font-semibold uppercase tracking-widest opacity-80">
+                {store.logoText}
+              </div>
               <button
                 type="button"
                 aria-label="Fechar menu"
@@ -126,7 +138,13 @@ export function LiquidMobileMenu({ store, hide = false }: { store: StoreConfig; 
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <MenuLink innerRef={firstItemRef} to="/demo/$storeSlug" params={{ storeSlug: store.slug }} icon={<Home className="h-4 w-4" />} label="Início" />
+            <MenuLink
+              innerRef={firstItemRef}
+              to="/demo/$storeSlug"
+              params={{ storeSlug: store.slug }}
+              icon={<Home className="h-4 w-4" />}
+              label="Início"
+            />
             <MenuLink
               to="/demo/$storeSlug/produtos"
               params={{ storeSlug: store.slug }}
@@ -151,10 +169,10 @@ export function LiquidMobileMenu({ store, hide = false }: { store: StoreConfig; 
               />
             )}
             <MenuLink
-              to="/demo/$storeSlug/login"
+              to="/demo/$storeSlug/meus-pedidos"
               params={{ storeSlug: store.slug }}
               icon={<User2 className="h-4 w-4" />}
-              label="Minha conta"
+              label="Meus pedidos"
             />
             <a
               role="menuitem"
@@ -209,7 +227,9 @@ function MenuLink({ innerRef, to, params, search, icon, label, badge }: any) {
       search={search}
       className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium outline-none hover:bg-primary-foreground/10 focus-visible:bg-primary-foreground/15"
     >
-      <span className="grid h-8 w-8 place-items-center rounded-full bg-primary-foreground/10">{icon}</span>
+      <span className="grid h-8 w-8 place-items-center rounded-full bg-primary-foreground/10">
+        {icon}
+      </span>
       <span className="flex-1">{label}</span>
       {badge && (
         <span className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary-foreground px-1 text-[10px] font-bold text-primary">
