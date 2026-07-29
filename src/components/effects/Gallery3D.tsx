@@ -1,6 +1,7 @@
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
+import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 
 export type Gallery3DProps = {
   images: string[];
@@ -19,9 +20,9 @@ export type Gallery3DProps = {
 export default function Gallery3D({ images, title, eyebrow }: Gallery3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [supportsWebGL, setSupportsWebGL] = useState<boolean | null>(null);
-  const [reduce, setReduce] = useState(false);
   const [inView, setInView] = useState(true);
   const [hasFocus, setHasFocus] = useState(false);
+  const { capabilities } = useCinematicMotion();
 
   useEffect(() => {
     try {
@@ -31,25 +32,17 @@ export default function Gallery3D({ images, title, eyebrow }: Gallery3DProps) {
     } catch {
       setSupportsWebGL(false);
     }
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduce(mq.matches);
-    const on = () => setReduce(mq.matches);
-    mq.addEventListener("change", on);
-    return () => mq.removeEventListener("change", on);
   }, []);
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const io = new IntersectionObserver(
-      ([e]) => setInView(e.isIntersecting),
-      { threshold: 0.05 },
-    );
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.05 });
     io.observe(el);
     return () => io.disconnect();
   }, []);
 
-  if (supportsWebGL === false || reduce) {
+  if (supportsWebGL === false || capabilities.reducedMotion || !capabilities.allow3D) {
     return (
       <section
         ref={containerRef}
@@ -62,9 +55,7 @@ export default function Gallery3D({ images, title, eyebrow }: Gallery3DProps) {
               {eyebrow}
             </span>
           )}
-          {title && (
-            <h2 className="font-display mt-4 text-4xl sm:text-6xl">{title}</h2>
-          )}
+          {title && <h2 className="font-display mt-4 text-4xl sm:text-6xl">{title}</h2>}
           <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {images.map((src, i) => (
               <img
@@ -84,8 +75,7 @@ export default function Gallery3D({ images, title, eyebrow }: Gallery3DProps) {
     );
   }
 
-  const isMobile = typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
-  const dpr: [number, number] = isMobile ? [1, 1] : [1, 1.5];
+  const dpr: [number, number] = capabilities.coarsePointer ? [1, 1] : [1, capabilities.dpr];
 
   return (
     <section
@@ -102,9 +92,7 @@ export default function Gallery3D({ images, title, eyebrow }: Gallery3DProps) {
             {eyebrow}
           </span>
         )}
-        {title && (
-          <h2 className="font-display mt-3 text-3xl sm:text-5xl">{title}</h2>
-        )}
+        {title && <h2 className="font-display mt-3 text-3xl sm:text-5xl">{title}</h2>}
       </div>
       <div className="h-[62vh] w-full sm:h-[64vh]">
         {supportsWebGL && (
@@ -232,7 +220,7 @@ function GalleryScene({
     for (let i = 0; i < g.children.length; i++) {
       const mesh = g.children[i] as THREE.Mesh;
       // posição wrap
-      let z = ((i - offset.current) % count + count) % count;
+      let z = (((i - offset.current) % count) + count) % count;
       if (z > count / 2) z -= count;
       mesh.position.z = -z * spacing;
       mesh.position.x = Math.sin(z * 0.4 + planes[i].base) * 0.45;

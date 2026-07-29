@@ -1,9 +1,22 @@
-import { motion, useReducedMotion, useScroll, useTransform, type Variants } from "framer-motion";
-import { useEffect, useMemo, useRef, useState, type ReactNode, type ComponentPropsWithoutRef, type ElementType } from "react";
+/* eslint-disable react-refresh/only-export-components -- Shared motion tokens ship with their primitives. */
+import { motion, useReducedMotion, useTransform, type Variants } from "framer-motion";
+import {
+  createElement,
+  useEffect,
+  useMemo,
+  useRef,
+  type ReactNode,
+  type ComponentPropsWithoutRef,
+  type ElementType,
+} from "react";
+import {
+  useCinematicMotion,
+  useInertialScrollProgress,
+} from "@/components/motion/cinematic-motion-system";
 
 // framer-motion v12 exige motion.create(Tag) para tags dinâmicas — evita warning "motion() is deprecated".
 function useMotionTag(As: ElementType) {
-  return useMemo(() => motion.create(As as any), [As]);
+  return useMemo(() => motion.create(As), [As]);
 }
 
 /**
@@ -123,11 +136,10 @@ export function WordReveal({
 }) {
   const reduce = useReducedMotion();
   const words = text.split(/\s+/);
-  if (reduce) {
-    const Tag = As as any;
-    return <Tag className={className}>{text}</Tag>;
-  }
   const MotionTag = useMotionTag(As);
+  if (reduce) {
+    return createElement(As, { className }, text);
+  }
   return (
     <MotionTag
       className={className}
@@ -175,11 +187,14 @@ export function ParallaxMedia({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [offset, -offset]);
+  const { capabilities } = useCinematicMotion();
+  const progress = useInertialScrollProgress(ref);
+  const y = useTransform(progress, [0, 1], [offset, -offset]);
+  const enabled =
+    !reduce && (capabilities.quality === "balanced" || capabilities.quality === "cinematic");
   return (
     <div ref={ref} className={className}>
-      <motion.div style={reduce ? undefined : { y }}>{children}</motion.div>
+      <motion.div style={enabled ? { y } : undefined}>{children}</motion.div>
     </div>
   );
 }
@@ -206,15 +221,15 @@ export function ImageReveal({
   const commonAnim = reduce
     ? { initial: { opacity: 1 } as const, animate: { opacity: 1 } as const }
     : eager
-    ? {
-        initial: { opacity: 0.001, scale: 1.06 } as const,
-        animate: { opacity: 1, scale: 1 } as const,
-      }
-    : {
-        initial: { opacity: 0.001, scale: 1.06 } as const,
-        whileInView: { opacity: 1, scale: 1 } as const,
-        viewport: { once: true, amount: 0.2 } as const,
-      };
+      ? {
+          initial: { opacity: 0.001, scale: 1.06 } as const,
+          animate: { opacity: 1, scale: 1 } as const,
+        }
+      : {
+          initial: { opacity: 0.001, scale: 1.06 } as const,
+          whileInView: { opacity: 1, scale: 1 } as const,
+          viewport: { once: true, amount: 0.2 } as const,
+        };
   return (
     <div className={"relative overflow-hidden " + (className ?? "")}>
       <motion.img
@@ -240,21 +255,11 @@ export function MagneticCTA({
   ...rest
 }: { children: ReactNode; strength?: number } & ComponentPropsWithoutRef<"div">) {
   const ref = useRef<HTMLDivElement>(null);
-  const [enabled, setEnabled] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mqReduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const mqDesktop = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const update = () => setEnabled(!mqReduce.matches && mqDesktop.matches);
-    update();
-    mqReduce.addEventListener?.("change", update);
-    mqDesktop.addEventListener?.("change", update);
-    return () => {
-      mqReduce.removeEventListener?.("change", update);
-      mqDesktop.removeEventListener?.("change", update);
-    };
-  }, []);
+  const { capabilities } = useCinematicMotion();
+  const enabled =
+    capabilities.precisePointer &&
+    !capabilities.reducedMotion &&
+    (capabilities.quality === "balanced" || capabilities.quality === "cinematic");
 
   useEffect(() => {
     if (!enabled) return;
@@ -284,7 +289,10 @@ export function MagneticCTA({
       ref={ref}
       {...rest}
       className={className}
-      style={{ transition: enabled ? "transform 0.35s cubic-bezier(.22,1,.36,1)" : undefined, ...(rest.style ?? {}) }}
+      style={{
+        transition: enabled ? "transform 0.35s cubic-bezier(.22,1,.36,1)" : undefined,
+        ...(rest.style ?? {}),
+      }}
     >
       {children}
     </div>
@@ -311,22 +319,14 @@ export function Marquee({
     >
       <div
         className="flex shrink-0 items-center gap-10 whitespace-nowrap will-change-transform group-hover:[animation-play-state:paused]"
-        style={
-          reduce
-            ? undefined
-            : { animation: `vb-marquee ${speed}s linear infinite` }
-        }
+        style={reduce ? undefined : { animation: `vb-marquee ${speed}s linear infinite` }}
       >
         {children}
       </div>
       <div
         aria-hidden
         className="flex shrink-0 items-center gap-10 whitespace-nowrap will-change-transform group-hover:[animation-play-state:paused]"
-        style={
-          reduce
-            ? undefined
-            : { animation: `vb-marquee ${speed}s linear infinite` }
-        }
+        style={reduce ? undefined : { animation: `vb-marquee ${speed}s linear infinite` }}
       >
         {children}
       </div>

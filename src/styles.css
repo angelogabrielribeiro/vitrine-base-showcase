@@ -63,6 +63,10 @@
 
 :root {
   --radius: 0.625rem;
+  --cinematic-pointer-x: 50%;
+  --cinematic-pointer-y: 50%;
+  --cinematic-pointer-nx: 0;
+  --cinematic-pointer-ny: 0;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
@@ -140,5 +144,72 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .cinematic-storefront {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    --cinematic-scene-accent: oklch(0.72 0.08 80);
+  }
+
+  .cinematic-storefront[data-cinematic-tone="fashion"] {
+    --cinematic-scene-accent: oklch(0.68 0.11 20);
+  }
+
+  .cinematic-storefront[data-cinematic-tone="barber"] {
+    --cinematic-scene-accent: oklch(0.76 0.12 78);
+  }
+
+  .cinematic-storefront[data-cinematic-tone="restaurant"] {
+    --cinematic-scene-accent: oklch(0.7 0.19 42);
+  }
+
+  .cinematic-storefront[data-cinematic-tone="electronics"] {
+    --cinematic-scene-accent: oklch(0.79 0.15 205);
+  }
+
+  [data-cinematic-deferred] {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 720px;
+  }
+
+  [data-cinematic-parallax] > *,
+  [data-cursor-parallax] {
+    transform: translateZ(0);
+  }
+}
+
+html[data-motion-quality="static"] [data-cinematic-parallax] > *,
+html[data-motion-quality="static"] [data-cursor-parallax],
+html[data-motion-quality="economy"] [data-cursor-parallax] {
+  transform: none !important;
+  will-change: auto !important;
+}
+
+@supports not (overflow: clip) {
+  .cinematic-storefront {
+    overflow-x: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .cinematic-storefront *,
+  .cinematic-storefront *::before,
+  .cinematic-storefront *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
