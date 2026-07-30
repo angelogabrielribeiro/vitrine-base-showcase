@@ -12,6 +12,12 @@ import {
   LayoutDashboard,
   CalendarDays,
   Cpu,
+  BadgeCheck,
+  Clock3,
+  Search,
+  TrendingUp,
+  BarChart3,
+  RefreshCw,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { STORES } from "@/config/stores";
@@ -25,17 +31,20 @@ import { PricingPreview } from "@/components/pricing/pricing-page";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Vitrine Base — E-commerce White Label" },
+      { title: "Vitrine Base — Sites que ajudam o negócio a vender e operar melhor" },
       {
         name: "description",
         content:
-          "Plataforma white-label pronta para apresentação: 4 lojas demonstrativas (moda, barbearia, restaurante e eletrônicos) com catálogo, agendamento, checkout e painel administrativo.",
+          "Sites e webapps para gerar confiança, organizar pedidos e agendamentos e transformar visitas em oportunidades para negócios locais.",
       },
-      { property: "og:title", content: "Vitrine Base — E-commerce White Label" },
+      {
+        property: "og:title",
+        content: "Vitrine Base — Presença que gera confiança. Operação que ajuda a vender.",
+      },
       {
         property: "og:description",
         content:
-          "Base sólida e reutilizável de e-commerce, com 4 lojas de demonstração (moda, barbearia, restaurante e eletrônicos) e painel administrativo completo.",
+          "Demonstrações de lojas, restaurantes e serviços com catálogo, pedidos, agendamento e painel administrativo.",
       },
     ],
   }),
@@ -75,6 +84,45 @@ const FEATURES = [
     icon: MessageCircle,
     title: "Integração WhatsApp",
     desc: "Contato e pós-venda direto pelo aplicativo.",
+  },
+];
+
+const BUSINESS_OUTCOMES = [
+  {
+    icon: Clock3,
+    pain: "Atendimento preso no WhatsApp",
+    outcome: "Catálogo e informações disponíveis sem depender de resposta imediata.",
+    proof: "Preço, opções, horários e políticas ficam claros antes do contato.",
+  },
+  {
+    icon: BadgeCheck,
+    pain: "Cliente inseguro para comprar",
+    outcome: "Marca, domínio, políticas e jornada profissional no mesmo lugar.",
+    proof: "Mais sinais de confiança antes do pedido, pagamento ou agendamento.",
+  },
+  {
+    icon: TrendingUp,
+    pain: "Interesse que não vira ação",
+    outcome: "Menos atrito para pedir, comprar, agendar ou chamar no WhatsApp.",
+    proof: "Checkout sem conta obrigatória e chamadas claras para a próxima etapa.",
+  },
+  {
+    icon: RefreshCw,
+    pain: "Pedidos e agenda desorganizados",
+    outcome: "Painel central para acompanhar a operação e atualizar o cliente.",
+    proof: "Produtos, pedidos, agendamentos e status reunidos em um fluxo.",
+  },
+  {
+    icon: Search,
+    pain: "Dependência total das redes sociais",
+    outcome: "Uma base própria para Google, campanhas, conteúdo e indicações.",
+    proof: "O site vira o destino oficial da marca, sem substituir Instagram e WhatsApp.",
+  },
+  {
+    icon: BarChart3,
+    pain: "Não saber se o digital dá retorno",
+    outcome: "Metas e eventos definidos para acompanhar o que realmente importa.",
+    proof: "Cliques, pedidos, agendamentos e abandono podem ser medidos no projeto final.",
   },
 ];
 
@@ -160,7 +208,7 @@ function Index() {
             transition={{ duration: 0.4 }}
             className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-300"
           >
-            Apresentação comercial
+            Estrutura comercial e operacional
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 12 }}
@@ -168,8 +216,8 @@ function Index() {
             transition={{ duration: 0.5, delay: 0.05 }}
             className="mt-4 text-4xl font-bold leading-tight sm:text-6xl"
           >
-            Um e-commerce sólido, <span className="text-amber-300">personalizado</span> para cada
-            lojista.
+            Credibilidade para ser escolhido.{" "}
+            <span className="text-amber-300">Operação para vender melhor.</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 12 }}
@@ -177,8 +225,8 @@ function Index() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mt-6 max-w-2xl text-base text-neutral-300 sm:text-lg"
           >
-            Quatro lojas demonstrativas — moda, barbearia, restaurante e eletrônicos — sobre o mesmo
-            núcleo, adaptadas visual e comercialmente ao segmento de cada lojista.
+            Sites e webapps que transformam catálogo espalhado, atendimento manual e processos
+            confusos em uma jornada clara para o cliente e para quem administra o negócio.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -309,6 +357,66 @@ function Index() {
                 </InteractiveTiltCard>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      <section className="relative overflow-hidden border-y border-cyan-200/10 bg-[#071018]">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(34,211,238,0.12),transparent_30%),radial-gradient(circle_at_85%_80%,rgba(251,191,36,0.09),transparent_28%)]" />
+        <div className="relative mx-auto max-w-6xl px-4 py-20">
+          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200">
+                Valor para o negócio
+              </p>
+              <h2 className="mt-4 max-w-xl font-display text-4xl font-light tracking-[-0.04em] text-white sm:text-6xl">
+                Não é “só um site”. É menos atrito entre interesse e venda.
+              </h2>
+            </div>
+            <div className="rounded-3xl border border-amber-200/15 bg-amber-300/[0.055] p-6">
+              <p className="text-sm font-semibold text-amber-100">
+                A verdade que protege o cliente
+              </p>
+              <p className="mt-2 text-sm leading-7 text-white/62">
+                Um site sozinho não cria demanda nem garante faturamento. Ele evita desperdiçar a
+                demanda que já chega, transmite confiança e cria uma base própria para Google,
+                avaliações, conteúdo, mídia e relacionamento.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {BUSINESS_OUTCOMES.map((item) => (
+              <article
+                key={item.pain}
+                className="rounded-3xl border border-white/10 bg-white/[0.045] p-6 backdrop-blur-sm"
+              >
+                <item.icon className="h-6 w-6 text-cyan-200" aria-hidden="true" />
+                <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-white/42">
+                  Dor: {item.pain}
+                </p>
+                <h3 className="mt-3 text-xl font-semibold leading-7 text-white">{item.outcome}</h3>
+                <p className="mt-3 text-sm leading-6 text-white/52">{item.proof}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="mt-8 flex flex-col gap-4 rounded-3xl border border-cyan-200/15 bg-cyan-300/[0.06] p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-semibold text-cyan-100">
+                Cada projeto começa com uma meta de negócio.
+              </p>
+              <p className="mt-1 text-sm leading-6 text-white/55">
+                Exemplo: receber mais pedidos, reduzir perguntas repetidas, aumentar agendamentos ou
+                melhorar a confiança antes da compra.
+              </p>
+            </div>
+            <Link
+              to="/planos"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
+            >
+              Ver investimento <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </section>
