@@ -6,8 +6,9 @@ import {
   Check,
   Clock3,
   Code2,
-  ExternalLink,
   Gauge,
+  Instagram,
+  MessageCircle,
   ServerCog,
   ShieldCheck,
   Sparkles,
@@ -15,8 +16,13 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { CursorParallax, useCinematicMotion } from "@/components/motion/cinematic-motion-system";
+import { whatsappUrl } from "@/lib/whatsapp";
 
-const PROPOSAL_URL = "https://www.instagram.com/angelo.sem.acento/";
+const INSTAGRAM_URL = "https://www.instagram.com/angelo.sem.acento/";
+const PROPOSAL_URL = whatsappUrl(
+  "5511987201816",
+  "Olá, Angelo! Vi a Vitrine Base e quero conversar sobre um projeto para o meu negócio.",
+);
 
 type CreationPlan = {
   name: string;
@@ -208,7 +214,7 @@ function Reveal({
 
 function ProposalLink({
   className,
-  label = "Solicitar proposta",
+  label = "Solicitar proposta pelo WhatsApp",
 }: {
   className: string;
   label?: string;
@@ -219,10 +225,31 @@ function ProposalLink({
       target="_blank"
       rel="noreferrer"
       className={className}
-      aria-label={label.includes("Instagram") ? label : `${label} pelo Instagram`}
+      aria-label={label}
     >
       {label}
-      <ExternalLink className="h-4 w-4" aria-hidden="true" />
+      <MessageCircle className="h-4 w-4" aria-hidden="true" />
+    </a>
+  );
+}
+
+function InstagramLink({
+  className,
+  label = "Ver projetos no Instagram",
+}: {
+  className: string;
+  label?: string;
+}) {
+  return (
+    <a
+      href={INSTAGRAM_URL}
+      target="_blank"
+      rel="noreferrer"
+      className={className}
+      aria-label={label}
+    >
+      {label}
+      <Instagram className="h-4 w-4" aria-hidden="true" />
     </a>
   );
 }
@@ -509,14 +536,17 @@ function CreationCard({ plan, index }: { plan: CreationPlan; index: number }) {
         ))}
       </ul>
 
-      <ProposalLink
-        className={[
-          "mt-auto inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200",
-          plan.popular
-            ? "bg-cyan-300 text-slate-950 hover:bg-cyan-200"
-            : "border border-white/15 bg-white/[0.06] text-white hover:border-cyan-300/40 hover:bg-cyan-300/10",
-        ].join(" ")}
-      />
+      <div className="mt-auto space-y-2">
+        <ProposalLink
+          className={[
+            "inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200",
+            plan.popular
+              ? "bg-cyan-300 text-slate-950 hover:bg-cyan-200"
+              : "border border-white/15 bg-white/[0.06] text-white hover:border-cyan-300/40 hover:bg-cyan-300/10",
+          ].join(" ")}
+        />
+        <InstagramLink className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold text-white/58 transition hover:bg-white/[0.05] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200" />
+      </div>
     </motion.article>
   );
 }
@@ -748,10 +778,16 @@ export function PricingPage() {
               Custos externos
             </a>
           </nav>
-          <ProposalLink
-            label="Falar sobre meu projeto"
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 text-xs font-semibold text-white transition hover:border-cyan-300/40 hover:bg-cyan-300/10"
-          />
+          <div className="flex items-center gap-2">
+            <InstagramLink
+              label="Instagram"
+              className="hidden items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold text-white/58 transition hover:bg-white/[0.05] hover:text-white md:inline-flex"
+            />
+            <ProposalLink
+              label="Falar no WhatsApp"
+              className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-4 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-200/55 hover:bg-cyan-300/15"
+            />
+          </div>
         </div>
       </header>
 
@@ -1001,10 +1037,10 @@ export function PricingPage() {
               Não existe compra automática. Antes de começar, alinhamos páginas, produtos,
               integrações, prazo e custos externos.
             </p>
-            <ProposalLink
-              label="Solicitar proposta no Instagram"
-              className="mt-9 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-cyan-300 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
-            />
+            <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <ProposalLink className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-cyan-300 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200" />
+              <InstagramLink className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-6 py-3 text-sm font-semibold text-white/75 transition hover:border-cyan-300/35 hover:bg-cyan-300/10 hover:text-white" />
+            </div>
           </Reveal>
         </section>
       </main>
