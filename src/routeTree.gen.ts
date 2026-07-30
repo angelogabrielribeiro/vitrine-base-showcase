@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlanosRouteImport } from './routes/planos'
 import { Route as DemoStoreSlugRouteImport } from './routes/demo.$storeSlug'
 import { Route as DemoStoreSlugIndexRouteImport } from './routes/demo.$storeSlug.index'
 import { Route as DemoStoreSlugAdminRouteImport } from './routes/demo.$storeSlug.admin'
@@ -42,6 +43,11 @@ import { Route as DemoStoreSlugAdminProdutosNovoRouteImport } from './routes/dem
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlanosRoute = PlanosRouteImport.update({
+  id: '/planos',
+  path: '/planos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStoreSlugRoute = DemoStoreSlugRouteImport.update({
@@ -203,6 +209,7 @@ const DemoStoreSlugAdminProdutosNovoRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/planos': typeof PlanosRoute
   '/demo/$storeSlug': typeof DemoStoreSlugRouteWithChildren
   '/demo/$storeSlug/admin': typeof DemoStoreSlugAdminRouteWithChildren
   '/demo/$storeSlug/agendar': typeof DemoStoreSlugAgendarRoute
@@ -234,6 +241,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/planos': typeof PlanosRoute
   '/demo/$storeSlug/agendar': typeof DemoStoreSlugAgendarRoute
   '/demo/$storeSlug/carrinho': typeof DemoStoreSlugCarrinhoRoute
   '/demo/$storeSlug/checkout': typeof DemoStoreSlugCheckoutRoute
@@ -263,6 +271,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/planos': typeof PlanosRoute
   '/demo/$storeSlug': typeof DemoStoreSlugRouteWithChildren
   '/demo/$storeSlug/admin': typeof DemoStoreSlugAdminRouteWithChildren
   '/demo/$storeSlug/agendar': typeof DemoStoreSlugAgendarRoute
@@ -296,6 +305,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/planos'
     | '/demo/$storeSlug'
     | '/demo/$storeSlug/admin'
     | '/demo/$storeSlug/agendar'
@@ -327,6 +337,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/planos'
     | '/demo/$storeSlug/agendar'
     | '/demo/$storeSlug/carrinho'
     | '/demo/$storeSlug/checkout'
@@ -355,6 +366,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/planos'
     | '/demo/$storeSlug'
     | '/demo/$storeSlug/admin'
     | '/demo/$storeSlug/agendar'
@@ -387,6 +399,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PlanosRoute: typeof PlanosRoute
   DemoStoreSlugRoute: typeof DemoStoreSlugRouteWithChildren
 }
 
@@ -397,6 +410,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/planos': {
+      id: '/planos'
+      path: '/planos'
+      fullPath: '/planos'
+      preLoaderRoute: typeof PlanosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/$storeSlug': {
@@ -701,6 +721,7 @@ const DemoStoreSlugRouteWithChildren = DemoStoreSlugRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PlanosRoute: PlanosRoute,
   DemoStoreSlugRoute: DemoStoreSlugRouteWithChildren,
 }
 export const routeTree = rootRouteImport

@@ -1,8 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ArrowRight, ShoppingBag, Utensils, Scissors, Sparkles, ShieldCheck,
-  MessageCircle, Smartphone, LayoutDashboard, CalendarDays, Cpu,
+  ArrowRight,
+  ShoppingBag,
+  Utensils,
+  Scissors,
+  Sparkles,
+  ShieldCheck,
+  MessageCircle,
+  Smartphone,
+  LayoutDashboard,
+  CalendarDays,
+  Cpu,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { STORES } from "@/config/stores";
@@ -11,6 +20,7 @@ import { AnimatedGradient } from "@/components/effects/AnimatedGradient";
 import { PulsingBorder } from "@/components/effects/PulsingBorder";
 import { InteractiveTiltCard } from "@/components/effects/InteractiveTiltCard";
 import { InteractiveProductFolder } from "@/components/effects/InteractiveProductFolder";
+import { PricingPreview } from "@/components/pricing/pricing-page";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -41,11 +51,31 @@ const NICHE_ICON: Record<string, typeof ShoppingBag> = {
 
 const FEATURES = [
   { icon: Smartphone, title: "Loja virtual responsiva", desc: "Mobile-first, rápida e acessível." },
-  { icon: ShoppingBag, title: "Produtos e estoque", desc: "Catálogo com variantes, adicionais e imagens." },
-  { icon: CalendarDays, title: "Agendamento online", desc: "Serviço, profissional, data e horário." },
-  { icon: ShieldCheck, title: "Checkout completo", desc: "Pix, cartão, dinheiro e cupom demonstrativo." },
-  { icon: Sparkles, title: "Painel administrativo", desc: "Produtos, pedidos e configurações em tempo real." },
-  { icon: MessageCircle, title: "Integração WhatsApp", desc: "Contato e pós-venda direto pelo aplicativo." },
+  {
+    icon: ShoppingBag,
+    title: "Produtos e estoque",
+    desc: "Catálogo com variantes, adicionais e imagens.",
+  },
+  {
+    icon: CalendarDays,
+    title: "Agendamento online",
+    desc: "Serviço, profissional, data e horário.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Checkout completo",
+    desc: "Pix, cartão, dinheiro e cupom demonstrativo.",
+  },
+  {
+    icon: Sparkles,
+    title: "Painel administrativo",
+    desc: "Produtos, pedidos e configurações em tempo real.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Integração WhatsApp",
+    desc: "Contato e pós-venda direto pelo aplicativo.",
+  },
 ];
 
 function Index() {
@@ -60,7 +90,10 @@ function Index() {
         return;
       }
       sessionStorage.setItem("vb-preloaded", "1");
-    } catch { setReady(true); return; }
+    } catch {
+      setReady(true);
+      return;
+    }
     const t = setTimeout(() => setReady(true), 1200);
     return () => clearTimeout(t);
   }, []);
@@ -71,9 +104,10 @@ function Index() {
   );
 
   const folderItems = useMemo(
-    () => STORES.flatMap((s) =>
-      s.banners.map((b) => ({ title: s.name, subtitle: s.tagline, image: b.image })),
-    ),
+    () =>
+      STORES.flatMap((s) =>
+        s.banners.map((b) => ({ title: s.name, subtitle: s.tagline, image: b.image })),
+      ),
     [],
   );
 
@@ -90,7 +124,9 @@ function Index() {
           >
             <div className="text-center">
               <div className="mx-auto h-14 w-14 rounded-full border-2 border-amber-300/30 border-t-amber-300 animate-spin" />
-              <div className="mt-4 font-semibold tracking-[0.35em] text-amber-300 text-xs">VITRINE BASE</div>
+              <div className="mt-4 font-semibold tracking-[0.35em] text-amber-300 text-xs">
+                VITRINE BASE
+              </div>
             </div>
           </motion.div>
         )}
@@ -98,20 +134,25 @@ function Index() {
 
       {/* Top bar */}
       <div className="border-b border-white/10 bg-black/40 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 text-xs">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 text-xs">
           <span className="font-semibold tracking-widest text-amber-300">VITRINE BASE</span>
-          <span className="rounded-full border border-amber-300/40 px-2 py-0.5 text-[10px] text-amber-200">
-            {DEMO_LABEL}
-          </span>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Link
+              to="/planos"
+              className="rounded-full border border-white/15 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-white/80 transition hover:border-cyan-300/40 hover:text-cyan-100"
+            >
+              Ver planos
+            </Link>
+            <span className="hidden rounded-full border border-amber-300/40 px-2 py-0.5 text-[10px] text-amber-200 sm:inline-flex">
+              {DEMO_LABEL}
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <AnimatedGradient
-          colors={["#f59e0b", "#a855f7", "#0ea5e9"]}
-          intensity={0.35}
-        />
+        <AnimatedGradient colors={["#f59e0b", "#a855f7", "#0ea5e9"]} intensity={0.35} />
         <div className="relative mx-auto max-w-6xl px-4 py-16 sm:py-24">
           <motion.p
             initial={{ opacity: 0, y: 8 }}
@@ -127,7 +168,8 @@ function Index() {
             transition={{ duration: 0.5, delay: 0.05 }}
             className="mt-4 text-4xl font-bold leading-tight sm:text-6xl"
           >
-            Um e-commerce sólido, <span className="text-amber-300">personalizado</span> para cada lojista.
+            Um e-commerce sólido, <span className="text-amber-300">personalizado</span> para cada
+            lojista.
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 12 }}
@@ -135,9 +177,22 @@ function Index() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mt-6 max-w-2xl text-base text-neutral-300 sm:text-lg"
           >
-            Quatro lojas demonstrativas — moda, barbearia, restaurante e eletrônicos — sobre o
-            mesmo núcleo, adaptadas visual e comercialmente ao segmento de cada lojista.
+            Quatro lojas demonstrativas — moda, barbearia, restaurante e eletrônicos — sobre o mesmo
+            núcleo, adaptadas visual e comercialmente ao segmento de cada lojista.
           </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.14 }}
+            className="mt-7"
+          >
+            <Link
+              to="/planos"
+              className="inline-flex items-center gap-2 rounded-full border border-cyan-200/30 bg-cyan-300/10 px-5 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/20"
+            >
+              Conhecer planos e valores <ArrowRight className="h-4 w-4" />
+            </Link>
+          </motion.div>
 
           {/* Seletor interativo */}
           <div className="mt-10 flex flex-wrap gap-2">
@@ -173,7 +228,9 @@ function Index() {
                       style={{ backgroundImage: `url(${selected.banners[0]?.image})` }}
                     />
                     <div className="p-6">
-                      <div className="text-xs uppercase tracking-widest text-amber-300">{selected.tagline}</div>
+                      <div className="text-xs uppercase tracking-widest text-amber-300">
+                        {selected.tagline}
+                      </div>
                       <h3 className="mt-2 font-display text-3xl">{selected.name}</h3>
                       <p className="mt-2 text-sm text-neutral-300">{selected.description}</p>
                       <div className="mt-5 flex flex-wrap gap-2">
@@ -244,7 +301,8 @@ function Index() {
                       <h3 className="mt-1 font-display text-2xl">{s.name}</h3>
                       <p className="mt-1 line-clamp-2 text-sm text-neutral-300">{s.description}</p>
                       <div className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-amber-300">
-                        Abrir <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                        Abrir{" "}
+                        <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
                       </div>
                     </div>
                   </Link>
@@ -254,6 +312,8 @@ function Index() {
           </div>
         </div>
       </section>
+
+      <PricingPreview />
 
       {/* Features */}
       <section className="border-t border-white/5 bg-black/30">
