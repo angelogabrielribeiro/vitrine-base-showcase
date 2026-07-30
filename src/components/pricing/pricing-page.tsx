@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
@@ -13,8 +13,8 @@ import {
   Sparkles,
   Wrench,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
-import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
+import { useEffect, useRef, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { CursorParallax, useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 
 const PROPOSAL_URL = "https://www.instagram.com/angelo.sem.acento/";
 
@@ -130,6 +130,82 @@ function formatPrice(price: string) {
   );
 }
 
+function usePricingCardMotion() {
+  const { capabilities } = useCinematicMotion();
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
+  const rotateX = useSpring(useTransform(pointerY, [-0.5, 0.5], [4.5, -4.5]), {
+    stiffness: 220,
+    damping: 24,
+    mass: 0.35,
+  });
+  const rotateY = useSpring(useTransform(pointerX, [-0.5, 0.5], [-5.5, 5.5]), {
+    stiffness: 220,
+    damping: 24,
+    mass: 0.35,
+  });
+  const glowX = useTransform(pointerX, [-0.5, 0.5], ["18%", "82%"]);
+  const glowY = useTransform(pointerY, [-0.5, 0.5], ["18%", "82%"]);
+  const tiltEnabled =
+    capabilities.hydrated &&
+    capabilities.precisePointer &&
+    !capabilities.reducedMotion &&
+    capabilities.quality !== "static";
+  const ambientEnabled =
+    capabilities.hydrated &&
+    !capabilities.reducedMotion &&
+    capabilities.quality !== "static" &&
+    capabilities.quality !== "economy";
+
+  const onPointerMove = (event: ReactPointerEvent<HTMLElement>) => {
+    if (!tiltEnabled) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    pointerX.set((event.clientX - bounds.left) / Math.max(bounds.width, 1) - 0.5);
+    pointerY.set((event.clientY - bounds.top) / Math.max(bounds.height, 1) - 0.5);
+  };
+
+  const onPointerLeave = () => {
+    pointerX.set(0);
+    pointerY.set(0);
+  };
+
+  return {
+    ambientEnabled,
+    capabilities,
+    glowX,
+    glowY,
+    onPointerLeave,
+    onPointerMove,
+    rotateX,
+    rotateY,
+    tiltEnabled,
+  };
+}
+
+function Reveal({
+  children,
+  className,
+  delay = 0,
+}: {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+}) {
+  const { capabilities } = useCinematicMotion();
+
+  return (
+    <motion.div
+      initial={capabilities.reducedMotion ? false : { opacity: 0, y: 26, filter: "blur(8px)" }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      viewport={{ once: true, margin: "-10%" }}
+      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 function ProposalLink({
   className,
   label = "Solicitar proposta",
@@ -183,14 +259,19 @@ function PricingShader() {
 
       void main() {
         vec2 uv = (gl_FragCoord.xy * 2.0 - uResolution.xy) / min(uResolution.x, uResolution.y);
-        uv.x += 0.26;
-        float halo = ring(uv, 0.58, 0.035);
-        halo += ring(uv, 0.67, 0.008) * 0.7;
+        float breathing = sin(uTime * 0.38) * 0.012;
+        float halo = ring(uv, 0.58 + breathing, 0.035);
+        halo += ring(uv, 0.67 - breathing * 0.45, 0.008) * 0.7;
+        halo += ring(uv, 0.535 + breathing * 0.3, 0.004) * 0.45;
         float glow = exp(-2.8 * length(uv - vec2(-0.8, 0.55)));
+        float angle = atan(uv.y, uv.x);
+        float shimmer = 0.72 + sin(angle * 2.0 - uTime * 0.55) * 0.28;
         vec3 base = vec3(0.018, 0.027, 0.043);
         vec3 cyan = vec3(0.13, 0.82, 0.91);
+        vec3 blue = vec3(0.18, 0.38, 0.96);
         vec3 amber = vec3(0.96, 0.69, 0.22);
-        vec3 color = base + cyan * halo * 0.32 + amber * glow * 0.07;
+        vec3 ringColor = mix(cyan, blue, 0.28 + shimmer * 0.2);
+        vec3 color = base + ringColor * halo * (0.25 + shimmer * 0.11) + amber * glow * 0.07;
         gl_FragColor = vec4(color, 1.0);
       }
     `;
@@ -270,7 +351,14 @@ function PricingShader() {
     };
   }, [capabilities.allow3D, capabilities.dpr, capabilities.reducedMotion]);
 
-  if (!capabilities.allow3D || capabilities.reducedMotion) return null;
+  if (!capabilities.allow3D || capabilities.reducedMotion) {
+    return (
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+        <span className="absolute left-1/2 top-1/2 aspect-square w-[min(120vw,52rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-300/20 shadow-[0_0_70px_rgba(34,211,238,0.14),inset_0_0_50px_rgba(59,130,246,0.08)] sm:w-[min(82vw,52rem)]" />
+        <span className="absolute left-1/2 top-1/2 aspect-square w-[min(106vw,46rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-200/10 shadow-[0_0_36px_rgba(34,211,238,0.08)] sm:w-[min(72vw,46rem)]" />
+      </div>
+    );
+  }
 
   return (
     <canvas
@@ -282,31 +370,103 @@ function PricingShader() {
 }
 
 function CreationCard({ plan, index }: { plan: CreationPlan; index: number }) {
+  const motionState = usePricingCardMotion();
+
   return (
     <motion.article
+      onPointerMove={motionState.onPointerMove}
+      onPointerLeave={motionState.onPointerLeave}
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
+      whileHover={motionState.tiltEnabled ? { scale: 1.018, y: -7 } : undefined}
       viewport={{ once: true, margin: "-10%" }}
-      transition={{ duration: 0.5, delay: index * 0.08 }}
+      animate={
+        motionState.ambientEnabled
+          ? {
+              boxShadow: plan.popular
+                ? [
+                    "0 30px 90px rgba(34,211,238,0.10)",
+                    "0 34px 115px rgba(34,211,238,0.22)",
+                    "0 30px 90px rgba(34,211,238,0.10)",
+                  ]
+                : [
+                    "0 24px 70px rgba(0,0,0,0.22)",
+                    "0 30px 90px rgba(34,211,238,0.08)",
+                    "0 24px 70px rgba(0,0,0,0.22)",
+                  ],
+            }
+          : undefined
+      }
+      transition={{
+        opacity: { duration: 0.58, delay: index * 0.1 },
+        y: { duration: 0.58, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] },
+        scale: { type: "spring", stiffness: 260, damping: 24 },
+        rotateX: { type: "spring", stiffness: 220, damping: 24 },
+        rotateY: { type: "spring", stiffness: 220, damping: 24 },
+        boxShadow: {
+          duration: 4.8 + index * 0.45,
+          delay: index * 0.3,
+          repeat: Infinity,
+          ease: "easeInOut",
+        },
+      }}
+      style={
+        motionState.tiltEnabled
+          ? {
+              rotateX: motionState.rotateX,
+              rotateY: motionState.rotateY,
+              transformPerspective: 1100,
+              transformStyle: "preserve-3d",
+            }
+          : undefined
+      }
       className={[
-        "relative flex min-h-[540px] flex-col overflow-hidden rounded-[1.75rem] border px-6 py-7 backdrop-blur-2xl sm:px-7",
+        "group relative isolate flex min-h-[540px] flex-col overflow-hidden rounded-[1.75rem] border px-6 py-7 backdrop-blur-2xl sm:px-7",
         plan.popular
-          ? "border-cyan-300/40 bg-gradient-to-b from-white/[0.16] to-white/[0.07] shadow-[0_30px_100px_rgba(34,211,238,0.12)] lg:-translate-y-5"
+          ? "border-cyan-300/40 bg-gradient-to-b from-white/[0.16] to-white/[0.07] shadow-[0_30px_100px_rgba(34,211,238,0.12)] lg:-mt-5 lg:mb-5"
           : "border-white/10 bg-gradient-to-b from-white/[0.09] to-white/[0.035] shadow-2xl shadow-black/25",
       ].join(" ")}
     >
-      <div
+      <motion.div
+        className="pointer-events-none absolute h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-300/15 blur-3xl"
+        style={{ left: motionState.glowX, top: motionState.glowY }}
+        animate={motionState.ambientEnabled ? { opacity: [0.16, 0.42, 0.16] } : { opacity: 0.14 }}
+        transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut" }}
+        aria-hidden="true"
+      />
+      <motion.div
         className={[
-          "absolute inset-x-0 top-0 h-px",
+          "pointer-events-none absolute inset-x-0 top-0 h-px origin-center",
           plan.popular
             ? "bg-gradient-to-r from-transparent via-cyan-300 to-transparent"
             : "bg-gradient-to-r from-transparent via-white/30 to-transparent",
         ].join(" ")}
+        animate={
+          motionState.ambientEnabled
+            ? { opacity: [0.35, 1, 0.35], scaleX: [0.32, 1, 0.32] }
+            : undefined
+        }
+        transition={{ duration: 4.1 + index * 0.35, repeat: Infinity, ease: "easeInOut" }}
+        aria-hidden="true"
       />
       {plan.popular && (
-        <span className="absolute right-5 top-5 rounded-full border border-cyan-200/30 bg-cyan-300 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-950">
+        <motion.span
+          className="absolute right-5 top-5 rounded-full border border-cyan-200/30 bg-cyan-300 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-950"
+          animate={
+            motionState.ambientEnabled
+              ? {
+                  boxShadow: [
+                    "0 0 0 rgba(34,211,238,0)",
+                    "0 0 30px rgba(34,211,238,.42)",
+                    "0 0 0 rgba(34,211,238,0)",
+                  ],
+                }
+              : undefined
+          }
+          transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+        >
           Mais escolhido
-        </span>
+        </motion.span>
       )}
 
       <div className="pr-20">
@@ -332,13 +492,20 @@ function CreationCard({ plan, index }: { plan: CreationPlan; index: number }) {
       </div>
 
       <ul className="space-y-3 text-sm text-white/78">
-        {plan.features.map((feature) => (
-          <li key={feature} className="flex items-start gap-3">
-            <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border border-cyan-300/25 bg-cyan-300/10 text-cyan-200">
+        {plan.features.map((feature, featureIndex) => (
+          <motion.li
+            key={feature}
+            className="flex items-start gap-3"
+            initial={motionState.capabilities.reducedMotion ? false : { opacity: 0, x: -8 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.34, delay: index * 0.08 + featureIndex * 0.045 }}
+          >
+            <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border border-cyan-300/25 bg-cyan-300/10 text-cyan-200 transition group-hover:border-cyan-200/45 group-hover:bg-cyan-300/15">
               <Check className="h-3 w-3" strokeWidth={3} aria-hidden="true" />
             </span>
             <span>{feature}</span>
-          </li>
+          </motion.li>
         ))}
       </ul>
 
@@ -355,19 +522,51 @@ function CreationCard({ plan, index }: { plan: CreationPlan; index: number }) {
 }
 
 function MaintenanceCard({ plan, index }: { plan: MaintenancePlan; index: number }) {
+  const motionState = usePricingCardMotion();
+
   return (
     <motion.article
+      onPointerMove={motionState.onPointerMove}
+      onPointerLeave={motionState.onPointerLeave}
       initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
+      whileHover={motionState.tiltEnabled ? { y: -7, scale: 1.012 } : undefined}
+      animate={
+        motionState.ambientEnabled && plan.popular
+          ? {
+              borderColor: [
+                "rgba(252, 211, 77, 0.35)",
+                "rgba(252, 211, 77, 0.56)",
+                "rgba(252, 211, 77, 0.35)",
+              ],
+            }
+          : undefined
+      }
       viewport={{ once: true, margin: "-10%" }}
-      transition={{ duration: 0.45, delay: index * 0.06 }}
+      transition={{
+        opacity: { duration: 0.45, delay: index * 0.06 },
+        y: { type: "spring", stiffness: 240, damping: 24, delay: index * 0.06 },
+        scale: { type: "spring", stiffness: 260, damping: 22 },
+        borderColor: { duration: 4.2, repeat: Infinity, ease: "easeInOut" },
+      }}
+      style={{
+        rotateX: motionState.rotateX,
+        rotateY: motionState.rotateY,
+        transformPerspective: 1100,
+        transformStyle: "preserve-3d",
+      }}
       className={[
-        "relative rounded-3xl border p-6 backdrop-blur-xl",
+        "group relative isolate overflow-hidden rounded-3xl border p-6 backdrop-blur-xl will-change-transform",
         plan.popular
           ? "border-amber-300/35 bg-amber-200/[0.08]"
           : "border-white/10 bg-white/[0.045]",
       ].join(" ")}
     >
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-300/15 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100"
+        style={{ left: motionState.glowX, top: motionState.glowY }}
+      />
       {plan.popular && (
         <span className="absolute right-5 top-5 rounded-full border border-amber-200/25 bg-amber-300/15 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.16em] text-amber-200">
           Equilíbrio
@@ -401,6 +600,8 @@ function MaintenanceCard({ plan, index }: { plan: MaintenancePlan; index: number
 }
 
 export function PricingPreview() {
+  const { capabilities } = useCinematicMotion();
+
   return (
     <section className="relative overflow-hidden border-t border-white/10 bg-[#071018]">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(34,211,238,0.13),transparent_34%),radial-gradient(circle_at_15%_90%,rgba(251,191,36,0.1),transparent_32%)]" />
@@ -423,35 +624,89 @@ export function PricingPreview() {
         </div>
 
         <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {CREATION_PLANS.map((plan) => (
-            <Link
+          {CREATION_PLANS.map((plan, index) => (
+            <motion.div
               key={plan.name}
-              to="/planos"
-              className={[
-                "group rounded-2xl border p-5 transition",
-                plan.popular
-                  ? "border-cyan-300/35 bg-cyan-300/[0.09]"
-                  : "border-white/10 bg-white/[0.04] hover:border-white/20",
-              ].join(" ")}
+              initial={capabilities.reducedMotion ? false : { opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              whileHover={
+                capabilities.precisePointer && !capabilities.reducedMotion
+                  ? { y: -6, scale: 1.012 }
+                  : undefined
+              }
+              animate={
+                plan.popular &&
+                capabilities.hydrated &&
+                !capabilities.reducedMotion &&
+                capabilities.quality !== "static"
+                  ? {
+                      boxShadow: [
+                        "0 18px 55px rgba(34,211,238,0.05)",
+                        "0 24px 75px rgba(34,211,238,0.16)",
+                        "0 18px 55px rgba(34,211,238,0.05)",
+                      ],
+                    }
+                  : undefined
+              }
+              viewport={{ once: true, margin: "-10%" }}
+              transition={{
+                opacity: { duration: 0.48, delay: index * 0.08 },
+                y: { duration: 0.48, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] },
+                scale: { type: "spring", stiffness: 260, damping: 22 },
+                boxShadow: { duration: 4.4, repeat: Infinity, ease: "easeInOut" },
+              }}
+              className="rounded-2xl"
             >
-              <div className="flex items-center justify-between gap-3">
-                <span className="font-display text-2xl text-white">{plan.name}</span>
-                {plan.popular && (
-                  <span className="rounded-full bg-cyan-300 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-slate-950">
-                    Mais escolhido
-                  </span>
-                )}
-              </div>
-              <p className="mt-5 text-xs uppercase tracking-[0.16em] text-white/45">
-                {plan.prefix ?? "Projeto completo"}
-              </p>
-              <p className="mt-1 font-display text-4xl font-light tracking-[-0.04em] text-white">
-                {formatPrice(plan.price)}
-              </p>
-              <p className="mt-4 flex items-center gap-2 text-sm text-white/60 transition group-hover:text-white/85">
-                Ver detalhes <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </p>
-            </Link>
+              <Link
+                to="/planos"
+                className={[
+                  "group relative block h-full overflow-hidden rounded-2xl border p-5 transition",
+                  plan.popular
+                    ? "border-cyan-300/35 bg-cyan-300/[0.09]"
+                    : "border-white/10 bg-white/[0.04] hover:border-white/20",
+                ].join(" ")}
+              >
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 translate-y-full bg-gradient-to-t from-cyan-300/10 to-transparent transition-transform duration-500 ease-out group-hover:translate-y-0"
+                />
+                <div className="relative flex items-center justify-between gap-3">
+                  <span className="font-display text-2xl text-white">{plan.name}</span>
+                  {plan.popular && (
+                    <motion.span
+                      className="rounded-full bg-cyan-300 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-slate-950"
+                      animate={
+                        capabilities.reducedMotion
+                          ? undefined
+                          : {
+                              boxShadow: [
+                                "0 0 0 rgba(34,211,238,0)",
+                                "0 0 24px rgba(34,211,238,.35)",
+                                "0 0 0 rgba(34,211,238,0)",
+                              ],
+                            }
+                      }
+                      transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      Mais escolhido
+                    </motion.span>
+                  )}
+                </div>
+                <p className="relative mt-5 text-xs uppercase tracking-[0.16em] text-white/45">
+                  {plan.prefix ?? "Projeto completo"}
+                </p>
+                <p className="relative mt-1 font-display text-4xl font-light tracking-[-0.04em] text-white">
+                  {formatPrice(plan.price)}
+                </p>
+                <p className="relative mt-4 flex items-center gap-2 text-sm text-white/60 transition group-hover:text-white/85">
+                  Ver detalhes{" "}
+                  <ArrowRight
+                    className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                    aria-hidden="true"
+                  />
+                </p>
+              </Link>
+            </motion.div>
           ))}
         </div>
         <p className="mt-6 text-xs leading-5 text-white/45">
@@ -464,6 +719,8 @@ export function PricingPreview() {
 }
 
 export function PricingPage() {
+  const { capabilities } = useCinematicMotion();
+
   return (
     <div className="min-h-screen overflow-x-clip bg-[#05070a] text-white">
       <PricingShader />
@@ -500,54 +757,56 @@ export function PricingPage() {
 
       <main className="relative z-10">
         <section className="mx-auto flex min-h-[76svh] max-w-6xl flex-col items-center justify-center px-4 py-24 text-center">
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="rounded-full border border-amber-200/20 bg-amber-300/10 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.24em] text-amber-200"
-          >
-            Condição de lançamento · 3 primeiros projetos
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.05 }}
-            className="mt-7 max-w-5xl bg-gradient-to-r from-white via-cyan-100 to-amber-200 bg-clip-text font-display text-5xl font-light leading-[0.96] tracking-[-0.055em] text-transparent sm:text-7xl lg:text-[6.2rem]"
-          >
-            O plano certo para transformar sua operação em presença digital.
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.12 }}
-            className="mt-7 max-w-2xl text-base leading-7 text-white/62 sm:text-lg"
-          >
-            Todos os planos entregam um site profissional e funcional. O que muda é a profundidade
-            do design, do conteúdo e dos fluxos do seu negócio.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.18 }}
-            className="mt-9 flex flex-wrap justify-center gap-3"
-          >
-            <a
-              href="#criacao"
-              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
+          <CursorParallax strengthX={8} strengthY={6} className="flex w-full flex-col items-center">
+            <motion.p
+              initial={capabilities.reducedMotion ? false : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-full border border-amber-200/20 bg-amber-300/10 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.24em] text-amber-200"
             >
-              Comparar investimentos <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </a>
-            <Link
-              to="/"
-              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.09]"
+              Condição de lançamento · 3 primeiros projetos
+            </motion.p>
+            <motion.h1
+              initial={capabilities.reducedMotion ? false : { opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.05 }}
+              className="mt-7 max-w-5xl bg-gradient-to-r from-white via-cyan-100 to-amber-200 bg-clip-text font-display text-5xl font-light leading-[0.96] tracking-[-0.055em] text-transparent sm:text-7xl lg:text-[6.2rem]"
             >
-              <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Ver demonstrações
-            </Link>
-          </motion.div>
+              O plano certo para transformar sua operação em presença digital.
+            </motion.h1>
+            <motion.p
+              initial={capabilities.reducedMotion ? false : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.12 }}
+              className="mt-7 max-w-2xl text-base leading-7 text-white/62 sm:text-lg"
+            >
+              Todos os planos entregam um site profissional e funcional. O que muda é a profundidade
+              do design, do conteúdo e dos fluxos do seu negócio.
+            </motion.p>
+            <motion.div
+              initial={capabilities.reducedMotion ? false : { opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.18 }}
+              className="mt-9 flex flex-wrap justify-center gap-3"
+            >
+              <a
+                href="#criacao"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
+              >
+                Comparar investimentos <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </a>
+              <Link
+                to="/"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.09]"
+              >
+                <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Ver demonstrações
+              </Link>
+            </motion.div>
+          </CursorParallax>
         </section>
 
         <section id="criacao" className="scroll-mt-24 px-4 py-20">
           <div className="mx-auto max-w-6xl">
-            <div className="mx-auto max-w-3xl text-center">
+            <Reveal className="mx-auto max-w-3xl text-center">
               <p className="text-xs font-semibold uppercase tracking-[0.26em] text-cyan-200">
                 Criação do site
               </p>
@@ -558,7 +817,7 @@ export function PricingPage() {
                 Banco, painel, WhatsApp e pagamentos entram quando fazem sentido para a operação. O
                 plano define o tamanho e a profundidade do projeto.
               </p>
-            </div>
+            </Reveal>
 
             <div className="mt-16 grid items-stretch gap-6 lg:grid-cols-3">
               {CREATION_PLANS.map((plan, index) => (
@@ -591,22 +850,35 @@ export function PricingPage() {
                 title: "Evolução possível",
                 text: "Novas páginas e funcionalidades podem ser contratadas conforme o negócio cresce.",
               },
-            ].map((item) => (
-              <div
+            ].map((item, index) => (
+              <motion.div
                 key={item.title}
-                className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"
+                initial={capabilities.reducedMotion ? false : { opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                whileHover={
+                  capabilities.precisePointer && !capabilities.reducedMotion
+                    ? { y: -5, borderColor: "rgba(103, 232, 249, 0.25)" }
+                    : undefined
+                }
+                viewport={{ once: true, margin: "-8%" }}
+                transition={{
+                  opacity: { duration: 0.45, delay: index * 0.06 },
+                  y: { duration: 0.45, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] },
+                  borderColor: { duration: 0.25 },
+                }}
+                className="rounded-2xl border border-white/10 bg-white/[0.035] p-5 transition-shadow hover:shadow-[0_18px_55px_rgba(34,211,238,0.08)]"
               >
                 <item.icon className="h-5 w-5 text-cyan-200" aria-hidden="true" />
                 <h3 className="mt-4 font-semibold">{item.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-white/52">{item.text}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </section>
 
         <section id="manutencao" className="scroll-mt-24 px-4 py-24">
           <div className="mx-auto max-w-6xl">
-            <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+            <Reveal className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
               <div className="max-w-3xl">
                 <p className="text-xs font-semibold uppercase tracking-[0.26em] text-amber-200">
                   Depois da publicação
@@ -619,7 +891,7 @@ export function PricingPage() {
                 O cliente recebe relatório de utilização. Erros reproduzíveis causados pela
                 implementação não consomem a franquia de suporte.
               </p>
-            </div>
+            </Reveal>
 
             <div className="mt-12 grid gap-5 lg:grid-cols-3">
               {MAINTENANCE_PLANS.map((plan, index) => (
@@ -663,7 +935,7 @@ export function PricingPage() {
           id="custos-externos"
           className="scroll-mt-24 border-y border-white/10 bg-[#071018] px-4 py-24"
         >
-          <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+          <Reveal className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.26em] text-cyan-200">
                 Sem custo escondido
@@ -714,11 +986,11 @@ export function PricingPage() {
                 </ul>
               </div>
             </div>
-          </div>
+          </Reveal>
         </section>
 
         <section className="px-4 py-24">
-          <div className="mx-auto max-w-4xl text-center">
+          <Reveal className="mx-auto max-w-4xl text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.26em] text-amber-200">
               Próximo passo
             </p>
@@ -733,7 +1005,7 @@ export function PricingPage() {
               label="Solicitar proposta no Instagram"
               className="mt-9 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-cyan-300 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
             />
-          </div>
+          </Reveal>
         </section>
       </main>
 
