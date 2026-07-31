@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Search, ShoppingBag, User, X } from "lucide-react";
-import { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { StoreConfig } from "@/types/commerce";
@@ -11,9 +12,24 @@ import { StoreSwitcher } from "./store-switcher";
 export function StoreHeader({ store }: { store: StoreConfig }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [cartPulse, setCartPulse] = useState(0);
+  const previousCount = useRef<number | null>(null);
   const { count } = useCart(store.slug);
   const hydrated = useHydrated();
+  const reduceMotion = useReducedMotion();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!hydrated) return;
+    if (previousCount.current === null) {
+      previousCount.current = count;
+      return;
+    }
+    if (previousCount.current !== count) {
+      previousCount.current = count;
+      setCartPulse((value) => value + 1);
+    }
+  }, [count, hydrated]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,11 +111,36 @@ export function StoreHeader({ store }: { store: StoreConfig }) {
           </Button>
           <Button asChild variant="ghost" size="icon" className="relative" aria-label="Carrinho">
             <Link to="/demo/$storeSlug/carrinho" params={{ storeSlug: store.slug }}>
-              <ShoppingBag className="h-5 w-5" />
+              <motion.span
+                key={`cart-${cartPulse}`}
+                className="inline-flex"
+                initial={false}
+                animate={
+                  cartPulse > 0 && !reduceMotion
+                    ? {
+                        rotate: [0, -14, 12, -7, 0],
+                        scale: [1, 1.24, 0.94, 1.08, 1],
+                      }
+                    : undefined
+                }
+                transition={{ duration: 0.55, ease: "easeOut" }}
+              >
+                <ShoppingBag className="h-5 w-5" />
+              </motion.span>
               {hydrated && count > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                <motion.span
+                  key={`cart-count-${count}-${cartPulse}`}
+                  initial={reduceMotion ? false : { scale: 0.45, opacity: 0, y: 4 }}
+                  animate={
+                    reduceMotion
+                      ? { opacity: 1 }
+                      : { scale: [1, 1.32, 1], opacity: 1, y: 0 }
+                  }
+                  transition={{ duration: 0.42, ease: "easeOut" }}
+                  className="absolute -right-0.5 -top-0.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground"
+                >
                   {count}
-                </span>
+                </motion.span>
               )}
             </Link>
           </Button>

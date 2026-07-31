@@ -1,4 +1,11 @@
-import { createFileRoute, Outlet, notFound, Link, useRouterState, redirect } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Outlet,
+  notFound,
+  Link,
+  useRouterState,
+  redirect,
+} from "@tanstack/react-router";
 import { getStore } from "@/config/stores";
 import { StoreThemeStyle, themeScopeClass } from "@/components/storefront/store-theme";
 import { StoreHeader } from "@/components/storefront/store-header";
@@ -8,6 +15,7 @@ import { DemoBanner } from "@/components/storefront/demo-banner";
 import { LiquidMobileMenu } from "@/components/storefront/liquid-mobile-menu";
 import { useEffect } from "react";
 import { seedAllStores } from "@/services/local-repository";
+import { useRepo } from "@/hooks/use-repo";
 
 export const Route = createFileRoute("/demo/$storeSlug")({
   beforeLoad: ({ params }) => {
@@ -36,10 +44,13 @@ export const Route = createFileRoute("/demo/$storeSlug")({
 
 function StoreLayout() {
   const { storeSlug } = Route.useParams();
-  const store = getStore(storeSlug)!;
+  const repo = useRepo();
+  const store = repo.getConfig(storeSlug) ?? getStore(storeSlug)!;
+
   useEffect(() => {
     seedAllStores();
   }, []);
+
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isAdmin = pathname.includes(`/demo/${storeSlug}/admin`);
   if (isAdmin) {
@@ -50,6 +61,7 @@ function StoreLayout() {
       </div>
     );
   }
+
   // Esconde o menu flutuante no formulário final do checkout para não cobrir o botão.
   const hideFloatingMenu = pathname.endsWith(`/demo/${storeSlug}/checkout`);
   return (
@@ -72,8 +84,13 @@ function StoreNotFound() {
     <div className="flex min-h-screen items-center justify-center px-4 text-center">
       <div>
         <h1 className="text-2xl font-bold">Loja não encontrada</h1>
-        <p className="mt-2 text-muted-foreground">A loja demonstrativa que você tentou abrir não existe.</p>
-        <Link to="/" className="mt-6 inline-block rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground">
+        <p className="mt-2 text-muted-foreground">
+          A loja demonstrativa que você tentou abrir não existe.
+        </p>
+        <Link
+          to="/"
+          className="mt-6 inline-block rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground"
+        >
           Voltar para a Central
         </Link>
       </div>

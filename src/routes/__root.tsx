@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CinematicMotionProvider } from "../components/motion/cinematic-motion-system";
+import { Toaster } from "../components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -130,7 +131,30 @@ function RootComponent() {
       <CinematicMotionProvider>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
+        <Toaster position="top-center" richColors closeButton duration={2800} />
+        <GlobalInteractionStyles />
       </CinematicMotionProvider>
     </QueryClientProvider>
+  );
+}
+
+function GlobalInteractionStyles() {
+  return (
+    <style>{`
+      button:has(.lucide-shopping-bag):not(:disabled) {
+        transform-origin: center;
+        transition: transform 160ms cubic-bezier(.22,1,.36,1), filter 160ms ease;
+        -webkit-tap-highlight-color: transparent;
+      }
+      button:has(.lucide-shopping-bag):not(:disabled):active {
+        transform: scale(.965);
+        filter: brightness(1.14);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        button:has(.lucide-shopping-bag):not(:disabled) {
+          transition: none !important;
+        }
+      }
+    `}</style>
   );
 }
