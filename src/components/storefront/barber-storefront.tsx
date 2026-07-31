@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
+import { motion, useReducedMotion, AnimatePresence, type PanInfo } from "framer-motion";
 import {
   CalendarDays,
   Clock,
@@ -11,6 +11,7 @@ import {
   Gift,
   Truck,
   RefreshCcw,
+  X,
 } from "lucide-react";
 import type { StoreConfig, Product, Service, Professional } from "@/types/commerce";
 import { BarberHero } from "@/components/storefront/hero/barber-hero";
@@ -26,6 +27,7 @@ import { brl } from "@/lib/format";
 import { SafeImage } from "@/components/storefront/safe-image";
 import { ProductCard } from "@/components/storefront/product-card";
 import { barberServiceFallback, BARBER_PROFESSIONAL_FALLBACK } from "@/lib/barber-media";
+import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 
 const ICONS: Record<string, typeof Sparkles> = {
   truck: Truck,
@@ -225,7 +227,10 @@ function ServiceRow({
         params={{ storeSlug }}
         className="relative flex items-center gap-6 overflow-hidden px-2 py-6 outline-none focus-visible:bg-neutral-900/40 sm:px-4 sm:py-7 lg:py-6"
       >
-        <div aria-hidden className="pointer-events-none absolute inset-0 -z-0 overflow-hidden lg:hidden">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-0 overflow-hidden lg:hidden"
+        >
           <motion.div
             initial={false}
             animate={
@@ -346,107 +351,245 @@ function RitualSteps() {
 function ProfessionalsStack({ professionals }: { professionals: Professional[] }) {
   const list = professionals.filter((p) => p.active).slice(0, 3);
   const [active, setActive] = useState(0);
+  const [expanded, setExpanded] = useState<Professional | null>(null);
   const reduce = useReducedMotion();
+  const { capabilities } = useCinematicMotion();
 
-  if (list.length === 0) return null;
   const activePro = list[active];
   const firstName = activePro?.name.split(" ")[0] ?? "";
+  const stackStep = capabilities.coarsePointer ? 9 : 22;
+
+  const cycle = (direction: -1 | 1) => {
+    setActive((current) => (current + direction + list.length) % list.length);
+  };
+
+  useEffect(() => {
+    if (reduce || expanded || list.length < 2) return;
+    const timer = window.setInterval(() => {
+      setActive((current) => (current + 1) % list.length);
+    }, 4600);
+    return () => window.clearInterval(timer);
+  }, [expanded, list.length, reduce]);
+
+  useEffect(() => {
+    if (!expanded) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setExpanded(null);
+    };
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [expanded]);
+
+  if (list.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-16">
-      <div className="grid gap-10 lg:grid-cols-[1fr_minmax(320px,380px)] lg:items-center">
-        <div>
-          <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">Time</div>
-          <h2 className="mt-2 font-display text-3xl uppercase tracking-tight text-white sm:text-4xl">
-            Mãos que assinam a casa
-          </h2>
-          <p className="mt-4 max-w-md text-sm leading-relaxed text-neutral-400">
-            Três barbeiros, três repertórios. Escolha quem executa o seu horário no agendamento.
-          </p>
+    <>
+      <section className="mx-auto max-w-6xl overflow-hidden px-6 py-16">
+        <div className="grid gap-10 lg:grid-cols-[1fr_minmax(320px,380px)] lg:items-center">
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">Time</div>
+            <h2 className="mt-2 font-display text-3xl uppercase tracking-tight text-white sm:text-4xl">
+              Mãos que assinam a casa
+            </h2>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-neutral-400">
+              Arraste os cards, conheça cada profissional e escolha quem executa o seu horário.
+            </p>
 
-          <div className="mt-6 flex flex-wrap gap-2">
-            {list.map((p, i) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => setActive(i)}
-                onFocus={() => setActive(i)}
-                aria-pressed={active === i}
-                className={
-                  "border px-4 py-2 text-[11px] uppercase tracking-[0.3em] transition " +
-                  (active === i
-                    ? "border-amber-300 bg-amber-300 text-neutral-950"
-                    : "border-neutral-700 text-neutral-300 hover:border-amber-300/60 hover:text-amber-200")
-                }
-              >
-                {p.name.split(" ")[0]}
-              </button>
-            ))}
+            <div className="mt-6 flex flex-wrap gap-2">
+              {list.map((p, i) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setActive(i)}
+                  onFocus={() => setActive(i)}
+                  aria-pressed={active === i}
+                  className={
+                    "border px-4 py-2 text-[11px] uppercase tracking-[0.3em] transition active:scale-95 " +
+                    (active === i
+                      ? "border-amber-300 bg-amber-300 text-neutral-950"
+                      : "border-neutral-700 text-neutral-300 hover:border-amber-300/60 hover:text-amber-200")
+                  }
+                >
+                  {p.name.split(" ")[0]}
+                </button>
+              ))}
+            </div>
+
+            {activePro && (
+              <div className="mt-8">
+                <Button
+                  asChild
+                  className="rounded-none bg-amber-300 px-6 py-5 text-[11px] font-semibold uppercase tracking-[0.3em] text-neutral-950 hover:bg-amber-200"
+                >
+                  <Link to="/demo/$storeSlug/agendar" params={{ storeSlug: "barbearia" }}>
+                    <CalendarDays className="mr-2 h-4 w-4" /> Agendar com {firstName}
+                  </Link>
+                </Button>
+              </div>
+            )}
           </div>
 
-          {activePro && (
-            <div className="mt-8">
-              <Button
-                asChild
-                className="rounded-none bg-amber-300 px-6 py-5 text-[11px] font-semibold uppercase tracking-[0.3em] text-neutral-950 hover:bg-amber-200"
-              >
-                <Link to="/demo/$storeSlug/agendar" params={{ storeSlug: "barbearia" }}>
-                  <CalendarDays className="mr-2 h-4 w-4" /> Agendar com {firstName}
-                </Link>
-              </Button>
-            </div>
-          )}
-        </div>
-
-        <div className="relative mx-auto h-[440px] w-full max-w-[360px]">
-          {list.map((p, i) => {
-            const offset = i - active;
-            const isActive = i === active;
-            return (
-              <motion.article
-                key={p.id}
-                initial={false}
-                animate={
-                  reduce
-                    ? { opacity: isActive ? 1 : 0.3 }
-                    : {
-                        x: isActive ? 0 : offset * 22,
-                        y: isActive ? 0 : Math.abs(offset) * 18,
-                        rotate: isActive ? 0 : offset * 2.5,
-                        scale: isActive ? 1 : 0.92,
-                        opacity: isActive ? 1 : Math.abs(offset) > 2 ? 0 : 0.35,
-                        filter: isActive ? "none" : "brightness(0.55)",
+          <div className="relative mx-auto h-[430px] w-[calc(100%_-_1.25rem)] max-w-[360px] sm:h-[440px] sm:w-full">
+            {list.map((p, i) => {
+              const offset = i - active;
+              const isActive = i === active;
+              return (
+                <motion.article
+                  key={p.id}
+                  layoutId={`barber-professional-${p.id}`}
+                  drag={isActive && !reduce ? "x" : false}
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.16}
+                  onDragEnd={(_event, info: PanInfo) => {
+                    if (info.offset.x > 50 || info.velocity.x > 450) cycle(-1);
+                    if (info.offset.x < -50 || info.velocity.x < -450) cycle(1);
+                  }}
+                  onClick={() => {
+                    if (!isActive) setActive(i);
+                  }}
+                  initial={false}
+                  animate={
+                    reduce
+                      ? { opacity: isActive ? 1 : 0.3 }
+                      : {
+                          x: isActive ? 0 : offset * stackStep,
+                          y: isActive ? 0 : Math.abs(offset) * 14,
+                          rotate: isActive ? 0 : offset * 1.8,
+                          scale: isActive ? 1 : 0.93,
+                          opacity: isActive ? 1 : Math.abs(offset) > 2 ? 0 : 0.35,
+                          filter: isActive ? "none" : "brightness(0.55)",
+                        }
+                  }
+                  transition={{ duration: 0.5, ease: MOTION.ease }}
+                  whileTap={reduce ? undefined : { scale: isActive ? 0.985 : 0.91 }}
+                  style={{
+                    zIndex: isActive ? 30 : 10 - Math.abs(offset),
+                    touchAction: "pan-y",
+                  }}
+                  className="absolute inset-0 w-full cursor-grab overflow-hidden border border-neutral-800 bg-neutral-900 shadow-2xl shadow-black/40 active:cursor-grabbing"
+                >
+                  <div className="h-[64%] w-full overflow-hidden">
+                    <motion.div
+                      className="h-full w-full"
+                      animate={
+                        isActive && !reduce
+                          ? {
+                              scale: [1, 1.035, 1],
+                              filter: ["grayscale(.15)", "grayscale(0)", "grayscale(.15)"],
+                            }
+                          : undefined
                       }
-                }
-                transition={{ duration: 0.5, ease: MOTION.ease }}
-                style={{ zIndex: isActive ? 30 : 10 - Math.abs(offset) }}
-                className="absolute inset-0 w-full overflow-hidden border border-neutral-800 bg-neutral-900 shadow-2xl shadow-black/40"
-              >
-                <div className="h-2/3 w-full overflow-hidden">
-                  <SafeImage
-                    src={p.avatar}
-                    fallbackSrc={BARBER_PROFESSIONAL_FALLBACK}
-                    alt={p.name}
-                    fallbackLabel={p.name}
-                    loading="lazy"
-                    className="h-full w-full object-cover grayscale-[0.15]"
-                  />
-                </div>
-                <div className="flex h-1/3 flex-col justify-center gap-1 border-t border-neutral-800 px-5">
-                  <div className="text-[10px] uppercase tracking-[0.3em] text-amber-200/80">
-                    {p.role}
+                      transition={{
+                        duration: 6.8,
+                        repeat: Number.POSITIVE_INFINITY,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      <SafeImage
+                        src={p.avatar}
+                        fallbackSrc={BARBER_PROFESSIONAL_FALLBACK}
+                        alt={p.name}
+                        fallbackLabel={p.name}
+                        loading="lazy"
+                        className="h-full w-full object-cover"
+                      />
+                    </motion.div>
                   </div>
-                  <div className="font-display text-xl uppercase tracking-tight text-white">
-                    {p.name}
+                  <div className="flex h-[36%] flex-col justify-center gap-1 border-t border-neutral-800 px-5">
+                    <div className="text-[10px] uppercase tracking-[0.3em] text-amber-200/80">
+                      {p.role}
+                    </div>
+                    <div className="font-display text-xl uppercase tracking-tight text-white">
+                      {p.name}
+                    </div>
+                    {p.bio && <p className="line-clamp-1 text-xs text-neutral-400">{p.bio}</p>}
+                    {isActive && (
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setExpanded(p);
+                        }}
+                        className="mt-2 self-start border-b border-amber-300/45 pb-1 text-[9px] uppercase tracking-[0.28em] text-amber-200"
+                      >
+                        Abrir perfil
+                      </button>
+                    )}
                   </div>
-                  {p.bio && <p className="line-clamp-2 text-xs text-neutral-400">{p.bio}</p>}
-                </div>
-              </motion.article>
-            );
-          })}
+                </motion.article>
+              );
+            })}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <AnimatePresence>
+        {expanded && (
+          <div className="fixed inset-0 z-[100] grid place-items-center p-4">
+            <motion.button
+              type="button"
+              aria-label="Fechar perfil"
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setExpanded(null)}
+            />
+            <motion.div
+              layoutId={`barber-professional-${expanded.id}`}
+              role="dialog"
+              aria-modal="true"
+              aria-label={`Perfil de ${expanded.name}`}
+              className="relative z-10 flex max-h-[86svh] w-full max-w-3xl flex-col overflow-hidden border border-amber-300/25 bg-neutral-950 shadow-[0_34px_120px_-35px_rgba(251,191,36,.42)] md:flex-row"
+            >
+              <button
+                type="button"
+                onClick={() => setExpanded(null)}
+                className="absolute right-3 top-3 z-20 grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-black/55 text-white backdrop-blur"
+                aria-label="Fechar perfil"
+              >
+                <X className="h-4 w-4" />
+              </button>
+              <div className="h-64 w-full shrink-0 overflow-hidden md:h-auto md:w-1/2">
+                <SafeImage
+                  src={expanded.avatar}
+                  fallbackSrc={BARBER_PROFESSIONAL_FALLBACK}
+                  alt={expanded.name}
+                  fallbackLabel={expanded.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div className="overflow-y-auto p-6 sm:p-8 md:w-1/2">
+                <div className="text-[10px] uppercase tracking-[0.32em] text-amber-200/75">
+                  {expanded.role}
+                </div>
+                <h3 className="mt-3 font-display text-4xl uppercase text-white">{expanded.name}</h3>
+                <p className="mt-5 text-sm leading-7 text-neutral-300">
+                  {expanded.bio ??
+                    "Especialista da Barber Noir, com atendimento personalizado e domínio dos rituais da casa."}
+                </p>
+                <Button
+                  asChild
+                  className="mt-7 rounded-none bg-amber-300 px-6 py-5 text-[10px] font-semibold uppercase tracking-[0.28em] text-neutral-950"
+                >
+                  <Link to="/demo/$storeSlug/agendar" params={{ storeSlug: "barbearia" }}>
+                    <CalendarDays className="mr-2 h-4 w-4" /> Agendar com{" "}
+                    {expanded.name.split(" ")[0]}
+                  </Link>
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
@@ -462,7 +605,9 @@ function ResultsEditorial({ services }: { services: Service[] }) {
       <div className="mx-auto max-w-7xl px-6 py-16">
         <div className="mb-8 flex items-end justify-between gap-6">
           <div>
-            <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">Atmosfera</div>
+            <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">
+              Atmosfera
+            </div>
             <h2 className="mt-2 font-display text-3xl uppercase tracking-tight text-white sm:text-4xl">
               Atmosfera Barber Noir
             </h2>

@@ -31,6 +31,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { TechnologyShader } from "./technology-shader";
+import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 
 type ElectronicsStorefrontProps = {
   store: StoreConfig;
@@ -99,10 +100,11 @@ export function ElectronicsStorefront({ store, products, featured }: Electronics
 
 function NovaHero({ store, product }: { store: StoreConfig; product?: Product }) {
   const reduceMotion = useReducedMotion();
+  const { capabilities } = useCinematicMotion();
   const price = product ? (product.salePrice ?? product.price) : undefined;
 
   return (
-    <section className="relative isolate min-h-[780px] overflow-hidden border-b border-white/10">
+    <section className="relative isolate overflow-hidden border-b border-white/10 sm:min-h-[780px]">
       <TechnologyShader className="absolute inset-0 opacity-90" />
       <div
         aria-hidden="true"
@@ -119,7 +121,7 @@ function NovaHero({ store, product }: { store: StoreConfig; product?: Product })
         className="absolute inset-0 bg-[linear-gradient(90deg,#050714_0%,rgba(5,7,20,.92)_35%,rgba(5,7,20,.25)_72%,#050714_100%)]"
       />
 
-      <div className="relative mx-auto flex min-h-[780px] max-w-7xl flex-col px-6 pb-14 pt-16 sm:px-8 lg:px-10">
+      <div className="relative mx-auto max-w-7xl px-5 pb-10 pt-10 sm:flex sm:min-h-[780px] sm:flex-col sm:px-8 sm:pb-14 sm:pt-16 lg:px-10">
         <div className="flex items-center justify-between border-b border-white/10 pb-4 text-[10px] uppercase tracking-[0.32em] text-cyan-100/70">
           <span className="inline-flex items-center gap-2">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-300 shadow-[0_0_16px_rgba(103,232,249,.9)]" />
@@ -129,7 +131,7 @@ function NovaHero({ store, product }: { store: StoreConfig; product?: Product })
           <span>São Paulo · BR</span>
         </div>
 
-        <div className="grid flex-1 items-center gap-12 py-14 lg:grid-cols-[1.08fr_.92fr]">
+        <div className="grid gap-10 py-10 sm:flex-1 sm:items-center sm:gap-12 sm:py-14 lg:grid-cols-[1.08fr_.92fr]">
           <div className="relative z-10">
             <motion.div
               initial={reduceMotion ? false : { opacity: 0, y: 14 }}
@@ -141,7 +143,7 @@ function NovaHero({ store, product }: { store: StoreConfig; product?: Product })
               {store.messages.heroKicker}
             </motion.div>
 
-            <h1 className="mt-7 max-w-4xl text-[clamp(4rem,10vw,8.7rem)] font-semibold uppercase leading-[0.78] tracking-[-0.075em]">
+            <h1 className="mt-7 max-w-full text-[clamp(3rem,14vw,8.7rem)] font-semibold uppercase leading-[0.8] tracking-[-0.055em] sm:max-w-4xl sm:tracking-[-0.075em]">
               {["Engineered", "for what's", "next."].map((line, index) => (
                 <motion.span
                   key={line}
@@ -200,14 +202,20 @@ function NovaHero({ store, product }: { store: StoreConfig; product?: Product })
 
           {product && (
             <motion.div
-              initial={reduceMotion ? false : { opacity: 0, x: 50, rotateY: -12 }}
-              animate={{ opacity: 1, x: 0, rotateY: 0 }}
+              initial={
+                reduceMotion
+                  ? false
+                  : capabilities.coarsePointer
+                    ? { opacity: 0, y: 36, scale: 0.96 }
+                    : { opacity: 0, x: 50, rotateY: -12 }
+              }
+              animate={{ opacity: 1, x: 0, y: 0, rotateY: 0, scale: 1 }}
               transition={{ delay: 0.22, duration: 0.85 }}
-              className="relative mx-auto w-full max-w-[520px] [perspective:1200px]"
+              className="relative mx-auto w-full max-w-[min(100%,520px)] [perspective:1200px]"
             >
               <div
                 aria-hidden="true"
-                className="absolute -inset-12 rounded-full bg-blue-500/20 blur-[100px]"
+                className="absolute -inset-4 rounded-full bg-blue-500/20 blur-[70px] sm:-inset-12 sm:blur-[100px]"
               />
               <div className="relative border border-cyan-200/20 bg-[#090d20]/75 p-3 shadow-[0_60px_130px_-55px_rgba(56,189,248,.8)] backdrop-blur-xl">
                 <div className="absolute left-6 top-6 z-10 flex items-center gap-2 bg-[#050714]/80 px-3 py-2 text-[9px] uppercase tracking-[0.3em] text-cyan-100 backdrop-blur">
@@ -224,7 +232,7 @@ function NovaHero({ store, product }: { store: StoreConfig; product?: Product })
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-3 bg-[linear-gradient(115deg,transparent_35%,rgba(103,232,249,.14)_50%,transparent_65%)]"
                 />
-                <div className="grid grid-cols-[1fr_auto] items-end gap-6 border-t border-white/10 bg-[#070a18] p-5">
+                <div className="grid grid-cols-1 items-end gap-3 border-t border-white/10 bg-[#070a18] p-5 sm:grid-cols-[1fr_auto] sm:gap-6">
                   <div>
                     <div className="text-[9px] uppercase tracking-[0.32em] text-cyan-200/65">
                       Flagship selection
@@ -232,7 +240,7 @@ function NovaHero({ store, product }: { store: StoreConfig; product?: Product })
                     <div className="mt-2 text-xl font-semibold">{product.name}</div>
                   </div>
                   {price != null && (
-                    <div className="text-right">
+                    <div className="text-left sm:text-right">
                       <div className="text-[9px] uppercase tracking-[0.24em] text-slate-500">
                         A partir de
                       </div>
@@ -321,7 +329,7 @@ function CategoryCommand({ store }: { store: StoreConfig }) {
                   key={category.slug}
                   to="/demo/$storeSlug/categoria/$categorySlug"
                   params={{ storeSlug: store.slug, categorySlug: category.slug }}
-                  className="group relative min-h-40 overflow-hidden bg-[#080b1a] p-5 transition duration-500 hover:bg-[#0c1430]"
+                  className="group relative min-h-40 overflow-hidden bg-[#080b1a] p-5 transition duration-500 hover:bg-[#0c1430] active:scale-[0.985] active:bg-[#0c1430]"
                 >
                   <div className="flex items-start justify-between">
                     <span className="text-[9px] uppercase tracking-[0.3em] text-slate-500">
@@ -348,6 +356,7 @@ function CategoryCommand({ store }: { store: StoreConfig }) {
 
 function ProductFan({ store, products }: { store: StoreConfig; products: Product[] }) {
   const reduceMotion = useReducedMotion();
+  const { capabilities } = useCinematicMotion();
   const [active, setActive] = useState(0);
   const [hovering, setHovering] = useState(false);
   const items = products.slice(0, 5);
@@ -371,6 +380,7 @@ function ProductFan({ store, products }: { store: StoreConfig; products: Product
   const selectRelative = (delta: number) => {
     setActive((value) => (value + delta + items.length) % items.length);
   };
+  const fanStep = capabilities.coarsePointer ? 58 : 92;
 
   return (
     <section id="showroom" className="relative border-b border-white/10 bg-[#070a17]">
@@ -464,21 +474,40 @@ function ProductFan({ store, products }: { store: StoreConfig; products: Product
                     initial={reduceMotion ? false : { opacity: 0, y: 40 }}
                     animate={{
                       opacity: isActive ? 1 : 0.42,
-                      x: wrappedOffset * 92,
-                      y: distance * 22,
-                      rotateZ: wrappedOffset * 7,
+                      x: wrappedOffset * fanStep,
+                      y: distance * (capabilities.coarsePointer ? 16 : 22),
+                      rotateZ: wrappedOffset * (capabilities.coarsePointer ? 5 : 7),
                       rotateY: wrappedOffset * -7,
                       scale: isActive ? 1 : 0.9,
                     }}
                     transition={{ type: "spring", stiffness: 230, damping: 27 }}
                     style={{ zIndex: 20 - distance }}
                     className={
-                      "absolute w-[min(75vw,430px)] cursor-pointer overflow-hidden border bg-[#090d20] shadow-2xl " +
+                      "absolute w-[min(78vw,430px)] cursor-pointer overflow-hidden border bg-[#090d20] shadow-2xl " +
                       (isActive
                         ? "border-cyan-200/40 shadow-cyan-950/60"
                         : "border-white/10 saturate-50")
                     }
                   >
+                    {isActive && !reduceMotion && (
+                      <motion.span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 z-30 border border-cyan-200/70"
+                        animate={{
+                          opacity: [0.35, 0.9, 0.35],
+                          boxShadow: [
+                            "inset 0 0 0 rgba(103,232,249,0), 0 0 0 rgba(103,232,249,0)",
+                            "inset 0 0 24px rgba(103,232,249,.12), 0 0 32px rgba(103,232,249,.3)",
+                            "inset 0 0 0 rgba(103,232,249,0), 0 0 0 rgba(103,232,249,0)",
+                          ],
+                        }}
+                        transition={{
+                          duration: 2.8,
+                          repeat: Number.POSITIVE_INFINITY,
+                          ease: "easeInOut",
+                        }}
+                      />
+                    )}
                     <div className="relative aspect-[5/4] overflow-hidden">
                       <img
                         src={product.images[0]}
@@ -530,6 +559,7 @@ function ProductFan({ store, products }: { store: StoreConfig; products: Product
 }
 
 function SystemsGrid({ store, products }: { store: StoreConfig; products: Product[] }) {
+  const reduceMotion = useReducedMotion();
   return (
     <section className="border-b border-white/10">
       <div className="mx-auto max-w-7xl px-6 py-24 sm:px-8 lg:px-10">
@@ -558,15 +588,22 @@ function SystemsGrid({ store, products }: { store: StoreConfig; products: Produc
               key={product.id}
               to="/demo/$storeSlug/produto/$productSlug"
               params={{ storeSlug: store.slug, productSlug: product.slug }}
-              className="group relative bg-[#070a18] p-3"
+              className="group relative bg-[#070a18] p-3 transition active:scale-[0.985]"
             >
               <div className="relative aspect-square overflow-hidden bg-[#0a0f24]">
-                <img
-                  src={product.images[0]}
-                  alt={product.name}
-                  loading="lazy"
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.045] group-hover:saturate-125"
-                />
+                <motion.div
+                  className="h-full w-full"
+                  whileInView={reduceMotion ? undefined : { scale: 1.035 }}
+                  viewport={{ amount: 0.68 }}
+                  transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <img
+                    src={product.images[0]}
+                    alt={product.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.045] group-hover:saturate-125"
+                  />
+                </motion.div>
                 <div className="absolute inset-0 bg-gradient-to-t from-[#070a18] via-transparent to-transparent opacity-80" />
                 <div className="absolute left-3 top-3 text-[8px] uppercase tracking-[0.3em] text-white/60">
                   NC/{String(index + 1).padStart(2, "0")}

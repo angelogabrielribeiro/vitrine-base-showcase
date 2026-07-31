@@ -5,6 +5,7 @@ import type { Product, StoreConfig } from "@/types/commerce";
 import { FashionHero } from "@/components/storefront/hero/fashion-hero";
 import type { HeroSpotlight } from "@/components/storefront/hero/niche-hero";
 import { ZoomParallax, type ZoomImage } from "@/components/effects/ZoomParallax";
+import { CardFanCarousel } from "@/components/effects/CardFanCarousel";
 import { FlowingMenu, type FlowingItem } from "@/components/effects/FlowingMenu";
 import { EditorialProductCard } from "@/components/storefront/product-card-editorial";
 import { SectionReveal, WordReveal, Marquee } from "@/components/motion/primitives";
@@ -150,21 +151,41 @@ export function FashionStorefront({
         <FlowingMenu items={flowingItems} />
       </section>
 
-      <DeferredScene
-        require3D
-        className="bg-neutral-950"
-        fallback={<StaticLookbook images={lookbook} title="Lookbook Alta Primavera" />}
-      >
-        <Suspense
-          fallback={
-            <div className="grid h-[62vh] place-items-center bg-neutral-950 text-white/60">
-              <span className="text-xs uppercase tracking-[0.4em]">Carregando lookbook…</span>
-            </div>
-          }
+      <section className="bg-neutral-950 px-4 py-16 text-white md:hidden">
+        <div className="mx-auto max-w-md text-center">
+          <span className="text-[10px] uppercase tracking-[0.5em] text-amber-200/80">Coleção</span>
+          <h2 className="font-display mt-3 text-4xl">Lookbook Alta Primavera</h2>
+          <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-white/55">
+            Arraste as imagens e toque na peça central para explorar o editorial.
+          </p>
+        </div>
+        <CardFanCarousel
+          accent="#fde68a"
+          items={lookbook.map((src, index) => ({
+            src,
+            alt: `Look ${index + 1} da coleção Alta Primavera`,
+            label: `Look ${String(index + 1).padStart(2, "0")}`,
+            meta: "Maison Belle",
+          }))}
+        />
+      </section>
+
+      <div className="hidden bg-neutral-950 md:block">
+        <DeferredScene
+          require3D
+          fallback={<StaticLookbook images={lookbook} title="Lookbook Alta Primavera" />}
         >
-          <Gallery3D images={lookbook} title="Lookbook Alta Primavera" eyebrow="Coleção" />
-        </Suspense>
-      </DeferredScene>
+          <Suspense
+            fallback={
+              <div className="grid h-[62vh] place-items-center bg-neutral-950 text-white/60">
+                <span className="text-xs uppercase tracking-[0.4em]">Carregando lookbook…</span>
+              </div>
+            }
+          >
+            <Gallery3D images={lookbook} title="Lookbook Alta Primavera" eyebrow="Coleção" />
+          </Suspense>
+        </DeferredScene>
+      </div>
 
       {/* GRID COMPACTO — Peças em destaque */}
       <section className="mx-auto max-w-[72rem] px-6 py-14 sm:py-[4.5rem]">

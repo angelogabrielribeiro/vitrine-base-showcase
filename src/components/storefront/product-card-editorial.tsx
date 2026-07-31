@@ -1,8 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { useRef } from "react";
 import type { Product } from "@/types/commerce";
 import { brl } from "@/lib/format";
+import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 
 /**
  * Card editorial da Maison Belle.
@@ -20,6 +22,15 @@ export function EditorialProductCard({
   aspect?: "portrait" | "square";
 }) {
   const reduce = useReducedMotion();
+  const cardRef = useRef<HTMLAnchorElement>(null);
+  const inView = useInView(cardRef, { amount: 0.58 });
+  const { capabilities } = useCinematicMotion();
+  const mobileActive =
+    !reduce &&
+    capabilities.hydrated &&
+    capabilities.coarsePointer &&
+    capabilities.quality !== "static" &&
+    inView;
   const inStock =
     product.variants && product.variants.length
       ? product.variants.some((v) => v.stock > 0)
@@ -30,8 +41,10 @@ export function EditorialProductCard({
 
   return (
     <Link
+      ref={cardRef}
       to="/demo/$storeSlug/produto/$productSlug"
       params={{ storeSlug, productSlug: product.slug }}
+      data-mobile-active={String(mobileActive)}
       className="ep-card group relative block focus:outline-none focus-visible:outline-none focus-visible:[&_.ep-card-frame]:ring-2 focus-visible:[&_.ep-card-frame]:ring-neutral-900 focus-visible:[&_.ep-card-frame]:ring-offset-2 focus-visible:[&_.ep-card-frame]:ring-offset-neutral-50"
     >
       <motion.div
@@ -52,14 +65,17 @@ export function EditorialProductCard({
         />
 
         {secondary && !reduce && (
-          <div aria-hidden className="ep-reveal pointer-events-none absolute inset-0 hidden overflow-hidden md:block">
+          <div
+            aria-hidden
+            className="ep-reveal pointer-events-none absolute inset-0 overflow-hidden"
+          >
             <img src={secondary} alt="" loading="lazy" className="h-full w-full object-cover" />
           </div>
         )}
 
         <span
           aria-hidden
-          className="ep-grad pointer-events-none absolute inset-x-0 bottom-0 hidden h-1/2 opacity-0 md:block"
+          className="ep-grad pointer-events-none absolute inset-x-0 bottom-0 h-1/2 opacity-0"
           style={{
             background:
               "linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.15) 55%, transparent)",
@@ -67,7 +83,7 @@ export function EditorialProductCard({
         />
 
         {!reduce && (
-          <span aria-hidden className="pointer-events-none absolute inset-0 hidden md:block">
+          <span aria-hidden className="pointer-events-none absolute inset-0">
             <span className="ep-line ep-line-t" />
             <span className="ep-line ep-line-r" />
             <span className="ep-line ep-line-b" />
@@ -77,7 +93,7 @@ export function EditorialProductCard({
 
         <span
           aria-hidden
-          className="ep-cta pointer-events-none absolute inset-x-0 bottom-4 z-10 hidden items-center justify-center gap-2 text-[10px] uppercase tracking-[0.4em] text-white opacity-0 md:flex"
+          className="ep-cta pointer-events-none absolute inset-x-0 bottom-4 z-10 flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.4em] text-white opacity-0"
         >
           Ver peça
           <ArrowRight className="h-3 w-3" />
@@ -107,9 +123,7 @@ export function EditorialProductCard({
         <div className="text-right">
           {product.salePrice ? (
             <>
-              <div className="text-sm font-semibold text-neutral-900">
-                {brl(product.salePrice)}
-              </div>
+              <div className="text-sm font-semibold text-neutral-900">{brl(product.salePrice)}</div>
               <div className="text-xs text-neutral-400 line-through">{brl(product.price)}</div>
             </>
           ) : (
@@ -131,6 +145,11 @@ export function EditorialProductCard({
           .ep-card:hover .ep-cta, .ep-card:focus-visible .ep-cta { opacity: 1; transform: translateY(0); }
           .ep-card:hover .ep-meta, .ep-card:focus-visible .ep-meta { transform: translateY(-4px); }
         }
+        .ep-card[data-mobile-active="true"] .ep-img-primary { transform: scale(1.035); }
+        .ep-card[data-mobile-active="true"] .ep-reveal { clip-path: inset(0 0 0 0); }
+        .ep-card[data-mobile-active="true"] .ep-grad { opacity: 1; }
+        .ep-card[data-mobile-active="true"] .ep-cta { opacity: 1; transform: translateY(0); }
+        .ep-card[data-mobile-active="true"] .ep-meta { transform: translateY(-4px); }
         .ep-line { position: absolute; background: rgba(255,255,255,0.85); transition: transform 550ms cubic-bezier(0.22,1,0.36,1); }
         .ep-line-t { top: 8px; left: 8px; right: 8px; height: 1px; transform: scaleX(0); transform-origin: left; }
         .ep-line-b { bottom: 8px; left: 8px; right: 8px; height: 1px; transform: scaleX(0); transform-origin: right; }
@@ -141,6 +160,14 @@ export function EditorialProductCard({
           .ep-card:hover .ep-line-b, .ep-card:focus-visible .ep-line-b { transform: scaleX(1); }
           .ep-card:hover .ep-line-l, .ep-card:focus-visible .ep-line-l,
           .ep-card:hover .ep-line-r, .ep-card:focus-visible .ep-line-r { transform: scaleY(1); }
+        }
+        .ep-card[data-mobile-active="true"] .ep-line-t,
+        .ep-card[data-mobile-active="true"] .ep-line-b { transform: scaleX(1); }
+        .ep-card[data-mobile-active="true"] .ep-line-l,
+        .ep-card[data-mobile-active="true"] .ep-line-r { transform: scaleY(1); }
+        @media (hover: none) {
+          .ep-card:active { transform: scale(.985); }
+          .ep-card { transition: transform 180ms ease; }
         }
         @media (prefers-reduced-motion: reduce) {
           .ep-card .ep-img-primary, .ep-card .ep-reveal, .ep-card .ep-grad, .ep-card .ep-cta, .ep-card .ep-meta { transition: none !important; transform: none !important; }
