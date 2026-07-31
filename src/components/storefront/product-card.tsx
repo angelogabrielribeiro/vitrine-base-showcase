@@ -1,11 +1,12 @@
 import { useRef, useState, type MouseEvent } from "react";
 import { Link } from "@tanstack/react-router";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, Cpu, Flame, Scissors, Sparkles } from "lucide-react";
 import type { Product, StoreNiche } from "@/types/commerce";
 import { brl } from "@/lib/format";
 import { SafeImage } from "@/components/storefront/safe-image";
 import { barberCategoryFallback } from "@/lib/barber-media";
+import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 
 const NICHE_BY_SLUG: Record<string, StoreNiche> = {
   moda: "fashion",
@@ -58,6 +59,8 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
   const Icon = copy.icon;
   const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLAnchorElement>(null);
+  const inView = useInView(ref, { amount: 0.58 });
+  const { capabilities } = useCinematicMotion();
   const [hovered, setHovered] = useState(false);
   const [pointer, setPointer] = useState({ x: 50, y: 50 });
   const [transform, setTransform] = useState(
@@ -73,6 +76,13 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
     !reduceMotion &&
     typeof window !== "undefined" &&
     window.matchMedia?.("(hover: hover) and (pointer: fine)").matches;
+  const activeVisual =
+    hovered ||
+    (!reduceMotion &&
+      capabilities.hydrated &&
+      capabilities.coarsePointer &&
+      capabilities.quality !== "static" &&
+      inView);
 
   const handleMove = (event: MouseEvent<HTMLAnchorElement>) => {
     if (!canTilt || !ref.current) return;
@@ -103,6 +113,7 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
       onMouseLeave={reset}
       onFocus={() => setHovered(true)}
       onBlur={reset}
+      data-mobile-active={String(activeVisual && capabilities.coarsePointer)}
       className={`premium-product-card group relative block ${copy.meta}`}
       style={{ transform }}
     >
@@ -119,14 +130,17 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
         />
 
         {niche === "fashion" && secondaryImage && (
-          <div className="premium-fashion-reveal pointer-events-none absolute inset-0 hidden md:block">
+          <div className="premium-fashion-reveal pointer-events-none absolute inset-0">
             <SafeImage src={secondaryImage} alt="" className="h-full w-full object-cover" />
           </div>
         )}
 
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100 group-focus-visible:opacity-100"
+          className={
+            "pointer-events-none absolute inset-0 transition-opacity duration-700 " +
+            (activeVisual ? "opacity-100" : "opacity-0")
+          }
           style={{
             background:
               niche === "electronics"
@@ -154,9 +168,12 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
             />
             <motion.span
               aria-hidden="true"
-              animate={reduceMotion || !hovered ? undefined : { y: ["-10%", "110%"] }}
+              animate={reduceMotion || !activeVisual ? undefined : { y: ["-10%", "110%"] }}
               transition={{ duration: 1.7, ease: "linear", repeat: Number.POSITIVE_INFINITY }}
-              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200 to-transparent opacity-0 shadow-[0_0_18px_rgba(103,232,249,.9)] group-hover:opacity-100"
+              className={
+                "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200 to-transparent shadow-[0_0_18px_rgba(103,232,249,.9)] transition-opacity " +
+                (activeVisual ? "opacity-100" : "opacity-0")
+              }
             />
           </>
         )}
@@ -181,7 +198,12 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
           </span>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 z-10 translate-y-4 p-4 opacity-0 transition duration-500 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
+        <div
+          className={
+            "absolute inset-x-0 bottom-0 z-10 p-4 transition duration-500 " +
+            (activeVisual ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0")
+          }
+        >
           <div className="flex items-end justify-between gap-3 text-white">
             <div>
               <div className="text-[7px] uppercase tracking-[0.34em] opacity-70">
@@ -241,7 +263,9 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
       </div>
 
       <div
-        className={`mt-3 h-px origin-left scale-x-0 transition duration-700 group-hover:scale-x-100 ${
+        className={`mt-3 h-px origin-left transition duration-700 ${
+          activeVisual ? "scale-x-100" : "scale-x-0"
+        } ${
           niche === "electronics"
             ? "bg-cyan-200"
             : niche === "restaurant"
@@ -267,12 +291,19 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
           transform: scale(1.065);
           filter: saturate(1.08) contrast(1.04);
         }
+        .premium-product-card[data-mobile-active="true"] .premium-product-image {
+          transform: scale(1.04);
+          filter: saturate(1.08) contrast(1.04);
+        }
         .premium-fashion-reveal {
           clip-path: inset(100% 0 0 0);
           transition: clip-path 750ms cubic-bezier(.22,1,.36,1);
         }
         .premium-product-card:hover .premium-fashion-reveal,
         .premium-product-card:focus-visible .premium-fashion-reveal {
+          clip-path: inset(0 0 0 0);
+        }
+        .premium-product-card[data-mobile-active="true"] .premium-fashion-reveal {
           clip-path: inset(0 0 0 0);
         }
         .premium-corner {
@@ -302,11 +333,19 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
           opacity: .75;
           transform: translate(0,0);
         }
+        .premium-product-card[data-mobile-active="true"] .premium-corner {
+          opacity: .75;
+          transform: translate(0,0);
+        }
         .premium-product-card:focus-visible {
           outline: 2px solid currentColor;
           outline-offset: 5px;
         }
-        @media (hover: none), (prefers-reduced-motion: reduce) {
+        @media (hover: none) {
+          .premium-product-card { transform: none !important; }
+          .premium-product-card:active { scale: .985; }
+        }
+        @media (prefers-reduced-motion: reduce) {
           .premium-product-card { transform: none !important; transition: none !important; }
           .premium-product-card .premium-product-image { transform: none !important; transition: none !important; }
           .premium-fashion-reveal { display: none !important; }

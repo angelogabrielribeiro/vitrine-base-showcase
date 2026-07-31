@@ -100,7 +100,8 @@ function resolveQuality({
 }): MotionQuality {
   if (reducedMotion) return "static";
   if (preference !== "auto") return preference;
-  if (saveData || viewportWidth < 640 || cores <= 2 || memory <= 2) return "economy";
+  if (saveData || cores <= 2 || memory <= 2) return "economy";
+  if (viewportWidth < 640 && (cores < 4 || memory < 4)) return "economy";
   if (!precisePointer || viewportWidth < 1024 || cores <= 4 || memory <= 4) {
     return "balanced";
   }
@@ -149,7 +150,14 @@ function readCapabilities(preference: MotionQualityPreference): CinematicCapabil
     quality,
     allow3D,
     dpr,
-    maxParticles: quality === "cinematic" ? 96 : quality === "balanced" ? 48 : 0,
+    maxParticles:
+      quality === "cinematic"
+        ? 96
+        : quality === "balanced"
+          ? coarsePointer || viewportWidth < 768
+            ? 24
+            : 48
+          : 0,
   };
 }
 

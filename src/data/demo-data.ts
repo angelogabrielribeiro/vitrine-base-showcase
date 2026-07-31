@@ -471,7 +471,7 @@ export const BARBEARIA_PROFESSIONALS: Professional[] = [
     name: "Diego Costa",
     role: "Barber",
     bio: "Foco em barbas e pigmentação. Cliente sai renovado.",
-    avatar: img("1531123897727-8f129e1688ce", 400),
+    avatar: img("1506794778202-cad84cf45f1d", 400),
     active: true,
     serviceIds: ["s3", "s4", "s5", "s6"],
     workingDays: [3, 4, 5, 6],

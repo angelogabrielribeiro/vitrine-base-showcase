@@ -30,6 +30,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { CardFanCarousel } from "@/components/effects/CardFanCarousel";
 
 const HERO_IMAGE = "/media/brasa-urbana/hero-brasa-duplo.webp";
 const PROCESS_IMAGE = "/media/brasa-urbana/processo-brasa.webp";
@@ -253,7 +254,21 @@ export function RestaurantStorefront({ store, products, featured }: Props) {
             </Link>
           </SectionReveal>
 
-          <Stagger className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4" step={0.1}>
+          <div className="mt-8 sm:hidden">
+            <CardFanCarousel
+              accent="#fb6a32"
+              autoPlayMs={3800}
+              items={popular.map((product, index) => ({
+                src: product.images[0],
+                alt: product.name,
+                href: `/demo/${store.slug}/produto/${product.slug}`,
+                label: product.name,
+                meta: `Mais pedido · 0${index + 1}`,
+              }))}
+            />
+          </div>
+
+          <Stagger className="mt-10 hidden gap-5 sm:grid sm:grid-cols-2 lg:grid-cols-4" step={0.1}>
             {popular.map((product, index) => (
               <StaggerItem key={product.id}>
                 <RestaurantProductCard product={product} storeSlug={store.slug} rank={index + 1} />
@@ -503,50 +518,66 @@ function RestaurantProductCard({
   rank: number;
 }) {
   const price = product.salePrice ?? product.price;
+  const reduce = useReducedMotion();
 
   return (
-    <Link
-      to="/demo/$storeSlug/produto/$productSlug"
-      params={{ storeSlug, productSlug: product.slug }}
-      className="group block h-full border border-white/10 bg-[#120d0a] transition duration-300 hover:-translate-y-1 hover:border-orange-400/45 hover:shadow-[0_24px_70px_-35px_rgba(241,90,36,.8)]"
+    <motion.div
+      className="h-full"
+      initial={reduce ? false : { opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: reduce ? 0 : -4, scale: reduce ? 1 : 1.01 }}
+      viewport={{ amount: 0.56 }}
+      transition={{ duration: 0.62, ease: MOTION.ease }}
+      whileTap={reduce ? undefined : { scale: 0.985 }}
     >
-      <div className="relative aspect-[4/4.7] overflow-hidden bg-[#251811]">
-        <SafeImage
-          src={product.images[0]}
-          alt={product.name}
-          loading="lazy"
-          className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-        />
-        <span
-          aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/10"
-        />
-        <span className="absolute left-4 top-4 grid h-9 w-9 place-items-center border border-white/15 bg-black/50 font-display text-xl text-orange-300 backdrop-blur">
-          {rank}
-        </span>
-        {product.salePrice && (
-          <span className="absolute right-4 top-4 bg-[#f15a24] px-3 py-2 text-[9px] font-black uppercase tracking-[0.16em]">
-            Oferta
+      <Link
+        to="/demo/$storeSlug/produto/$productSlug"
+        params={{ storeSlug, productSlug: product.slug }}
+        className="group block h-full border border-white/10 bg-[#120d0a] transition duration-300 hover:-translate-y-1 hover:border-orange-400/45 hover:shadow-[0_24px_70px_-35px_rgba(241,90,36,.8)] active:border-orange-400/60"
+      >
+        <div className="relative aspect-[4/4.7] overflow-hidden bg-[#251811]">
+          <motion.div
+            className="h-full w-full"
+            animate={reduce ? undefined : { scale: [1, 1.035, 1] }}
+            transition={{ duration: 7.5, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+          >
+            <SafeImage
+              src={product.images[0]}
+              alt={product.name}
+              loading="lazy"
+              className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+            />
+          </motion.div>
+          <span
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/10"
+          />
+          <span className="absolute left-4 top-4 grid h-9 w-9 place-items-center border border-white/15 bg-black/50 font-display text-xl text-orange-300 backdrop-blur">
+            {rank}
           </span>
-        )}
-        <div className="absolute inset-x-0 bottom-0 p-5">
-          <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-orange-300">
-            {product.category}
-          </span>
-          <h3 className="mt-1 font-display text-3xl uppercase leading-none">{product.name}</h3>
+          {product.salePrice && (
+            <span className="absolute right-4 top-4 bg-[#f15a24] px-3 py-2 text-[9px] font-black uppercase tracking-[0.16em]">
+              Oferta
+            </span>
+          )}
+          <div className="absolute inset-x-0 bottom-0 p-5">
+            <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-orange-300">
+              {product.category}
+            </span>
+            <h3 className="mt-1 font-display text-3xl uppercase leading-none">{product.name}</h3>
+          </div>
         </div>
-      </div>
-      <div className="flex items-center justify-between gap-4 p-5">
-        <span>
-          <span className="block text-[9px] uppercase tracking-[0.2em] text-white/35">
-            a partir de
+        <div className="flex items-center justify-between gap-4 p-5">
+          <span>
+            <span className="block text-[9px] uppercase tracking-[0.2em] text-white/35">
+              a partir de
+            </span>
+            <strong className="mt-1 block text-lg text-orange-200">{brl(price)}</strong>
           </span>
-          <strong className="mt-1 block text-lg text-orange-200">{brl(price)}</strong>
-        </span>
-        <span className="grid h-11 w-11 place-items-center border border-white/10 text-white/65 transition group-hover:border-orange-400 group-hover:bg-orange-500 group-hover:text-white">
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-        </span>
-      </div>
-    </Link>
+          <span className="grid h-11 w-11 place-items-center border border-white/10 text-white/65 transition group-hover:border-orange-400 group-hover:bg-orange-500 group-hover:text-white">
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </span>
+        </div>
+      </Link>
+    </motion.div>
   );
 }
