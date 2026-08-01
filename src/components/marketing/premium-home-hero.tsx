@@ -1,11 +1,5 @@
 import { motion } from "framer-motion";
-import {
-  ArrowDownRight,
-  ArrowRight,
-  BadgeCheck,
-  Check,
-  MessageCircle,
-} from "lucide-react";
+import { ArrowDownRight, ArrowRight, BadgeCheck, Check, MessageCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { CursorParallax } from "@/components/motion/cinematic-motion-system";
 
@@ -53,8 +47,7 @@ export function PremiumHomeHero({
   useEffect(() => {
     if (!touchCapable || activeCard === null) return;
     const closeWhenOutside = (event: PointerEvent) => {
-      if (!cardsRef.current?.contains(event.target as Node))
-        setActiveCard(null);
+      if (!cardsRef.current?.contains(event.target as Node)) setActiveCard(null);
     };
     document.addEventListener("pointerdown", closeWhenOutside);
     return () => document.removeEventListener("pointerdown", closeWhenOutside);
@@ -66,10 +59,7 @@ export function PremiumHomeHero({
       className="vb-hero-shell relative isolate scroll-mt-20 overflow-hidden border-b border-white/10"
     >
       <div aria-hidden="true" className="vb-pointer-aura absolute inset-0" />
-      <div
-        aria-hidden="true"
-        className="vb-noise absolute inset-0 opacity-35"
-      />
+      <div aria-hidden="true" className="vb-noise absolute inset-0 opacity-35" />
       <div aria-hidden="true" className="vb-hero-grid absolute inset-0" />
 
       <div className="relative mx-auto grid min-h-[calc(100svh-4rem)] max-w-[90rem] gap-12 px-5 py-14 sm:px-8 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-12">
@@ -80,9 +70,7 @@ export function PremiumHomeHero({
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-wrap items-center gap-3"
           >
-            <span className="vb-kicker">
-              Design + tecnologia para negócios locais
-            </span>
+            <span className="vb-kicker">Design + tecnologia para negócios locais</span>
             <span className="h-px w-12 bg-vb-gold/60" aria-hidden="true" />
             <span className="text-xs font-semibold uppercase tracking-[0.22em] text-white/45">
               Estratégia · experiência · operação
@@ -115,10 +103,9 @@ export function PremiumHomeHero({
             }}
             className="mt-8 max-w-2xl text-base leading-8 text-white/66 sm:text-lg"
           >
-            Criamos experiências digitais com identidade, movimento e
-            ferramentas reais para vender, atender e organizar a operação. Não é
-            uma troca de cores em template: cada negócio ganha uma presença
-            própria.
+            Criamos experiências digitais com identidade, movimento e ferramentas reais para vender,
+            atender e organizar a operação. Não é uma troca de cores em template: cada negócio ganha
+            uma presença própria.
           </motion.p>
 
           <motion.div
@@ -165,10 +152,7 @@ export function PremiumHomeHero({
               "Fluxos e painel conforme o escopo",
             ].map((item) => (
               <span key={item} className="inline-flex items-center gap-2">
-                <Check
-                  className="h-3.5 w-3.5 text-vb-gold"
-                  aria-hidden="true"
-                />
+                <Check className="h-3.5 w-3.5 text-vb-gold" aria-hidden="true" />
                 {item}
               </span>
             ))}
@@ -177,15 +161,10 @@ export function PremiumHomeHero({
           <details className="mt-8 max-w-xl border-t border-white/10 pt-4 text-sm text-white/55">
             <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 font-semibold text-white/72 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vb-cyan">
               <span className="inline-flex items-center gap-2">
-                <BadgeCheck
-                  className="h-4 w-4 text-vb-gold"
-                  aria-hidden="true"
-                />
-                O que é demonstrativo aqui?
+                <BadgeCheck className="h-4 w-4 text-vb-gold" aria-hidden="true" />O que é
+                demonstrativo aqui?
               </span>
-              <span className="text-xs uppercase tracking-[0.2em] text-vb-cyan">
-                Abrir
-              </span>
+              <span className="text-xs uppercase tracking-[0.2em] text-vb-cyan">Abrir</span>
             </summary>
             <p className="pb-2 pt-3 leading-6">{demoNotice}</p>
           </details>
@@ -193,18 +172,12 @@ export function PremiumHomeHero({
 
         <motion.div
           ref={cardsRef}
-          initial={
-            reducedMotion ? false : { opacity: 0, scale: 0.94, rotate: 2 }
-          }
+          initial={reducedMotion ? false : { opacity: 0, scale: 0.94, rotate: 2 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
           transition={{ duration: 1, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
           className="relative z-10 min-h-[31rem] lg:min-h-[43rem]"
         >
-          <CursorParallax
-            className="absolute inset-0"
-            strengthX={18}
-            strengthY={14}
-          >
+          <CursorParallax className="absolute inset-0" strengthX={18} strengthY={14}>
             <div className="absolute inset-[8%] rounded-[42%] border border-vb-cyan/20 bg-vb-cyan/[0.035] shadow-[0_0_100px_rgba(101,221,233,0.13)]" />
             <div className="absolute inset-[18%] rotate-12 rounded-[38%] border border-vb-violet/25" />
 
@@ -222,18 +195,14 @@ export function PremiumHomeHero({
                   onPointerDown={() => {
                     if (!touchCapable) return;
                     setPressedCard(index);
-                    setActiveCard((current) =>
-                      current === index ? null : index,
-                    );
+                    setActiveCard((current) => (current === index ? null : index));
                   }}
                   onPointerUp={() => setPressedCard(null)}
                   onPointerCancel={() => setPressedCard(null)}
                   onKeyDown={(event) => {
                     if (event.key !== "Enter" && event.key !== " ") return;
                     event.preventDefault();
-                    setActiveCard((current) =>
-                      current === index ? null : index,
-                    );
+                    setActiveCard((current) => (current === index ? null : index));
                   }}
                   animate={
                     reducedMotion
@@ -282,9 +251,7 @@ export function PremiumHomeHero({
                         <p
                           className={`mt-2 text-[9px] font-bold uppercase tracking-[0.16em] transition ${touchActive ? "text-white/70" : "text-white/42"}`}
                         >
-                          {touchActive
-                            ? "Experiência pronta para abrir"
-                            : "Toque para explorar"}
+                          {touchActive ? "Experiência pronta para abrir" : "Toque para explorar"}
                         </p>
                       )}
                     </div>
@@ -304,8 +271,7 @@ export function PremiumHomeHero({
                       }}
                       className={`absolute right-3 top-3 inline-flex min-h-10 items-center gap-2 rounded-full border border-white/20 bg-black/70 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-white backdrop-blur-xl ${touchActive ? "pointer-events-auto" : "pointer-events-none"}`}
                     >
-                      Abrir{" "}
-                      <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                      Abrir <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                     </motion.a>
                   </div>
                 </motion.article>
