@@ -89,6 +89,35 @@ async function assertNoCtaLabelOverlap(reveal, labels, name) {
   );
 }
 
+async function assertNoProgressLabelOverlap(progress, labels, name) {
+  const progressBox = await progress.boundingBox();
+  assert(progressBox, `${name}: a régua de progresso não possui área visível`);
+
+  const visibleLabelBoxes = await labels.evaluateAll((elements) =>
+    elements.flatMap((element) => {
+      const style = getComputedStyle(element);
+      if (Number(style.opacity) < 0.5 || style.visibility === "hidden") return [];
+      const rect = element.getBoundingClientRect();
+      return [
+        {
+          x: rect.x,
+          y: rect.y,
+          width: rect.width,
+          height: rect.height,
+        },
+      ];
+    }),
+  );
+
+  const overlappingLabel = visibleLabelBoxes.findIndex((labelBox) =>
+    boxesOverlap(progressBox, labelBox),
+  );
+  assert(
+    overlappingLabel === -1,
+    `${name}: a régua de progresso cobre o texto da cena ativa`,
+  );
+}
+
 async function validateHome(browser, config) {
   const { name, viewport, reducedMotion } = config;
   const { context, page, runtimeErrors } = await createPage(
@@ -134,6 +163,7 @@ async function validateHome(browser, config) {
     const intro = page.getByTestId("scroll-expand-intro");
     const reveal = page.getByTestId("scroll-expand-reveal");
     const labels = page.getByTestId("scroll-expand-card-label");
+    const progress = page.getByTestId("scroll-expand-progress");
     const staticHeading = page.getByTestId("scroll-expand-static-heading");
     await section.waitFor({ state: "visible" });
 
@@ -203,6 +233,7 @@ async function validateHome(browser, config) {
       assert(endReveal.opacity >= 0.9, `${name}: o CTA final não apareceu`);
       assert(endReveal.visibility !== "hidden", `${name}: o CTA final está oculto`);
       await assertNoCtaLabelOverlap(reveal, labels, name);
+      await assertNoProgressLabelOverlap(progress, labels, name);
 
       const showcaseLink = reveal.getByRole("link");
       assert(
