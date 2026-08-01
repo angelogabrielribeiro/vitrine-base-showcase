@@ -71,10 +71,10 @@ export function ScrollExpandShowcase({
         />
 
         <motion.div
-          className="relative isolate overflow-hidden rounded-[2rem] border border-white/10 bg-neutral-900"
+          className="relative isolate w-full overflow-hidden rounded-[2rem] border border-white/10 bg-neutral-900"
           style={
             reduceMotion
-              ? undefined
+              ? { maxWidth: "72rem" }
               : {
                   width: frameWidth,
                   height: frameHeight,
@@ -86,7 +86,7 @@ export function ScrollExpandShowcase({
           <div
             className={
               reduceMotion
-                ? "grid min-h-[34rem] w-[min(92vw,72rem)] grid-cols-2"
+                ? "grid min-h-[34rem] w-full grid-cols-2"
                 : "grid h-full w-full grid-cols-2"
             }
           >
