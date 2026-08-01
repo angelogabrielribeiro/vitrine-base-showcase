@@ -128,96 +128,103 @@ async function validateHome(browser, config) {
 
     await page.screenshot({ path: `${outputDir}/${name}-top.png`, fullPage: false });
 
-    const section = page.getByTestId("scroll-expand-showcase");
-    const sticky = page.getByTestId("scroll-expand-sticky");
-    const frame = page.getByTestId("scroll-expand-frame");
-    const intro = page.getByTestId("scroll-expand-intro");
-    const reveal = page.getByTestId("scroll-expand-reveal");
-    const labels = page.getByTestId("scroll-expand-card-label");
-    const staticHeading = page.getByTestId("scroll-expand-static-heading");
-    await section.waitFor({ state: "visible" });
+    const journey = page.getByTestId("universe-journey");
+    const configurator = page.getByTestId("offer-configurator");
+    await journey.waitFor({ state: "visible" });
 
-    const sectionMetrics = await section.evaluate((element) => ({
+    const journeyMetrics = await journey.evaluate((element) => ({
       top: element.getBoundingClientRect().top + window.scrollY,
       height: element.getBoundingClientRect().height,
       viewportHeight: window.innerHeight,
     }));
+    const journeyImages = await journey.locator("img").evaluateAll((images) => ({
+      total: images.length,
+      loaded: images.filter((image) => image.complete && image.naturalWidth > 0).length,
+    }));
+    assert(journeyImages.total === 4, `${name}: a jornada não contém os quatro universos`);
+    assert(journeyImages.loaded === 4, `${name}: nem todas as imagens da jornada carregaram`);
 
-    await page.evaluate((top) => window.scrollTo(0, top), sectionMetrics.top);
-    await page.waitForTimeout(650);
-
-    const startBox = await frame.boundingBox();
-    assert(startBox, `${name}: o frame expansível não possui área visível no início`);
-    const startScroll = await page.evaluate(() => window.scrollY);
-    const startIntro = await readLayerState(intro);
-    const startReveal = await readLayerState(reveal);
-    const stickyPosition = await sticky.evaluate((element) => getComputedStyle(element).position);
-    const hasScrollInstruction = await section.evaluate(
-      (element) => element.textContent?.includes("Role para ampliar") ?? false,
-    );
-
-    let endBox = startBox;
+    let startScroll = await page.evaluate(() => window.scrollY);
     let endScroll = startScroll;
-    let endIntro = startIntro;
-    let endReveal = startReveal;
+    let stickyPosition = "static";
+    let imageTransformChanged = false;
 
     if (reducedMotion === "reduce") {
-      assert(stickyPosition !== "sticky", `${name}: o modo reduzido manteve a seção presa`);
-      assert(!hasScrollInstruction, `${name}: o modo reduzido ainda pede rolagem para animar`);
-      assert(await staticHeading.isVisible(), `${name}: o título estático não apareceu`);
-      assert(startIntro.opacity <= 0.05, `${name}: o título animado continuou sobre os cards`);
-      assert(startReveal.opacity >= 0.9, `${name}: o CTA sumiu no modo reduzido`);
-      await assertNoCtaLabelOverlap(reveal, labels, name);
+      const staticChapters = page.getByTestId("universe-chapter-static");
+      assert((await staticChapters.count()) === 4, `${name}: fallback estático incompleto`);
+      assert(
+        (await page.getByTestId("universe-chapter-sticky").count()) === 0,
+        `${name}: o modo reduzido manteve capítulos presos`,
+      );
+      await page.evaluate((top) => window.scrollTo(0, top), journeyMetrics.top);
+      await page.waitForTimeout(650);
       await page.screenshot({ path: `${outputDir}/${name}-showcase.png`, fullPage: false });
-
-      const targetScroll = sectionMetrics.top + Math.max(sectionMetrics.height * 0.72, 320);
+      const targetScroll = journeyMetrics.top + Math.max(journeyMetrics.height * 0.6, 420);
       await page.evaluate((top) => window.scrollTo(0, top), targetScroll);
       await page.waitForTimeout(650);
       endScroll = await page.evaluate(() => window.scrollY);
       assert(endScroll > startScroll + 100, `${name}: a página não permitiu rolagem normal`);
     } else {
-      assert(stickyPosition === "sticky", `${name}: a camada principal deixou de ser sticky`);
-      assert(hasScrollInstruction, `${name}: a instrução inicial de rolagem não está visível`);
+      const chapters = page.getByTestId("universe-chapter");
+      assert((await chapters.count()) === 4, `${name}: faltam capítulos imersivos`);
+      assert(
+        journeyMetrics.height > journeyMetrics.viewportHeight * 8,
+        `${name}: a jornada não possui percurso suficiente`,
+      );
 
-      const activeScrollRange = Math.max(sectionMetrics.height - sectionMetrics.viewportHeight, 1);
-      const targetScroll = sectionMetrics.top + activeScrollRange * 0.82;
-      await page.evaluate((top) => window.scrollTo(0, top), targetScroll);
+      const firstChapter = chapters.nth(0);
+      const firstMetrics = await firstChapter.evaluate((element) => ({
+        top: element.getBoundingClientRect().top + window.scrollY,
+        height: element.getBoundingClientRect().height,
+        viewportHeight: window.innerHeight,
+      }));
+      assert(
+        firstMetrics.height > firstMetrics.viewportHeight * 1.8,
+        `${name}: o primeiro capítulo ficou curto demais`,
+      );
+
+      const sticky = firstChapter.getByTestId("universe-chapter-sticky");
+      stickyPosition = await sticky.evaluate((element) => getComputedStyle(element).position);
+      assert(stickyPosition === "sticky", `${name}: o capítulo principal deixou de ser sticky`);
+
+      const image = firstChapter.getByTestId("universe-chapter-image");
+      await page.evaluate((top) => window.scrollTo(0, top), firstMetrics.top + 10);
+      await page.waitForTimeout(650);
+      startScroll = await page.evaluate(() => window.scrollY);
+      const startTransform = await image.evaluate((element) => getComputedStyle(element).transform);
+
+      const activeRange = Math.max(firstMetrics.height - firstMetrics.viewportHeight, 1);
+      await page.evaluate((top) => window.scrollTo(0, top), firstMetrics.top + activeRange * 0.58);
       await page.waitForTimeout(850);
-
-      endBox = await frame.boundingBox();
-      assert(endBox, `${name}: o frame expansível desapareceu durante a rolagem`);
       endScroll = await page.evaluate(() => window.scrollY);
-      endIntro = await readLayerState(intro);
-      endReveal = await readLayerState(reveal);
+      const middleTransform = await image.evaluate((element) => getComputedStyle(element).transform);
+      imageTransformChanged = startTransform !== middleTransform;
 
       assert(endScroll > startScroll + 100, `${name}: a página não permitiu rolagem normal`);
-      assert(
-        endBox.y >= 60 && endBox.y <= 68,
-        `${name}: o frame saiu da faixa sticky durante a expansão (y=${endBox.y.toFixed(1)}px)`,
-      );
-      assert(
-        endBox.width - startBox.width > 20 || endBox.height - startBox.height > 40,
-        `${name}: o frame não aumentou durante a rolagem`,
-      );
-      assert(endIntro.opacity <= 0.05, `${name}: o título inicial não desapareceu`);
-      assert(endReveal.opacity >= 0.9, `${name}: o CTA final não apareceu`);
-      assert(endReveal.visibility !== "hidden", `${name}: o CTA final está oculto`);
-      await assertNoCtaLabelOverlap(reveal, labels, name);
-
-      const showcaseLink = reveal.getByRole("link");
-      assert(
-        (await showcaseLink.getAttribute("href")) === "#demonstracoes",
-        `${name}: o CTA final aponta para o destino incorreto`,
-      );
+      assert(imageTransformChanged, `${name}: a imagem não respondeu ao progresso do capítulo`);
       await page.screenshot({ path: `${outputDir}/${name}-showcase.png`, fullPage: false });
     }
 
-    const showcaseImages = await section.locator("img").evaluateAll((images) => ({
-      total: images.length,
-      loaded: images.filter((image) => image.complete && image.naturalWidth > 0).length,
-    }));
-    assert(showcaseImages.total === 4, `${name}: o showcase não contém as quatro demonstrações`);
-    assert(showcaseImages.loaded === 4, `${name}: nem todas as imagens do showcase carregaram`);
+    await configurator.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(500);
+    const goalButtons = configurator.getByTestId("offer-goal");
+    const planButtons = configurator.getByTestId("offer-plan");
+    assert((await goalButtons.count()) === 4, `${name}: objetivos do configurador incompletos`);
+    assert((await planButtons.count()) === 3, `${name}: níveis de escopo incompletos`);
+
+    const secondGoal = goalButtons.nth(1);
+    await secondGoal.click();
+    assert(
+      (await secondGoal.getAttribute("aria-pressed")) === "true",
+      `${name}: o objetivo não alterou o configurador`,
+    );
+    const firstPlan = planButtons.nth(0);
+    await firstPlan.click();
+    assert(
+      (await firstPlan.getAttribute("aria-pressed")) === "true",
+      `${name}: o escopo não alterou o configurador`,
+    );
+
     assert(runtimeErrors.length === 0, `${name}: erros de runtime: ${runtimeErrors.join(" | ")}`);
 
     report.checks.push({
@@ -225,16 +232,14 @@ async function validateHome(browser, config) {
       status: "passed",
       viewport,
       reducedMotion,
-      startBox,
-      endBox,
+      journeyMetrics,
+      journeyImages,
       startScroll,
       endScroll,
       stickyPosition,
-      startIntro,
-      startReveal,
-      endIntro,
-      endReveal,
-      showcaseImages,
+      imageTransformChanged,
+      configuratorGoals: await goalButtons.count(),
+      configuratorPlans: await planButtons.count(),
     });
   } finally {
     await context.close();
