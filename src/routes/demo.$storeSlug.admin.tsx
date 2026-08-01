@@ -102,11 +102,17 @@ function AdminLayout() {
     <div className="min-h-screen bg-muted/40">
       <div className="flex min-h-screen min-w-0 flex-col md:flex-row">
         <aside className="border-b border-border bg-card p-4 md:w-60 md:shrink-0 md:border-b-0 md:border-r">
-          <div className="mb-6 flex items-center justify-between">
+          <div className="mb-6 flex items-center justify-between gap-3">
             <div className="min-w-0">
               <div className="text-xs uppercase tracking-widest text-muted-foreground">Admin</div>
               <div className="truncate font-display text-lg font-semibold">{store.name}</div>
             </div>
+            <Button asChild variant="outline" size="sm" className="shrink-0 md:hidden">
+              <Link to="/demo/$storeSlug" params={{ storeSlug }}>
+                <Store className="mr-2 h-4 w-4" />
+                Ver loja
+              </Link>
+            </Button>
           </div>
           <nav className="flex flex-row gap-1 overflow-x-auto pb-1 md:flex-col md:overflow-visible md:pb-0">
             {items.map((it) => {
