@@ -1,0 +1,90 @@
+name: Fix product edit route
+
+on:
+  push:
+    branches:
+      - fix/product-edit-route
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/product-edit-route
+
+      - name: Apply focused route patch
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path("src/routes/demo.$storeSlug.admin.produtos.tsx")
+          text = path.read_text(encoding="utf-8")
+
+          old_import = 'import { createFileRoute, Link } from "@tanstack/react-router";'
+          new_import = 'import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";'
+          if old_import in text:
+              text = text.replace(old_import, new_import, 1)
+          elif new_import not in text:
+              raise SystemExit("Import esperado não encontrado")
+
+          params_line = '  const { storeSlug } = Route.useParams();\n'
+          pathname_line = '  const pathname = useRouterState({ select: (state) => state.location.pathname });\n'
+          if pathname_line not in text:
+              if params_line not in text:
+                  raise SystemExit("Ponto de inserção do pathname não encontrado")
+              text = text.replace(params_line, params_line + pathname_line, 1)
+
+          state_line = '  const [query, setQuery] = useState("");\n'
+          route_guard = '''  const isProductsIndex =\n    pathname.replace(/\\/+$/, "") === `/demo/${storeSlug}/admin/produtos`;\n\n  if (!isProductsIndex) return <Outlet />;\n'''
+          if route_guard not in text:
+              if state_line not in text:
+                  raise SystemExit("Ponto de inserção do Outlet não encontrado")
+              text = text.replace(state_line, state_line + route_guard, 1)
+
+          path.write_text(text, encoding="utf-8")
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Format changed file
+        run: bunx prettier --write 'src/routes/demo.$storeSlug.admin.produtos.tsx'
+
+      - name: Lint changed file
+        run: bunx eslint 'src/routes/demo.$storeSlug.admin.produtos.tsx'
+
+      - name: TypeScript
+        run: bunx tsc --noEmit
+
+      - name: Production build
+        run: bun run build
+
+      - name: Verify edit and new-product routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq 'return <Outlet />' 'src/routes/demo.$storeSlug.admin.produtos.tsx'
+          grep -Fq 'createFileRoute("/demo/$storeSlug/admin/produtos/$id")' 'src/routes/demo.$storeSlug.admin.produtos.$id.tsx'
+          grep -Fq 'createFileRoute("/demo/$storeSlug/admin/produtos/novo")' 'src/routes/demo.$storeSlug.admin.produtos.novo.tsx'
+
+      - name: Commit validated fix and remove temporary workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm '.github/workflows/fix-product-edit-route.yml'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add 'src/routes/demo.$storeSlug.admin.produtos.tsx' '.github/workflows/fix-product-edit-route.yml'
+          git commit -m 'Fix nested product edit and create routes'
+          git push origin HEAD:fix/product-edit-route
