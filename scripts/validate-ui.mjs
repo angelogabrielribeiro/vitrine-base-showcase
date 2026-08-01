@@ -109,11 +109,23 @@ async function validateHome(browser, config) {
     });
 
     if (reducedMotion === "reduce") {
-      assert(motionState.prefersReducedMotion, `${name}: a preferência por movimento reduzido não foi aplicada`);
-      assert(motionState.stickyPosition !== "sticky", `${name}: o modo reduzido manteve a seção presa`);
-      assert(!motionState.hasScrollInstruction, `${name}: o modo reduzido ainda pede rolagem para animar`);
+      assert(
+        motionState.prefersReducedMotion,
+        `${name}: a preferência por movimento reduzido não foi aplicada`,
+      );
+      assert(
+        motionState.stickyPosition !== "sticky",
+        `${name}: o modo reduzido manteve a seção presa`,
+      );
+      assert(
+        !motionState.hasScrollInstruction,
+        `${name}: o modo reduzido ainda pede rolagem para animar`,
+      );
     } else {
-      assert(motionState.stickyPosition === "sticky", `${name}: a camada principal deixou de ser sticky`);
+      assert(
+        motionState.stickyPosition === "sticky",
+        `${name}: a camada principal deixou de ser sticky`,
+      );
       const widthGrowth = endBox.width - startBox.width;
       const heightGrowth = endBox.height - startBox.height;
       assert(
@@ -209,7 +221,7 @@ try {
   report.status = "passed";
 } catch (error) {
   report.status = "failed";
-  report.error = error instanceof Error ? error.stack ?? error.message : String(error);
+  report.error = error instanceof Error ? (error.stack ?? error.message) : String(error);
   process.exitCode = 1;
 } finally {
   report.finishedAt = new Date().toISOString();
