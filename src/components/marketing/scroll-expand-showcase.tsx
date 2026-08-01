@@ -99,19 +99,11 @@ export function ScrollExpandShowcase({
     [0, 0.72, 1],
     ["min(56svh, 34rem)", "78svh", "calc(100svh - 4rem)"],
   );
-  const frameRadius = useTransform(
-    scrollYProgress,
-    [0, 0.82, 1],
-    ["2rem", "0rem", "0rem"],
-  );
+  const frameRadius = useTransform(scrollYProgress, [0, 0.82, 1], ["2rem", "0rem", "0rem"]);
   const frameShadow = useTransform(
     scrollYProgress,
     [0, 0.8, 1],
-    [
-      "0 35px 100px rgba(0,0,0,.52)",
-      "0 0 0 rgba(0,0,0,0)",
-      "0 0 0 rgba(0,0,0,0)",
-    ],
+    ["0 35px 100px rgba(0,0,0,.52)", "0 0 0 rgba(0,0,0,0)", "0 0 0 rgba(0,0,0,0)"],
   );
   const introOpacity = useTransform(scrollYProgress, [0, 0.42, 0.62, 1], [1, 1, 0, 0]);
   const introY = useTransform(scrollYProgress, [0, 0.62, 1], [0, -72, -72]);
@@ -149,7 +141,10 @@ export function ScrollExpandShowcase({
         }
       >
         <div aria-hidden="true" className="vb-pointer-aura pointer-events-none absolute inset-0" />
-        <div aria-hidden="true" className="vb-noise pointer-events-none absolute inset-0 opacity-25" />
+        <div
+          aria-hidden="true"
+          className="vb-noise pointer-events-none absolute inset-0 opacity-25"
+        />
 
         {reduceMotion && (
           <div
@@ -254,7 +249,8 @@ export function ScrollExpandShowcase({
                 <span className="block text-vb-gold">Quatro mundos sem cara de template.</span>
               </h2>
               <p className="mx-auto mt-6 max-w-2xl text-sm leading-7 text-white/62 sm:text-base">
-                O scroll conduz a troca de atmosfera, hierarquia e narrativa sem bloquear a navegação.
+                O scroll conduz a troca de atmosfera, hierarquia e narrativa sem bloquear a
+                navegação.
               </p>
               {!reduceMotion && (
                 <p className="mt-7 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-white/55">

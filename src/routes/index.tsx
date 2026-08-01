@@ -112,12 +112,14 @@ const PROCESS = [
   {
     step: "02",
     title: "Direção",
-    description: "Definimos identidade, narrativa, funcionalidades, investimento e prazo antes de iniciar.",
+    description:
+      "Definimos identidade, narrativa, funcionalidades, investimento e prazo antes de iniciar.",
   },
   {
     step: "03",
     title: "Construção",
-    description: "Design, conteúdo, movimento e fluxos são desenvolvidos como uma experiência única.",
+    description:
+      "Design, conteúdo, movimento e fluxos são desenvolvidos como uma experiência única.",
   },
   {
     step: "04",
@@ -140,7 +142,8 @@ const INCLUDED = [
   {
     icon: LayoutDashboard,
     title: "Controle do negócio",
-    description: "Painel simples para atualizar conteúdo e acompanhar a operação quando necessário.",
+    description:
+      "Painel simples para atualizar conteúdo e acompanhar a operação quando necessário.",
   },
   {
     icon: ShieldCheck,
@@ -155,7 +158,8 @@ const INCLUDED = [
   {
     icon: MessageCircle,
     title: "Conversão com contexto",
-    description: "Chamadas comerciais aparecem nos momentos certos, sem transformar o site em panfleto.",
+    description:
+      "Chamadas comerciais aparecem nos momentos certos, sem transformar o site em panfleto.",
   },
 ];
 
@@ -230,7 +234,10 @@ function Index() {
           demoNotice={DEMO_NOTICE}
         />
 
-        <section aria-label="Princípios da Vitrine Base" className="overflow-hidden border-b border-white/10 bg-vb-deep py-5">
+        <section
+          aria-label="Princípios da Vitrine Base"
+          className="overflow-hidden border-b border-white/10 bg-vb-deep py-5"
+        >
           <div className="vb-marquee flex min-w-max items-center gap-10 text-[10px] font-bold uppercase tracking-[0.28em] text-white/42 motion-reduce:translate-x-0">
             {[...Array(2)].flatMap((_, group) =>
               [
@@ -308,11 +315,16 @@ function Index() {
 
                     <div className={reverse ? "lg:order-1 lg:col-span-5" : "lg:col-span-5"}>
                       <div className="flex items-center gap-4">
-                        <span className={`font-display text-5xl font-semibold ${value?.accent ?? "text-vb-gold"}`}>
+                        <span
+                          className={`font-display text-5xl font-semibold ${value?.accent ?? "text-vb-gold"}`}
+                        >
                           {value?.number ?? `0${index + 1}`}
                         </span>
                         <span className="h-px flex-1 bg-white/12" />
-                        <Icon className={`h-5 w-5 ${value?.accent ?? "text-vb-gold"}`} aria-hidden="true" />
+                        <Icon
+                          className={`h-5 w-5 ${value?.accent ?? "text-vb-gold"}`}
+                          aria-hidden="true"
+                        />
                       </div>
 
                       <h3 className="mt-7 font-display text-4xl font-semibold tracking-[-0.05em] text-white sm:text-5xl">
@@ -364,18 +376,25 @@ function Index() {
         </section>
 
         <section className="relative overflow-hidden bg-vb-ivory text-vb-deep">
-          <div aria-hidden="true" className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(3,4,5,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(3,4,5,.08)_1px,transparent_1px)] [background-size:64px_64px]" />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(3,4,5,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(3,4,5,.08)_1px,transparent_1px)] [background-size:64px_64px]"
+          />
           <div className="relative mx-auto max-w-[90rem] px-5 py-24 sm:px-8 sm:py-32 lg:px-12">
             <div className="grid gap-12 lg:grid-cols-12">
               <div className="lg:col-span-5">
-                <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#8b641d]">A diferença</p>
+                <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#8b641d]">
+                  A diferença
+                </p>
                 <h2 className="mt-5 font-display text-5xl font-semibold leading-[0.92] tracking-[-0.06em] sm:text-7xl">
                   Não é colocar efeito em cima de um template.
                 </h2>
               </div>
               <div className="grid gap-5 sm:grid-cols-2 lg:col-span-7">
                 <article className="rounded-[2rem] border border-black/10 bg-white/45 p-7 backdrop-blur-sm sm:p-9">
-                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-black/42">Site comum</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-black/42">
+                    Site comum
+                  </p>
                   <ul className="mt-7 space-y-5 text-base leading-7 text-black/62">
                     {[
                       "Mesma hierarquia para qualquer nicho",
@@ -391,7 +410,9 @@ function Index() {
                   </ul>
                 </article>
                 <article className="rounded-[2rem] bg-vb-deep p-7 text-vb-ivory shadow-2xl shadow-black/20 sm:p-9">
-                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-vb-gold">Vitrine Base</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-vb-gold">
+                    Vitrine Base
+                  </p>
                   <ul className="mt-7 space-y-5 text-base leading-7 text-white/72">
                     {[
                       "Direção visual ligada ao posicionamento da marca",
@@ -440,7 +461,9 @@ function Index() {
                   <span className="font-display text-5xl font-semibold text-white/12 transition group-hover:text-vb-gold/80">
                     {item.step}
                   </span>
-                  <h3 className="mt-16 font-display text-3xl font-semibold text-white">{item.title}</h3>
+                  <h3 className="mt-16 font-display text-3xl font-semibold text-white">
+                    {item.title}
+                  </h3>
                   <p className="mt-4 text-sm leading-7 text-white/55">{item.description}</p>
                   <ChevronRight className="absolute bottom-8 right-8 h-5 w-5 text-white/20 transition group-hover:translate-x-1 group-hover:text-vb-gold" />
                 </motion.article>
@@ -473,7 +496,9 @@ function Index() {
                     className="group rounded-[1.6rem] border border-white/10 bg-white/[0.035] p-6 transition duration-500 hover:-translate-y-1 hover:border-vb-cyan/35 hover:bg-white/[0.06]"
                   >
                     <item.icon className="h-5 w-5 text-vb-gold transition group-hover:text-vb-cyan" />
-                    <h3 className="mt-7 font-display text-2xl font-semibold text-white">{item.title}</h3>
+                    <h3 className="mt-7 font-display text-2xl font-semibold text-white">
+                      {item.title}
+                    </h3>
                     <p className="mt-3 text-sm leading-7 text-white/52">{item.description}</p>
                   </motion.article>
                 ))}
@@ -491,8 +516,9 @@ function Index() {
               Vamos construir uma presença que seja difícil de esquecer.
             </h2>
             <p className="mt-7 max-w-2xl text-base leading-8 text-white/58">
-              Conte o que você vende, como atende e qual é o principal problema da operação. A partir
-              disso, definimos o projeto certo — sem funcionalidades inventadas e sem promessa vazia.
+              Conte o que você vende, como atende e qual é o principal problema da operação. A
+              partir disso, definimos o projeto certo — sem funcionalidades inventadas e sem
+              promessa vazia.
             </p>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <a
@@ -518,7 +544,9 @@ function Index() {
 
       <footer className="border-t border-white/10 bg-vb-deep px-5 py-8 text-xs text-white/38 sm:px-8 lg:px-12">
         <div className="mx-auto flex max-w-[90rem] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <span className="font-display font-semibold tracking-[0.14em] text-white/65">VITRINE BASE</span>
+          <span className="font-display font-semibold tracking-[0.14em] text-white/65">
+            VITRINE BASE
+          </span>
           <span>Demonstrações locais · Nenhum pagamento real é processado</span>
         </div>
       </footer>

@@ -185,7 +185,8 @@
         transparent 48%
       ),
       radial-gradient(
-        28rem circle at calc(100% - var(--cinematic-pointer-x)) calc(100% - var(--cinematic-pointer-y)),
+        28rem circle at calc(100% - var(--cinematic-pointer-x))
+          calc(100% - var(--cinematic-pointer-y)),
         oklch(0.7715 0.1161 83.622 / 0.1),
         transparent 50%
       );

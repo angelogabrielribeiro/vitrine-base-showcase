@@ -125,8 +125,8 @@ export function PremiumHomeHero({
           <details className="mt-8 max-w-xl border-t border-white/10 pt-4 text-sm text-white/55">
             <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 font-semibold text-white/72 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vb-cyan">
               <span className="inline-flex items-center gap-2">
-                <BadgeCheck className="h-4 w-4 text-vb-gold" aria-hidden="true" />
-                O que é demonstrativo aqui?
+                <BadgeCheck className="h-4 w-4 text-vb-gold" aria-hidden="true" />O que é
+                demonstrativo aqui?
               </span>
               <span className="text-xs uppercase tracking-[0.2em] text-vb-cyan">Abrir</span>
             </summary>
