@@ -172,7 +172,11 @@ async function validateNotFound(browser) {
       waitUntil: "networkidle",
       timeout: 90_000,
     });
-    assert(response?.ok(), `404: a aplicação não entregou o shell para a rota inexistente`);
+    const httpStatus = response?.status();
+    assert(
+      httpStatus === 404 || httpStatus === 200,
+      `404: resposta HTTP inesperada ${httpStatus ?? "sem status"}`,
+    );
     await waitForStablePage(page);
 
     await page.getByRole("heading", { name: "404" }).waitFor({ state: "visible" });
@@ -192,7 +196,7 @@ async function validateNotFound(browser) {
     assert(runtimeErrors.length === 0, `404: erros de runtime: ${runtimeErrors.join(" | ")}`);
 
     await page.screenshot({ path: `${outputDir}/404-desktop.png`, fullPage: false });
-    report.checks.push({ name: "404", status: "passed" });
+    report.checks.push({ name: "404", status: "passed", httpStatus });
   } finally {
     await context.close();
   }
