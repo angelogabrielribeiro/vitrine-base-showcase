@@ -61,13 +61,6 @@ export function ScrollExpandShowcase({
           : "relative min-h-[175svh] overflow-clip border-y border-white/10 bg-[#050a10] md:min-h-[195svh]"
       }
     >
-      <motion.span
-        data-testid="scroll-expand-progress"
-        aria-hidden="true"
-        className="pointer-events-none absolute left-0 top-0 h-px w-px overflow-hidden"
-        style={{ opacity: scrollYProgress }}
-      />
-
       <div
         className={
           reduceMotion
@@ -75,6 +68,13 @@ export function ScrollExpandShowcase({
             : "sticky top-16 flex h-[calc(100svh-4rem)] items-center justify-center overflow-hidden"
         }
       >
+        <motion.span
+          data-testid="scroll-expand-progress"
+          aria-hidden="true"
+          className="pointer-events-none absolute left-0 top-0 h-px w-px overflow-hidden"
+          style={{ opacity: scrollYProgress }}
+        />
+
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(251,191,36,0.14),transparent_30%),radial-gradient(circle_at_85%_30%,rgba(34,211,238,0.16),transparent_32%),radial-gradient(circle_at_50%_90%,rgba(99,102,241,0.12),transparent_35%)]"
