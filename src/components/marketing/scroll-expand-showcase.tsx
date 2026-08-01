@@ -256,9 +256,11 @@ export function ScrollExpandShowcase({
               <p className="mx-auto mt-6 max-w-2xl text-sm leading-7 text-white/62 sm:text-base">
                 O scroll conduz a troca de atmosfera, hierarquia e narrativa sem bloquear a navegação.
               </p>
-              <p className="mt-7 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-white/55">
-                Role para ampliar <ArrowDown className="h-4 w-4 animate-bounce" />
-              </p>
+              {!reduceMotion && (
+                <p className="mt-7 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-white/55">
+                  Role para ampliar <ArrowDown className="h-4 w-4 animate-bounce" />
+                </p>
+              )}
             </div>
           </motion.div>
 
