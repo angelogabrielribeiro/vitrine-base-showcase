@@ -58,20 +58,11 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Generate exact formatting for browser validation script
-        run: npx prettier --write scripts/validate-ui.mjs
-
-      - name: Upload formatted browser validation script
-        uses: actions/upload-artifact@v5
-        with:
-          name: formatted-validation-script
-          path: scripts/validate-ui.mjs
-          retention-days: 1
-
-      - name: Check formatting of committed interface files
+      - name: Check formatting
         run: |
           npx prettier --check \
             .github/workflows/validate-pr.yml \
+            scripts/validate-ui.mjs \
             src/routes/index.tsx \
             src/routes/__root.tsx \
             src/components/marketing/scroll-expand-showcase.tsx \
@@ -115,22 +106,19 @@ jobs:
       - name: Install matching Playwright library
         run: npm install --no-save --no-audit --no-fund playwright@1.62.0
 
-      - name: Build application for browser validation
-        run: npm run build
-
-      - name: Start preview server
+      - name: Start application server
         run: |
-          npm run preview -- --host 0.0.0.0 --port 4173 > /tmp/vitrine-preview.log 2>&1 &
-          echo $! > /tmp/vitrine-preview.pid
+          npm run dev -- --host 0.0.0.0 --port 4173 > /tmp/vitrine-server.log 2>&1 &
+          echo $! > /tmp/vitrine-server.pid
 
-          for attempt in $(seq 1 45); do
+          for attempt in $(seq 1 60); do
             if curl --fail --silent http://127.0.0.1:4173 > /dev/null; then
               exit 0
             fi
             sleep 1
           done
 
-          cat /tmp/vitrine-preview.log
+          cat /tmp/vitrine-server.log
           exit 1
 
       - name: Run browser validation
@@ -138,11 +126,11 @@ jobs:
           BASE_URL: http://127.0.0.1:4173
         run: node scripts/validate-ui.mjs
 
-      - name: Copy preview log
+      - name: Copy server log
         if: always()
         run: |
           mkdir -p artifacts/ui-validation
-          cp /tmp/vitrine-preview.log artifacts/ui-validation/preview.log || true
+          cp /tmp/vitrine-server.log artifacts/ui-validation/server.log || true
 
       - name: Upload validation screenshots and report
         if: always()
