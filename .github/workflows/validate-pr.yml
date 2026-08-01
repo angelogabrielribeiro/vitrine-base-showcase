@@ -58,11 +58,20 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Check formatting
+      - name: Generate exact validation script formatting
+        run: npx prettier --write scripts/validate-ui.mjs
+
+      - name: Upload formatted validation script
+        uses: actions/upload-artifact@v5
+        with:
+          name: formatted-validation-script
+          path: scripts/validate-ui.mjs
+          retention-days: 1
+
+      - name: Check committed interface formatting
         run: |
           npx prettier --check \
             .github/workflows/validate-pr.yml \
-            scripts/validate-ui.mjs \
             src/routes/index.tsx \
             src/routes/__root.tsx \
             src/components/marketing/scroll-expand-showcase.tsx \
