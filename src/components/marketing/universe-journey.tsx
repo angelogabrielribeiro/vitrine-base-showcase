@@ -21,9 +21,9 @@ function CapabilitySignal({
       {universe.capabilities.map((capability, index) => (
         <motion.li
           key={capability.kind}
-          initial={progress ? false : { opacity: 0, y: 12 }}
-          whileInView={progress ? undefined : { opacity: 1, y: 0 }}
-          viewport={progress ? undefined : { once: true }}
+          initial={false}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.45, delay: index * 0.06 }}
           className="flex min-h-16 gap-3 rounded-2xl border border-white/10 bg-black/25 p-3 backdrop-blur-xl"
         >
