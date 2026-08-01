@@ -83,7 +83,10 @@ async function assertNoCtaLabelOverlap(reveal, labels, name) {
   );
 
   const overlappingLabel = labelBoxes.findIndex((labelBox) => boxesOverlap(ctaBox, labelBox));
-  assert(overlappingLabel === -1, `${name}: o CTA final cobre o texto do card ${overlappingLabel + 1}`);
+  assert(
+    overlappingLabel === -1,
+    `${name}: o CTA final cobre o texto do card ${overlappingLabel + 1}`,
+  );
 }
 
 async function validateHome(browser, config) {
@@ -111,9 +114,15 @@ async function validateHome(browser, config) {
     assert(!hasHorizontalOverflow, `${name}: foi detectado overflow horizontal`);
 
     const whatsappLinks = page.locator('a[href^="https://wa.me/"]');
-    assert((await whatsappLinks.count()) >= 2, `${name}: os CTAs de WhatsApp não foram encontrados`);
     assert(
-      await page.getByRole("link", { name: /Planos/i }).first().isVisible(),
+      (await whatsappLinks.count()) >= 2,
+      `${name}: os CTAs de WhatsApp não foram encontrados`,
+    );
+    assert(
+      await page
+        .getByRole("link", { name: /Planos/i })
+        .first()
+        .isVisible(),
       `${name}: o acesso aos planos não está visível`,
     );
 
@@ -258,7 +267,10 @@ async function validateNotFound(browser, config) {
     const demosLink = page.getByRole("link", { name: /Ver demonstrações/i });
     assert(await homeLink.isVisible(), `${label}: o retorno ao início não está visível`);
     assert(await demosLink.isVisible(), `${label}: o acesso às demonstrações não está visível`);
-    assert((await homeLink.getAttribute("href")) === "/", `${label}: o retorno aponta para rota errada`);
+    assert(
+      (await homeLink.getAttribute("href")) === "/",
+      `${label}: o retorno aponta para rota errada`,
+    );
     assert(
       (await demosLink.getAttribute("href")) === "/#demonstracoes",
       `${label}: o acesso às demonstrações aponta para rota errada`,
