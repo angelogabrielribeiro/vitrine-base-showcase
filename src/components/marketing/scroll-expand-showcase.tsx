@@ -37,36 +37,16 @@ export function ScrollExpandShowcase({
     [0, 0.72, 1],
     ["min(56svh, 34rem)", "78svh", "calc(100svh - 4rem)"],
   );
-  const frameRadius = useTransform(
-    scrollYProgress,
-    [0, 0.82, 1],
-    ["2rem", "0rem", "0rem"],
-  );
+  const frameRadius = useTransform(scrollYProgress, [0, 0.82, 1], ["2rem", "0rem", "0rem"]);
   const frameShadow = useTransform(
     scrollYProgress,
     [0, 0.8, 1],
-    [
-      "0 35px 100px rgba(0,0,0,.42)",
-      "0 0 0 rgba(0,0,0,0)",
-      "0 0 0 rgba(0,0,0,0)",
-    ],
+    ["0 35px 100px rgba(0,0,0,.42)", "0 0 0 rgba(0,0,0,0)", "0 0 0 rgba(0,0,0,0)"],
   );
-  const introOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.48, 0.66, 1],
-    [1, 1, 0, 0],
-  );
+  const introOpacity = useTransform(scrollYProgress, [0, 0.48, 0.66, 1], [1, 1, 0, 0]);
   const introY = useTransform(scrollYProgress, [0, 0.66, 1], [0, -72, -72]);
-  const revealOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.56, 0.8, 1],
-    [0, 0, 1, 1],
-  );
-  const revealY = useTransform(
-    scrollYProgress,
-    [0, 0.56, 0.8, 1],
-    [32, 32, 0, 0],
-  );
+  const revealOpacity = useTransform(scrollYProgress, [0, 0.56, 0.8, 1], [0, 0, 1, 1]);
+  const revealY = useTransform(scrollYProgress, [0, 0.56, 0.8, 1], [32, 32, 0, 0]);
   const imageScale = useTransform(scrollYProgress, [0, 1], [1.06, 1]);
   const overlayOpacity = useTransform(scrollYProgress, [0, 1], [0.62, 0.28]);
 
@@ -82,19 +62,13 @@ export function ScrollExpandShowcase({
       }
     >
       <div
+        data-testid="scroll-expand-sticky"
         className={
           reduceMotion
             ? "relative mx-auto flex max-w-6xl items-center justify-center px-4 py-20"
             : "sticky top-16 flex h-[calc(100svh-4rem)] items-center justify-center overflow-hidden"
         }
       >
-        <motion.span
-          data-testid="scroll-expand-progress"
-          aria-hidden="true"
-          className="pointer-events-none absolute left-0 top-0 h-px w-px overflow-hidden"
-          style={{ opacity: scrollYProgress }}
-        />
-
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(251,191,36,0.14),transparent_30%),radial-gradient(circle_at_85%_30%,rgba(34,211,238,0.16),transparent_32%),radial-gradient(circle_at_50%_90%,rgba(99,102,241,0.12),transparent_35%)]"
@@ -131,7 +105,10 @@ export function ScrollExpandShowcase({
                   style={reduceMotion ? undefined : { scale: imageScale }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6">
+                <div
+                  data-testid="scroll-expand-card-label"
+                  className="absolute inset-x-0 bottom-0 p-4 sm:p-6"
+                >
                   <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-300">
                     {item.subtitle}
                   </p>
@@ -150,7 +127,7 @@ export function ScrollExpandShowcase({
           <motion.div
             data-testid="scroll-expand-intro"
             className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-5 text-center"
-            style={reduceMotion ? undefined : { opacity: introOpacity, y: introY }}
+            style={reduceMotion ? { opacity: 1, y: 0 } : { opacity: introOpacity, y: introY }}
           >
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-300">
@@ -172,8 +149,8 @@ export function ScrollExpandShowcase({
 
           <motion.div
             data-testid="scroll-expand-reveal"
-            className="absolute inset-x-0 bottom-0 z-20 flex justify-center p-5 sm:p-8"
-            style={reduceMotion ? undefined : { opacity: revealOpacity, y: revealY }}
+            className="absolute inset-x-0 top-0 z-20 flex justify-center p-4 sm:p-6"
+            style={reduceMotion ? { opacity: 1, y: 0 } : { opacity: revealOpacity, y: revealY }}
           >
             <a
               href={`#${targetId}`}
