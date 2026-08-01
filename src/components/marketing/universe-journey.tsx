@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { motion, useScroll, useTransform, type MotionStyle } from "framer-motion";
 import { ArrowRight, Check, MousePointer2 } from "lucide-react";
 import { useRef } from "react";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
@@ -11,23 +11,13 @@ type UniverseJourneyProps = {
 
 function CapabilitySignal({
   universe,
-  progress,
+  style,
 }: {
   universe: Universe;
-  progress?: MotionValue<number>;
+  style?: MotionStyle;
 }) {
-  const reveal = progress
-    ? useTransform(progress, [0.18, 0.32, 0.68, 0.84], [0, 1, 1, 0])
-    : undefined;
-  const lift = progress
-    ? useTransform(progress, [0.18, 0.36, 0.7, 0.88], [20, 0, 0, -14])
-    : undefined;
-
   return (
-    <motion.ul
-      className="grid gap-2 sm:grid-cols-2"
-      style={progress ? { opacity: reveal, y: lift } : undefined}
-    >
+    <motion.ul className="grid gap-2 sm:grid-cols-2" style={style}>
       {universe.capabilities.map((capability, index) => (
         <motion.li
           key={capability.kind}
@@ -127,6 +117,8 @@ function ImmersiveChapter({ universe, index }: { universe: Universe; index: numb
   );
   const copyOpacity = useTransform(scrollYProgress, [0.08, 0.22, 0.72, 0.9], [0, 1, 1, 0]);
   const energyScale = useTransform(scrollYProgress, [0, 0.16, 0.82, 1], [0, 1, 1, 0]);
+  const capabilityOpacity = useTransform(scrollYProgress, [0.18, 0.32, 0.68, 0.84], [0, 1, 1, 0]);
+  const capabilityY = useTransform(scrollYProgress, [0.18, 0.36, 0.7, 0.88], [20, 0, 0, -14]);
   const materialOpacity = useTransform(scrollYProgress, [0.05, 0.28, 0.74, 0.96], [0, 0.8, 0.8, 0]);
   const numberScale = useTransform(scrollYProgress, [0, 0.32, 0.78, 1], [0.72, 1, 1, 1.18]);
   const stageProgress = useTransform(scrollYProgress, [0.08, 0.88], ["0%", "100%"]);
@@ -217,7 +209,7 @@ function ImmersiveChapter({ universe, index }: { universe: Universe; index: numb
             </p>
 
             <div className="mt-8 max-w-2xl">
-              <CapabilitySignal universe={universe} progress={scrollYProgress} />
+              <CapabilitySignal universe={universe} style={{ opacity: capabilityOpacity, y: capabilityY }} />
             </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
