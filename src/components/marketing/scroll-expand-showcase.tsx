@@ -61,6 +61,13 @@ export function ScrollExpandShowcase({
           : "relative min-h-[175svh] overflow-clip border-y border-white/10 bg-[#050a10] md:min-h-[195svh]"
       }
     >
+      <motion.span
+        data-testid="scroll-expand-progress"
+        aria-hidden="true"
+        className="pointer-events-none absolute left-0 top-0 h-px w-px overflow-hidden"
+        style={{ opacity: scrollYProgress }}
+      />
+
       <div
         className={
           reduceMotion
