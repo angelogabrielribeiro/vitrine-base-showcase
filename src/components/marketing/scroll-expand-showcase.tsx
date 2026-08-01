@@ -121,6 +121,7 @@ export function ScrollExpandShowcase({
           />
 
           <motion.div
+            data-testid="scroll-expand-intro"
             className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-5 text-center"
             style={reduceMotion ? undefined : { opacity: introOpacity, y: introY }}
           >
@@ -143,6 +144,7 @@ export function ScrollExpandShowcase({
           </motion.div>
 
           <motion.div
+            data-testid="scroll-expand-reveal"
             className="absolute inset-x-0 bottom-0 z-20 flex justify-center p-5 sm:p-8"
             style={reduceMotion ? undefined : { opacity: revealOpacity, y: revealY }}
           >
