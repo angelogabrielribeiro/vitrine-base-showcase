@@ -125,6 +125,7 @@ async function validateHome(browser, config) {
     const intro = page.getByTestId("scroll-expand-intro");
     const reveal = page.getByTestId("scroll-expand-reveal");
     const labels = page.getByTestId("scroll-expand-card-label");
+    const staticHeading = page.getByTestId("scroll-expand-static-heading");
     await section.waitFor({ state: "visible" });
 
     const sectionMetrics = await section.evaluate((element) => ({
@@ -154,7 +155,8 @@ async function validateHome(browser, config) {
     if (reducedMotion === "reduce") {
       assert(stickyPosition !== "sticky", `${name}: o modo reduzido manteve a seção presa`);
       assert(!hasScrollInstruction, `${name}: o modo reduzido ainda pede rolagem para animar`);
-      assert(startIntro.opacity >= 0.9, `${name}: o conteúdo principal sumiu no modo reduzido`);
+      assert(await staticHeading.isVisible(), `${name}: o título estático não apareceu`);
+      assert(startIntro.opacity <= 0.05, `${name}: o título animado continuou sobre os cards`);
       assert(startReveal.opacity >= 0.9, `${name}: o CTA sumiu no modo reduzido`);
       await assertNoCtaLabelOverlap(reveal, labels, name);
       await page.screenshot({ path: `${outputDir}/${name}-showcase.png`, fullPage: false });
@@ -311,6 +313,11 @@ try {
   await validateHome(browser, {
     name: "reduced-motion",
     viewport: { width: 1280, height: 800 },
+    reducedMotion: "reduce",
+  });
+  await validateHome(browser, {
+    name: "reduced-motion-mobile",
+    viewport: { width: 390, height: 844 },
     reducedMotion: "reduce",
   });
   await validateNotFound(browser, {
