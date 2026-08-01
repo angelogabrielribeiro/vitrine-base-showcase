@@ -127,11 +127,7 @@ export function NotFoundPage() {
                 animate={reduceMotion ? undefined : { rotate: [0, 5, -5, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
               >
-                <Compass
-                  className="h-16 w-16 text-cyan-200"
-                  strokeWidth={1.2}
-                  aria-hidden="true"
-                />
+                <Compass className="h-16 w-16 text-cyan-200" strokeWidth={1.2} aria-hidden="true" />
               </motion.div>
 
               <motion.div

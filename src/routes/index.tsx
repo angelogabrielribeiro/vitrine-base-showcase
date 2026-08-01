@@ -57,10 +57,7 @@ const NICHE_ICON: Record<string, typeof ShoppingBag> = {
   electronics: Cpu,
 };
 
-const DEMO_VALUE: Record<
-  string,
-  { problem: string; solution: string; highlight: string }
-> = {
+const DEMO_VALUE: Record<string, { problem: string; solution: string; highlight: string }> = {
   moda: {
     problem: "Coleções espalhadas entre posts e mensagens.",
     solution: "Uma vitrine editorial com catálogo, produto, carrinho e checkout no mesmo fluxo.",
@@ -92,7 +89,8 @@ const PROCESS = [
   {
     step: "02",
     title: "Escopo e proposta",
-    description: "Definimos páginas, funções, investimento, prazo e custos externos antes de iniciar.",
+    description:
+      "Definimos páginas, funções, investimento, prazo e custos externos antes de iniciar.",
   },
   {
     step: "03",
@@ -102,7 +100,8 @@ const PROCESS = [
   {
     step: "04",
     title: "Revisão e publicação",
-    description: "Você aprova o projeto, concluímos os ajustes e publicamos somente depois da validação.",
+    description:
+      "Você aprova o projeto, concluímos os ajustes e publicamos somente depois da validação.",
   },
 ];
 
@@ -134,7 +133,8 @@ const INCLUDED = [
   {
     icon: Sparkles,
     title: "Identidade própria",
-    description: "Layout, conteúdo, cards e movimento são adaptados ao posicionamento de cada marca.",
+    description:
+      "Layout, conteúdo, cards e movimento são adaptados ao posicionamento de cada marca.",
   },
   {
     icon: MessageCircle,
@@ -556,7 +556,8 @@ function Index() {
           <div className="relative mx-auto max-w-4xl px-4 py-24 text-center">
             <BadgeCheck className="mx-auto h-8 w-8 text-amber-300" aria-hidden="true" />
             <h2 className="mt-6 font-display text-4xl font-light tracking-[-0.045em] text-white sm:text-6xl">
-              Seu negócio já tem uma identidade. O site precisa traduzir isso e facilitar a operação.
+              Seu negócio já tem uma identidade. O site precisa traduzir isso e facilitar a
+              operação.
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/62">
               Conte como sua empresa vende, atende ou agenda. A proposta será construída a partir do
