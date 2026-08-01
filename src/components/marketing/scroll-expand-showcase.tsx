@@ -70,7 +70,7 @@ function SceneLayer({ item, index, opacity, sceneProgress }: SceneLayerProps) {
 
       <motion.div
         data-testid="scroll-expand-card-label"
-        className="absolute inset-x-0 bottom-0 z-10 p-5 sm:p-8 lg:p-12"
+        className="absolute inset-x-0 bottom-0 z-10 p-5 pb-16 sm:p-8 lg:p-12"
         style={{ y: labelY, opacity: labelOpacity }}
       >
         <div className="flex max-w-4xl items-end justify-between gap-5">
