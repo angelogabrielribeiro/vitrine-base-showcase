@@ -132,6 +132,24 @@ async function validateHome(browser, config) {
     const configurator = page.getByTestId("offer-configurator");
     await journey.waitFor({ state: "visible" });
 
+    const journeyImageLocators = journey.locator("img");
+    const journeyImageCount = await journeyImageLocators.count();
+    for (let index = 0; index < journeyImageCount; index += 1) {
+      const image = journeyImageLocators.nth(index);
+      await image.scrollIntoViewIfNeeded();
+      await image.evaluate(async (element) => {
+        if (!element.complete) {
+          await new Promise((resolve) => {
+            element.addEventListener("load", resolve, { once: true });
+            element.addEventListener("error", resolve, { once: true });
+          });
+        }
+        await element.decode?.().catch(() => undefined);
+      });
+    }
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(300);
+
     const journeyMetrics = await journey.evaluate((element) => ({
       top: element.getBoundingClientRect().top + window.scrollY,
       height: element.getBoundingClientRect().height,
