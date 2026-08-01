@@ -1,9 +1,4 @@
-import {
-  motion,
-  useScroll,
-  useTransform,
-  type MotionValue,
-} from "framer-motion";
+import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { ArrowDown, ArrowRight } from "lucide-react";
 import { useRef } from "react";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
@@ -51,11 +46,7 @@ function SceneLayer({ item, index, opacity, sceneProgress }: SceneLayerProps) {
     [0, 0.16, 0.78, 1],
     [0, 1, 1, index === 3 ? 1 : 0.82],
   );
-  const accentOpacity = useTransform(
-    sceneProgress,
-    [0, 0.25, 0.74, 1],
-    [0.18, 0.65, 0.82, 0.48],
-  );
+  const accentOpacity = useTransform(sceneProgress, [0, 0.25, 0.74, 1], [0.18, 0.65, 0.82, 0.48]);
 
   return (
     <motion.article
@@ -123,55 +114,19 @@ export function ScrollExpandShowcase({
     [0, 0.78, 1],
     ["min(56svh, 34rem)", "78svh", "calc(100svh - 4rem)"],
   );
-  const frameRadius = useTransform(
-    scrollYProgress,
-    [0, 0.86, 1],
-    ["2rem", "0rem", "0rem"],
-  );
+  const frameRadius = useTransform(scrollYProgress, [0, 0.86, 1], ["2rem", "0rem", "0rem"]);
   const frameShadow = useTransform(
     scrollYProgress,
     [0, 0.82, 1],
-    [
-      "0 35px 100px rgba(0,0,0,.52)",
-      "0 0 0 rgba(0,0,0,0)",
-      "0 0 0 rgba(0,0,0,0)",
-    ],
+    ["0 35px 100px rgba(0,0,0,.52)", "0 0 0 rgba(0,0,0,0)", "0 0 0 rgba(0,0,0,0)"],
   );
-  const introOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.11, 0.2, 1],
-    [1, 1, 0, 0],
-  );
-  const introY = useTransform(
-    scrollYProgress,
-    [0, 0.11, 0.2, 1],
-    [0, 0, -56, -56],
-  );
-  const revealOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.84, 0.94, 1],
-    [0, 0, 1, 1],
-  );
-  const revealY = useTransform(
-    scrollYProgress,
-    [0, 0.84, 0.94, 1],
-    [32, 32, 0, 0],
-  );
-  const overlayOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.2, 0.76, 1],
-    [0.7, 0.46, 0.18, 0.12],
-  );
-  const portalScale = useTransform(
-    scrollYProgress,
-    [0, 0.18, 0.8, 1],
-    [0.6, 0.78, 1.18, 1.38],
-  );
-  const portalOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.14, 0.76, 1],
-    [0.25, 0.72, 0.26, 0],
-  );
+  const introOpacity = useTransform(scrollYProgress, [0, 0.11, 0.2, 1], [1, 1, 0, 0]);
+  const introY = useTransform(scrollYProgress, [0, 0.11, 0.2, 1], [0, 0, -56, -56]);
+  const revealOpacity = useTransform(scrollYProgress, [0, 0.84, 0.94, 1], [0, 0, 1, 1]);
+  const revealY = useTransform(scrollYProgress, [0, 0.84, 0.94, 1], [32, 32, 0, 0]);
+  const overlayOpacity = useTransform(scrollYProgress, [0, 0.2, 0.76, 1], [0.7, 0.46, 0.18, 0.12]);
+  const portalScale = useTransform(scrollYProgress, [0, 0.18, 0.8, 1], [0.6, 0.78, 1.18, 1.38]);
+  const portalOpacity = useTransform(scrollYProgress, [0, 0.14, 0.76, 1], [0.25, 0.72, 0.26, 0]);
   const progressScale = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   // Cada cena recebe uma faixa própria para separar entrada, permanência e saída.
@@ -195,9 +150,7 @@ export function ScrollExpandShowcase({
       id="experiencia"
       ref={sectionRef}
       data-testid="scroll-expand-showcase"
-      aria-labelledby={
-        reduceMotion ? "showcase-title-static" : "showcase-title"
-      }
+      aria-labelledby={reduceMotion ? "showcase-title-static" : "showcase-title"}
       className={
         reduceMotion
           ? "relative overflow-hidden border-y border-white/10 bg-vb-deep"
@@ -212,10 +165,7 @@ export function ScrollExpandShowcase({
             : "sticky top-16 flex h-[calc(100svh-4rem)] items-center justify-center overflow-hidden"
         }
       >
-        <div
-          aria-hidden="true"
-          className="vb-pointer-aura pointer-events-none absolute inset-0"
-        />
+        <div aria-hidden="true" className="vb-pointer-aura pointer-events-none absolute inset-0" />
         <div
           aria-hidden="true"
           className="vb-noise pointer-events-none absolute inset-0 opacity-25"
@@ -253,10 +203,7 @@ export function ScrollExpandShowcase({
           {reduceMotion ? (
             <div className="grid min-h-[40rem] w-full grid-cols-1 sm:grid-cols-2">
               {visibleItems.map((item) => (
-                <article
-                  key={item.title}
-                  className="relative min-h-72 overflow-hidden"
-                >
+                <article key={item.title} className="relative min-h-72 overflow-hidden">
                   <img
                     src={item.image}
                     alt={`Prévia visual de ${item.title}`}
@@ -304,9 +251,7 @@ export function ScrollExpandShowcase({
           <motion.div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 z-10 bg-black"
-            style={
-              reduceMotion ? { opacity: 0.16 } : { opacity: overlayOpacity }
-            }
+            style={reduceMotion ? { opacity: 0.16 } : { opacity: overlayOpacity }}
           />
 
           <motion.div
@@ -326,18 +271,15 @@ export function ScrollExpandShowcase({
                 className="mx-auto mt-5 font-display text-4xl font-semibold leading-[0.9] tracking-[-0.065em] text-white sm:text-7xl lg:text-[7.4rem]"
               >
                 Uma base técnica.
-                <span className="block text-vb-gold">
-                  Quatro mundos sem cara de template.
-                </span>
+                <span className="block text-vb-gold">Quatro mundos sem cara de template.</span>
               </h2>
               <p className="mx-auto mt-6 max-w-2xl text-sm leading-7 text-white/62 sm:text-base">
-                O scroll conduz a troca de atmosfera, hierarquia e narrativa sem
-                bloquear a navegação.
+                O scroll conduz a troca de atmosfera, hierarquia e narrativa sem bloquear a
+                navegação.
               </p>
               {!reduceMotion && (
                 <p className="mt-7 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-white/55">
-                  Role para descobrir{" "}
-                  <ArrowDown className="h-4 w-4 animate-bounce" />
+                  Role para descobrir <ArrowDown className="h-4 w-4 animate-bounce" />
                 </p>
               )}
             </div>
@@ -366,11 +308,7 @@ export function ScrollExpandShowcase({
           <motion.div
             data-testid="scroll-expand-reveal"
             className="absolute inset-x-0 top-0 z-30 flex justify-center p-4 sm:p-6"
-            style={
-              reduceMotion
-                ? { opacity: 1, y: 0 }
-                : { opacity: revealOpacity, y: revealY }
-            }
+            style={reduceMotion ? { opacity: 1, y: 0 } : { opacity: revealOpacity, y: revealY }}
           >
             <a
               href={`#${targetId}`}
