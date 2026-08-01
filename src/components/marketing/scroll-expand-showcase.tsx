@@ -65,7 +65,7 @@ function SceneLayer({ item, index, opacity, sceneProgress }: SceneLayerProps) {
     >
       <motion.img
         src={item.image}
-        alt={`PrÃ©via visual de ${item.title}`}
+        alt={`Prévia visual de ${item.title}`}
         loading={index === 0 ? "eager" : "lazy"}
         className="h-full w-full object-cover will-change-transform"
         style={{ scale, x, y }}
@@ -85,7 +85,7 @@ function SceneLayer({ item, index, opacity, sceneProgress }: SceneLayerProps) {
         <div className="flex max-w-4xl items-end justify-between gap-5">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-vb-gold sm:text-xs">
-              Universo {String(index + 1).padStart(2, "0")} Â· {item.subtitle}
+              Universo {String(index + 1).padStart(2, "0")} · {item.subtitle}
             </p>
             <p className="mt-2 font-display text-3xl font-semibold tracking-[-0.04em] text-white sm:text-5xl lg:text-7xl">
               {item.title}
@@ -174,8 +174,8 @@ export function ScrollExpandShowcase({
   );
   const progressScale = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
-  // Cada cena recebe uma faixa prÃ³pria para separar entrada, permanÃªncia e saÃ­da.
-  // A seÃ§Ã£o mais alta no mobile transforma pequenos gestos em mudanÃ§as graduais,
+  // Cada cena recebe uma faixa própria para separar entrada, permanência e saída.
+  // A seção mais alta no mobile transforma pequenos gestos em mudanças graduais,
   // sem capturar wheel/touch nem alterar a rolagem nativa.
   const sceneProgresses = [
     useTransform(scrollYProgress, [0, 0.24], [0, 1]),
@@ -231,7 +231,7 @@ export function ScrollExpandShowcase({
               id="showcase-title-static"
               className="mt-5 font-display text-4xl font-semibold leading-[0.96] tracking-[-0.055em] text-vb-ivory sm:text-6xl"
             >
-              A operaÃ§Ã£o muda. O cenÃ¡rio, o ritmo e a linguagem mudam junto.
+              A operação muda. O cenário, o ritmo e a linguagem mudam junto.
             </h2>
           </div>
         )}
@@ -259,7 +259,7 @@ export function ScrollExpandShowcase({
                 >
                   <img
                     src={item.image}
-                    alt={`PrÃ©via visual de ${item.title}`}
+                    alt={`Prévia visual de ${item.title}`}
                     loading="lazy"
                     className="h-full w-full object-cover"
                   />
@@ -325,14 +325,14 @@ export function ScrollExpandShowcase({
                 id="showcase-title"
                 className="mx-auto mt-5 font-display text-4xl font-semibold leading-[0.9] tracking-[-0.065em] text-white sm:text-7xl lg:text-[7.4rem]"
               >
-                Uma base tÃ©cnica.
+                Uma base técnica.
                 <span className="block text-vb-gold">
                   Quatro mundos sem cara de template.
                 </span>
               </h2>
               <p className="mx-auto mt-6 max-w-2xl text-sm leading-7 text-white/62 sm:text-base">
                 O scroll conduz a troca de atmosfera, hierarquia e narrativa sem
-                bloquear a navegaÃ§Ã£o.
+                bloquear a navegação.
               </p>
               {!reduceMotion && (
                 <p className="mt-7 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-white/55">
