@@ -213,10 +213,8 @@ export function UniverseShowroomHero({
     if (dragState.current.moved > 14) goTo(normalizeIndex(rotation.get()));
   };
 
-  const glow = useMotionTemplate`radial-gradient(circle at calc(50% + ${useTransform(
-    rotation,
-    (r) => Math.sin((r * Math.PI) / 180) * 14,
-  )}%) 46%, ${active.accent}2e, transparent 58%)`;
+  const glowShift = useTransform(rotation, (r) => Math.sin((r * Math.PI) / 180) * 14);
+  const glow = useMotionTemplate`radial-gradient(circle at calc(50% + ${glowShift}%) 46%, ${active.accent}2e, transparent 58%)`;
 
   return (
     <section

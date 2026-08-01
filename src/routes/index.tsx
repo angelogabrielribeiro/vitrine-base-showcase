@@ -15,7 +15,7 @@ import {
   Sparkles,
   Utensils,
 } from "lucide-react";
-import { PremiumHomeHero } from "@/components/marketing/premium-home-hero";
+import { UniverseShowroomHero } from "@/components/marketing/universe-showroom-hero";
 import { ScrollExpandShowcase } from "@/components/marketing/scroll-expand-showcase";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 import { PricingPreview } from "@/components/pricing/pricing-page";
@@ -227,12 +227,7 @@ function Index() {
       </header>
 
       <main id="conteudo">
-        <PremiumHomeHero
-          items={showcaseItems}
-          proposalUrl={PROPOSAL_URL}
-          reducedMotion={reduceMotion}
-          demoNotice={DEMO_NOTICE}
-        />
+        <UniverseShowroomHero proposalUrl={PROPOSAL_URL} demoNotice={DEMO_NOTICE} />
 
         <section
           aria-label="Princípios da Vitrine Base"
