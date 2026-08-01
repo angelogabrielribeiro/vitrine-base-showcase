@@ -73,6 +73,10 @@ async function validateHome(browser, config) {
     assert(response?.ok(), `${name}: a homepage respondeu com status ${response?.status()}`);
     await page.locator("main#conteudo").waitFor({ state: "visible" });
     await waitForStablePage(page);
+    await page.evaluate(() => {
+      document.documentElement.style.scrollBehavior = "auto";
+      document.body.style.scrollBehavior = "auto";
+    });
 
     const hasHorizontalOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > window.innerWidth + 1,
@@ -93,7 +97,7 @@ async function validateHome(browser, config) {
       viewportHeight: window.innerHeight,
     }));
 
-    await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), sectionMetrics.top);
+    await page.evaluate((top) => window.scrollTo(0, top), sectionMetrics.top);
     await page.waitForTimeout(600);
 
     const startBox = await frame.boundingBox();
@@ -108,10 +112,7 @@ async function validateHome(browser, config) {
 
     if (reducedMotion === "reduce") {
       const targetScroll = sectionMetrics.top + Math.max(sectionMetrics.height * 0.72, 320);
-      await page.evaluate(
-        (top) => window.scrollTo({ top, behavior: "instant" }),
-        targetScroll,
-      );
+      await page.evaluate((top) => window.scrollTo(0, top), targetScroll);
       await page.waitForTimeout(900);
       endBox = await frame.boundingBox();
       endScroll = await page.evaluate(() => window.scrollY);
@@ -119,10 +120,7 @@ async function validateHome(browser, config) {
     } else {
       for (const progress of [0.82, 0.9, 0.95, 0.98, 0.995]) {
         const targetScroll = sectionMetrics.top + activeScrollRange * progress;
-        await page.evaluate(
-          (top) => window.scrollTo({ top, behavior: "instant" }),
-          targetScroll,
-        );
+        await page.evaluate((top) => window.scrollTo(0, top), targetScroll);
         await page.waitForTimeout(650);
 
         endBox = await frame.boundingBox();
