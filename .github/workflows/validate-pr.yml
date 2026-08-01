@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: validate-${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -58,18 +58,14 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Generate exact formatting for validation
-        run: |
-          npx prettier --write \
-            scripts/validate-ui.mjs \
-            src/components/marketing/scroll-expand-showcase.tsx
-
-      - name: Check remaining committed interface formatting
+      - name: Check formatting
         run: |
           npx prettier --check \
             .github/workflows/validate-pr.yml \
+            scripts/validate-ui.mjs \
             src/routes/index.tsx \
             src/routes/__root.tsx \
+            src/components/marketing/scroll-expand-showcase.tsx \
             src/components/system/not-found-page.tsx
 
       - name: Lint changed interface files
@@ -125,10 +121,110 @@ jobs:
           cat /tmp/vitrine-server.log
           exit 1
 
-      - name: Run browser validation
+      - name: Run animation and responsive validation
         env:
           BASE_URL: http://127.0.0.1:4173
         run: node scripts/validate-ui.mjs
+
+      - name: Validate commercial routes and keyboard access
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from "playwright";
+
+          const baseUrl = process.env.BASE_URL;
+          const browser = await chromium.launch({ headless: true });
+          const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+          const page = await context.newPage();
+
+          try {
+            const response = await page.goto(baseUrl, {
+              waitUntil: "networkidle",
+              timeout: 90_000,
+            });
+
+            if (!response?.ok()) {
+              throw new Error(`Homepage respondeu com status ${response?.status()}`);
+            }
+
+            await page.keyboard.press("Tab");
+            const focused = page.locator(":focus");
+            const focusedText = (await focused.textContent())?.trim() ?? "";
+
+            if (!/Ir para o conteúdo/i.test(focusedText) || !(await focused.isVisible())) {
+              throw new Error("O link de pular para o conteúdo não recebeu foco visível");
+            }
+
+            const whatsappLinks = await page.locator('a[href^="https://wa.me/"]').count();
+            if (whatsappLinks < 2) {
+              throw new Error(`Foram encontrados apenas ${whatsappLinks} CTAs de WhatsApp`);
+            }
+
+            const collectRoutes = async (name, expectedCount, pattern) => {
+              const links = page.getByRole("link", { name });
+              const count = await links.count();
+
+              if (count !== expectedCount) {
+                throw new Error(`${String(name)}: esperado ${expectedCount}, encontrado ${count}`);
+              }
+
+              const hrefs = await links.evaluateAll((elements) =>
+                elements.map((element) => element.getAttribute("href")),
+              );
+
+              for (const href of hrefs) {
+                if (!href || !pattern.test(href)) {
+                  throw new Error(`${String(name)} possui destino inválido: ${href}`);
+                }
+              }
+
+              return hrefs;
+            };
+
+            const storeRoutes = await collectRoutes("Abrir loja", 4, /^\/demo\/[^/]+$/);
+            const adminRoutes = await collectRoutes(
+              "Explorar painel",
+              4,
+              /^\/demo\/[^/]+\/admin$/,
+            );
+            const bookingRoutes = await collectRoutes(
+              "Testar agendamento",
+              1,
+              /^\/demo\/[^/]+\/agendar$/,
+            );
+
+            const planHrefs = await page
+              .getByRole("link", { name: /Planos/i })
+              .evaluateAll((elements) => elements.map((element) => element.getAttribute("href")));
+
+            if (!planHrefs.includes("/planos")) {
+              throw new Error(`Nenhum link de planos aponta para /planos: ${planHrefs.join(", ")}`);
+            }
+
+            const uniqueRoutes = [
+              ...new Set([...storeRoutes, ...adminRoutes, ...bookingRoutes, "/planos"]),
+            ];
+
+            for (const route of uniqueRoutes) {
+              const routeResponse = await page.goto(new URL(route, baseUrl).toString(), {
+                waitUntil: "domcontentloaded",
+                timeout: 90_000,
+              });
+
+              if (!routeResponse || routeResponse.status() >= 400) {
+                throw new Error(`${route} respondeu com status ${routeResponse?.status()}`);
+              }
+
+              const bodyText = (await page.locator("body").innerText()).trim();
+              if (bodyText.length < 20) {
+                throw new Error(`${route} carregou sem conteúdo suficiente`);
+              }
+            }
+          } finally {
+            await browser.close();
+          }
+          NODE
 
       - name: Copy server log
         if: always()
@@ -144,51 +240,3 @@ jobs:
           path: artifacts/ui-validation
           if-no-files-found: warn
           retention-days: 14
-
-  format:
-    name: Commit exact formatting
-    needs:
-      - build
-      - lint
-      - ui
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - name: Checkout pull request branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: package.json
-
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund
-
-      - name: Format approved validation files
-        run: |
-          npx prettier --write \
-            scripts/validate-ui.mjs \
-            src/components/marketing/scroll-expand-showcase.tsx
-
-      - name: Commit formatting when needed
-        env:
-          BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
-        run: |
-          git add scripts/validate-ui.mjs src/components/marketing/scroll-expand-showcase.tsx
-
-          if git diff --cached --quiet; then
-            echo "Approved files already match the repository format."
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Format validated interface files"
-          git push origin "HEAD:${BRANCH_NAME}"
