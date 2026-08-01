@@ -1,0 +1,270 @@
+name: Validate pull request
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build application
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout pull request branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package.json
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build
+        run: npm run build
+
+  lint:
+    name: Validate changed files
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout pull request branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package.json
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Check formatting
+        run: |
+          npx prettier --check \
+            .github/workflows/validate-pr.yml \
+            scripts/validate-ui.mjs \
+            src/routes/index.tsx \
+            src/routes/__root.tsx \
+            src/styles.css \
+            src/components/marketing/premium-home-hero.tsx \
+            src/components/marketing/scroll-expand-showcase.tsx \
+            src/components/system/not-found-page.tsx
+
+      - name: Lint changed interface files
+        run: |
+          npx eslint \
+            src/routes/index.tsx \
+            src/routes/__root.tsx \
+            src/components/marketing/premium-home-hero.tsx \
+            src/components/marketing/scroll-expand-showcase.tsx \
+            src/components/system/not-found-page.tsx
+
+      - name: Validate browser script syntax
+        run: node --check scripts/validate-ui.mjs
+
+      - name: Report existing repository lint debt
+        continue-on-error: true
+        run: npm run lint
+
+  ui:
+    name: Validate animations and responsive states
+    needs:
+      - build
+      - lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.0-noble
+      options: --user 1001
+
+    steps:
+      - name: Checkout pull request branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Install application dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install matching Playwright library
+        run: npm install --no-save --no-audit --no-fund playwright@1.62.0
+
+      - name: Start application server
+        run: |
+          npm run dev -- --host 0.0.0.0 --port 4173 > /tmp/vitrine-server.log 2>&1 &
+          echo $! > /tmp/vitrine-server.pid
+
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:4173 > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+
+          cat /tmp/vitrine-server.log
+          exit 1
+
+      - name: Run animation and responsive validation
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: node scripts/validate-ui.mjs
+
+      - name: Validate commercial routes, typography and keyboard access
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from "playwright";
+
+          const baseUrl = process.env.BASE_URL;
+          const browser = await chromium.launch({ headless: true });
+          const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+          const page = await context.newPage();
+
+          try {
+            const response = await page.goto(baseUrl, {
+              waitUntil: "networkidle",
+              timeout: 90_000,
+            });
+
+            if (!response?.ok()) {
+              throw new Error(`Homepage respondeu com status ${response?.status()}`);
+            }
+
+            await page.keyboard.press("Tab");
+            const focused = page.locator(":focus");
+            const focusedText = (await focused.textContent())?.trim() ?? "";
+
+            if (!/Ir para o conteúdo/i.test(focusedText) || !(await focused.isVisible())) {
+              throw new Error("O link de pular para o conteúdo não recebeu foco visível");
+            }
+
+            const headingFont = await page.locator("#inicio h1").evaluate(
+              (element) => getComputedStyle(element).fontFamily,
+            );
+            const bodyFont = await page.locator("body").evaluate(
+              (element) => getComputedStyle(element).fontFamily,
+            );
+
+            if (!headingFont.includes("Syne")) {
+              throw new Error(`A tipografia display não usa Syne: ${headingFont}`);
+            }
+            if (!bodyFont.includes("Manrope")) {
+              throw new Error(`A tipografia de interface não usa Manrope: ${bodyFont}`);
+            }
+
+            const heroImages = await page.locator("#inicio img").evaluateAll((images) => ({
+              total: images.length,
+              loaded: images.filter((image) => image.complete && image.naturalWidth > 0).length,
+            }));
+
+            if (heroImages.total !== 4 || heroImages.loaded !== 4) {
+              throw new Error(
+                `Hero: esperado 4 imagens carregadas, encontrado ${heroImages.loaded}/${heroImages.total}`,
+              );
+            }
+
+            const whatsappLinks = await page.locator('a[href^="https://wa.me/"]').count();
+            if (whatsappLinks < 2) {
+              throw new Error(`Foram encontrados apenas ${whatsappLinks} CTAs de WhatsApp`);
+            }
+
+            const collectRoutes = async (name, expectedCount, pattern) => {
+              const links = page.getByRole("link", { name });
+              const count = await links.count();
+
+              if (count !== expectedCount) {
+                throw new Error(`${String(name)}: esperado ${expectedCount}, encontrado ${count}`);
+              }
+
+              const hrefs = await links.evaluateAll((elements) =>
+                elements.map((element) => element.getAttribute("href")),
+              );
+
+              for (const href of hrefs) {
+                if (!href || !pattern.test(href)) {
+                  throw new Error(`${String(name)} possui destino inválido: ${href}`);
+                }
+              }
+
+              return hrefs;
+            };
+
+            const storeRoutes = await collectRoutes("Abrir loja", 4, /^\/demo\/[^/]+$/);
+            const adminRoutes = await collectRoutes(
+              "Explorar painel",
+              4,
+              /^\/demo\/[^/]+\/admin$/,
+            );
+            const bookingRoutes = await collectRoutes(
+              "Testar agendamento",
+              1,
+              /^\/demo\/[^/]+\/agendar$/,
+            );
+
+            const planHrefs = await page
+              .getByRole("link", { name: /Planos/i })
+              .evaluateAll((elements) => elements.map((element) => element.getAttribute("href")));
+
+            if (!planHrefs.includes("/planos")) {
+              throw new Error(`Nenhum link de planos aponta para /planos: ${planHrefs.join(", ")}`);
+            }
+
+            const uniqueRoutes = [
+              ...new Set([...storeRoutes, ...adminRoutes, ...bookingRoutes, "/planos"]),
+            ];
+
+            for (const route of uniqueRoutes) {
+              const routeResponse = await page.goto(new URL(route, baseUrl).toString(), {
+                waitUntil: "domcontentloaded",
+                timeout: 90_000,
+              });
+
+              if (!routeResponse || routeResponse.status() >= 400) {
+                throw new Error(`${route} respondeu com status ${routeResponse?.status()}`);
+              }
+
+              const bodyText = (await page.locator("body").innerText()).trim();
+              if (bodyText.length < 20) {
+                throw new Error(`${route} carregou sem conteúdo suficiente`);
+              }
+            }
+          } finally {
+            await browser.close();
+          }
+          NODE
+
+      - name: Copy server log
+        if: always()
+        run: |
+          mkdir -p artifacts/ui-validation
+          cp /tmp/vitrine-server.log artifacts/ui-validation/server.log || true
+
+      - name: Upload validation screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: ui-validation
+          path: artifacts/ui-validation
+          if-no-files-found: warn
+          retention-days: 14

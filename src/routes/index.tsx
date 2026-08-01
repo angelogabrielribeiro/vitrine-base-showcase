@@ -1,55 +1,55 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
-  ShoppingBag,
-  Utensils,
-  Scissors,
-  Sparkles,
-  ShieldCheck,
-  MessageCircle,
-  Smartphone,
-  LayoutDashboard,
   CalendarDays,
+  Check,
+  ChevronRight,
   Cpu,
-  BadgeCheck,
-  Clock3,
-  Search,
-  TrendingUp,
-  BarChart3,
-  RefreshCw,
+  LayoutDashboard,
+  MessageCircle,
+  Scissors,
+  ShieldCheck,
+  ShoppingBag,
+  Smartphone,
+  Sparkles,
+  Utensils,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { STORES } from "@/config/stores";
-import { DEMO_LABEL } from "@/lib/demo-mode";
-import { AnimatedGradient } from "@/components/effects/AnimatedGradient";
-import { PulsingBorder } from "@/components/effects/PulsingBorder";
-import { InteractiveTiltCard } from "@/components/effects/InteractiveTiltCard";
-import { InteractiveProductFolder } from "@/components/effects/InteractiveProductFolder";
+import { PremiumHomeHero } from "@/components/marketing/premium-home-hero";
+import { ScrollExpandShowcase } from "@/components/marketing/scroll-expand-showcase";
+import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 import { PricingPreview } from "@/components/pricing/pricing-page";
+import { STORES } from "@/config/stores";
+import { DEMO_NOTICE } from "@/lib/demo-mode";
+import { whatsappUrl } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Vitrine Base — Sites que ajudam o negócio a vender e operar melhor" },
+      { title: "Vitrine Base — Experiências digitais para negócios locais" },
       {
         name: "description",
         content:
-          "Sites e webapps para gerar confiança, organizar pedidos e agendamentos e transformar visitas em oportunidades para negócios locais.",
+          "Sites e sistemas sob medida com identidade, movimento e ferramentas reais para negócios locais venderem e operarem melhor.",
       },
       {
         property: "og:title",
-        content: "Vitrine Base — Presença que gera confiança. Operação que ajuda a vender.",
+        content: "Vitrine Base — Sites que o cliente sente antes de entender",
       },
       {
         property: "og:description",
         content:
-          "Demonstrações de lojas, restaurantes e serviços com catálogo, pedidos, agendamento e painel administrativo.",
+          "Atravesse quatro experiências digitais e veja como design, catálogo, pedidos, agenda e painel podem trabalhar juntos.",
       },
     ],
   }),
   component: Index,
 });
+
+const PROPOSAL_URL = whatsappUrl(
+  "5511987201816",
+  "Olá, Angelo! Vi a Vitrine Base e quero entender como seria um site para o meu negócio.",
+);
 
 const NICHE_ICON: Record<string, typeof ShoppingBag> = {
   fashion: ShoppingBag,
@@ -58,392 +58,497 @@ const NICHE_ICON: Record<string, typeof ShoppingBag> = {
   electronics: Cpu,
 };
 
-const FEATURES = [
-  { icon: Smartphone, title: "Loja virtual responsiva", desc: "Mobile-first, rápida e acessível." },
+const DEMO_VALUE: Record<
+  string,
   {
-    icon: ShoppingBag,
-    title: "Produtos e estoque",
-    desc: "Catálogo com variantes, adicionais e imagens.",
+    problem: string;
+    solution: string;
+    highlight: string;
+    accent: string;
+    glow: string;
+    number: string;
+  }
+> = {
+  moda: {
+    problem: "Coleções espalhadas entre posts, destaques e mensagens.",
+    solution: "Uma vitrine editorial que transforma produto, composição e compra em uma jornada.",
+    highlight: "Moda e varejo",
+    accent: "text-[#d58c9a]",
+    glow: "from-[#d58c9a]/28 via-transparent to-vb-gold/16",
+    number: "01",
+  },
+  barbearia: {
+    problem: "Agenda dependente de trocas manuais de mensagens.",
+    solution: "Serviços, profissionais e horários organizados para o cliente reservar sozinho.",
+    highlight: "Serviços e agenda",
+    accent: "text-vb-gold",
+    glow: "from-vb-gold/28 via-transparent to-[#8a6d36]/18",
+    number: "02",
+  },
+  restaurante: {
+    problem: "Cardápio, adicionais e pedidos difíceis de conferir.",
+    solution: "Uma experiência quente e direta para escolher, personalizar e finalizar o pedido.",
+    highlight: "Pedidos locais",
+    accent: "text-[#ff7448]",
+    glow: "from-[#ff7448]/28 via-transparent to-vb-gold/14",
+    number: "03",
+  },
+  eletronicos: {
+    problem: "Produtos técnicos apresentados sem hierarquia ou contexto.",
+    solution: "Categorias, detalhes e compra organizados em um ambiente digital de alta precisão.",
+    highlight: "Catálogo técnico",
+    accent: "text-vb-cyan",
+    glow: "from-vb-cyan/26 via-transparent to-vb-violet/25",
+    number: "04",
+  },
+};
+
+const PROCESS = [
+  {
+    step: "01",
+    title: "Diagnóstico",
+    description: "Entendemos o negócio, a rotina, o público e o objetivo comercial prioritário.",
   },
   {
-    icon: CalendarDays,
-    title: "Agendamento online",
-    desc: "Serviço, profissional, data e horário.",
+    step: "02",
+    title: "Direção",
+    description:
+      "Definimos identidade, narrativa, funcionalidades, investimento e prazo antes de iniciar.",
   },
   {
-    icon: ShieldCheck,
-    title: "Checkout completo",
-    desc: "Pix, cartão, dinheiro e cupom demonstrativo.",
+    step: "03",
+    title: "Construção",
+    description:
+      "Design, conteúdo, movimento e fluxos são desenvolvidos como uma experiência única.",
   },
   {
-    icon: Sparkles,
-    title: "Painel administrativo",
-    desc: "Produtos, pedidos e configurações em tempo real.",
-  },
-  {
-    icon: MessageCircle,
-    title: "Integração WhatsApp",
-    desc: "Contato e pós-venda direto pelo aplicativo.",
+    step: "04",
+    title: "Validação",
+    description: "Testamos desktop, mobile e operação; só publicamos depois da sua aprovação.",
   },
 ];
 
-const BUSINESS_OUTCOMES = [
+const INCLUDED = [
   {
-    icon: Clock3,
-    pain: "Atendimento preso no WhatsApp",
-    outcome: "Catálogo e informações disponíveis sem depender de resposta imediata.",
-    proof: "Preço, opções, horários e políticas ficam claros antes do contato.",
+    icon: Smartphone,
+    title: "Responsividade real",
+    description: "Composição, movimento e hierarquia adaptados para celular e computador.",
   },
   {
-    icon: BadgeCheck,
-    pain: "Cliente inseguro para comprar",
-    outcome: "Marca, domínio, políticas e jornada profissional no mesmo lugar.",
-    proof: "Mais sinais de confiança antes do pedido, pagamento ou agendamento.",
+    icon: ShoppingBag,
+    title: "Operação conectada",
+    description: "Catálogo, pedidos, serviços, agenda ou checkout entram conforme a necessidade.",
   },
   {
-    icon: TrendingUp,
-    pain: "Interesse que não vira ação",
-    outcome: "Menos atrito para pedir, comprar, agendar ou chamar no WhatsApp.",
-    proof: "Checkout sem conta obrigatória e chamadas claras para a próxima etapa.",
+    icon: LayoutDashboard,
+    title: "Controle do negócio",
+    description:
+      "Painel simples para atualizar conteúdo e acompanhar a operação quando necessário.",
   },
   {
-    icon: RefreshCw,
-    pain: "Pedidos e agenda desorganizados",
-    outcome: "Painel central para acompanhar a operação e atualizar o cliente.",
-    proof: "Produtos, pedidos, agendamentos e status reunidos em um fluxo.",
+    icon: ShieldCheck,
+    title: "Base profissional",
+    description: "Domínio, segurança, banco de dados e permissões planejados para a entrega real.",
   },
   {
-    icon: Search,
-    pain: "Dependência total das redes sociais",
-    outcome: "Uma base própria para Google, campanhas, conteúdo e indicações.",
-    proof: "O site vira o destino oficial da marca, sem substituir Instagram e WhatsApp.",
+    icon: Sparkles,
+    title: "Identidade própria",
+    description: "Layout, tipografia, cards, transições e conteúdo construídos para cada marca.",
   },
   {
-    icon: BarChart3,
-    pain: "Não saber se o digital dá retorno",
-    outcome: "Metas e eventos definidos para acompanhar o que realmente importa.",
-    proof: "Cliques, pedidos, agendamentos e abandono podem ser medidos no projeto final.",
+    icon: MessageCircle,
+    title: "Conversão com contexto",
+    description:
+      "Chamadas comerciais aparecem nos momentos certos, sem transformar o site em panfleto.",
   },
 ];
 
 function Index() {
-  const [ready, setReady] = useState(false);
-  const [selectedSlug, setSelectedSlug] = useState<string>(STORES[0]?.slug ?? "");
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      if (sessionStorage.getItem("vb-preloaded") === "1") {
-        setReady(true);
-        return;
-      }
-      sessionStorage.setItem("vb-preloaded", "1");
-    } catch {
-      setReady(true);
-      return;
-    }
-    const t = setTimeout(() => setReady(true), 1200);
-    return () => clearTimeout(t);
-  }, []);
-
-  const selected = useMemo(
-    () => STORES.find((s) => s.slug === selectedSlug) ?? STORES[0],
-    [selectedSlug],
-  );
-
-  const folderItems = useMemo(
-    () =>
-      STORES.flatMap((s) =>
-        s.banners.map((b) => ({ title: s.name, subtitle: s.tagline, image: b.image })),
-      ),
-    [],
-  );
+  const { capabilities } = useCinematicMotion();
+  const reduceMotion = capabilities.hydrated && capabilities.reducedMotion;
+  const showcaseItems = STORES.map((store) => ({
+    title: store.name,
+    subtitle: DEMO_VALUE[store.slug]?.highlight ?? store.tagline,
+    image: store.banners[0]?.image ?? "",
+  }));
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100">
-      <AnimatePresence>
-        {!ready && (
-          <motion.div
-            key="preloader"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.35 }}
-            className="fixed inset-0 z-[60] grid place-items-center bg-neutral-950"
-          >
-            <div className="text-center">
-              <div className="mx-auto h-14 w-14 rounded-full border-2 border-amber-300/30 border-t-amber-300 animate-spin" />
-              <div className="mt-4 font-semibold tracking-[0.35em] text-amber-300 text-xs">
-                VITRINE BASE
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div className="min-h-screen overflow-x-clip bg-vb-canvas font-sans text-vb-ivory">
+      <a
+        href="#conteudo"
+        className="sr-only z-[80] rounded-full bg-vb-gold px-5 py-3 font-bold text-vb-deep focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+      >
+        Ir para o conteúdo
+      </a>
 
-      {/* Top bar */}
-      <div className="border-b border-white/10 bg-black/40 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 text-xs">
-          <span className="font-semibold tracking-widest text-amber-300">VITRINE BASE</span>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <Link
-              to="/planos"
-              className="rounded-full border border-white/15 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-white/80 transition hover:border-cyan-300/40 hover:text-cyan-100"
-            >
-              Ver planos
-            </Link>
-            <span className="hidden rounded-full border border-amber-300/40 px-2 py-0.5 text-[10px] text-amber-200 sm:inline-flex">
-              {DEMO_LABEL}
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-vb-canvas/80 backdrop-blur-2xl">
+        <div className="mx-auto flex min-h-16 max-w-[90rem] items-center justify-between gap-4 px-5 sm:px-8 lg:px-12">
+          <a
+            href="#inicio"
+            className="group inline-flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vb-cyan"
+          >
+            <span className="relative grid h-8 w-8 place-items-center overflow-hidden rounded-full border border-vb-gold/40">
+              <span className="absolute h-2.5 w-2.5 rounded-full bg-vb-gold transition-transform duration-500 group-hover:scale-[2.8]" />
             </span>
-          </div>
-        </div>
-      </div>
+            <span className="font-display text-sm font-semibold tracking-[0.16em] text-vb-ivory">
+              VITRINE BASE
+            </span>
+          </a>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <AnimatedGradient colors={["#f59e0b", "#a855f7", "#0ea5e9"]} intensity={0.35} />
-        <div className="relative mx-auto max-w-6xl px-4 py-16 sm:py-24">
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-300"
+          <nav
+            className="hidden items-center gap-7 text-xs font-bold uppercase tracking-[0.17em] text-white/52 md:flex"
+            aria-label="Principal"
           >
-            Estrutura comercial e operacional
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.05 }}
-            className="mt-4 text-4xl font-bold leading-tight sm:text-6xl"
-          >
-            Credibilidade para ser escolhido.{" "}
-            <span className="text-amber-300">Operação para vender melhor.</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="mt-6 max-w-2xl text-base text-neutral-300 sm:text-lg"
-          >
-            Sites e webapps que transformam catálogo espalhado, atendimento manual e processos
-            confusos em uma jornada clara para o cliente e para quem administra o negócio.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.14 }}
-            className="mt-7"
-          >
-            <Link
-              to="/planos"
-              className="inline-flex items-center gap-2 rounded-full border border-cyan-200/30 bg-cyan-300/10 px-5 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/20"
-            >
-              Conhecer planos e valores <ArrowRight className="h-4 w-4" />
+            <a href="#experiencia" className="transition hover:text-vb-gold">
+              Experiência
+            </a>
+            <a href="#demonstracoes" className="transition hover:text-vb-gold">
+              Projetos
+            </a>
+            <a href="#processo" className="transition hover:text-vb-gold">
+              Processo
+            </a>
+            <Link to="/planos" className="transition hover:text-vb-gold">
+              Planos
             </Link>
-          </motion.div>
+          </nav>
 
-          {/* Seletor interativo */}
-          <div className="mt-10 flex flex-wrap gap-2">
-            {STORES.map((s) => {
-              const Icon = NICHE_ICON[s.niche] ?? ShoppingBag;
-              const active = s.slug === selectedSlug;
-              return (
-                <button
-                  key={s.slug}
-                  type="button"
-                  onClick={() => setSelectedSlug(s.slug)}
-                  className={
-                    "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition " +
-                    (active
-                      ? "border-amber-300 bg-amber-300 text-neutral-950"
-                      : "border-white/15 text-neutral-200 hover:border-amber-300/50 hover:text-white")
-                  }
-                >
-                  <Icon className="h-4 w-4" />
-                  {s.name}
-                </button>
-              );
-            })}
+          <a
+            href={PROPOSAL_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="vb-button-primary inline-flex min-h-11 items-center gap-2 px-4 py-2 text-xs"
+          >
+            <span className="hidden sm:inline">Começar um projeto</span>
+            <span className="sm:hidden">Falar agora</span>
+            <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+          </a>
+        </div>
+      </header>
+
+      <main id="conteudo">
+        <PremiumHomeHero
+          items={showcaseItems}
+          proposalUrl={PROPOSAL_URL}
+          reducedMotion={reduceMotion}
+          demoNotice={DEMO_NOTICE}
+        />
+
+        <section
+          aria-label="Princípios da Vitrine Base"
+          className="overflow-hidden border-b border-white/10 bg-vb-deep py-5"
+        >
+          <div className="vb-marquee flex min-w-max items-center gap-10 text-[10px] font-bold uppercase tracking-[0.28em] text-white/42 motion-reduce:translate-x-0">
+            {[...Array(2)].flatMap((_, group) =>
+              [
+                "Identidade antes de template",
+                "Movimento com função",
+                "Performance adaptativa",
+                "Operação conectada",
+                "Clareza para converter",
+              ].map((item) => (
+                <span key={`${group}-${item}`} className="inline-flex items-center gap-10">
+                  {item}
+                  <span className="h-1.5 w-1.5 rounded-full bg-vb-gold" aria-hidden="true" />
+                </span>
+              )),
+            )}
           </div>
+        </section>
 
-          {selected && (
-            <div className="mt-6 grid gap-6 lg:grid-cols-[1.15fr_1fr]">
-              <PulsingBorder color="rgba(251,191,36,0.55)" radius="1rem">
-                <InteractiveTiltCard className="rounded-2xl">
-                  <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
-                    <div
-                      className="aspect-[16/9] w-full bg-cover bg-center"
-                      style={{ backgroundImage: `url(${selected.banners[0]?.image})` }}
-                    />
-                    <div className="p-6">
-                      <div className="text-xs uppercase tracking-widest text-amber-300">
-                        {selected.tagline}
+        <ScrollExpandShowcase items={showcaseItems} />
+
+        <section
+          id="demonstracoes"
+          className="relative scroll-mt-20 overflow-hidden border-b border-white/10 bg-vb-canvas"
+        >
+          <div aria-hidden="true" className="vb-noise absolute inset-0 opacity-20" />
+          <div className="relative mx-auto max-w-[90rem] px-5 py-24 sm:px-8 sm:py-32 lg:px-12">
+            <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+              <div>
+                <p className="vb-kicker">Projetos demonstrativos</p>
+                <h2 className="mt-5 font-display text-5xl font-semibold leading-[0.9] tracking-[-0.06em] text-vb-ivory sm:text-7xl">
+                  Cada negócio merece seu próprio mundo.
+                </h2>
+              </div>
+              <p className="max-w-2xl text-base leading-8 text-white/58 lg:justify-self-end lg:text-lg">
+                A estrutura técnica pode ser reaproveitada com responsabilidade. O que o cliente vê,
+                sente e usa é construído a partir da identidade e da operação de cada marca.
+              </p>
+            </div>
+
+            <div className="mt-20 divide-y divide-white/10 border-y border-white/10">
+              {STORES.map((store, index) => {
+                const value = DEMO_VALUE[store.slug];
+                const Icon = NICHE_ICON[store.niche] ?? ShoppingBag;
+                const reverse = index % 2 === 1;
+
+                return (
+                  <motion.article
+                    key={store.slug}
+                    initial={reduceMotion ? false : { opacity: 0, y: 36 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-12%" }}
+                    transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+                    className="group grid gap-8 py-12 sm:py-16 lg:grid-cols-12 lg:items-center"
+                  >
+                    <div className={reverse ? "lg:order-2 lg:col-span-7" : "lg:col-span-7"}>
+                      <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-vb-elevated p-2 shadow-2xl shadow-black/35">
+                        <div
+                          aria-hidden="true"
+                          className={`absolute inset-0 bg-gradient-to-br ${value?.glow} opacity-60 transition duration-700 group-hover:opacity-100`}
+                        />
+                        <div className="relative aspect-[16/10] overflow-hidden rounded-[1.55rem]">
+                          <img
+                            src={store.banners[0]?.image}
+                            alt={`Página inicial da demonstração ${store.name}`}
+                            loading="lazy"
+                            className="h-full w-full object-cover transition duration-[900ms] ease-out group-hover:scale-[1.045]"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+                          <span className="absolute left-5 top-5 rounded-full border border-white/20 bg-black/45 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/75 backdrop-blur-xl">
+                            {value?.highlight ?? store.tagline}
+                          </span>
+                        </div>
                       </div>
-                      <h3 className="mt-2 font-display text-3xl">{selected.name}</h3>
-                      <p className="mt-2 text-sm text-neutral-300">{selected.description}</p>
-                      <div className="mt-5 flex flex-wrap gap-2">
+                    </div>
+
+                    <div className={reverse ? "lg:order-1 lg:col-span-5" : "lg:col-span-5"}>
+                      <div className="flex items-center gap-4">
+                        <span
+                          className={`font-display text-5xl font-semibold ${value?.accent ?? "text-vb-gold"}`}
+                        >
+                          {value?.number ?? `0${index + 1}`}
+                        </span>
+                        <span className="h-px flex-1 bg-white/12" />
+                        <Icon
+                          className={`h-5 w-5 ${value?.accent ?? "text-vb-gold"}`}
+                          aria-hidden="true"
+                        />
+                      </div>
+
+                      <h3 className="mt-7 font-display text-4xl font-semibold tracking-[-0.05em] text-white sm:text-5xl">
+                        {store.name}
+                      </h3>
+                      <p className="mt-3 text-xs font-bold uppercase tracking-[0.2em] text-white/38">
+                        Problema
+                      </p>
+                      <p className="mt-2 text-base leading-7 text-white/62">{value?.problem}</p>
+                      <p className="mt-5 text-xs font-bold uppercase tracking-[0.2em] text-white/38">
+                        Experiência criada
+                      </p>
+                      <p className="mt-2 text-lg leading-8 text-white/82">{value?.solution}</p>
+
+                      <div className="mt-8 flex flex-wrap gap-3">
                         <Link
                           to="/demo/$storeSlug"
-                          params={{ storeSlug: selected.slug }}
-                          className="inline-flex items-center gap-2 rounded-full bg-amber-300 px-4 py-2 text-sm font-semibold text-neutral-950 transition hover:brightness-95"
+                          params={{ storeSlug: store.slug }}
+                          className="vb-button-primary group/link inline-flex min-h-12 items-center gap-2 px-5 py-3 text-sm"
                         >
-                          Abrir demonstração <ArrowRight className="h-4 w-4" />
+                          Abrir loja
+                          <ArrowRight className="h-4 w-4 transition-transform group-hover/link:translate-x-1" />
                         </Link>
                         <Link
                           to="/demo/$storeSlug/admin"
-                          params={{ storeSlug: selected.slug }}
-                          className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm text-neutral-100 transition hover:border-amber-300/60"
+                          params={{ storeSlug: store.slug }}
+                          className="vb-button-glass inline-flex min-h-12 items-center gap-2 px-5 py-3 text-sm"
                         >
-                          <LayoutDashboard className="h-4 w-4" /> Ver painel
+                          <LayoutDashboard className="h-4 w-4" />
+                          Explorar painel
                         </Link>
-                        {selected.niche === "barber" && (
+                        {store.niche === "barber" && (
                           <Link
                             to="/demo/$storeSlug/agendar"
-                            params={{ storeSlug: selected.slug }}
-                            className="inline-flex items-center gap-2 rounded-full border border-amber-300/60 px-4 py-2 text-sm text-amber-200 transition hover:bg-amber-300/10"
+                            params={{ storeSlug: store.slug }}
+                            className="vb-button-secondary inline-flex min-h-12 items-center gap-2 px-5 py-3 text-sm"
                           >
-                            <CalendarDays className="h-4 w-4" /> Agendar
+                            <CalendarDays className="h-4 w-4" />
+                            Testar agendamento
                           </Link>
                         )}
                       </div>
                     </div>
-                  </div>
-                </InteractiveTiltCard>
-              </PulsingBorder>
-
-              <InteractiveProductFolder items={folderItems} label="Galeria das lojas" />
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Bento das demos */}
-      <section className="border-t border-white/5 bg-black/30">
-        <div className="mx-auto max-w-6xl px-4 py-16">
-          <div className="flex items-end justify-between">
-            <div>
-              <div className="text-xs uppercase tracking-widest text-amber-300">Demos</div>
-              <h2 className="text-2xl font-semibold sm:text-3xl">Quatro lojas, um núcleo</h2>
+                  </motion.article>
+                );
+              })}
             </div>
           </div>
-          <div className="mt-8 grid gap-4 sm:grid-cols-6">
-            {STORES.map((s, i) => {
-              const Icon = NICHE_ICON[s.niche] ?? ShoppingBag;
-              const spans = i === 0 ? "sm:col-span-6 lg:col-span-3" : "sm:col-span-3 lg:col-span-3";
-              return (
-                <InteractiveTiltCard key={s.slug} className={"rounded-2xl " + spans}>
-                  <Link
-                    to="/demo/$storeSlug"
-                    params={{ storeSlug: s.slug }}
-                    className="group relative flex h-full min-h-[220px] flex-col justify-end overflow-hidden rounded-2xl border border-white/10 bg-neutral-900"
-                  >
-                    <div
-                      className="absolute inset-0 bg-cover bg-center opacity-70 transition group-hover:scale-105 group-hover:opacity-90"
-                      style={{ backgroundImage: `url(${s.banners[0]?.image})` }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
-                    <div className="relative p-5">
-                      <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-widest text-amber-300">
-                        <Icon className="h-3 w-3" /> {s.tagline}
-                      </div>
-                      <h3 className="mt-1 font-display text-2xl">{s.name}</h3>
-                      <p className="mt-1 line-clamp-2 text-sm text-neutral-300">{s.description}</p>
-                      <div className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-amber-300">
-                        Abrir{" "}
-                        <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-                      </div>
-                    </div>
-                  </Link>
-                </InteractiveTiltCard>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="relative overflow-hidden border-y border-cyan-200/10 bg-[#071018]">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(34,211,238,0.12),transparent_30%),radial-gradient(circle_at_85%_80%,rgba(251,191,36,0.09),transparent_28%)]" />
-        <div className="relative mx-auto max-w-6xl px-4 py-20">
-          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200">
-                Valor para o negócio
-              </p>
-              <h2 className="mt-4 max-w-xl font-display text-4xl font-light tracking-[-0.04em] text-white sm:text-6xl">
-                Não é “só um site”. É menos atrito entre interesse e venda.
-              </h2>
-            </div>
-            <div className="rounded-3xl border border-amber-200/15 bg-amber-300/[0.055] p-6">
-              <p className="text-sm font-semibold text-amber-100">
-                A verdade que protege o cliente
-              </p>
-              <p className="mt-2 text-sm leading-7 text-white/62">
-                Um site sozinho não cria demanda nem garante faturamento. Ele evita desperdiçar a
-                demanda que já chega, transmite confiança e cria uma base própria para Google,
-                avaliações, conteúdo, mídia e relacionamento.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {BUSINESS_OUTCOMES.map((item) => (
-              <article
-                key={item.pain}
-                className="rounded-3xl border border-white/10 bg-white/[0.045] p-6 backdrop-blur-sm"
-              >
-                <item.icon className="h-6 w-6 text-cyan-200" aria-hidden="true" />
-                <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-white/42">
-                  Dor: {item.pain}
+        <section className="relative overflow-hidden bg-vb-ivory text-vb-deep">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(3,4,5,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(3,4,5,.08)_1px,transparent_1px)] [background-size:64px_64px]"
+          />
+          <div className="relative mx-auto max-w-[90rem] px-5 py-24 sm:px-8 sm:py-32 lg:px-12">
+            <div className="grid gap-12 lg:grid-cols-12">
+              <div className="lg:col-span-5">
+                <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#8b641d]">
+                  A diferença
                 </p>
-                <h3 className="mt-3 text-xl font-semibold leading-7 text-white">{item.outcome}</h3>
-                <p className="mt-3 text-sm leading-6 text-white/52">{item.proof}</p>
-              </article>
-            ))}
+                <h2 className="mt-5 font-display text-5xl font-semibold leading-[0.92] tracking-[-0.06em] sm:text-7xl">
+                  Não é colocar efeito em cima de um template.
+                </h2>
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2 lg:col-span-7">
+                <article className="rounded-[2rem] border border-black/10 bg-white/45 p-7 backdrop-blur-sm sm:p-9">
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-black/42">
+                    Site comum
+                  </p>
+                  <ul className="mt-7 space-y-5 text-base leading-7 text-black/62">
+                    {[
+                      "Mesma hierarquia para qualquer nicho",
+                      "Animação decorativa e sem narrativa",
+                      "Interface bonita, mas desconectada da operação",
+                      "Experiência idêntica em desktop e celular",
+                    ].map((item) => (
+                      <li key={item} className="flex gap-3">
+                        <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-black/30" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+                <article className="rounded-[2rem] bg-vb-deep p-7 text-vb-ivory shadow-2xl shadow-black/20 sm:p-9">
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-vb-gold">
+                    Vitrine Base
+                  </p>
+                  <ul className="mt-7 space-y-5 text-base leading-7 text-white/72">
+                    {[
+                      "Direção visual ligada ao posicionamento da marca",
+                      "Movimento que explica, conduz e responde",
+                      "Design conectado a catálogo, agenda, pedido ou venda",
+                      "Qualidade adaptada à capacidade do dispositivo",
+                    ].map((item) => (
+                      <li key={item} className="flex gap-3">
+                        <Check className="mt-1 h-4 w-4 shrink-0 text-vb-gold" aria-hidden="true" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              </div>
+            </div>
           </div>
+        </section>
 
-          <div className="mt-8 flex flex-col gap-4 rounded-3xl border border-cyan-200/15 bg-cyan-300/[0.06] p-6 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="font-semibold text-cyan-100">
-                Cada projeto começa com uma meta de negócio.
-              </p>
-              <p className="mt-1 text-sm leading-6 text-white/55">
-                Exemplo: receber mais pedidos, reduzir perguntas repetidas, aumentar agendamentos ou
-                melhorar a confiança antes da compra.
+        <section id="processo" className="scroll-mt-20 border-y border-white/10 bg-vb-deep">
+          <div className="mx-auto max-w-[90rem] px-5 py-24 sm:px-8 sm:py-32 lg:px-12">
+            <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+              <div className="max-w-3xl">
+                <p className="vb-kicker">Da ideia à publicação</p>
+                <h2 className="mt-5 font-display text-5xl font-semibold leading-[0.92] tracking-[-0.06em] sm:text-7xl">
+                  Processo claro. Resultado sem improviso.
+                </h2>
+              </div>
+              <p className="max-w-md text-sm leading-7 text-white/55">
+                O prazo é definido depois do escopo. O pagamento é 50% para iniciar e 50% depois da
+                aprovação, antes da publicação.
               </p>
             </div>
-            <Link
-              to="/planos"
-              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
-            >
-              Ver investimento <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
+
+            <div className="mt-16 grid gap-px overflow-hidden rounded-[2rem] border border-white/10 bg-white/10 md:grid-cols-2 xl:grid-cols-4">
+              {PROCESS.map((item, index) => (
+                <motion.article
+                  key={item.step}
+                  initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-10%" }}
+                  transition={{ duration: 0.58, delay: index * 0.08 }}
+                  className="group relative min-h-80 overflow-hidden bg-vb-canvas p-7 sm:p-9"
+                >
+                  <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-vb-gold/0 blur-3xl transition duration-500 group-hover:bg-vb-gold/20" />
+                  <span className="font-display text-5xl font-semibold text-white/12 transition group-hover:text-vb-gold/80">
+                    {item.step}
+                  </span>
+                  <h3 className="mt-16 font-display text-3xl font-semibold text-white">
+                    {item.title}
+                  </h3>
+                  <p className="mt-4 text-sm leading-7 text-white/55">{item.description}</p>
+                  <ChevronRight className="absolute bottom-8 right-8 h-5 w-5 text-white/20 transition group-hover:translate-x-1 group-hover:text-vb-gold" />
+                </motion.article>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <PricingPreview />
+        <section className="bg-vb-canvas py-8">
+          <PricingPreview />
+        </section>
 
-      {/* Features */}
-      <section className="border-t border-white/5 bg-black/30">
-        <div className="mx-auto max-w-6xl px-4 py-16">
-          <h2 className="text-2xl font-semibold sm:text-3xl">O que está incluso</h2>
-          <p className="mt-2 text-neutral-400">
-            Um núcleo técnico compartilhado por todas as lojas, pronto para personalização.
-          </p>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((f) => (
-              <div key={f.title} className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
-                <f.icon className="h-6 w-6 text-amber-300" />
-                <h3 className="mt-3 font-semibold">{f.title}</h3>
-                <p className="mt-1 text-sm text-neutral-400">{f.desc}</p>
+        <section className="border-y border-white/10 bg-vb-canvas">
+          <div className="mx-auto max-w-[90rem] px-5 py-24 sm:px-8 sm:py-32 lg:px-12">
+            <div className="grid gap-12 lg:grid-cols-[0.75fr_1.25fr]">
+              <div>
+                <p className="vb-kicker">O que pode fazer parte</p>
+                <h2 className="mt-5 font-display text-5xl font-semibold leading-[0.92] tracking-[-0.06em] sm:text-6xl">
+                  Tecnologia suficiente para resolver. Nunca só para impressionar.
+                </h2>
               </div>
-            ))}
+              <div className="grid gap-4 sm:grid-cols-2">
+                {INCLUDED.map((item, index) => (
+                  <motion.article
+                    key={item.title}
+                    initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-8%" }}
+                    transition={{ duration: 0.5, delay: (index % 2) * 0.07 }}
+                    className="group rounded-[1.6rem] border border-white/10 bg-white/[0.035] p-6 transition duration-500 hover:-translate-y-1 hover:border-vb-cyan/35 hover:bg-white/[0.06]"
+                  >
+                    <item.icon className="h-5 w-5 text-vb-gold transition group-hover:text-vb-cyan" />
+                    <h3 className="mt-7 font-display text-2xl font-semibold text-white">
+                      {item.title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-7 text-white/52">{item.description}</p>
+                  </motion.article>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <footer className="border-t border-white/5 py-8 text-center text-xs text-neutral-500">
-        Vitrine Base · Modelo demonstrativo · Nenhum pagamento é processado
+        <section className="relative isolate overflow-hidden bg-vb-deep">
+          <div aria-hidden="true" className="vb-pointer-aura absolute inset-0" />
+          <div aria-hidden="true" className="vb-noise absolute inset-0 opacity-30" />
+          <div className="relative mx-auto flex min-h-[70svh] max-w-[90rem] flex-col items-center justify-center px-5 py-24 text-center sm:px-8 lg:px-12">
+            <p className="vb-kicker">Seu negócio não precisa parecer pequeno</p>
+            <h2 className="mt-6 max-w-6xl font-display text-5xl font-semibold leading-[0.88] tracking-[-0.065em] text-vb-ivory sm:text-7xl lg:text-[7rem]">
+              Vamos construir uma presença que seja difícil de esquecer.
+            </h2>
+            <p className="mt-7 max-w-2xl text-base leading-8 text-white/58">
+              Conte o que você vende, como atende e qual é o principal problema da operação. A
+              partir disso, definimos o projeto certo — sem funcionalidades inventadas e sem
+              promessa vazia.
+            </p>
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+              <a
+                href={PROPOSAL_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="vb-button-primary group inline-flex min-h-14 items-center justify-center gap-3 px-7 py-4"
+              >
+                Conversar sobre meu projeto
+                <MessageCircle className="h-4 w-4 transition-transform group-hover:rotate-6" />
+              </a>
+              <Link
+                to="/planos"
+                className="vb-button-secondary inline-flex min-h-14 items-center justify-center gap-3 px-7 py-4"
+              >
+                Ver Planos
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="border-t border-white/10 bg-vb-deep px-5 py-8 text-xs text-white/38 sm:px-8 lg:px-12">
+        <div className="mx-auto flex max-w-[90rem] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <span className="font-display font-semibold tracking-[0.14em] text-white/65">
+            VITRINE BASE
+          </span>
+          <span>Demonstrações locais · Nenhum pagamento real é processado</span>
+        </div>
       </footer>
     </div>
   );
