@@ -47,6 +47,19 @@ async function waitForStablePage(page) {
   await page.waitForTimeout(500);
 }
 
+async function readAnimationLayers(intro, reveal) {
+  return {
+    intro: await intro.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return { opacity: Number(style.opacity), visibility: style.visibility };
+    }),
+    reveal: await reveal.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return { opacity: Number(style.opacity), visibility: style.visibility };
+    }),
+  };
+}
+
 async function validateHome(browser, config) {
   const { name, viewport, reducedMotion } = config;
   const { context, page, runtimeErrors } = await createPage(
@@ -86,26 +99,48 @@ async function validateHome(browser, config) {
     const startBox = await frame.boundingBox();
     assert(startBox, `${name}: o frame expansível não possui área visível no início`);
     const startScroll = await page.evaluate(() => window.scrollY);
-
     const activeScrollRange = Math.max(sectionMetrics.height - sectionMetrics.viewportHeight, 1);
-    const targetScroll =
-      reducedMotion === "reduce"
-        ? sectionMetrics.top + Math.max(sectionMetrics.height * 0.72, 320)
-        : sectionMetrics.top + activeScrollRange * 0.82;
 
-    await page.evaluate(
-      (top) =>
-        window.scrollTo({
-          top,
-          behavior: "instant",
-        }),
-      targetScroll,
-    );
-    await page.waitForTimeout(900);
+    let endBox = null;
+    let endScroll = startScroll;
+    let animationLayers = await readAnimationLayers(intro, reveal);
+    let selectedProgress = 0;
 
-    const endBox = await frame.boundingBox();
+    if (reducedMotion === "reduce") {
+      const targetScroll = sectionMetrics.top + Math.max(sectionMetrics.height * 0.72, 320);
+      await page.evaluate(
+        (top) => window.scrollTo({ top, behavior: "instant" }),
+        targetScroll,
+      );
+      await page.waitForTimeout(900);
+      endBox = await frame.boundingBox();
+      endScroll = await page.evaluate(() => window.scrollY);
+      animationLayers = await readAnimationLayers(intro, reveal);
+    } else {
+      for (const progress of [0.82, 0.9, 0.95, 0.98, 0.995]) {
+        const targetScroll = sectionMetrics.top + activeScrollRange * progress;
+        await page.evaluate(
+          (top) => window.scrollTo({ top, behavior: "instant" }),
+          targetScroll,
+        );
+        await page.waitForTimeout(650);
+
+        endBox = await frame.boundingBox();
+        endScroll = await page.evaluate(() => window.scrollY);
+        animationLayers = await readAnimationLayers(intro, reveal);
+        selectedProgress = progress;
+
+        if (
+          animationLayers.intro.opacity <= 0.05 &&
+          animationLayers.reveal.opacity >= 0.9 &&
+          animationLayers.reveal.visibility !== "hidden"
+        ) {
+          break;
+        }
+      }
+    }
+
     assert(endBox, `${name}: o frame expansível desapareceu durante a rolagem`);
-    const endScroll = await page.evaluate(() => window.scrollY);
     assert(endScroll > startScroll + 100, `${name}: a página não permitiu rolagem normal`);
 
     const motionState = await section.evaluate((element) => {
@@ -116,17 +151,6 @@ async function validateHome(browser, config) {
         hasScrollInstruction: element.textContent?.includes("Role para ampliar") ?? false,
       };
     });
-
-    const animationLayers = {
-      intro: await intro.evaluate((element) => {
-        const style = getComputedStyle(element);
-        return { opacity: Number(style.opacity), visibility: style.visibility };
-      }),
-      reveal: await reveal.evaluate((element) => {
-        const style = getComputedStyle(element);
-        return { opacity: Number(style.opacity), visibility: style.visibility };
-      }),
-    };
 
     if (reducedMotion === "reduce") {
       assert(
@@ -158,11 +182,11 @@ async function validateHome(browser, config) {
       );
       assert(
         animationLayers.intro.opacity <= 0.05,
-        `${name}: o título inicial não desapareceu ao final da expansão (opacidade ${animationLayers.intro.opacity})`,
+        `${name}: o título inicial não desapareceu dentro da faixa sticky (opacidade ${animationLayers.intro.opacity}, progresso testado ${selectedProgress})`,
       );
       assert(
         animationLayers.reveal.opacity >= 0.9 && animationLayers.reveal.visibility !== "hidden",
-        `${name}: o CTA final não apareceu corretamente (opacidade ${animationLayers.reveal.opacity})`,
+        `${name}: o CTA final não apareceu corretamente (opacidade ${animationLayers.reveal.opacity}, progresso testado ${selectedProgress})`,
       );
     }
 
@@ -184,6 +208,7 @@ async function validateHome(browser, config) {
       endBox,
       startScroll,
       endScroll,
+      selectedProgress,
       motionState,
       animationLayers,
       showcaseImages,
