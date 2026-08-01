@@ -112,10 +112,7 @@ async function assertNoProgressLabelOverlap(progress, labels, name) {
   const overlappingLabel = visibleLabelBoxes.findIndex((labelBox) =>
     boxesOverlap(progressBox, labelBox),
   );
-  assert(
-    overlappingLabel === -1,
-    `${name}: a régua de progresso cobre o texto da cena ativa`,
-  );
+  assert(overlappingLabel === -1, `${name}: a régua de progresso cobre o texto da cena ativa`);
 }
 
 async function validateHome(browser, config) {
