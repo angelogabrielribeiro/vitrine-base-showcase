@@ -1,267 +1,206 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { ArrowRight, ChevronLeft, ChevronRight, MousePointer2 } from "lucide-react";
+import { useMemo, useState } from "react";
 import type { NicheHeroProps } from "./niche-hero";
-import { Button } from "@/components/ui/button";
 import { brl } from "@/lib/format";
-import { SectionReveal, WordReveal, Marquee } from "@/components/motion/primitives";
-import { motion, useReducedMotion, useScroll, useTransform, type MotionStyle } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
-import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 
-/**
- * Fashion — editorial, split assimétrico, tipografia serif dominante,
- * imagens revelam por máscara, marquee sutil como tagline de coleção.
- */
-/**
- * Maison Belle — hero editorial vibrante em vinho/magenta.
- * Colagem de 4 imagens reais dos produtos, sempre visíveis (on-mount), com
- * parallax localizado ao mouse no desktop. Sem dependência de whileInView na
- * primeira dobra.
- */
+const wrap = (value: number, total: number) => (value + total) % total;
+
 export function FashionHero({ store, spotlight, featured }: NicheHeroProps) {
-  const banner = store.banners[0];
-  const pool = [
-    spotlight?.kind === "product" ? spotlight.product.images[0] : undefined,
-    ...featured.map((p) => p.images[0]).filter(Boolean),
-    banner?.image,
-  ].filter(Boolean) as string[];
-  const uniq = Array.from(new Set(pool));
-  const [i0, i1, i2, i3] = [0, 1, 2, 3].map(
-    (i) => uniq[i % Math.max(uniq.length, 1)] ?? banner?.image ?? "",
-  );
-  const price =
-    spotlight?.kind === "product"
-      ? (spotlight.product.salePrice ?? spotlight.product.price)
-      : undefined;
+  const reduceMotion = useReducedMotion();
+  const fallbackImage = store.banners[0]?.image ?? "";
+  const looks = useMemo(() => {
+    const candidates = featured.slice(0, 5).map((product) => ({
+      id: product.id,
+      slug: product.slug,
+      name: product.name,
+      image: product.images[0] ?? fallbackImage,
+      price: product.salePrice ?? product.price,
+      category: product.category,
+    }));
 
-  const reduce = useReducedMotion();
-  const { capabilities } = useCinematicMotion();
-  const wrapRef = useRef<HTMLElement>(null);
-  const [pt, setPt] = useState({ x: 0, y: 0 });
-  const { scrollYProgress } = useScroll({
-    target: wrapRef,
-    offset: ["start start", "end start"],
-  });
-  const mobileY0 = useTransform(scrollYProgress, [0, 1], [28, -72]);
-  const mobileY1 = useTransform(scrollYProgress, [0, 1], [52, -38]);
-  const mobileY2 = useTransform(scrollYProgress, [0, 1], [70, -54]);
-  const mobileY3 = useTransform(scrollYProgress, [0, 1], [44, -82]);
-  const mobileX0 = useTransform(scrollYProgress, [0, 1], [-10, 10]);
-  const mobileX1 = useTransform(scrollYProgress, [0, 1], [16, -16]);
-  const mobileX2 = useTransform(scrollYProgress, [0, 1], [-18, 14]);
-  const mobileX3 = useTransform(scrollYProgress, [0, 1], [12, -10]);
-  const mobileScale = useTransform(scrollYProgress, [0, 1], [0.94, 1.08]);
+    if (candidates.length) return candidates;
+    return [
+      {
+        id: "collection",
+        slug: "",
+        name: store.banners[0]?.title ?? store.name,
+        image: fallbackImage,
+        price: 0,
+        category: "coleção",
+      },
+    ];
+  }, [fallbackImage, featured, store]);
 
-  useEffect(() => {
-    if (reduce) return;
-    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
-    if (!mq.matches) return;
-    const el = wrapRef.current;
-    if (!el) return;
-    const onMove = (e: MouseEvent) => {
-      const r = el.getBoundingClientRect();
-      const x = (e.clientX - (r.left + r.width / 2)) / r.width;
-      const y = (e.clientY - (r.top + r.height / 2)) / r.height;
-      setPt({ x, y });
-    };
-    const onLeave = () => setPt({ x: 0, y: 0 });
-    el.addEventListener("mousemove", onMove);
-    el.addEventListener("mouseleave", onLeave);
-    return () => {
-      el.removeEventListener("mousemove", onMove);
-      el.removeEventListener("mouseleave", onLeave);
-    };
-  }, [reduce]);
-
-  const par = (mx: number, my: number, mobileStyle: MotionStyle) => {
-    if (reduce) return undefined;
-    if (capabilities.precisePointer) {
-      return { transform: `translate3d(${pt.x * mx}px, ${pt.y * my}px, 0)` };
-    }
-    return mobileStyle;
-  };
+  const [active, setActive] = useState(0);
+  const selected = looks[active];
+  const step = (direction: number) =>
+    setActive((current) => wrap(current + direction, looks.length));
 
   return (
     <section
-      ref={wrapRef}
-      className="relative isolate overflow-hidden text-neutral-50"
-      style={{
-        background:
-          "radial-gradient(120% 80% at 15% 10%, oklch(0.38 0.18 15) 0%, oklch(0.22 0.12 355) 45%, oklch(0.14 0.06 340) 100%)",
-      }}
+      data-testid="fashion-hero"
+      className="relative isolate min-h-[calc(100svh-4.5rem)] overflow-hidden bg-[#25131d] text-[#f7eee8]"
+      aria-label="Provador interativo Maison Belle"
     >
-      {/* Camadas ambiente */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-40 top-10 h-[42rem] w-[42rem] rounded-full opacity-70 blur-3xl"
-        style={{
-          background: "radial-gradient(closest-side, oklch(0.62 0.22 20 / 0.55), transparent)",
-        }}
+      <motion.img
+        key={selected.image}
+        src={selected.image}
+        alt=""
+        aria-hidden="true"
+        initial={reduceMotion ? false : { opacity: 0, scale: 1.08 }}
+        animate={{ opacity: 0.2, scale: 1.02 }}
+        transition={{ duration: reduceMotion ? 0 : 1.4 }}
+        className="absolute inset-0 h-full w-full object-cover blur-2xl saturate-75"
       />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-32 bottom-0 h-[36rem] w-[36rem] rounded-full opacity-70 blur-3xl"
-        style={{
-          background: "radial-gradient(closest-side, oklch(0.55 0.24 340 / 0.55), transparent)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 mix-blend-overlay opacity-30"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,0.06) 3px 4px)",
-        }}
-      />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_28%,rgba(197,114,132,.32),transparent_34%),linear-gradient(115deg,rgba(37,19,29,.98)_0%,rgba(74,24,43,.92)_48%,rgba(35,18,28,.86)_100%)]" />
+      <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(244,217,205,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(244,217,205,.12)_1px,transparent_1px)] [background-size:72px_72px]" />
 
-      {/* Barra editorial */}
-      <div className="relative mx-auto flex max-w-[110rem] items-center justify-between px-6 py-5 text-[10px] uppercase tracking-[0.4em] text-white/70">
-        <span>Édition {new Date().getFullYear()}</span>
-        <span className="hidden sm:inline">{store.tagline}</span>
-        <span>№ 01</span>
-      </div>
-
-      <div className="relative mx-auto grid max-w-[110rem] grid-cols-12 gap-x-6 gap-y-10 px-6 pb-24 pt-6 lg:pb-32">
-        {/* Coluna texto */}
-        <div className="col-span-12 lg:col-span-5 lg:pt-16">
-          <SectionReveal>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.45em] text-amber-200/90">
-              {store.messages.heroKicker}
-            </p>
-          </SectionReveal>
-          <h1 className="font-display mt-6 text-[clamp(2.75rem,7.4vw,6rem)] font-medium leading-[0.92] tracking-tight text-white">
-            <WordReveal text={store.messages.heroTitle} as="span" className="block" />
+      <div className="relative mx-auto grid min-h-[calc(100svh-4.5rem)] max-w-[110rem] items-center gap-12 px-5 py-12 sm:px-8 lg:grid-cols-[0.76fr_1.24fr] lg:px-12">
+        <div className="relative z-20">
+          <div className="flex items-center gap-4 text-[10px] font-semibold uppercase tracking-[0.42em] text-[#d9ad72]">
+            <span>Maison Belle</span>
+            <span className="h-px w-10 bg-[#d9ad72]/50" />
+            <span>Édition 01</span>
+          </div>
+          <h1 className="mt-7 max-w-3xl font-display text-[clamp(3.7rem,8.2vw,8.7rem)] font-medium leading-[0.78] tracking-[-0.065em]">
+            Vista a cena.
+            <span className="block text-[#dda5ad]">Mude a história.</span>
           </h1>
-          <SectionReveal delay={0.15}>
-            <p className="mt-8 max-w-md text-base leading-relaxed text-white/80">
-              {store.messages.heroSubtitle}
+          <p className="mt-8 max-w-xl text-base leading-8 text-[#f7eee8]/68 sm:text-lg">
+            Escolha um look, mova o carrossel e veja a vitrine responder. Cada gesto revela peça,
+            preço e caminho de compra — sem sair da campanha.
+          </p>
+
+          <div className="mt-9 grid max-w-lg grid-cols-[auto_1fr] gap-x-5 gap-y-2 border-l border-[#d9ad72]/45 pl-5">
+            <span className="row-span-2 font-display text-5xl text-[#d9ad72]">
+              {String(active + 1).padStart(2, "0")}
+            </span>
+            <p className="self-end text-xs font-bold uppercase tracking-[0.22em] text-white/48">
+              {selected.category}
             </p>
-          </SectionReveal>
-          <SectionReveal delay={0.25}>
-            <div className="mt-10 flex flex-wrap items-center gap-6">
-              <Button
-                asChild
-                size="lg"
-                className="group rounded-none bg-amber-200 px-8 py-6 text-xs uppercase tracking-[0.3em] text-neutral-900 hover:bg-white"
+            <p className="font-display text-2xl leading-tight text-white">{selected.name}</p>
+            {selected.price > 0 && (
+              <p className="col-start-2 text-sm text-[#e8c9c2]/72">{brl(selected.price)}</p>
+            )}
+          </div>
+
+          <div className="mt-9 flex flex-wrap items-center gap-3">
+            {selected.slug ? (
+              <Link
+                to="/demo/$storeSlug/produto/$productSlug"
+                params={{ storeSlug: store.slug, productSlug: selected.slug }}
+                className="group inline-flex min-h-13 items-center gap-3 bg-[#e9d3c7] px-6 py-4 text-xs font-bold uppercase tracking-[0.2em] text-[#301722] transition hover:bg-white"
               >
-                <Link
-                  to="/demo/$storeSlug/produtos"
-                  params={{ storeSlug: store.slug }}
-                  search={{ q: "", cat: "", sort: "" }}
-                >
-                  {store.messages.heroCta}
-                  <ArrowRight className="ml-2 h-4 w-4 transition group-hover:translate-x-1" />
-                </Link>
-              </Button>
-              {spotlight?.kind === "product" && (
-                <Link
-                  to="/demo/$storeSlug/produto/$productSlug"
-                  params={{ storeSlug: store.slug, productSlug: spotlight.product.slug }}
-                  className="group inline-flex flex-col text-xs uppercase tracking-[0.3em] text-white/70"
-                >
-                  <span className="text-white">Peça destaque</span>
-                  <span className="mt-1 border-b border-white/30 pb-0.5 transition group-hover:border-white">
-                    {spotlight.product.name}
-                    {price ? ` — ${brl(price)}` : ""}
-                  </span>
-                </Link>
-              )}
-            </div>
-          </SectionReveal>
+                Vestir este look
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            ) : (
+              <Link
+                to="/demo/$storeSlug/produtos"
+                params={{ storeSlug: store.slug }}
+                search={{ q: "", cat: "", sort: "" }}
+                className="inline-flex min-h-13 items-center gap-3 bg-[#e9d3c7] px-6 py-4 text-xs font-bold uppercase tracking-[0.2em] text-[#301722]"
+              >
+                Explorar coleção <ArrowRight className="h-4 w-4" />
+              </Link>
+            )}
+            <span className="inline-flex items-center gap-2 px-2 text-[10px] uppercase tracking-[0.2em] text-white/45">
+              <MousePointer2 className="h-4 w-4 text-[#d9ad72]" /> Arraste ou escolha
+            </span>
+          </div>
         </div>
 
-        {/* Colagem à direita — 4 imagens sempre visíveis */}
-        <div className="col-span-12 lg:col-span-7">
-          <div className="relative mx-auto aspect-[5/6] w-full max-w-[46rem]">
-            <CollageImage
-              src={i0}
-              alt={spotlight?.kind === "product" ? spotlight.product.name : store.name}
-              className="absolute left-[4%] top-0 h-[78%] w-[62%] shadow-2xl shadow-black/40 ring-1 ring-white/10"
-              style={par(-14, -10, { x: mobileX0, y: mobileY0, scale: mobileScale })}
-              delay={0.05}
-              eager
-            />
-            <CollageImage
-              src={i1}
-              alt=""
-              className="absolute right-0 top-[14%] h-[50%] w-[42%] shadow-2xl shadow-black/40 ring-1 ring-white/10"
-              style={par(18, 12, { x: mobileX1, y: mobileY1, scale: mobileScale })}
-              delay={0.18}
-              eager
-            />
-            <CollageImage
-              src={i2}
-              alt=""
-              className="absolute bottom-0 left-0 h-[44%] w-[36%] shadow-2xl shadow-black/40 ring-1 ring-white/10"
-              style={par(-22, 18, { x: mobileX2, y: mobileY2, scale: mobileScale })}
-              delay={0.3}
-              eager
-            />
-            <CollageImage
-              src={i3}
-              alt=""
-              className="absolute bottom-[6%] right-[8%] hidden h-[36%] w-[30%] shadow-2xl shadow-black/40 ring-1 ring-white/10 sm:block"
-              style={par(12, -18, { x: mobileX3, y: mobileY3, scale: mobileScale })}
-              delay={0.42}
-              eager
-            />
+        <div className="relative min-h-[34rem] lg:min-h-[44rem]" style={{ perspective: "1400px" }}>
+          <motion.div
+            drag={reduceMotion ? false : "x"}
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.14}
+            onDragEnd={(_, info) => {
+              if (Math.abs(info.offset.x) > 45) step(info.offset.x < 0 ? 1 : -1);
+            }}
+            className="absolute inset-0"
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            {looks.map((look, index) => {
+              let offset = index - active;
+              if (offset > looks.length / 2) offset -= looks.length;
+              if (offset < -looks.length / 2) offset += looks.length;
+              const distance = Math.abs(offset);
+              const isActive = offset === 0;
+
+              return (
+                <motion.button
+                  type="button"
+                  data-testid="fashion-look-card"
+                  key={look.id}
+                  onClick={() => setActive(index)}
+                  aria-pressed={isActive}
+                  aria-label={`Selecionar ${look.name}`}
+                  animate={{
+                    x: offset * 150,
+                    y: distance * 30,
+                    z: isActive ? 100 : -120 * distance,
+                    rotateY: offset * -24,
+                    rotateZ: offset * 2.5,
+                    scale: isActive ? 1 : Math.max(0.72, 1 - distance * 0.12),
+                    opacity: distance > 2 ? 0 : isActive ? 1 : 0.62,
+                  }}
+                  transition={{ duration: reduceMotion ? 0 : 0.75, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute left-1/2 top-1/2 h-[30rem] w-[15.5rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden border border-[#f5ded2]/25 bg-[#4b2234] text-left shadow-[0_35px_80px_rgba(14,4,10,.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d9ad72] sm:h-[38rem] sm:w-[20rem]"
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+                  <img src={look.image} alt="" className="h-full w-full object-cover" />
+                  <span className="absolute inset-0 bg-gradient-to-t from-[#241019]/85 via-transparent to-transparent" />
+                  <span className="absolute inset-x-5 bottom-5 flex items-end justify-between gap-3">
+                    <span className="font-display text-2xl leading-none text-white">
+                      {look.name}
+                    </span>
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#e8c9c2]">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                  </span>
+                </motion.button>
+              );
+            })}
+          </motion.div>
+
+          <div className="absolute inset-x-0 bottom-1 z-30 flex items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={() => step(-1)}
+              className="grid h-12 w-12 place-items-center rounded-full border border-white/20 bg-[#2e1722]/75 text-white transition hover:border-[#d9ad72] hover:text-[#d9ad72]"
+              aria-label="Look anterior"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <div className="flex gap-2" aria-label="Posição no provador">
+              {looks.map((look, index) => (
+                <button
+                  key={look.id}
+                  type="button"
+                  onClick={() => setActive(index)}
+                  aria-label={`Ir para look ${index + 1}`}
+                  className={`h-1.5 rounded-full transition-all ${index === active ? "w-10 bg-[#d9ad72]" : "w-4 bg-white/25"}`}
+                />
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => step(1)}
+              className="grid h-12 w-12 place-items-center rounded-full border border-white/20 bg-[#2e1722]/75 text-white transition hover:border-[#d9ad72] hover:text-[#d9ad72]"
+              aria-label="Próximo look"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="relative border-y border-white/10 bg-black/25 py-4 backdrop-blur-sm">
-        <Marquee speed={40}>
-          {[
-            "Alta primavera",
-            "Tecidos naturais",
-            "Produção limitada",
-            "Curadoria autoral",
-            "Novos lançamentos",
-          ].map((t) => (
-            <span key={t} className="font-display text-2xl italic tracking-tight text-white/85">
-              {t} <span className="mx-6 text-amber-200/70">◆</span>
-            </span>
-          ))}
-        </Marquee>
-      </div>
+      {spotlight?.kind === "product" && (
+        <p className="sr-only">Peça em destaque: {spotlight.product.name}</p>
+      )}
     </section>
-  );
-}
-
-function CollageImage({
-  src,
-  alt,
-  className,
-  style,
-  delay = 0,
-  eager,
-}: {
-  src: string;
-  alt: string;
-  className?: string;
-  style?: MotionStyle;
-  delay?: number;
-  eager?: boolean;
-}) {
-  const reduce = useReducedMotion();
-  return (
-    <motion.div
-      className={"overflow-hidden " + (className ?? "")}
-      style={style}
-      initial={reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay }}
-    >
-      <img
-        src={src}
-        alt={alt}
-        loading={eager ? "eager" : "lazy"}
-        decoding="async"
-        onError={(e) => {
-          (e.currentTarget as HTMLImageElement).style.opacity = "0.4";
-        }}
-        className="h-full w-full object-cover"
-      />
-    </motion.div>
   );
 }
