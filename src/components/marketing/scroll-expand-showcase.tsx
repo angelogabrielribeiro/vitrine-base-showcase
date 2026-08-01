@@ -73,7 +73,10 @@ function SceneLayer({ item, index, opacity, sceneProgress }: SceneLayerProps) {
         className="absolute inset-x-0 bottom-0 z-10 p-5 pb-16 sm:p-8 lg:p-12"
         style={{ y: labelY, opacity: labelOpacity }}
       >
-        <div className="flex max-w-4xl items-end justify-between gap-5">
+        <div
+          data-testid="scroll-expand-card-label-content"
+          className="flex max-w-4xl items-end justify-between gap-5"
+        >
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-vb-gold sm:text-xs">
               Universo {String(index + 1).padStart(2, "0")} · {item.subtitle}
