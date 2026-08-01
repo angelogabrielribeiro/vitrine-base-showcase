@@ -146,7 +146,8 @@ export function ScrollExpandShowcase({
               href={`#${targetId}`}
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/20 bg-black/55 px-6 py-3 text-sm font-semibold text-white backdrop-blur-xl transition hover:border-cyan-200/50 hover:bg-cyan-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200"
             >
-              Ver cada projeto em detalhes <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              Ver cada projeto em detalhes
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>
           </motion.div>
         </motion.div>
