@@ -160,6 +160,7 @@ async function validateHome(browser, config) {
     const intro = page.getByTestId("scroll-expand-intro");
     const reveal = page.getByTestId("scroll-expand-reveal");
     const labels = page.getByTestId("scroll-expand-card-label");
+    const labelContents = page.getByTestId("scroll-expand-card-label-content");
     const progress = page.getByTestId("scroll-expand-progress");
     const staticHeading = page.getByTestId("scroll-expand-static-heading");
     await section.waitFor({ state: "visible" });
@@ -230,7 +231,7 @@ async function validateHome(browser, config) {
       assert(endReveal.opacity >= 0.9, `${name}: o CTA final não apareceu`);
       assert(endReveal.visibility !== "hidden", `${name}: o CTA final está oculto`);
       await assertNoCtaLabelOverlap(reveal, labels, name);
-      await assertNoProgressLabelOverlap(progress, labels, name);
+      await assertNoProgressLabelOverlap(progress, labelContents, name);
 
       const showcaseLink = reveal.getByRole("link");
       assert(
