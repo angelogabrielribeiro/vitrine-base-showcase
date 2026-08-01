@@ -81,11 +81,11 @@ export function PremiumHomeHero({
             className="flex flex-wrap items-center gap-3"
           >
             <span className="vb-kicker">
-              Design + tecnologia para negÃ³cios locais
+              Design + tecnologia para negócios locais
             </span>
             <span className="h-px w-12 bg-vb-gold/60" aria-hidden="true" />
             <span className="text-xs font-semibold uppercase tracking-[0.22em] text-white/45">
-              EstratÃ©gia Â· experiÃªncia Â· operaÃ§Ã£o
+              Estratégia · experiência · operação
             </span>
           </motion.div>
 
@@ -115,10 +115,10 @@ export function PremiumHomeHero({
             }}
             className="mt-8 max-w-2xl text-base leading-8 text-white/66 sm:text-lg"
           >
-            Criamos experiÃªncias digitais com identidade, movimento e
-            ferramentas reais para vender, atender e organizar a operaÃ§Ã£o. NÃ£o Ã©
-            uma troca de cores em template: cada negÃ³cio ganha uma presenÃ§a
-            prÃ³pria.
+            Criamos experiências digitais com identidade, movimento e
+            ferramentas reais para vender, atender e organizar a operação. Não é
+            uma troca de cores em template: cada negócio ganha uma presença
+            própria.
           </motion.p>
 
           <motion.div
@@ -148,7 +148,7 @@ export function PremiumHomeHero({
               whileTap={reducedMotion ? undefined : { scale: 0.985 }}
               className="vb-button-secondary group inline-flex min-h-14 items-center justify-center gap-3 px-7 py-4"
             >
-              Entrar nas experiÃªncias
+              Entrar nas experiências
               <ArrowDownRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:translate-y-1" />
             </motion.a>
           </motion.div>
@@ -160,7 +160,7 @@ export function PremiumHomeHero({
             className="mt-8 flex flex-wrap gap-x-5 gap-y-3 text-xs text-white/54"
           >
             {[
-              "Identidade visual prÃ³pria",
+              "Identidade visual própria",
               "Motion adaptativo por dispositivo",
               "Fluxos e painel conforme o escopo",
             ].map((item) => (
@@ -181,7 +181,7 @@ export function PremiumHomeHero({
                   className="h-4 w-4 text-vb-gold"
                   aria-hidden="true"
                 />
-                O que Ã© demonstrativo aqui?
+                O que é demonstrativo aqui?
               </span>
               <span className="text-xs uppercase tracking-[0.2em] text-vb-cyan">
                 Abrir
@@ -262,7 +262,7 @@ export function PremiumHomeHero({
                   <div className="relative aspect-[4/5] overflow-hidden rounded-[1.15rem]">
                     <img
                       src={item.image}
-                      alt={`PrÃ©via de ${item.title}`}
+                      alt={`Prévia de ${item.title}`}
                       className={`h-full w-full object-cover transition duration-700 ${touchActive ? "scale-105" : "group-hover:scale-105"}`}
                       loading={index === 0 ? "eager" : "lazy"}
                     />
@@ -283,7 +283,7 @@ export function PremiumHomeHero({
                           className={`mt-2 text-[9px] font-bold uppercase tracking-[0.16em] transition ${touchActive ? "text-white/70" : "text-white/42"}`}
                         >
                           {touchActive
-                            ? "ExperiÃªncia pronta para abrir"
+                            ? "Experiência pronta para abrir"
                             : "Toque para explorar"}
                         </p>
                       )}
