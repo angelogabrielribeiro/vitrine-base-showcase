@@ -1,0 +1,49 @@
+name: Validate stable theme and shared admin
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Formatting
+        run: bunx prettier --check src/components/storefront/store-theme.tsx src/routes/__root.tsx
+
+      - name: Lint changed files
+        run: bunx eslint src/components/storefront/store-theme.tsx src/routes/__root.tsx
+
+      - name: TypeScript
+        run: bunx tsc --noEmit
+
+      - name: Production build
+        run: bun run build
+
+      - name: Audit shared routes for all stores
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq 'createFileRoute("/demo/$storeSlug/admin")' 'src/routes/demo.$storeSlug.admin.tsx'
+          grep -Fq 'createFileRoute("/demo/$storeSlug/admin/produtos")' 'src/routes/demo.$storeSlug.admin.produtos.tsx'
+          grep -Fq 'createFileRoute("/demo/$storeSlug/admin/pedidos/")' 'src/routes/demo.$storeSlug.admin.pedidos.index.tsx'
+          grep -Fq 'createFileRoute("/demo/$storeSlug/admin/configuracoes")' 'src/routes/demo.$storeSlug.admin.configuracoes.tsx'
+          grep -Fq 'createFileRoute("/demo/$storeSlug/produto/$productSlug")' 'src/routes/demo.$storeSlug.produto.$productSlug.tsx'
+          grep -Fq 'md:hidden' 'src/routes/demo.$storeSlug.admin.produtos.tsx'
+          grep -Fq 'md:hidden' 'src/routes/demo.$storeSlug.admin.pedidos.index.tsx'
+          grep -Fq 'Ver loja' 'src/routes/demo.$storeSlug.admin.tsx'
+          grep -Fq 'StoreThemeBootstrapScript' src/routes/__root.tsx
