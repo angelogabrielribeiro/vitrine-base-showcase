@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowLeft, Compass, Home, LayoutGrid, MapPin } from "lucide-react";
+import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 
 const routeNodes = [
   { label: "Início", className: "left-[8%] top-[18%]" },
@@ -10,7 +11,8 @@ const routeNodes = [
 ];
 
 export function NotFoundPage() {
-  const reduceMotion = useReducedMotion();
+  const { capabilities } = useCinematicMotion();
+  const reduceMotion = capabilities.hydrated && capabilities.reducedMotion;
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#05070a] px-4 text-white">

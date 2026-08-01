@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
   BadgeCheck,
@@ -17,6 +17,7 @@ import {
   Utensils,
 } from "lucide-react";
 import { ScrollExpandShowcase } from "@/components/marketing/scroll-expand-showcase";
+import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 import { PricingPreview } from "@/components/pricing/pricing-page";
 import { STORES } from "@/config/stores";
 import { DEMO_NOTICE } from "@/lib/demo-mode";
@@ -144,7 +145,8 @@ const INCLUDED = [
 ];
 
 function Index() {
-  const reduceMotion = useReducedMotion();
+  const { capabilities } = useCinematicMotion();
+  const reduceMotion = capabilities.hydrated && capabilities.reducedMotion;
   const showcaseItems = STORES.map((store) => ({
     title: store.name,
     subtitle: DEMO_VALUE[store.slug]?.highlight ?? store.tagline,

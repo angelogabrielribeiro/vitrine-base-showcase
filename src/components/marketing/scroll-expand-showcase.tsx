@@ -1,6 +1,7 @@
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowDown, ArrowRight } from "lucide-react";
 import { useRef } from "react";
+import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 
 export type ScrollExpandShowcaseItem = {
   title: string;
@@ -18,7 +19,8 @@ export function ScrollExpandShowcase({
   targetId = "demonstracoes",
 }: ScrollExpandShowcaseProps) {
   const sectionRef = useRef<HTMLElement>(null);
-  const reduceMotion = useReducedMotion();
+  const { capabilities } = useCinematicMotion();
+  const reduceMotion = capabilities.hydrated && capabilities.reducedMotion;
   const visibleItems = items.slice(0, 4);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
