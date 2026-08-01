@@ -279,7 +279,7 @@ export function ScrollExpandShowcase({
               </p>
               {!reduceMotion && (
                 <p className="mt-7 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-white/55">
-                  Role para descobrir <ArrowDown className="h-4 w-4 animate-bounce" />
+                  Role para ampliar <ArrowDown className="h-4 w-4 animate-bounce" />
                 </p>
               )}
             </div>
