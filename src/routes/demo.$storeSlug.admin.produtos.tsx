@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { Plus, Pencil, Trash2, FileSpreadsheet } from "lucide-react";
 import { useState } from "react";
 import { useRepo } from "@/hooks/use-repo";
@@ -27,9 +27,13 @@ export const Route = createFileRoute("/demo/$storeSlug/admin/produtos")({
 
 function ProductsAdmin() {
   const { storeSlug } = Route.useParams();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const store = getStore(storeSlug)!;
   const repo = useRepo();
   const [query, setQuery] = useState("");
+  const isProductsIndex = pathname.replace(/\/+$/, "") === `/demo/${storeSlug}/admin/produtos`;
+
+  if (!isProductsIndex) return <Outlet />;
   const products = repo
     .listProducts(storeSlug)
     .filter((p) => (query ? p.name.toLowerCase().includes(query.toLowerCase()) : true));
@@ -54,12 +58,14 @@ function ProductsAdmin() {
         <div className="grid w-full gap-2 sm:flex sm:w-auto sm:flex-wrap">
           <Button asChild variant="outline" className="w-full sm:w-auto">
             <Link to="/demo/$storeSlug/admin/importar-exportar" params={{ storeSlug }}>
-              <FileSpreadsheet className="mr-2 h-4 w-4" />Importar / Exportar
+              <FileSpreadsheet className="mr-2 h-4 w-4" />
+              Importar / Exportar
             </Link>
           </Button>
           <Button asChild className="w-full sm:w-auto">
             <Link to="/demo/$storeSlug/admin/produtos/novo" params={{ storeSlug }}>
-              <Plus className="mr-2 h-4 w-4" />Novo produto
+              <Plus className="mr-2 h-4 w-4" />
+              Novo produto
             </Link>
           </Button>
         </div>
@@ -129,7 +135,8 @@ function ProductsAdmin() {
                     to="/demo/$storeSlug/admin/produtos/$id"
                     params={{ storeSlug, id: product.id }}
                   >
-                    <Pencil className="mr-2 h-4 w-4" />Editar
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Editar
                   </Link>
                 </Button>
                 <DeleteProductButton product={product} onDelete={() => deleteProduct(product)} />
@@ -176,8 +183,8 @@ function ProductsAdmin() {
                     </div>
                   </td>
                   <td className="p-3 text-muted-foreground">
-                    {store.categories.find((category) => category.slug === product.category)?.name ??
-                      product.category}
+                    {store.categories.find((category) => category.slug === product.category)
+                      ?.name ?? product.category}
                   </td>
                   <td className="whitespace-nowrap p-3">
                     {brl(product.salePrice ?? product.price)}
@@ -231,7 +238,8 @@ function DeleteProductButton({ product, onDelete }: { product: Product; onDelete
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="outline" className="w-full">
-          <Trash2 className="mr-2 h-4 w-4" />Excluir
+          <Trash2 className="mr-2 h-4 w-4" />
+          Excluir
         </Button>
       </AlertDialogTrigger>
       <DeleteProductDialogContent product={product} onDelete={onDelete} />
