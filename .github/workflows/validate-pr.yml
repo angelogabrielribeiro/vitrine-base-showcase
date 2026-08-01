@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: validate-${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -58,9 +58,10 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Generate exact formatting
+      - name: Check formatting
         run: |
-          npx prettier --write \
+          npx prettier --check \
+            .github/workflows/validate-pr.yml \
             scripts/validate-ui.mjs \
             src/routes/index.tsx \
             src/routes/__root.tsx \
@@ -68,25 +69,6 @@ jobs:
             src/components/marketing/premium-home-hero.tsx \
             src/components/marketing/scroll-expand-showcase.tsx \
             src/components/system/not-found-page.tsx
-
-      - name: Commit exact formatting
-        run: |
-          if git diff --quiet; then
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            scripts/validate-ui.mjs \
-            src/routes/index.tsx \
-            src/routes/__root.tsx \
-            src/styles.css \
-            src/components/marketing/premium-home-hero.tsx \
-            src/components/marketing/scroll-expand-showcase.tsx \
-            src/components/system/not-found-page.tsx
-          git commit -m "Format premium immersive redesign"
-          git push origin HEAD:${{ github.event.pull_request.head.ref }}
 
       - name: Lint changed interface files
         run: |
@@ -147,7 +129,7 @@ jobs:
           BASE_URL: http://127.0.0.1:4173
         run: node scripts/validate-ui.mjs
 
-      - name: Validate commercial routes and keyboard access
+      - name: Validate commercial routes, typography and keyboard access
         env:
           BASE_URL: http://127.0.0.1:4173
         run: |
@@ -175,6 +157,31 @@ jobs:
 
             if (!/Ir para o conteúdo/i.test(focusedText) || !(await focused.isVisible())) {
               throw new Error("O link de pular para o conteúdo não recebeu foco visível");
+            }
+
+            const headingFont = await page.locator("#inicio h1").evaluate(
+              (element) => getComputedStyle(element).fontFamily,
+            );
+            const bodyFont = await page.locator("body").evaluate(
+              (element) => getComputedStyle(element).fontFamily,
+            );
+
+            if (!headingFont.includes("Syne")) {
+              throw new Error(`A tipografia display não usa Syne: ${headingFont}`);
+            }
+            if (!bodyFont.includes("Manrope")) {
+              throw new Error(`A tipografia de interface não usa Manrope: ${bodyFont}`);
+            }
+
+            const heroImages = await page.locator("#inicio img").evaluateAll((images) => ({
+              total: images.length,
+              loaded: images.filter((image) => image.complete && image.naturalWidth > 0).length,
+            }));
+
+            if (heroImages.total !== 4 || heroImages.loaded !== 4) {
+              throw new Error(
+                `Hero: esperado 4 imagens carregadas, encontrado ${heroImages.loaded}/${heroImages.total}`,
+              );
             }
 
             const whatsappLinks = await page.locator('a[href^="https://wa.me/"]').count();
