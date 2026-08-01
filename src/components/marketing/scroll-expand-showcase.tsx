@@ -51,6 +51,7 @@ export function ScrollExpandShowcase({
   return (
     <section
       ref={sectionRef}
+      data-testid="scroll-expand-showcase"
       aria-labelledby="showcase-title"
       className={
         reduceMotion
@@ -71,6 +72,7 @@ export function ScrollExpandShowcase({
         />
 
         <motion.div
+          data-testid="scroll-expand-frame"
           className="relative isolate w-full overflow-hidden rounded-[2rem] border border-white/10 bg-neutral-900"
           style={
             reduceMotion
