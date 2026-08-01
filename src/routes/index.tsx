@@ -2,10 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  BadgeCheck,
   CalendarDays,
   Check,
-  Clock3,
+  ChevronRight,
   Cpu,
   LayoutDashboard,
   MessageCircle,
@@ -16,6 +15,7 @@ import {
   Sparkles,
   Utensils,
 } from "lucide-react";
+import { PremiumHomeHero } from "@/components/marketing/premium-home-hero";
 import { ScrollExpandShowcase } from "@/components/marketing/scroll-expand-showcase";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 import { PricingPreview } from "@/components/pricing/pricing-page";
@@ -26,20 +26,20 @@ import { whatsappUrl } from "@/lib/whatsapp";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Vitrine Base — Sites sob medida para negócios locais" },
+      { title: "Vitrine Base — Experiências digitais para negócios locais" },
       {
         name: "description",
         content:
-          "Sites e sistemas sob medida para negócios locais venderem, atenderem e organizarem a operação com mais confiança.",
+          "Sites e sistemas sob medida com identidade, movimento e ferramentas reais para negócios locais venderem e operarem melhor.",
       },
       {
         property: "og:title",
-        content: "Vitrine Base — Um site com a identidade e a operação do seu negócio",
+        content: "Vitrine Base — Sites que o cliente sente antes de entender",
       },
       {
         property: "og:description",
         content:
-          "Explore quatro demonstrações completas e veja como catálogo, pedidos, agendamentos e painel administrativo podem trabalhar juntos.",
+          "Atravesse quatro experiências digitais e veja como design, catálogo, pedidos, agenda e painel podem trabalhar juntos.",
       },
     ],
   }),
@@ -58,26 +58,48 @@ const NICHE_ICON: Record<string, typeof ShoppingBag> = {
   electronics: Cpu,
 };
 
-const DEMO_VALUE: Record<string, { problem: string; solution: string; highlight: string }> = {
+const DEMO_VALUE: Record<
+  string,
+  {
+    problem: string;
+    solution: string;
+    highlight: string;
+    accent: string;
+    glow: string;
+    number: string;
+  }
+> = {
   moda: {
-    problem: "Coleções espalhadas entre posts e mensagens.",
-    solution: "Uma vitrine editorial com catálogo, produto, carrinho e checkout no mesmo fluxo.",
+    problem: "Coleções espalhadas entre posts, destaques e mensagens.",
+    solution: "Uma vitrine editorial que transforma produto, composição e compra em uma jornada.",
     highlight: "Moda e varejo",
+    accent: "text-[#d58c9a]",
+    glow: "from-[#d58c9a]/28 via-transparent to-vb-gold/16",
+    number: "01",
   },
   barbearia: {
-    problem: "Agenda dependente de troca manual de mensagens.",
+    problem: "Agenda dependente de trocas manuais de mensagens.",
     solution: "Serviços, profissionais e horários organizados para o cliente reservar sozinho.",
     highlight: "Serviços e agenda",
+    accent: "text-vb-gold",
+    glow: "from-vb-gold/28 via-transparent to-[#8a6d36]/18",
+    number: "02",
   },
   restaurante: {
     problem: "Cardápio, adicionais e pedidos difíceis de conferir.",
-    solution: "Uma jornada direta para escolher, personalizar e finalizar o pedido.",
+    solution: "Uma experiência quente e direta para escolher, personalizar e finalizar o pedido.",
     highlight: "Pedidos locais",
+    accent: "text-[#ff7448]",
+    glow: "from-[#ff7448]/28 via-transparent to-vb-gold/14",
+    number: "03",
   },
   eletronicos: {
     problem: "Produtos técnicos apresentados sem hierarquia ou contexto.",
-    solution: "Categorias, detalhes e compra organizados para reduzir dúvida antes do contato.",
+    solution: "Categorias, detalhes e compra organizados em um ambiente digital de alta precisão.",
     highlight: "Catálogo técnico",
+    accent: "text-vb-cyan",
+    glow: "from-vb-cyan/26 via-transparent to-vb-violet/25",
+    number: "04",
   },
 };
 
@@ -85,62 +107,55 @@ const PROCESS = [
   {
     step: "01",
     title: "Diagnóstico",
-    description: "Entendemos o negócio, a rotina, o público e o principal objetivo comercial.",
+    description: "Entendemos o negócio, a rotina, o público e o objetivo comercial prioritário.",
   },
   {
     step: "02",
-    title: "Escopo e proposta",
-    description:
-      "Definimos páginas, funções, investimento, prazo e custos externos antes de iniciar.",
+    title: "Direção",
+    description: "Definimos identidade, narrativa, funcionalidades, investimento e prazo antes de iniciar.",
   },
   {
     step: "03",
     title: "Construção",
-    description: "Design, conteúdo e fluxos são desenvolvidos para a identidade real do negócio.",
+    description: "Design, conteúdo, movimento e fluxos são desenvolvidos como uma experiência única.",
   },
   {
     step: "04",
-    title: "Revisão e publicação",
-    description:
-      "Você aprova o projeto, concluímos os ajustes e publicamos somente depois da validação.",
+    title: "Validação",
+    description: "Testamos desktop, mobile e operação; só publicamos depois da sua aprovação.",
   },
 ];
 
 const INCLUDED = [
   {
     icon: Smartphone,
-    title: "Experiência responsiva",
-    description:
-      "Interface pensada para celular e computador, com navegação clara e áreas de toque adequadas.",
+    title: "Responsividade real",
+    description: "Composição, movimento e hierarquia adaptados para celular e computador.",
   },
   {
     icon: ShoppingBag,
-    title: "Catálogo e operação",
-    description:
-      "Produtos, serviços, pedidos, agendamentos ou checkout entram conforme o escopo do negócio.",
+    title: "Operação conectada",
+    description: "Catálogo, pedidos, serviços, agenda ou checkout entram conforme a necessidade.",
   },
   {
     icon: LayoutDashboard,
-    title: "Painel administrativo",
-    description:
-      "Uma área simples para atualizar informações e acompanhar a operação quando o projeto exigir.",
+    title: "Controle do negócio",
+    description: "Painel simples para atualizar conteúdo e acompanhar a operação quando necessário.",
   },
   {
     icon: ShieldCheck,
     title: "Base profissional",
-    description:
-      "Domínio, segurança, banco de dados e permissões são planejados para a versão entregue ao cliente.",
+    description: "Domínio, segurança, banco de dados e permissões planejados para a entrega real.",
   },
   {
     icon: Sparkles,
     title: "Identidade própria",
-    description:
-      "Layout, conteúdo, cards e movimento são adaptados ao posicionamento de cada marca.",
+    description: "Layout, tipografia, cards, transições e conteúdo construídos para cada marca.",
   },
   {
     icon: MessageCircle,
-    title: "Contato que vira ação",
-    description: "WhatsApp e chamadas comerciais aparecem nos momentos certos da jornada.",
+    title: "Conversão com contexto",
+    description: "Chamadas comerciais aparecem nos momentos certos, sem transformar o site em panfleto.",
   },
 ];
 
@@ -154,34 +169,42 @@ function Index() {
   }));
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-neutral-950 text-neutral-100">
+    <div className="min-h-screen overflow-x-clip bg-vb-canvas font-sans text-vb-ivory">
       <a
         href="#conteudo"
-        className="sr-only z-[70] rounded-md bg-cyan-300 px-4 py-2 font-semibold text-slate-950 focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+        className="sr-only z-[80] rounded-full bg-vb-gold px-5 py-3 font-bold text-vb-deep focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
       >
         Ir para o conteúdo
       </a>
 
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-950/90 backdrop-blur-xl">
-        <div className="mx-auto flex min-h-16 max-w-6xl items-center justify-between gap-4 px-4">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-vb-canvas/80 backdrop-blur-2xl">
+        <div className="mx-auto flex min-h-16 max-w-[90rem] items-center justify-between gap-4 px-5 sm:px-8 lg:px-12">
           <a
             href="#inicio"
-            className="font-semibold tracking-[0.2em] text-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200"
+            className="group inline-flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vb-cyan"
           >
-            VITRINE BASE
+            <span className="relative grid h-8 w-8 place-items-center overflow-hidden rounded-full border border-vb-gold/40">
+              <span className="absolute h-2.5 w-2.5 rounded-full bg-vb-gold transition-transform duration-500 group-hover:scale-[2.8]" />
+            </span>
+            <span className="font-display text-sm font-semibold tracking-[0.16em] text-vb-ivory">
+              VITRINE BASE
+            </span>
           </a>
 
           <nav
-            className="hidden items-center gap-6 text-sm text-white/65 md:flex"
+            className="hidden items-center gap-7 text-xs font-bold uppercase tracking-[0.17em] text-white/52 md:flex"
             aria-label="Principal"
           >
-            <a href="#demonstracoes" className="transition hover:text-white">
-              Demonstrações
+            <a href="#experiencia" className="transition hover:text-vb-gold">
+              Experiência
             </a>
-            <a href="#processo" className="transition hover:text-white">
+            <a href="#demonstracoes" className="transition hover:text-vb-gold">
+              Projetos
+            </a>
+            <a href="#processo" className="transition hover:text-vb-gold">
               Processo
             </a>
-            <Link to="/planos" className="transition hover:text-white">
+            <Link to="/planos" className="transition hover:text-vb-gold">
               Planos
             </Link>
           </nav>
@@ -190,405 +213,313 @@ function Index() {
             href={PROPOSAL_URL}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-cyan-300 px-4 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-100"
+            className="vb-button-primary inline-flex min-h-11 items-center gap-2 px-4 py-2 text-xs"
           >
-            <span className="hidden sm:inline">Quero um site assim</span>
+            <span className="hidden sm:inline">Começar um projeto</span>
             <span className="sm:hidden">Falar agora</span>
-            <MessageCircle className="h-4 w-4" aria-hidden="true" />
+            <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
           </a>
         </div>
       </header>
 
       <main id="conteudo">
-        <section id="inicio" className="relative scroll-mt-20 overflow-hidden">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(251,191,36,0.16),transparent_30%),radial-gradient(circle_at_88%_16%,rgba(34,211,238,0.15),transparent_28%),radial-gradient(circle_at_65%_90%,rgba(99,102,241,0.12),transparent_32%)]"
-          />
+        <PremiumHomeHero
+          items={showcaseItems}
+          proposalUrl={PROPOSAL_URL}
+          reducedMotion={reduceMotion}
+          demoNotice={DEMO_NOTICE}
+        />
 
-          <div className="relative mx-auto grid min-h-[calc(100svh-4rem)] max-w-6xl gap-12 px-4 py-16 sm:py-24 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
-            <div>
-              <motion.p
-                initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45 }}
-                className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-300"
-              >
-                Sites sob medida para negócios locais
-              </motion.p>
-
-              <motion.h1
-                initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.58, delay: 0.05 }}
-                className="mt-5 max-w-3xl font-display text-4xl font-light leading-[1.02] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl"
-              >
-                Seu negócio não precisa de mais um template. Precisa de uma experiência que ajude a
-                vender e operar melhor.
-              </motion.h1>
-
-              <motion.p
-                initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.52, delay: 0.12 }}
-                className="mt-6 max-w-2xl text-base leading-7 text-white/68 sm:text-lg"
-              >
-                Criamos sites com identidade própria, conteúdo pensado para conversão e ferramentas
-                que organizam catálogo, pedidos, atendimento ou agendamentos — conforme a realidade
-                de cada empresa.
-              </motion.p>
-
-              <motion.div
-                initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.48, delay: 0.18 }}
-                className="mt-8 flex flex-col gap-3 sm:flex-row"
-              >
-                <a
-                  href={PROPOSAL_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-cyan-300 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-100"
-                >
-                  Quero um site assim <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                </a>
-                <a
-                  href="#demonstracoes"
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.045] px-6 py-3 text-sm font-semibold text-white transition hover:border-amber-300/45 hover:bg-amber-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
-                >
-                  Explorar demonstrações <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </a>
-              </motion.div>
-
-              <div className="mt-8 flex flex-wrap gap-2 text-xs text-white/68">
-                {[
-                  "Identidade própria",
-                  "Painel e fluxos conforme o escopo",
-                  "50% para iniciar · 50% antes da publicação",
-                ].map((item) => (
-                  <span
-                    key={item}
-                    className="inline-flex min-h-9 items-center gap-2 rounded-full border border-white/10 bg-black/25 px-3 py-2"
-                  >
-                    <Check className="h-3.5 w-3.5 text-amber-300" aria-hidden="true" />
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="relative">
-              <div
-                aria-hidden="true"
-                className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-amber-300/10 via-transparent to-cyan-300/15 blur-2xl"
-              />
-              <div className="relative rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-7">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">
-                  Do interesse à ação
-                </p>
-                <div className="mt-6 space-y-3">
-                  {[
-                    ["01", "Apresentar a marca com clareza"],
-                    ["02", "Organizar produtos, serviços ou agenda"],
-                    ["03", "Conduzir para compra, pedido ou contato"],
-                    ["04", "Dar controle para quem administra"],
-                  ].map(([step, label]) => (
-                    <div
-                      key={step}
-                      className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/20 p-4"
-                    >
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-amber-300/25 bg-amber-300/10 font-display text-lg text-amber-200">
-                        {step}
-                      </span>
-                      <span className="text-sm font-medium text-white/78">{label}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <details className="mt-5 rounded-2xl border border-white/10 bg-black/20 text-sm text-white/66">
-                  <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 font-medium text-white/78 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200">
-                    <span className="inline-flex items-center gap-2">
-                      <BadgeCheck className="h-4 w-4 text-amber-300" aria-hidden="true" />
-                      Ambiente de demonstração
-                    </span>
-                    <span className="text-xs text-cyan-200">Entenda</span>
-                  </summary>
-                  <p className="border-t border-white/10 px-4 py-3 leading-6">{DEMO_NOTICE}</p>
-                </details>
-              </div>
-            </div>
+        <section aria-label="Princípios da Vitrine Base" className="overflow-hidden border-b border-white/10 bg-vb-deep py-5">
+          <div className="vb-marquee flex min-w-max items-center gap-10 text-[10px] font-bold uppercase tracking-[0.28em] text-white/42 motion-reduce:translate-x-0">
+            {[...Array(2)].flatMap((_, group) =>
+              [
+                "Identidade antes de template",
+                "Movimento com função",
+                "Performance adaptativa",
+                "Operação conectada",
+                "Clareza para converter",
+              ].map((item) => (
+                <span key={`${group}-${item}`} className="inline-flex items-center gap-10">
+                  {item}
+                  <span className="h-1.5 w-1.5 rounded-full bg-vb-gold" aria-hidden="true" />
+                </span>
+              )),
+            )}
           </div>
         </section>
 
         <ScrollExpandShowcase items={showcaseItems} />
 
-        <section id="demonstracoes" className="scroll-mt-20 border-b border-white/10 bg-black/25">
-          <div className="mx-auto max-w-6xl px-4 py-20">
-            <div className="max-w-3xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.26em] text-amber-300">
-                Quatro negócios, quatro experiências
-              </p>
-              <h2 className="mt-4 font-display text-4xl font-light tracking-[-0.04em] text-white sm:text-6xl">
-                A estrutura técnica pode evoluir. A experiência não precisa parecer repetida.
-              </h2>
-              <p className="mt-5 text-base leading-7 text-white/62">
-                Cada demonstração responde a uma operação diferente. Explore a vitrine e o painel
-                para entender como design e funcionalidade trabalham juntos.
+        <section
+          id="demonstracoes"
+          className="relative scroll-mt-20 overflow-hidden border-b border-white/10 bg-vb-canvas"
+        >
+          <div aria-hidden="true" className="vb-noise absolute inset-0 opacity-20" />
+          <div className="relative mx-auto max-w-[90rem] px-5 py-24 sm:px-8 sm:py-32 lg:px-12">
+            <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+              <div>
+                <p className="vb-kicker">Projetos demonstrativos</p>
+                <h2 className="mt-5 font-display text-5xl font-semibold leading-[0.9] tracking-[-0.06em] text-vb-ivory sm:text-7xl">
+                  Cada negócio merece seu próprio mundo.
+                </h2>
+              </div>
+              <p className="max-w-2xl text-base leading-8 text-white/58 lg:justify-self-end lg:text-lg">
+                A estrutura técnica pode ser reaproveitada com responsabilidade. O que o cliente vê,
+                sente e usa é construído a partir da identidade e da operação de cada marca.
               </p>
             </div>
 
-            <div className="mt-12 grid gap-5 lg:grid-cols-2">
-              {STORES.map((store) => {
-                const Icon = NICHE_ICON[store.niche] ?? ShoppingBag;
+            <div className="mt-20 divide-y divide-white/10 border-y border-white/10">
+              {STORES.map((store, index) => {
                 const value = DEMO_VALUE[store.slug];
+                const Icon = NICHE_ICON[store.niche] ?? ShoppingBag;
+                const reverse = index % 2 === 1;
 
                 return (
-                  <article
+                  <motion.article
                     key={store.slug}
-                    className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035]"
+                    initial={reduceMotion ? false : { opacity: 0, y: 36 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-12%" }}
+                    transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+                    className="group grid gap-8 py-12 sm:py-16 lg:grid-cols-12 lg:items-center"
                   >
-                    <div className="relative aspect-[16/9] overflow-hidden">
-                      <img
-                        src={store.banners[0]?.image}
-                        alt={`Prévia da demonstração ${store.name}`}
-                        loading="lazy"
-                        className="h-full w-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/18 to-transparent" />
-                      <div className="absolute inset-x-0 bottom-0 p-5">
-                        <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-300">
-                          <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                          {value?.highlight}
-                        </p>
-                        <h3 className="mt-2 font-display text-3xl text-white">{store.name}</h3>
+                    <div className={reverse ? "lg:order-2 lg:col-span-7" : "lg:col-span-7"}>
+                      <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-vb-elevated p-2 shadow-2xl shadow-black/35">
+                        <div
+                          aria-hidden="true"
+                          className={`absolute inset-0 bg-gradient-to-br ${value?.glow} opacity-60 transition duration-700 group-hover:opacity-100`}
+                        />
+                        <div className="relative aspect-[16/10] overflow-hidden rounded-[1.55rem]">
+                          <img
+                            src={store.banners[0]?.image}
+                            alt={`Página inicial da demonstração ${store.name}`}
+                            loading="lazy"
+                            className="h-full w-full object-cover transition duration-[900ms] ease-out group-hover:scale-[1.045]"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+                          <span className="absolute left-5 top-5 rounded-full border border-white/20 bg-black/45 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/75 backdrop-blur-xl">
+                            {value?.highlight ?? store.tagline}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="p-5 sm:p-6">
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">
-                            Problema
-                          </p>
-                          <p className="mt-2 text-sm leading-6 text-white/72">{value?.problem}</p>
-                        </div>
-                        <div className="rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.055] p-4">
-                          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-200">
-                            Solução demonstrada
-                          </p>
-                          <p className="mt-2 text-sm leading-6 text-white/72">{value?.solution}</p>
-                        </div>
+                    <div className={reverse ? "lg:order-1 lg:col-span-5" : "lg:col-span-5"}>
+                      <div className="flex items-center gap-4">
+                        <span className={`font-display text-5xl font-semibold ${value?.accent ?? "text-vb-gold"}`}>
+                          {value?.number ?? `0${index + 1}`}
+                        </span>
+                        <span className="h-px flex-1 bg-white/12" />
+                        <Icon className={`h-5 w-5 ${value?.accent ?? "text-vb-gold"}`} aria-hidden="true" />
                       </div>
 
-                      <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+                      <h3 className="mt-7 font-display text-4xl font-semibold tracking-[-0.05em] text-white sm:text-5xl">
+                        {store.name}
+                      </h3>
+                      <p className="mt-3 text-xs font-bold uppercase tracking-[0.2em] text-white/38">
+                        Problema
+                      </p>
+                      <p className="mt-2 text-base leading-7 text-white/62">{value?.problem}</p>
+                      <p className="mt-5 text-xs font-bold uppercase tracking-[0.2em] text-white/38">
+                        Experiência criada
+                      </p>
+                      <p className="mt-2 text-lg leading-8 text-white/82">{value?.solution}</p>
+
+                      <div className="mt-8 flex flex-wrap gap-3">
                         <Link
                           to="/demo/$storeSlug"
                           params={{ storeSlug: store.slug }}
-                          className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-amber-300 px-4 py-3 text-sm font-semibold text-neutral-950 transition hover:bg-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-100"
+                          className="vb-button-primary group/link inline-flex min-h-12 items-center gap-2 px-5 py-3 text-sm"
                         >
-                          Abrir loja <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                          Abrir loja
+                          <ArrowRight className="h-4 w-4 transition-transform group-hover/link:translate-x-1" />
                         </Link>
                         <Link
                           to="/demo/$storeSlug/admin"
                           params={{ storeSlug: store.slug }}
-                          className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white transition hover:border-cyan-300/40 hover:bg-cyan-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200"
+                          className="vb-button-glass inline-flex min-h-12 items-center gap-2 px-5 py-3 text-sm"
                         >
-                          <LayoutDashboard className="h-4 w-4" aria-hidden="true" /> Explorar painel
+                          <LayoutDashboard className="h-4 w-4" />
+                          Explorar painel
                         </Link>
+                        {store.niche === "barber" && (
+                          <Link
+                            to="/demo/$storeSlug/agendar"
+                            params={{ storeSlug: store.slug }}
+                            className="vb-button-secondary inline-flex min-h-12 items-center gap-2 px-5 py-3 text-sm"
+                          >
+                            <CalendarDays className="h-4 w-4" />
+                            Testar agendamento
+                          </Link>
+                        )}
                       </div>
-
-                      {store.niche === "barber" && (
-                        <Link
-                          to="/demo/$storeSlug/agendar"
-                          params={{ storeSlug: store.slug }}
-                          className="mt-2 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-amber-300/30 bg-amber-300/[0.06] px-4 py-3 text-sm font-semibold text-amber-200 transition hover:bg-amber-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
-                        >
-                          <CalendarDays className="h-4 w-4" aria-hidden="true" /> Testar agendamento
-                        </Link>
-                      )}
                     </div>
-                  </article>
+                  </motion.article>
                 );
               })}
             </div>
           </div>
         </section>
 
-        <section className="bg-[#071018]">
-          <div className="mx-auto max-w-6xl px-4 py-20">
-            <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-cyan-200">
-                  Site comum x solução completa
-                </p>
-                <h2 className="mt-4 font-display text-4xl font-light tracking-[-0.04em] text-white sm:text-6xl">
-                  Aparência chama atenção. Estrutura transforma interesse em ação.
+        <section className="relative overflow-hidden bg-vb-ivory text-vb-deep">
+          <div aria-hidden="true" className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(3,4,5,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(3,4,5,.08)_1px,transparent_1px)] [background-size:64px_64px]" />
+          <div className="relative mx-auto max-w-[90rem] px-5 py-24 sm:px-8 sm:py-32 lg:px-12">
+            <div className="grid gap-12 lg:grid-cols-12">
+              <div className="lg:col-span-5">
+                <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#8b641d]">A diferença</p>
+                <h2 className="mt-5 font-display text-5xl font-semibold leading-[0.92] tracking-[-0.06em] sm:text-7xl">
+                  Não é colocar efeito em cima de um template.
                 </h2>
               </div>
-              <p className="text-base leading-7 text-white/62">
-                O projeto não termina na página bonita. A proposta é conectar posicionamento,
-                informação e operação para reduzir dúvidas e facilitar o próximo passo do cliente.
-              </p>
-            </div>
-
-            <div className="mt-12 grid gap-5 md:grid-cols-2">
-              <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-                  Site genérico
-                </p>
-                <ul className="mt-5 space-y-4 text-sm leading-6 text-white/58">
-                  {[
-                    "Visual reaproveitado sem relação clara com a marca",
-                    "Informação espalhada e chamada para ação fraca",
-                    "Dependência de mensagens para explicar tudo",
-                    "Funcionalidades adicionadas sem considerar a rotina",
-                  ].map((item) => (
-                    <li key={item} className="flex gap-3">
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-white/30" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="rounded-3xl border border-cyan-300/20 bg-cyan-300/[0.06] p-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
-                  Projeto Vitrine Base
-                </p>
-                <ul className="mt-5 space-y-4 text-sm leading-6 text-white/76">
-                  {[
-                    "Identidade, hierarquia e conteúdo adaptados ao negócio",
-                    "Fluxos definidos pela ação que o cliente deve realizar",
-                    "Painel, pedidos ou agenda quando realmente necessários",
-                    "Escopo, prazo e custos alinhados antes do desenvolvimento",
-                  ].map((item) => (
-                    <li key={item} className="flex gap-3">
-                      <Check className="mt-1 h-4 w-4 shrink-0 text-cyan-200" aria-hidden="true" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+              <div className="grid gap-5 sm:grid-cols-2 lg:col-span-7">
+                <article className="rounded-[2rem] border border-black/10 bg-white/45 p-7 backdrop-blur-sm sm:p-9">
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-black/42">Site comum</p>
+                  <ul className="mt-7 space-y-5 text-base leading-7 text-black/62">
+                    {[
+                      "Mesma hierarquia para qualquer nicho",
+                      "Animação decorativa e sem narrativa",
+                      "Interface bonita, mas desconectada da operação",
+                      "Experiência idêntica em desktop e celular",
+                    ].map((item) => (
+                      <li key={item} className="flex gap-3">
+                        <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-black/30" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+                <article className="rounded-[2rem] bg-vb-deep p-7 text-vb-ivory shadow-2xl shadow-black/20 sm:p-9">
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-vb-gold">Vitrine Base</p>
+                  <ul className="mt-7 space-y-5 text-base leading-7 text-white/72">
+                    {[
+                      "Direção visual ligada ao posicionamento da marca",
+                      "Movimento que explica, conduz e responde",
+                      "Design conectado a catálogo, agenda, pedido ou venda",
+                      "Qualidade adaptada à capacidade do dispositivo",
+                    ].map((item) => (
+                      <li key={item} className="flex gap-3">
+                        <Check className="mt-1 h-4 w-4 shrink-0 text-vb-gold" aria-hidden="true" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </article>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="processo" className="scroll-mt-20 border-y border-white/10 bg-black/25">
-          <div className="mx-auto max-w-6xl px-4 py-20">
-            <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+        <section id="processo" className="scroll-mt-20 border-y border-white/10 bg-vb-deep">
+          <div className="mx-auto max-w-[90rem] px-5 py-24 sm:px-8 sm:py-32 lg:px-12">
+            <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-amber-300">
-                  Como o projeto acontece
-                </p>
-                <h2 className="mt-4 font-display text-4xl font-light tracking-[-0.04em] text-white sm:text-6xl">
-                  Um processo claro antes de qualquer publicação.
+                <p className="vb-kicker">Da ideia à publicação</p>
+                <h2 className="mt-5 font-display text-5xl font-semibold leading-[0.92] tracking-[-0.06em] sm:text-7xl">
+                  Processo claro. Resultado sem improviso.
                 </h2>
               </div>
-              <div className="inline-flex items-center gap-2 text-sm text-white/58">
-                <Clock3 className="h-4 w-4 text-amber-300" aria-hidden="true" />
-                Prazo definido junto com o escopo
-              </div>
-            </div>
-
-            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {PROCESS.map((item) => (
-                <article
-                  key={item.step}
-                  className="rounded-3xl border border-white/10 bg-white/[0.035] p-6"
-                >
-                  <p className="font-display text-4xl text-amber-300/75">{item.step}</p>
-                  <h3 className="mt-5 text-lg font-semibold text-white">{item.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-white/58">{item.description}</p>
-                </article>
-              ))}
-            </div>
-
-            <div className="mt-6 flex flex-col gap-4 rounded-3xl border border-amber-300/20 bg-amber-300/[0.055] p-6 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="font-semibold text-amber-100">
-                  Pagamento por etapa, sem publicação antecipada.
-                </p>
-                <p className="mt-1 text-sm leading-6 text-white/58">
-                  50% para iniciar e 50% após a aprovação, antes da publicação do projeto.
-                </p>
-              </div>
-              <Link
-                to="/planos"
-                className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-amber-300/35 px-5 py-3 text-sm font-semibold text-amber-100 transition hover:bg-amber-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
-              >
-                Ver planos e condições <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <PricingPreview />
-
-        <section className="border-t border-white/10 bg-neutral-950">
-          <div className="mx-auto max-w-6xl px-4 py-20">
-            <div className="max-w-3xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.26em] text-cyan-200">
-                O que pode fazer parte do projeto
+              <p className="max-w-md text-sm leading-7 text-white/55">
+                O prazo é definido depois do escopo. O pagamento é 50% para iniciar e 50% depois da
+                aprovação, antes da publicação.
               </p>
-              <h2 className="mt-4 font-display text-4xl font-light tracking-[-0.04em] text-white sm:text-6xl">
-                A mesma qualidade de base, com profundidade definida pelo escopo.
-              </h2>
             </div>
 
-            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {INCLUDED.map((item) => (
-                <article
-                  key={item.title}
-                  className="rounded-3xl border border-white/10 bg-white/[0.035] p-6"
+            <div className="mt-16 grid gap-px overflow-hidden rounded-[2rem] border border-white/10 bg-white/10 md:grid-cols-2 xl:grid-cols-4">
+              {PROCESS.map((item, index) => (
+                <motion.article
+                  key={item.step}
+                  initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-10%" }}
+                  transition={{ duration: 0.58, delay: index * 0.08 }}
+                  className="group relative min-h-80 overflow-hidden bg-vb-canvas p-7 sm:p-9"
                 >
-                  <item.icon className="h-6 w-6 text-amber-300" aria-hidden="true" />
-                  <h3 className="mt-4 text-lg font-semibold text-white">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-white/58">{item.description}</p>
-                </article>
+                  <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-vb-gold/0 blur-3xl transition duration-500 group-hover:bg-vb-gold/20" />
+                  <span className="font-display text-5xl font-semibold text-white/12 transition group-hover:text-vb-gold/80">
+                    {item.step}
+                  </span>
+                  <h3 className="mt-16 font-display text-3xl font-semibold text-white">{item.title}</h3>
+                  <p className="mt-4 text-sm leading-7 text-white/55">{item.description}</p>
+                  <ChevronRight className="absolute bottom-8 right-8 h-5 w-5 text-white/20 transition group-hover:translate-x-1 group-hover:text-vb-gold" />
+                </motion.article>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="relative overflow-hidden border-t border-white/10 bg-[#071018]">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(34,211,238,0.14),transparent_35%),radial-gradient(circle_at_15%_90%,rgba(251,191,36,0.1),transparent_30%)]"
-          />
-          <div className="relative mx-auto max-w-4xl px-4 py-24 text-center">
-            <BadgeCheck className="mx-auto h-8 w-8 text-amber-300" aria-hidden="true" />
-            <h2 className="mt-6 font-display text-4xl font-light tracking-[-0.045em] text-white sm:text-6xl">
-              Seu negócio já tem uma identidade. O site precisa traduzir isso e facilitar a
-              operação.
+        <section className="bg-vb-canvas py-8">
+          <PricingPreview />
+        </section>
+
+        <section className="border-y border-white/10 bg-vb-canvas">
+          <div className="mx-auto max-w-[90rem] px-5 py-24 sm:px-8 sm:py-32 lg:px-12">
+            <div className="grid gap-12 lg:grid-cols-[0.75fr_1.25fr]">
+              <div>
+                <p className="vb-kicker">O que pode fazer parte</p>
+                <h2 className="mt-5 font-display text-5xl font-semibold leading-[0.92] tracking-[-0.06em] sm:text-6xl">
+                  Tecnologia suficiente para resolver. Nunca só para impressionar.
+                </h2>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {INCLUDED.map((item, index) => (
+                  <motion.article
+                    key={item.title}
+                    initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-8%" }}
+                    transition={{ duration: 0.5, delay: (index % 2) * 0.07 }}
+                    className="group rounded-[1.6rem] border border-white/10 bg-white/[0.035] p-6 transition duration-500 hover:-translate-y-1 hover:border-vb-cyan/35 hover:bg-white/[0.06]"
+                  >
+                    <item.icon className="h-5 w-5 text-vb-gold transition group-hover:text-vb-cyan" />
+                    <h3 className="mt-7 font-display text-2xl font-semibold text-white">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-white/52">{item.description}</p>
+                  </motion.article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="relative isolate overflow-hidden bg-vb-deep">
+          <div aria-hidden="true" className="vb-pointer-aura absolute inset-0" />
+          <div aria-hidden="true" className="vb-noise absolute inset-0 opacity-30" />
+          <div className="relative mx-auto flex min-h-[70svh] max-w-[90rem] flex-col items-center justify-center px-5 py-24 text-center sm:px-8 lg:px-12">
+            <p className="vb-kicker">Seu negócio não precisa parecer pequeno</p>
+            <h2 className="mt-6 max-w-6xl font-display text-5xl font-semibold leading-[0.88] tracking-[-0.065em] text-vb-ivory sm:text-7xl lg:text-[7rem]">
+              Vamos construir uma presença que seja difícil de esquecer.
             </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/62">
-              Conte como sua empresa vende, atende ou agenda. A proposta será construída a partir do
-              que realmente precisa funcionar.
+            <p className="mt-7 max-w-2xl text-base leading-8 text-white/58">
+              Conte o que você vende, como atende e qual é o principal problema da operação. A partir
+              disso, definimos o projeto certo — sem funcionalidades inventadas e sem promessa vazia.
             </p>
-            <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <a
                 href={PROPOSAL_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-cyan-300 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-100"
+                className="vb-button-primary group inline-flex min-h-14 items-center justify-center gap-3 px-7 py-4"
               >
-                Conversar pelo WhatsApp <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                Conversar sobre meu projeto
+                <MessageCircle className="h-4 w-4 transition-transform group-hover:rotate-6" />
               </a>
               <Link
                 to="/planos"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.045] px-6 py-3 text-sm font-semibold text-white transition hover:border-amber-300/40 hover:bg-amber-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
+                className="vb-button-secondary inline-flex min-h-14 items-center justify-center gap-3 px-7 py-4"
               >
-                Ver investimento <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                Ver Planos
+                <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-white/10 bg-black/30 px-4 py-8">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between">
-          <span>Vitrine Base · sites e sistemas para negócios locais</span>
-          <span>As lojas exibidas são demonstrações. Nenhum pagamento real é processado.</span>
+      <footer className="border-t border-white/10 bg-vb-deep px-5 py-8 text-xs text-white/38 sm:px-8 lg:px-12">
+        <div className="mx-auto flex max-w-[90rem] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <span className="font-display font-semibold tracking-[0.14em] text-white/65">VITRINE BASE</span>
+          <span>Demonstrações locais · Nenhum pagamento real é processado</span>
         </div>
       </footer>
     </div>
