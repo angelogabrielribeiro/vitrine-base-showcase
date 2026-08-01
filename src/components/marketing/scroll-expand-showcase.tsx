@@ -388,4 +388,3 @@ export function ScrollExpandShowcase({
     </section>
   );
 }
-
