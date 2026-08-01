@@ -145,6 +145,7 @@ export function OfferConfigurator({ proposalUrl }: OfferConfiguratorProps) {
   return (
     <section
       id="configurador"
+      data-testid="offer-configurator"
       className="relative isolate overflow-hidden border-y border-white/10 bg-vb-canvas py-24 text-white sm:py-32"
       style={{ ["--offer-accent" as string]: goal.accent }}
     >
@@ -208,6 +209,7 @@ export function OfferConfigurator({ proposalUrl }: OfferConfiguratorProps) {
               {GOALS.map((item, index) => (
                 <button
                   key={item.id}
+                  data-testid="offer-goal"
                   type="button"
                   onClick={() => chooseGoal(index)}
                   aria-pressed={goalIndex === index}
@@ -367,6 +369,7 @@ export function OfferConfigurator({ proposalUrl }: OfferConfiguratorProps) {
               {PLANS.map((item, index) => (
                 <button
                   key={item.name}
+                  data-testid="offer-plan"
                   type="button"
                   onClick={() => {
                     setPlanIndex(index);
