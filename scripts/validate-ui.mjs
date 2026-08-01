@@ -41,7 +41,7 @@ async function createPage(browser, options, label) {
   page.on("requestfailed", (request) => {
     const url = request.url();
     if (!url.startsWith(baseUrl)) {
-      report.warnings.push(`${label}: recurso externo não carregou: ${url}`);
+      report.warnings.push(`${label}: recurso externo nÃ£o carregou: ${url}`);
     }
   });
 
@@ -68,7 +68,7 @@ async function readLayerState(locator) {
 
 async function assertNoCtaLabelOverlap(reveal, labels, name) {
   const ctaBox = await reveal.getByRole("link").boundingBox();
-  assert(ctaBox, `${name}: o CTA final não possui área visível`);
+  assert(ctaBox, `${name}: o CTA final nÃ£o possui Ã¡rea visÃ­vel`);
 
   const labelBoxes = await labels.evaluateAll((elements) =>
     elements.map((element) => {
@@ -116,14 +116,14 @@ async function validateHome(browser, config) {
     const whatsappLinks = page.locator('a[href^="https://wa.me/"]');
     assert(
       (await whatsappLinks.count()) >= 2,
-      `${name}: os CTAs de WhatsApp não foram encontrados`,
+      `${name}: os CTAs de WhatsApp nÃ£o foram encontrados`,
     );
     assert(
       await page
         .getByRole("link", { name: /Planos/i })
         .first()
         .isVisible(),
-      `${name}: o acesso aos planos não está visível`,
+      `${name}: o acesso aos planos nÃ£o estÃ¡ visÃ­vel`,
     );
 
     await page.screenshot({ path: `${outputDir}/${name}-top.png`, fullPage: false });
@@ -141,7 +141,7 @@ async function validateHome(browser, config) {
       total: images.length,
       loaded: images.filter((image) => image.complete && image.naturalWidth > 0).length,
     }));
-    assert(journeyImages.total === 4, `${name}: a jornada não contém os quatro universos`);
+    assert(journeyImages.total === 4, `${name}: a jornada nÃ£o contÃ©m os quatro universos`);
     assert(journeyImages.loaded === 4, `${name}: nem todas as imagens da jornada carregaram`);
 
     let startScroll = await page.evaluate(() => window.scrollY);
@@ -151,10 +151,10 @@ async function validateHome(browser, config) {
 
     if (reducedMotion === "reduce") {
       const staticChapters = page.getByTestId("universe-chapter-static");
-      assert((await staticChapters.count()) === 4, `${name}: fallback estático incompleto`);
+      assert((await staticChapters.count()) === 4, `${name}: fallback estÃ¡tico incompleto`);
       assert(
         (await page.getByTestId("universe-chapter-sticky").count()) === 0,
-        `${name}: o modo reduzido manteve capítulos presos`,
+        `${name}: o modo reduzido manteve capÃ­tulos presos`,
       );
       await page.evaluate((top) => window.scrollTo(0, top), journeyMetrics.top);
       await page.waitForTimeout(650);
@@ -163,13 +163,13 @@ async function validateHome(browser, config) {
       await page.evaluate((top) => window.scrollTo(0, top), targetScroll);
       await page.waitForTimeout(650);
       endScroll = await page.evaluate(() => window.scrollY);
-      assert(endScroll > startScroll + 100, `${name}: a página não permitiu rolagem normal`);
+      assert(endScroll > startScroll + 100, `${name}: a pÃ¡gina nÃ£o permitiu rolagem normal`);
     } else {
       const chapters = page.getByTestId("universe-chapter");
-      assert((await chapters.count()) === 4, `${name}: faltam capítulos imersivos`);
+      assert((await chapters.count()) === 4, `${name}: faltam capÃ­tulos imersivos`);
       assert(
         journeyMetrics.height > journeyMetrics.viewportHeight * 8,
-        `${name}: a jornada não possui percurso suficiente`,
+        `${name}: a jornada nÃ£o possui percurso suficiente`,
       );
 
       const firstChapter = chapters.nth(0);
@@ -180,12 +180,12 @@ async function validateHome(browser, config) {
       }));
       assert(
         firstMetrics.height > firstMetrics.viewportHeight * 1.8,
-        `${name}: o primeiro capítulo ficou curto demais`,
+        `${name}: o primeiro capÃ­tulo ficou curto demais`,
       );
 
       const sticky = firstChapter.getByTestId("universe-chapter-sticky");
       stickyPosition = await sticky.evaluate((element) => getComputedStyle(element).position);
-      assert(stickyPosition === "sticky", `${name}: o capítulo principal deixou de ser sticky`);
+      assert(stickyPosition === "sticky", `${name}: o capÃ­tulo principal deixou de ser sticky`);
 
       const image = firstChapter.getByTestId("universe-chapter-image");
       await page.evaluate((top) => window.scrollTo(0, top), firstMetrics.top + 10);
@@ -197,11 +197,13 @@ async function validateHome(browser, config) {
       await page.evaluate((top) => window.scrollTo(0, top), firstMetrics.top + activeRange * 0.58);
       await page.waitForTimeout(850);
       endScroll = await page.evaluate(() => window.scrollY);
-      const middleTransform = await image.evaluate((element) => getComputedStyle(element).transform);
+      const middleTransform = await image.evaluate(
+        (element) => getComputedStyle(element).transform,
+      );
       imageTransformChanged = startTransform !== middleTransform;
 
-      assert(endScroll > startScroll + 100, `${name}: a página não permitiu rolagem normal`);
-      assert(imageTransformChanged, `${name}: a imagem não respondeu ao progresso do capítulo`);
+      assert(endScroll > startScroll + 100, `${name}: a pÃ¡gina nÃ£o permitiu rolagem normal`);
+      assert(imageTransformChanged, `${name}: a imagem nÃ£o respondeu ao progresso do capÃ­tulo`);
       await page.screenshot({ path: `${outputDir}/${name}-showcase.png`, fullPage: false });
     }
 
@@ -210,19 +212,19 @@ async function validateHome(browser, config) {
     const goalButtons = configurator.getByTestId("offer-goal");
     const planButtons = configurator.getByTestId("offer-plan");
     assert((await goalButtons.count()) === 4, `${name}: objetivos do configurador incompletos`);
-    assert((await planButtons.count()) === 3, `${name}: níveis de escopo incompletos`);
+    assert((await planButtons.count()) === 3, `${name}: nÃ­veis de escopo incompletos`);
 
     const secondGoal = goalButtons.nth(1);
     await secondGoal.click();
     assert(
       (await secondGoal.getAttribute("aria-pressed")) === "true",
-      `${name}: o objetivo não alterou o configurador`,
+      `${name}: o objetivo nÃ£o alterou o configurador`,
     );
     const firstPlan = planButtons.nth(0);
     await firstPlan.click();
     assert(
       (await firstPlan.getAttribute("aria-pressed")) === "true",
-      `${name}: o escopo não alterou o configurador`,
+      `${name}: o escopo nÃ£o alterou o configurador`,
     );
 
     assert(runtimeErrors.length === 0, `${name}: erros de runtime: ${runtimeErrors.join(" | ")}`);
@@ -268,17 +270,17 @@ async function validateNotFound(browser, config) {
     await waitForStablePage(page);
 
     await page.getByRole("heading", { name: "404" }).waitFor({ state: "visible" });
-    const homeLink = page.getByRole("link", { name: /Voltar ao início/i });
-    const demosLink = page.getByRole("link", { name: /Ver demonstrações/i });
-    assert(await homeLink.isVisible(), `${label}: o retorno ao início não está visível`);
-    assert(await demosLink.isVisible(), `${label}: o acesso às demonstrações não está visível`);
+    const homeLink = page.getByRole("link", { name: /Voltar ao inÃ­cio/i });
+    const demosLink = page.getByRole("link", { name: /Ver demonstraÃ§Ãµes/i });
+    assert(await homeLink.isVisible(), `${label}: o retorno ao inÃ­cio nÃ£o estÃ¡ visÃ­vel`);
+    assert(await demosLink.isVisible(), `${label}: o acesso Ã s demonstraÃ§Ãµes nÃ£o estÃ¡ visÃ­vel`);
     assert(
       (await homeLink.getAttribute("href")) === "/",
       `${label}: o retorno aponta para rota errada`,
     );
     assert(
       (await demosLink.getAttribute("href")) === "/#demonstracoes",
-      `${label}: o acesso às demonstrações aponta para rota errada`,
+      `${label}: o acesso Ã s demonstraÃ§Ãµes aponta para rota errada`,
     );
 
     const hasHorizontalOverflow = await page.evaluate(
@@ -355,3 +357,4 @@ try {
   await writeFile(`${outputDir}/report.json`, JSON.stringify(report, null, 2));
   await browser.close();
 }
+
