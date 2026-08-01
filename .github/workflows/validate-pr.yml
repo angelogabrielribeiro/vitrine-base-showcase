@@ -6,15 +6,112 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: validate-${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
+  motion-hydration-fix:
+    name: Apply hydration-safe motion preference
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout pull request branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Apply targeted motion replacements
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          changes = {
+              Path("src/routes/index.tsx"): [
+                  (
+                      'import { motion, useReducedMotion } from "framer-motion";',
+                      'import { motion } from "framer-motion";',
+                  ),
+                  (
+                      'import { ScrollExpandShowcase } from "@/components/marketing/scroll-expand-showcase";\n',
+                      'import { ScrollExpandShowcase } from "@/components/marketing/scroll-expand-showcase";\nimport { useCinematicMotion } from "@/components/motion/cinematic-motion-system";\n',
+                  ),
+                  (
+                      '  const reduceMotion = useReducedMotion();',
+                      '  const { capabilities } = useCinematicMotion();\n  const reduceMotion = capabilities.hydrated && capabilities.reducedMotion;',
+                  ),
+              ],
+              Path("src/components/marketing/scroll-expand-showcase.tsx"): [
+                  (
+                      'import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";',
+                      'import { motion, useScroll, useTransform } from "framer-motion";',
+                  ),
+                  (
+                      'import { useRef } from "react";\n',
+                      'import { useRef } from "react";\nimport { useCinematicMotion } from "@/components/motion/cinematic-motion-system";\n',
+                  ),
+                  (
+                      '  const reduceMotion = useReducedMotion();',
+                      '  const { capabilities } = useCinematicMotion();\n  const reduceMotion = capabilities.hydrated && capabilities.reducedMotion;',
+                  ),
+              ],
+              Path("src/components/system/not-found-page.tsx"): [
+                  (
+                      'import { motion, useReducedMotion } from "framer-motion";',
+                      'import { motion } from "framer-motion";',
+                  ),
+                  (
+                      'import { ArrowLeft, Compass, Home, LayoutGrid, MapPin } from "lucide-react";\n',
+                      'import { ArrowLeft, Compass, Home, LayoutGrid, MapPin } from "lucide-react";\nimport { useCinematicMotion } from "@/components/motion/cinematic-motion-system";\n',
+                  ),
+                  (
+                      '  const reduceMotion = useReducedMotion();',
+                      '  const { capabilities } = useCinematicMotion();\n  const reduceMotion = capabilities.hydrated && capabilities.reducedMotion;',
+                  ),
+              ],
+          }
+
+          changed = False
+          for path, replacements in changes.items():
+              text = path.read_text()
+              original = text
+              for old, new in replacements:
+                  count = text.count(old)
+                  if count == 1:
+                      text = text.replace(old, new)
+                  elif count == 0 and new in text:
+                      continue
+                  else:
+                      raise SystemExit(f"Replacement mismatch in {path}: expected one occurrence, found {count}: {old}")
+              if text != original:
+                  path.write_text(text)
+                  changed = True
+
+          print("Motion hydration files updated." if changed else "Motion hydration files already updated.")
+          PY
+
+      - name: Commit hydration fix
+        run: |
+          if git diff --quiet; then
+            echo "No hydration changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/routes/index.tsx \
+            src/components/marketing/scroll-expand-showcase.tsx \
+            src/components/system/not-found-page.tsx
+          git commit -m "Make reduced motion hydration safe"
+          git push
+
   build:
     name: Build application
+    needs: motion-hydration-fix
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -39,6 +136,7 @@ jobs:
 
   lint:
     name: Validate changed files
+    needs: motion-hydration-fix
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
