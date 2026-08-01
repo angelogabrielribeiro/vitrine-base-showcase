@@ -57,7 +57,10 @@ const NICHE_ICON: Record<string, typeof ShoppingBag> = {
   electronics: Cpu,
 };
 
-const DEMO_VALUE: Record<string, { problem: string; solution: string; highlight: string }> = {
+const DEMO_VALUE: Record<
+  string,
+  { problem: string; solution: string; highlight: string }
+> = {
   moda: {
     problem: "Coleções espalhadas entre posts e mensagens.",
     solution: "Uma vitrine editorial com catálogo, produto, carrinho e checkout no mesmo fluxo.",
@@ -107,22 +110,26 @@ const INCLUDED = [
   {
     icon: Smartphone,
     title: "Experiência responsiva",
-    description: "Interface pensada para celular e computador, com navegação clara e áreas de toque adequadas.",
+    description:
+      "Interface pensada para celular e computador, com navegação clara e áreas de toque adequadas.",
   },
   {
     icon: ShoppingBag,
     title: "Catálogo e operação",
-    description: "Produtos, serviços, pedidos, agendamentos ou checkout entram conforme o escopo do negócio.",
+    description:
+      "Produtos, serviços, pedidos, agendamentos ou checkout entram conforme o escopo do negócio.",
   },
   {
     icon: LayoutDashboard,
     title: "Painel administrativo",
-    description: "Uma área simples para atualizar informações e acompanhar a operação quando o projeto exigir.",
+    description:
+      "Uma área simples para atualizar informações e acompanhar a operação quando o projeto exigir.",
   },
   {
     icon: ShieldCheck,
     title: "Base profissional",
-    description: "Domínio, segurança, banco de dados e permissões são planejados para a versão entregue ao cliente.",
+    description:
+      "Domínio, segurança, banco de dados e permissões são planejados para a versão entregue ao cliente.",
   },
   {
     icon: Sparkles,
@@ -162,7 +169,10 @@ function Index() {
             VITRINE BASE
           </a>
 
-          <nav className="hidden items-center gap-6 text-sm text-white/65 md:flex" aria-label="Principal">
+          <nav
+            className="hidden items-center gap-6 text-sm text-white/65 md:flex"
+            aria-label="Principal"
+          >
             <a href="#demonstracoes" className="transition hover:text-white">
               Demonstrações
             </a>
@@ -421,7 +431,9 @@ function Index() {
 
             <div className="mt-12 grid gap-5 md:grid-cols-2">
               <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">Site genérico</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+                  Site genérico
+                </p>
                 <ul className="mt-5 space-y-4 text-sm leading-6 text-white/58">
                   {[
                     "Visual reaproveitado sem relação clara com a marca",
@@ -438,7 +450,9 @@ function Index() {
               </div>
 
               <div className="rounded-3xl border border-cyan-300/20 bg-cyan-300/[0.06] p-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">Projeto Vitrine Base</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
+                  Projeto Vitrine Base
+                </p>
                 <ul className="mt-5 space-y-4 text-sm leading-6 text-white/76">
                   {[
                     "Identidade, hierarquia e conteúdo adaptados ao negócio",
@@ -461,7 +475,9 @@ function Index() {
           <div className="mx-auto max-w-6xl px-4 py-20">
             <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
               <div className="max-w-3xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-amber-300">Como o projeto acontece</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-amber-300">
+                  Como o projeto acontece
+                </p>
                 <h2 className="mt-4 font-display text-4xl font-light tracking-[-0.04em] text-white sm:text-6xl">
                   Um processo claro antes de qualquer publicação.
                 </h2>
@@ -474,7 +490,10 @@ function Index() {
 
             <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {PROCESS.map((item) => (
-                <article key={item.step} className="rounded-3xl border border-white/10 bg-white/[0.035] p-6">
+                <article
+                  key={item.step}
+                  className="rounded-3xl border border-white/10 bg-white/[0.035] p-6"
+                >
                   <p className="font-display text-4xl text-amber-300/75">{item.step}</p>
                   <h3 className="mt-5 text-lg font-semibold text-white">{item.title}</h3>
                   <p className="mt-3 text-sm leading-6 text-white/58">{item.description}</p>
@@ -484,7 +503,9 @@ function Index() {
 
             <div className="mt-6 flex flex-col gap-4 rounded-3xl border border-amber-300/20 bg-amber-300/[0.055] p-6 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="font-semibold text-amber-100">Pagamento por etapa, sem publicação antecipada.</p>
+                <p className="font-semibold text-amber-100">
+                  Pagamento por etapa, sem publicação antecipada.
+                </p>
                 <p className="mt-1 text-sm leading-6 text-white/58">
                   50% para iniciar e 50% após a aprovação, antes da publicação do projeto.
                 </p>
@@ -514,7 +535,10 @@ function Index() {
 
             <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {INCLUDED.map((item) => (
-                <article key={item.title} className="rounded-3xl border border-white/10 bg-white/[0.035] p-6">
+                <article
+                  key={item.title}
+                  className="rounded-3xl border border-white/10 bg-white/[0.035] p-6"
+                >
                   <item.icon className="h-6 w-6 text-amber-300" aria-hidden="true" />
                   <h3 className="mt-4 text-lg font-semibold text-white">{item.title}</h3>
                   <p className="mt-2 text-sm leading-6 text-white/58">{item.description}</p>
