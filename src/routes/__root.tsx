@@ -76,6 +76,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Syne:wght@500;600;700&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -110,7 +116,6 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CinematicMotionProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <Toaster position="top-center" richColors closeButton duration={2800} />
         <GlobalInteractionStyles />
