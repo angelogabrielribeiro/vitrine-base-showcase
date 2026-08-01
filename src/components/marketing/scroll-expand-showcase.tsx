@@ -91,12 +91,12 @@ export function ScrollExpandShowcase({
             }
           >
             {visibleItems.map((item) => (
-              <div key={item.title} className="group relative min-h-40 overflow-hidden">
+              <div key={item.title} className="relative min-h-40 overflow-hidden">
                 <motion.img
                   src={item.image}
                   alt={`Prévia visual de ${item.title}`}
                   loading="lazy"
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                  className="h-full w-full object-cover"
                   style={reduceMotion ? undefined : { scale: imageScale }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
