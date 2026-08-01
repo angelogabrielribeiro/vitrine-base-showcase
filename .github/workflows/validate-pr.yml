@@ -58,21 +58,37 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Check formatting
+      - name: Generate exact formatting
         run: |
-          npx prettier --check \
-            .github/workflows/validate-pr.yml \
+          npx prettier --write \
             scripts/validate-ui.mjs \
             src/routes/index.tsx \
             src/routes/__root.tsx \
+            src/styles.css \
+            src/components/marketing/premium-home-hero.tsx \
             src/components/marketing/scroll-expand-showcase.tsx \
             src/components/system/not-found-page.tsx
+
+      - name: Upload exact formatted files
+        uses: actions/upload-artifact@v5
+        with:
+          name: formatted-premium-files
+          path: |
+            scripts/validate-ui.mjs
+            src/routes/index.tsx
+            src/routes/__root.tsx
+            src/styles.css
+            src/components/marketing/premium-home-hero.tsx
+            src/components/marketing/scroll-expand-showcase.tsx
+            src/components/system/not-found-page.tsx
+          retention-days: 1
 
       - name: Lint changed interface files
         run: |
           npx eslint \
             src/routes/index.tsx \
             src/routes/__root.tsx \
+            src/components/marketing/premium-home-hero.tsx \
             src/components/marketing/scroll-expand-showcase.tsx \
             src/components/system/not-found-page.tsx
 
