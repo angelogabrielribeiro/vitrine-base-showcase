@@ -50,6 +50,7 @@ function CapabilitySignal({
 function StaticChapter({ universe }: { universe: Universe }) {
   return (
     <article
+      data-testid="universe-chapter-static"
       className="relative isolate overflow-hidden border-b border-white/10 px-5 py-20 text-white sm:px-8"
       style={{
         background:
@@ -126,12 +127,14 @@ function ImmersiveChapter({ universe, index }: { universe: Universe; index: numb
   return (
     <section
       ref={chapterRef}
+      data-testid="universe-chapter"
       className="relative min-h-[210svh] border-b border-white/10 bg-vb-deep sm:min-h-[225svh]"
       aria-labelledby={"universe-title-" + universe.slug}
     >
-      <div className="sticky top-16 h-[calc(100svh-4rem)] overflow-hidden">
+      <div data-testid="universe-chapter-sticky" className="sticky top-16 h-[calc(100svh-4rem)] overflow-hidden">
         <motion.div className="absolute inset-0" style={{ opacity: sceneOpacity }}>
           <motion.img
+            data-testid="universe-chapter-image"
             src={universe.image}
             alt=""
             aria-hidden="true"
@@ -253,7 +256,7 @@ export function UniverseJourney({ proposalUrl }: UniverseJourneyProps) {
   const reduced = capabilities.hydrated && capabilities.reducedMotion;
 
   return (
-    <section id="experiencia" className="relative scroll-mt-20 bg-vb-deep text-white">
+    <section id="experiencia" data-testid="universe-journey" className="relative scroll-mt-20 bg-vb-deep text-white">
       <div className="relative mx-auto max-w-[90rem] px-5 py-24 text-center sm:px-8 sm:py-32 lg:px-12">
         <p className="vb-kicker">Uma jornada, não uma grade</p>
         <h2 className="mx-auto mt-6 max-w-6xl font-display text-5xl font-semibold leading-[0.88] tracking-[-0.06em] sm:text-7xl lg:text-[7.2rem]">
