@@ -51,10 +51,22 @@ export function ScrollExpandShowcase({
       "0 0 0 rgba(0,0,0,0)",
     ],
   );
-  const introOpacity = useTransform(scrollYProgress, [0, 0.48, 0.66, 1], [1, 1, 0, 0]);
+  const introOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.48, 0.66, 1],
+    [1, 1, 0, 0],
+  );
   const introY = useTransform(scrollYProgress, [0, 0.66, 1], [0, -72, -72]);
-  const revealOpacity = useTransform(scrollYProgress, [0, 0.56, 0.8, 1], [0, 0, 1, 1]);
-  const revealY = useTransform(scrollYProgress, [0, 0.56, 0.8, 1], [32, 32, 0, 0]);
+  const revealOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.56, 0.8, 1],
+    [0, 0, 1, 1],
+  );
+  const revealY = useTransform(
+    scrollYProgress,
+    [0, 0.56, 0.8, 1],
+    [32, 32, 0, 0],
+  );
   const imageScale = useTransform(scrollYProgress, [0, 1], [1.06, 1]);
   const overlayOpacity = useTransform(scrollYProgress, [0, 1], [0.62, 0.28]);
 
