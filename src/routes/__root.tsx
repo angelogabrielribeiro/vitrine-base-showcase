@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CinematicMotionProvider } from "../components/motion/cinematic-motion-system";
 import { Toaster } from "../components/ui/sonner";
+import { StoreThemeBootstrapScript } from "../components/storefront/store-theme";
 
 function NotFoundComponent() {
   return (
@@ -113,6 +114,7 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR">
       <head>
+        <StoreThemeBootstrapScript />
         <HeadContent />
       </head>
       <body>
