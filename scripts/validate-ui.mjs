@@ -180,7 +180,7 @@ async function validateHome(browser, config) {
       assert(hasScrollInstruction, `${name}: a instrução inicial de rolagem não está visível`);
 
       const activeScrollRange = Math.max(sectionMetrics.height - sectionMetrics.viewportHeight, 1);
-      const targetScroll = sectionMetrics.top + activeScrollRange * 0.82;
+      const targetScroll = sectionMetrics.top + activeScrollRange * 0.96;
       await page.evaluate((top) => window.scrollTo(0, top), targetScroll);
       await page.waitForTimeout(850);
 
