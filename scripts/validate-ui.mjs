@@ -89,6 +89,7 @@ async function validateHome(browser, config) {
     const frame = page.getByTestId("scroll-expand-frame");
     const intro = page.getByTestId("scroll-expand-intro");
     const reveal = page.getByTestId("scroll-expand-reveal");
+    const progressIndicator = page.getByTestId("scroll-expand-progress");
     await section.waitFor({ state: "visible" });
 
     const sectionMetrics = await section.evaluate((element) => ({
@@ -109,6 +110,10 @@ async function validateHome(browser, config) {
     let endScroll = startScroll;
     let animationLayers = await readAnimationLayers(intro, reveal);
     let selectedProgress = 0;
+    let motionProgress = await progressIndicator.evaluate((element) =>
+      Number(getComputedStyle(element).opacity),
+    );
+    const progressSamples = [];
 
     if (reducedMotion === "reduce") {
       const targetScroll = sectionMetrics.top + Math.max(sectionMetrics.height * 0.72, 320);
@@ -117,6 +122,9 @@ async function validateHome(browser, config) {
       endBox = await frame.boundingBox();
       endScroll = await page.evaluate(() => window.scrollY);
       animationLayers = await readAnimationLayers(intro, reveal);
+      motionProgress = await progressIndicator.evaluate((element) =>
+        Number(getComputedStyle(element).opacity),
+      );
     } else {
       for (const progress of [0.82, 0.9, 0.95, 0.98, 0.995]) {
         const targetScroll = sectionMetrics.top + activeScrollRange * progress;
@@ -126,7 +134,18 @@ async function validateHome(browser, config) {
         endBox = await frame.boundingBox();
         endScroll = await page.evaluate(() => window.scrollY);
         animationLayers = await readAnimationLayers(intro, reveal);
+        motionProgress = await progressIndicator.evaluate((element) =>
+          Number(getComputedStyle(element).opacity),
+        );
         selectedProgress = progress;
+        progressSamples.push({
+          requestedProgress: progress,
+          motionProgress,
+          scrollY: endScroll,
+          frameY: endBox?.y ?? null,
+          introOpacity: animationLayers.intro.opacity,
+          revealOpacity: animationLayers.reveal.opacity,
+        });
 
         if (
           animationLayers.intro.opacity <= 0.05 &&
@@ -180,7 +199,7 @@ async function validateHome(browser, config) {
       );
       assert(
         animationLayers.intro.opacity <= 0.05,
-        `${name}: o título inicial não desapareceu dentro da faixa sticky (opacidade ${animationLayers.intro.opacity}, progresso testado ${selectedProgress})`,
+        `${name}: o título inicial não desapareceu dentro da faixa sticky (opacidade ${animationLayers.intro.opacity}, progresso físico ${selectedProgress}, progresso Framer ${motionProgress}, amostras ${JSON.stringify(progressSamples)})`,
       );
       assert(
         animationLayers.reveal.opacity >= 0.9 && animationLayers.reveal.visibility !== "hidden",
@@ -207,6 +226,8 @@ async function validateHome(browser, config) {
       startScroll,
       endScroll,
       selectedProgress,
+      motionProgress,
+      progressSamples,
       motionState,
       animationLayers,
       showcaseImages,
