@@ -1,0 +1,29 @@
+name: Validate product image upload
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Formatting
+        run: bunx prettier --check src/components/admin/product-form.tsx
+      - name: ESLint
+        run: bunx eslint src/components/admin/product-form.tsx
+      - name: TypeScript
+        run: bunx tsc --noEmit
+      - name: Production build
+        run: bun run build
