@@ -107,9 +107,16 @@ export function NotFoundPage() {
                   animate={
                     reduceMotion
                       ? undefined
-                      : { y: [0, index % 2 === 0 ? -6 : 6, 0], opacity: [0.72, 1, 0.72] }
+                      : {
+                          y: [0, index % 2 === 0 ? -6 : 6, 0],
+                          opacity: [0.72, 1, 0.72],
+                        }
                   }
-                  transition={{ duration: 4 + index * 0.45, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{
+                    duration: 4 + index * 0.45,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
                 >
                   {node.label}
                 </motion.div>
@@ -120,7 +127,11 @@ export function NotFoundPage() {
                 animate={reduceMotion ? undefined : { rotate: [0, 5, -5, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
               >
-                <Compass className="h-16 w-16 text-cyan-200" strokeWidth={1.2} aria-hidden="true" />
+                <Compass
+                  className="h-16 w-16 text-cyan-200"
+                  strokeWidth={1.2}
+                  aria-hidden="true"
+                />
               </motion.div>
 
               <motion.div
@@ -128,7 +139,10 @@ export function NotFoundPage() {
                 animate={reduceMotion ? undefined : { y: [0, -10, 0], scale: [1, 1.08, 1] }}
                 transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
               >
-                <MapPin className="h-9 w-9 drop-shadow-[0_0_18px_rgba(251,191,36,.45)]" aria-hidden="true" />
+                <MapPin
+                  className="h-9 w-9 drop-shadow-[0_0_18px_rgba(251,191,36,.45)]"
+                  aria-hidden="true"
+                />
               </motion.div>
 
               <div className="absolute inset-x-0 bottom-8 flex justify-center">
