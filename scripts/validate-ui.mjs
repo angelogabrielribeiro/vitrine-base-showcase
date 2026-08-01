@@ -70,11 +70,14 @@ async function validateHome(browser, config) {
 
     const section = page.getByTestId("scroll-expand-showcase");
     const frame = page.getByTestId("scroll-expand-frame");
+    const intro = page.getByTestId("scroll-expand-intro");
+    const reveal = page.getByTestId("scroll-expand-reveal");
     await section.waitFor({ state: "visible" });
 
     const sectionMetrics = await section.evaluate((element) => ({
       top: element.getBoundingClientRect().top + window.scrollY,
       height: element.getBoundingClientRect().height,
+      viewportHeight: window.innerHeight,
     }));
 
     await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), sectionMetrics.top);
@@ -84,13 +87,19 @@ async function validateHome(browser, config) {
     assert(startBox, `${name}: o frame expansível não possui área visível no início`);
     const startScroll = await page.evaluate(() => window.scrollY);
 
+    const activeScrollRange = Math.max(sectionMetrics.height - sectionMetrics.viewportHeight, 1);
+    const targetScroll =
+      reducedMotion === "reduce"
+        ? sectionMetrics.top + Math.max(sectionMetrics.height * 0.72, 320)
+        : sectionMetrics.top + activeScrollRange * 0.82;
+
     await page.evaluate(
-      ({ top, height }) =>
+      (top) =>
         window.scrollTo({
-          top: top + height * 0.72,
+          top,
           behavior: "instant",
         }),
-      sectionMetrics,
+      targetScroll,
     );
     await page.waitForTimeout(900);
 
@@ -107,6 +116,17 @@ async function validateHome(browser, config) {
         hasScrollInstruction: element.textContent?.includes("Role para ampliar") ?? false,
       };
     });
+
+    const animationLayers = {
+      intro: await intro.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return { opacity: Number(style.opacity), visibility: style.visibility };
+      }),
+      reveal: await reveal.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return { opacity: Number(style.opacity), visibility: style.visibility };
+      }),
+    };
 
     if (reducedMotion === "reduce") {
       assert(
@@ -126,11 +146,23 @@ async function validateHome(browser, config) {
         motionState.stickyPosition === "sticky",
         `${name}: a camada principal deixou de ser sticky`,
       );
+      assert(
+        endBox.y >= 60 && endBox.y <= 68,
+        `${name}: o frame saiu da faixa sticky durante a medição (y=${endBox.y.toFixed(1)}px)`,
+      );
       const widthGrowth = endBox.width - startBox.width;
       const heightGrowth = endBox.height - startBox.height;
       assert(
         widthGrowth > 20 || heightGrowth > 40,
         `${name}: a expansão não ocorreu (largura ${widthGrowth.toFixed(1)}px, altura ${heightGrowth.toFixed(1)}px)`,
+      );
+      assert(
+        animationLayers.intro.opacity <= 0.05,
+        `${name}: o título inicial não desapareceu ao final da expansão (opacidade ${animationLayers.intro.opacity})`,
+      );
+      assert(
+        animationLayers.reveal.opacity >= 0.9 && animationLayers.reveal.visibility !== "hidden",
+        `${name}: o CTA final não apareceu corretamente (opacidade ${animationLayers.reveal.opacity})`,
       );
     }
 
@@ -153,6 +185,7 @@ async function validateHome(browser, config) {
       startScroll,
       endScroll,
       motionState,
+      animationLayers,
       showcaseImages,
     });
   } finally {
@@ -193,10 +226,29 @@ async function validateNotFound(browser) {
       () => document.documentElement.scrollWidth > window.innerWidth + 1,
     );
     assert(!hasHorizontalOverflow, "404: foi detectado overflow horizontal");
-    assert(runtimeErrors.length === 0, `404: erros de runtime: ${runtimeErrors.join(" | ")}`);
 
     await page.screenshot({ path: `${outputDir}/404-desktop.png`, fullPage: false });
-    report.checks.push({ name: "404", status: "passed", httpStatus });
+
+    const unexpectedRuntimeErrors = runtimeErrors.filter(
+      (error) =>
+        !(
+          httpStatus === 404 &&
+          error.startsWith(
+            "console.error: Failed to load resource: the server responded with a status of 404",
+          )
+        ),
+    );
+    assert(
+      unexpectedRuntimeErrors.length === 0,
+      `404: erros de runtime: ${unexpectedRuntimeErrors.join(" | ")}`,
+    );
+
+    report.checks.push({
+      name: "404",
+      status: "passed",
+      httpStatus,
+      ignoredExpectedConsoleMessages: runtimeErrors.length - unexpectedRuntimeErrors.length,
+    });
   } finally {
     await context.close();
   }
