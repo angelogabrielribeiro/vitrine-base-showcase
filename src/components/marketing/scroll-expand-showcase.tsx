@@ -37,16 +37,24 @@ export function ScrollExpandShowcase({
     [0, 0.72, 1],
     ["min(56svh, 34rem)", "78svh", "calc(100svh - 4rem)"],
   );
-  const frameRadius = useTransform(scrollYProgress, [0, 0.82], ["2rem", "0rem"]);
+  const frameRadius = useTransform(
+    scrollYProgress,
+    [0, 0.82, 1],
+    ["2rem", "0rem", "0rem"],
+  );
   const frameShadow = useTransform(
     scrollYProgress,
-    [0, 0.8],
-    ["0 35px 100px rgba(0,0,0,.42)", "0 0 0 rgba(0,0,0,0)"],
+    [0, 0.8, 1],
+    [
+      "0 35px 100px rgba(0,0,0,.42)",
+      "0 0 0 rgba(0,0,0,0)",
+      "0 0 0 rgba(0,0,0,0)",
+    ],
   );
-  const introOpacity = useTransform(scrollYProgress, [0, 0.48, 0.66], [1, 1, 0]);
-  const introY = useTransform(scrollYProgress, [0, 0.66], [0, -72]);
-  const revealOpacity = useTransform(scrollYProgress, [0.56, 0.8], [0, 1]);
-  const revealY = useTransform(scrollYProgress, [0.56, 0.8], [32, 0]);
+  const introOpacity = useTransform(scrollYProgress, [0, 0.48, 0.66, 1], [1, 1, 0, 0]);
+  const introY = useTransform(scrollYProgress, [0, 0.66, 1], [0, -72, -72]);
+  const revealOpacity = useTransform(scrollYProgress, [0, 0.56, 0.8, 1], [0, 0, 1, 1]);
+  const revealY = useTransform(scrollYProgress, [0, 0.56, 0.8, 1], [32, 32, 0, 0]);
   const imageScale = useTransform(scrollYProgress, [0, 1], [1.06, 1]);
   const overlayOpacity = useTransform(scrollYProgress, [0, 1], [0.62, 0.28]);
 
