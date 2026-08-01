@@ -58,23 +58,27 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Generate exact validation script formatting
-        run: npx prettier --write scripts/validate-ui.mjs
+      - name: Generate exact formatting
+        run: |
+          npx prettier --write \
+            scripts/validate-ui.mjs \
+            src/components/marketing/scroll-expand-showcase.tsx
 
-      - name: Upload formatted validation script
+      - name: Upload exact formatted files
         uses: actions/upload-artifact@v5
         with:
-          name: formatted-validation-script
-          path: scripts/validate-ui.mjs
+          name: formatted-validation-files
+          path: |
+            scripts/validate-ui.mjs
+            src/components/marketing/scroll-expand-showcase.tsx
           retention-days: 1
 
-      - name: Check committed interface formatting
+      - name: Check remaining committed interface formatting
         run: |
           npx prettier --check \
             .github/workflows/validate-pr.yml \
             src/routes/index.tsx \
             src/routes/__root.tsx \
-            src/components/marketing/scroll-expand-showcase.tsx \
             src/components/system/not-found-page.tsx
 
       - name: Lint changed interface files
