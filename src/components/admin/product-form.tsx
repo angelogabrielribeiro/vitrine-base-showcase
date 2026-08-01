@@ -80,9 +80,7 @@ export function ProductForm({
       if (converted.length) {
         setImages((current) => [...current, ...converted].slice(0, MAX_IMAGES));
         toast.success(
-          converted.length === 1
-            ? "Imagem adicionada"
-            : `${converted.length} imagens adicionadas`,
+          converted.length === 1 ? "Imagem adicionada" : `${converted.length} imagens adicionadas`,
         );
       }
     } catch (error) {
@@ -209,11 +207,7 @@ export function ProductForm({
         </div>
         <div>
           <Label>Estoque</Label>
-          <Input
-            type="number"
-            value={stock}
-            onChange={(event) => setStock(event.target.value)}
-          />
+          <Input type="number" value={stock} onChange={(event) => setStock(event.target.value)} />
         </div>
         <div>
           <Label>Unidade (opcional)</Label>
