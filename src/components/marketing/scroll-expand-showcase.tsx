@@ -54,7 +54,7 @@ export function ScrollExpandShowcase({
     <section
       ref={sectionRef}
       data-testid="scroll-expand-showcase"
-      aria-labelledby="showcase-title"
+      aria-labelledby={reduceMotion ? "showcase-title-static" : "showcase-title"}
       className={
         reduceMotion
           ? "relative overflow-hidden border-y border-white/10 bg-[#050a10]"
@@ -65,7 +65,7 @@ export function ScrollExpandShowcase({
         data-testid="scroll-expand-sticky"
         className={
           reduceMotion
-            ? "relative mx-auto flex max-w-6xl items-center justify-center px-4 py-20"
+            ? "relative mx-auto flex max-w-6xl flex-col items-center justify-center px-4 py-16 sm:py-20"
             : "sticky top-16 flex h-[calc(100svh-4rem)] items-center justify-center overflow-hidden"
         }
       >
@@ -73,6 +73,23 @@ export function ScrollExpandShowcase({
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(251,191,36,0.14),transparent_30%),radial-gradient(circle_at_85%_30%,rgba(34,211,238,0.16),transparent_32%),radial-gradient(circle_at_50%_90%,rgba(99,102,241,0.12),transparent_35%)]"
         />
+
+        {reduceMotion && (
+          <div
+            data-testid="scroll-expand-static-heading"
+            className="relative z-10 mb-6 max-w-4xl text-center sm:mb-8"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-300">
+              Explore a experiência
+            </p>
+            <h2
+              id="showcase-title-static"
+              className="mt-4 font-display text-3xl font-light leading-tight tracking-[-0.04em] text-white sm:text-5xl"
+            >
+              Quatro operações. Quatro experiências construídas com intenção.
+            </h2>
+          </div>
+        )}
 
         <motion.div
           data-testid="scroll-expand-frame"
@@ -126,8 +143,13 @@ export function ScrollExpandShowcase({
 
           <motion.div
             data-testid="scroll-expand-intro"
+            aria-hidden={reduceMotion}
             className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-5 text-center"
-            style={reduceMotion ? { opacity: 1, y: 0 } : { opacity: introOpacity, y: introY }}
+            style={
+              reduceMotion
+                ? { opacity: 0, visibility: "hidden", y: 0 }
+                : { opacity: introOpacity, y: introY }
+            }
           >
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-300">
