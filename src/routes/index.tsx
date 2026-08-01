@@ -1,55 +1,53 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
-  ShoppingBag,
-  Utensils,
-  Scissors,
-  Sparkles,
-  ShieldCheck,
-  MessageCircle,
-  Smartphone,
-  LayoutDashboard,
-  CalendarDays,
-  Cpu,
   BadgeCheck,
+  CalendarDays,
+  Check,
   Clock3,
-  Search,
-  TrendingUp,
-  BarChart3,
-  RefreshCw,
+  Cpu,
+  LayoutDashboard,
+  MessageCircle,
+  Scissors,
+  ShieldCheck,
+  ShoppingBag,
+  Smartphone,
+  Sparkles,
+  Utensils,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { STORES } from "@/config/stores";
-import { DEMO_LABEL } from "@/lib/demo-mode";
-import { AnimatedGradient } from "@/components/effects/AnimatedGradient";
-import { PulsingBorder } from "@/components/effects/PulsingBorder";
-import { InteractiveTiltCard } from "@/components/effects/InteractiveTiltCard";
-import { InteractiveProductFolder } from "@/components/effects/InteractiveProductFolder";
 import { PricingPreview } from "@/components/pricing/pricing-page";
+import { STORES } from "@/config/stores";
+import { DEMO_NOTICE } from "@/lib/demo-mode";
+import { whatsappUrl } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Vitrine Base — Sites que ajudam o negócio a vender e operar melhor" },
+      { title: "Vitrine Base — Sites sob medida para negócios locais" },
       {
         name: "description",
         content:
-          "Sites e webapps para gerar confiança, organizar pedidos e agendamentos e transformar visitas em oportunidades para negócios locais.",
+          "Sites e sistemas sob medida para negócios locais venderem, atenderem e organizarem a operação com mais confiança.",
       },
       {
         property: "og:title",
-        content: "Vitrine Base — Presença que gera confiança. Operação que ajuda a vender.",
+        content: "Vitrine Base — Um site com a identidade e a operação do seu negócio",
       },
       {
         property: "og:description",
         content:
-          "Demonstrações de lojas, restaurantes e serviços com catálogo, pedidos, agendamento e painel administrativo.",
+          "Explore quatro demonstrações completas e veja como catálogo, pedidos, agendamentos e painel administrativo podem trabalhar juntos.",
       },
     ],
   }),
   component: Index,
 });
+
+const PROPOSAL_URL = whatsappUrl(
+  "5511987201816",
+  "Olá, Angelo! Vi a Vitrine Base e quero entender como seria um site para o meu negócio.",
+);
 
 const NICHE_ICON: Record<string, typeof ShoppingBag> = {
   fashion: ShoppingBag,
@@ -58,392 +56,515 @@ const NICHE_ICON: Record<string, typeof ShoppingBag> = {
   electronics: Cpu,
 };
 
-const FEATURES = [
-  { icon: Smartphone, title: "Loja virtual responsiva", desc: "Mobile-first, rápida e acessível." },
+const DEMO_VALUE: Record<
+  string,
+  { problem: string; solution: string; highlight: string }
+> = {
+  moda: {
+    problem: "Coleções espalhadas entre posts e mensagens.",
+    solution: "Uma vitrine editorial com catálogo, produto, carrinho e checkout no mesmo fluxo.",
+    highlight: "Moda e varejo",
+  },
+  barbearia: {
+    problem: "Agenda dependente de troca manual de mensagens.",
+    solution: "Serviços, profissionais e horários organizados para o cliente reservar sozinho.",
+    highlight: "Serviços e agenda",
+  },
+  restaurante: {
+    problem: "Cardápio, adicionais e pedidos difíceis de conferir.",
+    solution: "Uma jornada direta para escolher, personalizar e finalizar o pedido.",
+    highlight: "Pedidos locais",
+  },
+  eletronicos: {
+    problem: "Produtos técnicos apresentados sem hierarquia ou contexto.",
+    solution: "Categorias, detalhes e compra organizados para reduzir dúvida antes do contato.",
+    highlight: "Catálogo técnico",
+  },
+};
+
+const PROCESS = [
   {
-    icon: ShoppingBag,
-    title: "Produtos e estoque",
-    desc: "Catálogo com variantes, adicionais e imagens.",
+    step: "01",
+    title: "Diagnóstico",
+    description: "Entendemos o negócio, a rotina, o público e o principal objetivo comercial.",
   },
   {
-    icon: CalendarDays,
-    title: "Agendamento online",
-    desc: "Serviço, profissional, data e horário.",
+    step: "02",
+    title: "Escopo e proposta",
+    description: "Definimos páginas, funções, investimento, prazo e custos externos antes de iniciar.",
   },
   {
-    icon: ShieldCheck,
-    title: "Checkout completo",
-    desc: "Pix, cartão, dinheiro e cupom demonstrativo.",
+    step: "03",
+    title: "Construção",
+    description: "Design, conteúdo e fluxos são desenvolvidos para a identidade real do negócio.",
   },
   {
-    icon: Sparkles,
-    title: "Painel administrativo",
-    desc: "Produtos, pedidos e configurações em tempo real.",
-  },
-  {
-    icon: MessageCircle,
-    title: "Integração WhatsApp",
-    desc: "Contato e pós-venda direto pelo aplicativo.",
+    step: "04",
+    title: "Revisão e publicação",
+    description: "Você aprova o projeto, concluímos os ajustes e publicamos somente depois da validação.",
   },
 ];
 
-const BUSINESS_OUTCOMES = [
+const INCLUDED = [
   {
-    icon: Clock3,
-    pain: "Atendimento preso no WhatsApp",
-    outcome: "Catálogo e informações disponíveis sem depender de resposta imediata.",
-    proof: "Preço, opções, horários e políticas ficam claros antes do contato.",
+    icon: Smartphone,
+    title: "Experiência responsiva",
+    description: "Interface pensada para celular e computador, com navegação clara e áreas de toque adequadas.",
   },
   {
-    icon: BadgeCheck,
-    pain: "Cliente inseguro para comprar",
-    outcome: "Marca, domínio, políticas e jornada profissional no mesmo lugar.",
-    proof: "Mais sinais de confiança antes do pedido, pagamento ou agendamento.",
+    icon: ShoppingBag,
+    title: "Catálogo e operação",
+    description: "Produtos, serviços, pedidos, agendamentos ou checkout entram conforme o escopo do negócio.",
   },
   {
-    icon: TrendingUp,
-    pain: "Interesse que não vira ação",
-    outcome: "Menos atrito para pedir, comprar, agendar ou chamar no WhatsApp.",
-    proof: "Checkout sem conta obrigatória e chamadas claras para a próxima etapa.",
+    icon: LayoutDashboard,
+    title: "Painel administrativo",
+    description: "Uma área simples para atualizar informações e acompanhar a operação quando o projeto exigir.",
   },
   {
-    icon: RefreshCw,
-    pain: "Pedidos e agenda desorganizados",
-    outcome: "Painel central para acompanhar a operação e atualizar o cliente.",
-    proof: "Produtos, pedidos, agendamentos e status reunidos em um fluxo.",
+    icon: ShieldCheck,
+    title: "Base profissional",
+    description: "Domínio, segurança, banco de dados e permissões são planejados para a versão entregue ao cliente.",
   },
   {
-    icon: Search,
-    pain: "Dependência total das redes sociais",
-    outcome: "Uma base própria para Google, campanhas, conteúdo e indicações.",
-    proof: "O site vira o destino oficial da marca, sem substituir Instagram e WhatsApp.",
+    icon: Sparkles,
+    title: "Identidade própria",
+    description: "Layout, conteúdo, cards e movimento são adaptados ao posicionamento de cada marca.",
   },
   {
-    icon: BarChart3,
-    pain: "Não saber se o digital dá retorno",
-    outcome: "Metas e eventos definidos para acompanhar o que realmente importa.",
-    proof: "Cliques, pedidos, agendamentos e abandono podem ser medidos no projeto final.",
+    icon: MessageCircle,
+    title: "Contato que vira ação",
+    description: "WhatsApp e chamadas comerciais aparecem nos momentos certos da jornada.",
   },
 ];
 
 function Index() {
-  const [ready, setReady] = useState(false);
-  const [selectedSlug, setSelectedSlug] = useState<string>(STORES[0]?.slug ?? "");
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      if (sessionStorage.getItem("vb-preloaded") === "1") {
-        setReady(true);
-        return;
-      }
-      sessionStorage.setItem("vb-preloaded", "1");
-    } catch {
-      setReady(true);
-      return;
-    }
-    const t = setTimeout(() => setReady(true), 1200);
-    return () => clearTimeout(t);
-  }, []);
-
-  const selected = useMemo(
-    () => STORES.find((s) => s.slug === selectedSlug) ?? STORES[0],
-    [selectedSlug],
-  );
-
-  const folderItems = useMemo(
-    () =>
-      STORES.flatMap((s) =>
-        s.banners.map((b) => ({ title: s.name, subtitle: s.tagline, image: b.image })),
-      ),
-    [],
-  );
+  const reduceMotion = useReducedMotion();
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100">
-      <AnimatePresence>
-        {!ready && (
-          <motion.div
-            key="preloader"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.35 }}
-            className="fixed inset-0 z-[60] grid place-items-center bg-neutral-950"
+    <div className="min-h-screen overflow-x-clip bg-neutral-950 text-neutral-100">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-950/88 backdrop-blur-xl">
+        <div className="mx-auto flex min-h-16 max-w-6xl items-center justify-between gap-4 px-4">
+          <a
+            href="#inicio"
+            className="font-semibold tracking-[0.2em] text-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200"
           >
-            <div className="text-center">
-              <div className="mx-auto h-14 w-14 rounded-full border-2 border-amber-300/30 border-t-amber-300 animate-spin" />
-              <div className="mt-4 font-semibold tracking-[0.35em] text-amber-300 text-xs">
-                VITRINE BASE
+            VITRINE BASE
+          </a>
+
+          <nav className="hidden items-center gap-6 text-sm text-white/65 md:flex" aria-label="Principal">
+            <a href="#demonstracoes" className="transition hover:text-white">
+              Demonstrações
+            </a>
+            <a href="#processo" className="transition hover:text-white">
+              Processo
+            </a>
+            <Link to="/planos" className="transition hover:text-white">
+              Planos
+            </Link>
+          </nav>
+
+          <a
+            href={PROPOSAL_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-cyan-300 px-4 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-100"
+          >
+            <span className="hidden sm:inline">Quero um site assim</span>
+            <span className="sm:hidden">Falar agora</span>
+            <MessageCircle className="h-4 w-4" aria-hidden="true" />
+          </a>
+        </div>
+      </header>
+
+      <main>
+        <section id="inicio" className="relative scroll-mt-20 overflow-hidden">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(251,191,36,0.16),transparent_30%),radial-gradient(circle_at_88%_16%,rgba(34,211,238,0.15),transparent_28%),radial-gradient(circle_at_65%_90%,rgba(99,102,241,0.12),transparent_32%)]"
+          />
+
+          <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:py-24 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+            <div>
+              <motion.p
+                initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45 }}
+                className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-300"
+              >
+                Sites sob medida para negócios locais
+              </motion.p>
+
+              <motion.h1
+                initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.58, delay: 0.05 }}
+                className="mt-5 max-w-3xl font-display text-4xl font-light leading-[1.02] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl"
+              >
+                Seu negócio não precisa de mais um template. Precisa de uma experiência que ajude a
+                vender e operar melhor.
+              </motion.h1>
+
+              <motion.p
+                initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.52, delay: 0.12 }}
+                className="mt-6 max-w-2xl text-base leading-7 text-white/68 sm:text-lg"
+              >
+                Criamos sites com identidade própria, conteúdo pensado para conversão e ferramentas
+                que organizam catálogo, pedidos, atendimento ou agendamentos — conforme a realidade
+                de cada empresa.
+              </motion.p>
+
+              <motion.div
+                initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.48, delay: 0.18 }}
+                className="mt-8 flex flex-col gap-3 sm:flex-row"
+              >
+                <a
+                  href={PROPOSAL_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-cyan-300 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-100"
+                >
+                  Quero um site assim <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                </a>
+                <a
+                  href="#demonstracoes"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.045] px-6 py-3 text-sm font-semibold text-white transition hover:border-amber-300/45 hover:bg-amber-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
+                >
+                  Explorar demonstrações <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </a>
+              </motion.div>
+
+              <div className="mt-8 flex flex-wrap gap-2 text-xs text-white/68">
+                {[
+                  "Identidade própria",
+                  "Painel e fluxos conforme o escopo",
+                  "50% para iniciar · 50% antes da publicação",
+                ].map((item) => (
+                  <span
+                    key={item}
+                    className="inline-flex min-h-9 items-center gap-2 rounded-full border border-white/10 bg-black/25 px-3 py-2"
+                  >
+                    <Check className="h-3.5 w-3.5 text-amber-300" aria-hidden="true" />
+                    {item}
+                  </span>
+                ))}
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      {/* Top bar */}
-      <div className="border-b border-white/10 bg-black/40 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 text-xs">
-          <span className="font-semibold tracking-widest text-amber-300">VITRINE BASE</span>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <Link
-              to="/planos"
-              className="rounded-full border border-white/15 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-white/80 transition hover:border-cyan-300/40 hover:text-cyan-100"
-            >
-              Ver planos
-            </Link>
-            <span className="hidden rounded-full border border-amber-300/40 px-2 py-0.5 text-[10px] text-amber-200 sm:inline-flex">
-              {DEMO_LABEL}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <AnimatedGradient colors={["#f59e0b", "#a855f7", "#0ea5e9"]} intensity={0.35} />
-        <div className="relative mx-auto max-w-6xl px-4 py-16 sm:py-24">
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-300"
-          >
-            Estrutura comercial e operacional
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.05 }}
-            className="mt-4 text-4xl font-bold leading-tight sm:text-6xl"
-          >
-            Credibilidade para ser escolhido.{" "}
-            <span className="text-amber-300">Operação para vender melhor.</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="mt-6 max-w-2xl text-base text-neutral-300 sm:text-lg"
-          >
-            Sites e webapps que transformam catálogo espalhado, atendimento manual e processos
-            confusos em uma jornada clara para o cliente e para quem administra o negócio.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.14 }}
-            className="mt-7"
-          >
-            <Link
-              to="/planos"
-              className="inline-flex items-center gap-2 rounded-full border border-cyan-200/30 bg-cyan-300/10 px-5 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/20"
-            >
-              Conhecer planos e valores <ArrowRight className="h-4 w-4" />
-            </Link>
-          </motion.div>
-
-          {/* Seletor interativo */}
-          <div className="mt-10 flex flex-wrap gap-2">
-            {STORES.map((s) => {
-              const Icon = NICHE_ICON[s.niche] ?? ShoppingBag;
-              const active = s.slug === selectedSlug;
-              return (
-                <button
-                  key={s.slug}
-                  type="button"
-                  onClick={() => setSelectedSlug(s.slug)}
-                  className={
-                    "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition " +
-                    (active
-                      ? "border-amber-300 bg-amber-300 text-neutral-950"
-                      : "border-white/15 text-neutral-200 hover:border-amber-300/50 hover:text-white")
-                  }
-                >
-                  <Icon className="h-4 w-4" />
-                  {s.name}
-                </button>
-              );
-            })}
-          </div>
-
-          {selected && (
-            <div className="mt-6 grid gap-6 lg:grid-cols-[1.15fr_1fr]">
-              <PulsingBorder color="rgba(251,191,36,0.55)" radius="1rem">
-                <InteractiveTiltCard className="rounded-2xl">
-                  <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
-                    <div
-                      className="aspect-[16/9] w-full bg-cover bg-center"
-                      style={{ backgroundImage: `url(${selected.banners[0]?.image})` }}
+            <div className="relative">
+              <div
+                aria-hidden="true"
+                className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-amber-300/14 via-transparent to-cyan-300/14 blur-2xl"
+              />
+              <div className="relative grid grid-cols-2 gap-3 rounded-[2rem] border border-white/10 bg-white/[0.04] p-3 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-4">
+                {STORES.map((store, index) => (
+                  <Link
+                    key={store.slug}
+                    to="/demo/$storeSlug"
+                    params={{ storeSlug: store.slug }}
+                    className={[
+                      "group relative overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200",
+                      index === 0 || index === 3 ? "aspect-[4/5]" : "aspect-square",
+                    ].join(" ")}
+                    aria-label={`Abrir demonstração ${store.name}`}
+                  >
+                    <img
+                      src={store.banners[0]?.image}
+                      alt=""
+                      className="h-full w-full object-cover opacity-72 transition duration-500 group-hover:scale-105 group-hover:opacity-90"
                     />
-                    <div className="p-6">
-                      <div className="text-xs uppercase tracking-widest text-amber-300">
-                        {selected.tagline}
+                    <span className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/18 to-transparent" />
+                    <span className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
+                      <span className="block text-[10px] font-semibold uppercase tracking-[0.17em] text-amber-300">
+                        {DEMO_VALUE[store.slug]?.highlight}
+                      </span>
+                      <span className="mt-1 block font-display text-lg text-white sm:text-2xl">
+                        {store.name}
+                      </span>
+                    </span>
+                  </Link>
+                ))}
+              </div>
+
+              <details className="relative mt-4 rounded-2xl border border-white/10 bg-white/[0.035] text-sm text-white/66">
+                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 font-medium text-white/78 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200">
+                  <span className="inline-flex items-center gap-2">
+                    <BadgeCheck className="h-4 w-4 text-amber-300" aria-hidden="true" />
+                    Ambiente de demonstração
+                  </span>
+                  <span className="text-xs text-cyan-200">Entenda</span>
+                </summary>
+                <p className="border-t border-white/10 px-4 py-3 leading-6">{DEMO_NOTICE}</p>
+              </details>
+            </div>
+          </div>
+        </section>
+
+        <section id="demonstracoes" className="scroll-mt-20 border-y border-white/10 bg-black/25">
+          <div className="mx-auto max-w-6xl px-4 py-20">
+            <div className="max-w-3xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.26em] text-amber-300">
+                Quatro negócios, quatro experiências
+              </p>
+              <h2 className="mt-4 font-display text-4xl font-light tracking-[-0.04em] text-white sm:text-6xl">
+                A estrutura técnica pode evoluir. A experiência não precisa parecer repetida.
+              </h2>
+              <p className="mt-5 text-base leading-7 text-white/62">
+                Cada demonstração responde a uma operação diferente. Explore a vitrine e o painel
+                para entender como design e funcionalidade trabalham juntos.
+              </p>
+            </div>
+
+            <div className="mt-12 grid gap-5 lg:grid-cols-2">
+              {STORES.map((store) => {
+                const Icon = NICHE_ICON[store.niche] ?? ShoppingBag;
+                const value = DEMO_VALUE[store.slug];
+
+                return (
+                  <article
+                    key={store.slug}
+                    className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035]"
+                  >
+                    <div className="relative aspect-[16/9] overflow-hidden">
+                      <img
+                        src={store.banners[0]?.image}
+                        alt={`Prévia da demonstração ${store.name}`}
+                        loading="lazy"
+                        className="h-full w-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/18 to-transparent" />
+                      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5">
+                        <div>
+                          <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-300">
+                            <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                            {value?.highlight}
+                          </p>
+                          <h3 className="mt-2 font-display text-3xl text-white">{store.name}</h3>
+                        </div>
                       </div>
-                      <h3 className="mt-2 font-display text-3xl">{selected.name}</h3>
-                      <p className="mt-2 text-sm text-neutral-300">{selected.description}</p>
-                      <div className="mt-5 flex flex-wrap gap-2">
+                    </div>
+
+                    <div className="p-5 sm:p-6">
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">
+                            Problema
+                          </p>
+                          <p className="mt-2 text-sm leading-6 text-white/72">{value?.problem}</p>
+                        </div>
+                        <div className="rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.055] p-4">
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-200">
+                            Solução demonstrada
+                          </p>
+                          <p className="mt-2 text-sm leading-6 text-white/72">{value?.solution}</p>
+                        </div>
+                      </div>
+
+                      <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                         <Link
                           to="/demo/$storeSlug"
-                          params={{ storeSlug: selected.slug }}
-                          className="inline-flex items-center gap-2 rounded-full bg-amber-300 px-4 py-2 text-sm font-semibold text-neutral-950 transition hover:brightness-95"
+                          params={{ storeSlug: store.slug }}
+                          className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-amber-300 px-4 py-3 text-sm font-semibold text-neutral-950 transition hover:bg-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-100"
                         >
-                          Abrir demonstração <ArrowRight className="h-4 w-4" />
+                          Abrir loja <ArrowRight className="h-4 w-4" aria-hidden="true" />
                         </Link>
                         <Link
                           to="/demo/$storeSlug/admin"
-                          params={{ storeSlug: selected.slug }}
-                          className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm text-neutral-100 transition hover:border-amber-300/60"
+                          params={{ storeSlug: store.slug }}
+                          className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white transition hover:border-cyan-300/40 hover:bg-cyan-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200"
                         >
-                          <LayoutDashboard className="h-4 w-4" /> Ver painel
+                          <LayoutDashboard className="h-4 w-4" aria-hidden="true" /> Explorar painel
                         </Link>
-                        {selected.niche === "barber" && (
-                          <Link
-                            to="/demo/$storeSlug/agendar"
-                            params={{ storeSlug: selected.slug }}
-                            className="inline-flex items-center gap-2 rounded-full border border-amber-300/60 px-4 py-2 text-sm text-amber-200 transition hover:bg-amber-300/10"
-                          >
-                            <CalendarDays className="h-4 w-4" /> Agendar
-                          </Link>
-                        )}
                       </div>
+
+                      {store.niche === "barber" && (
+                        <Link
+                          to="/demo/$storeSlug/agendar"
+                          params={{ storeSlug: store.slug }}
+                          className="mt-2 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-amber-300/30 bg-amber-300/[0.06] px-4 py-3 text-sm font-semibold text-amber-200 transition hover:bg-amber-300/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
+                        >
+                          <CalendarDays className="h-4 w-4" aria-hidden="true" /> Testar agendamento
+                        </Link>
+                      )}
                     </div>
-                  </div>
-                </InteractiveTiltCard>
-              </PulsingBorder>
-
-              <InteractiveProductFolder items={folderItems} label="Galeria das lojas" />
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Bento das demos */}
-      <section className="border-t border-white/5 bg-black/30">
-        <div className="mx-auto max-w-6xl px-4 py-16">
-          <div className="flex items-end justify-between">
-            <div>
-              <div className="text-xs uppercase tracking-widest text-amber-300">Demos</div>
-              <h2 className="text-2xl font-semibold sm:text-3xl">Quatro lojas, um núcleo</h2>
+                  </article>
+                );
+              })}
             </div>
           </div>
-          <div className="mt-8 grid gap-4 sm:grid-cols-6">
-            {STORES.map((s, i) => {
-              const Icon = NICHE_ICON[s.niche] ?? ShoppingBag;
-              const spans = i === 0 ? "sm:col-span-6 lg:col-span-3" : "sm:col-span-3 lg:col-span-3";
-              return (
-                <InteractiveTiltCard key={s.slug} className={"rounded-2xl " + spans}>
-                  <Link
-                    to="/demo/$storeSlug"
-                    params={{ storeSlug: s.slug }}
-                    className="group relative flex h-full min-h-[220px] flex-col justify-end overflow-hidden rounded-2xl border border-white/10 bg-neutral-900"
-                  >
-                    <div
-                      className="absolute inset-0 bg-cover bg-center opacity-70 transition group-hover:scale-105 group-hover:opacity-90"
-                      style={{ backgroundImage: `url(${s.banners[0]?.image})` }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
-                    <div className="relative p-5">
-                      <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-widest text-amber-300">
-                        <Icon className="h-3 w-3" /> {s.tagline}
-                      </div>
-                      <h3 className="mt-1 font-display text-2xl">{s.name}</h3>
-                      <p className="mt-1 line-clamp-2 text-sm text-neutral-300">{s.description}</p>
-                      <div className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-amber-300">
-                        Abrir{" "}
-                        <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-                      </div>
-                    </div>
-                  </Link>
-                </InteractiveTiltCard>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="relative overflow-hidden border-y border-cyan-200/10 bg-[#071018]">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(34,211,238,0.12),transparent_30%),radial-gradient(circle_at_85%_80%,rgba(251,191,36,0.09),transparent_28%)]" />
-        <div className="relative mx-auto max-w-6xl px-4 py-20">
-          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200">
-                Valor para o negócio
+        <section className="bg-[#071018]">
+          <div className="mx-auto max-w-6xl px-4 py-20">
+            <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-cyan-200">
+                  Site comum x solução completa
+                </p>
+                <h2 className="mt-4 font-display text-4xl font-light tracking-[-0.04em] text-white sm:text-6xl">
+                  Aparência chama atenção. Estrutura transforma interesse em ação.
+                </h2>
+              </div>
+              <p className="text-base leading-7 text-white/62">
+                O projeto não termina na página bonita. A proposta é conectar posicionamento,
+                informação e operação para reduzir dúvidas e facilitar o próximo passo do cliente.
               </p>
-              <h2 className="mt-4 max-w-xl font-display text-4xl font-light tracking-[-0.04em] text-white sm:text-6xl">
-                Não é “só um site”. É menos atrito entre interesse e venda.
+            </div>
+
+            <div className="mt-12 grid gap-5 md:grid-cols-2">
+              <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+                  Site genérico
+                </p>
+                <ul className="mt-5 space-y-4 text-sm leading-6 text-white/58">
+                  {[
+                    "Visual reaproveitado sem relação clara com a marca",
+                    "Informação espalhada e chamada para ação fraca",
+                    "Dependência de mensagens para explicar tudo",
+                    "Funcionalidades adicionadas sem considerar a rotina",
+                  ].map((item) => (
+                    <li key={item} className="flex gap-3">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-white/30" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="rounded-3xl border border-cyan-300/20 bg-cyan-300/[0.06] p-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
+                  Projeto Vitrine Base
+                </p>
+                <ul className="mt-5 space-y-4 text-sm leading-6 text-white/76">
+                  {[
+                    "Identidade, hierarquia e conteúdo adaptados ao negócio",
+                    "Fluxos definidos pela ação que o cliente deve realizar",
+                    "Painel, pedidos ou agenda quando realmente necessários",
+                    "Escopo, prazo e custos alinhados antes do desenvolvimento",
+                  ].map((item) => (
+                    <li key={item} className="flex gap-3">
+                      <Check className="mt-1 h-4 w-4 shrink-0 text-cyan-200" aria-hidden="true" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="processo" className="scroll-mt-20 border-y border-white/10 bg-black/25">
+          <div className="mx-auto max-w-6xl px-4 py-20">
+            <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+              <div className="max-w-3xl">
+                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-amber-300">
+                  Como o projeto acontece
+                </p>
+                <h2 className="mt-4 font-display text-4xl font-light tracking-[-0.04em] text-white sm:text-6xl">
+                  Um processo claro antes de qualquer publicação.
+                </h2>
+              </div>
+              <div className="inline-flex items-center gap-2 text-sm text-white/58">
+                <Clock3 className="h-4 w-4 text-amber-300" aria-hidden="true" />
+                Prazo definido junto com o escopo
+              </div>
+            </div>
+
+            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {PROCESS.map((item) => (
+                <article key={item.step} className="rounded-3xl border border-white/10 bg-white/[0.035] p-6">
+                  <p className="font-display text-4xl text-amber-300/75">{item.step}</p>
+                  <h3 className="mt-5 text-lg font-semibold text-white">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-white/58">{item.description}</p>
+                </article>
+              ))}
+            </div>
+
+            <div className="mt-6 flex flex-col gap-4 rounded-3xl border border-amber-300/18 bg-amber-300/[0.055] p-6 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-semibold text-amber-100">Pagamento por etapa, sem publicação antecipada.</p>
+                <p className="mt-1 text-sm leading-6 text-white/58">
+                  50% para iniciar e 50% após a aprovação, antes da publicação do projeto.
+                </p>
+              </div>
+              <Link
+                to="/planos"
+                className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-amber-300/35 px-5 py-3 text-sm font-semibold text-amber-100 transition hover:bg-amber-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
+              >
+                Ver planos e condições <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <PricingPreview />
+
+        <section className="border-t border-white/10 bg-neutral-950">
+          <div className="mx-auto max-w-6xl px-4 py-20">
+            <div className="max-w-3xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.26em] text-cyan-200">
+                O que pode fazer parte do projeto
+              </p>
+              <h2 className="mt-4 font-display text-4xl font-light tracking-[-0.04em] text-white sm:text-6xl">
+                A mesma qualidade de base, com profundidade definida pelo escopo.
               </h2>
             </div>
-            <div className="rounded-3xl border border-amber-200/15 bg-amber-300/[0.055] p-6">
-              <p className="text-sm font-semibold text-amber-100">
-                A verdade que protege o cliente
-              </p>
-              <p className="mt-2 text-sm leading-7 text-white/62">
-                Um site sozinho não cria demanda nem garante faturamento. Ele evita desperdiçar a
-                demanda que já chega, transmite confiança e cria uma base própria para Google,
-                avaliações, conteúdo, mídia e relacionamento.
-              </p>
+
+            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {INCLUDED.map((item) => (
+                <article key={item.title} className="rounded-3xl border border-white/10 bg-white/[0.035] p-6">
+                  <item.icon className="h-6 w-6 text-amber-300" aria-hidden="true" />
+                  <h3 className="mt-4 text-lg font-semibold text-white">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-white/58">{item.description}</p>
+                </article>
+              ))}
             </div>
           </div>
+        </section>
 
-          <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {BUSINESS_OUTCOMES.map((item) => (
-              <article
-                key={item.pain}
-                className="rounded-3xl border border-white/10 bg-white/[0.045] p-6 backdrop-blur-sm"
+        <section className="relative overflow-hidden border-t border-white/10 bg-[#071018]">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(34,211,238,0.14),transparent_35%),radial-gradient(circle_at_15%_90%,rgba(251,191,36,0.1),transparent_30%)]"
+          />
+          <div className="relative mx-auto max-w-4xl px-4 py-24 text-center">
+            <BadgeCheck className="mx-auto h-8 w-8 text-amber-300" aria-hidden="true" />
+            <h2 className="mt-6 font-display text-4xl font-light tracking-[-0.045em] text-white sm:text-6xl">
+              Seu negócio já tem uma identidade. O site precisa traduzir isso e facilitar a operação.
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/62">
+              Conte como sua empresa vende, atende ou agenda. A proposta será construída a partir do
+              que realmente precisa funcionar.
+            </p>
+            <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
+              <a
+                href={PROPOSAL_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-cyan-300 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-100"
               >
-                <item.icon className="h-6 w-6 text-cyan-200" aria-hidden="true" />
-                <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-white/42">
-                  Dor: {item.pain}
-                </p>
-                <h3 className="mt-3 text-xl font-semibold leading-7 text-white">{item.outcome}</h3>
-                <p className="mt-3 text-sm leading-6 text-white/52">{item.proof}</p>
-              </article>
-            ))}
-          </div>
-
-          <div className="mt-8 flex flex-col gap-4 rounded-3xl border border-cyan-200/15 bg-cyan-300/[0.06] p-6 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="font-semibold text-cyan-100">
-                Cada projeto começa com uma meta de negócio.
-              </p>
-              <p className="mt-1 text-sm leading-6 text-white/55">
-                Exemplo: receber mais pedidos, reduzir perguntas repetidas, aumentar agendamentos ou
-                melhorar a confiança antes da compra.
-              </p>
+                Conversar pelo WhatsApp <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              </a>
+              <Link
+                to="/planos"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.045] px-6 py-3 text-sm font-semibold text-white transition hover:border-amber-300/40 hover:bg-amber-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
+              >
+                Ver investimento <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
             </div>
-            <Link
-              to="/planos"
-              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
-            >
-              Ver investimento <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
           </div>
+        </section>
+      </main>
+
+      <footer className="border-t border-white/10 bg-black/30 px-4 py-8">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between">
+          <span>Vitrine Base · sites e sistemas para negócios locais</span>
+          <span>As lojas exibidas são demonstrações. Nenhum pagamento real é processado.</span>
         </div>
-      </section>
-
-      <PricingPreview />
-
-      {/* Features */}
-      <section className="border-t border-white/5 bg-black/30">
-        <div className="mx-auto max-w-6xl px-4 py-16">
-          <h2 className="text-2xl font-semibold sm:text-3xl">O que está incluso</h2>
-          <p className="mt-2 text-neutral-400">
-            Um núcleo técnico compartilhado por todas as lojas, pronto para personalização.
-          </p>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((f) => (
-              <div key={f.title} className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
-                <f.icon className="h-6 w-6 text-amber-300" />
-                <h3 className="mt-3 font-semibold">{f.title}</h3>
-                <p className="mt-1 text-sm text-neutral-400">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <footer className="border-t border-white/5 py-8 text-center text-xs text-neutral-500">
-        Vitrine Base · Modelo demonstrativo · Nenhum pagamento é processado
       </footer>
     </div>
   );
