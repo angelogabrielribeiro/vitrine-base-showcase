@@ -78,7 +78,7 @@ export function RestaurantStorefront({ store, products, featured }: Props) {
   const popular = featured.length ? featured.slice(0, 4) : products.slice(0, 4);
 
   return (
-    <div className="overflow-hidden bg-[#120d0a] text-[#fff8eb]">
+    <div className="overflow-x-clip bg-[#120d0a] text-[#fff8eb]">
       <section className="relative isolate min-h-[760px] overflow-hidden border-b border-orange-300/10 lg:min-h-[calc(100svh-6.5rem)]">
         <motion.div
           aria-hidden
