@@ -258,7 +258,7 @@ export function PremiumProductDetail({ store, product, related }: PremiumProduct
               <span className={surface.muted}>{product.sku ?? "Curated object"}</span>
             </div>
 
-            <h1 className="font-display mt-5 text-5xl leading-[0.9] tracking-[-0.045em] sm:text-6xl lg:text-[4.6rem]">
+            <h1 className={`${store.niche === "fashion" ? "font-sans font-semibold" : "font-display"} mt-5 text-5xl leading-[0.9] tracking-[-0.045em] sm:text-6xl lg:text-[4.6rem]`}>
               {product.name}
             </h1>
 
@@ -483,7 +483,7 @@ export function PremiumProductDetail({ store, product, related }: PremiumProduct
               <div className={`text-[9px] uppercase tracking-[0.36em] ${surface.eyebrow}`}>
                 Product intelligence
               </div>
-              <h2 className="font-display mt-5 text-4xl leading-[0.94] sm:text-5xl">
+              <h2 className={`${store.niche === "fashion" ? "font-sans font-semibold" : "font-display"} mt-5 text-4xl leading-[0.94] sm:text-5xl`}>
                 O detalhe não é uma nota de rodapé.
               </h2>
               <p className={`mt-6 max-w-lg text-sm leading-7 ${surface.muted}`}>
@@ -515,7 +515,7 @@ export function PremiumProductDetail({ store, product, related }: PremiumProduct
                 <div className={`text-[8px] uppercase tracking-[0.3em] ${surface.muted}`}>
                   0{index + 1} / {label}
                 </div>
-                <div className="font-display mt-5 text-2xl">{value}</div>
+                <div className={`${store.niche === "fashion" ? "font-sans font-semibold" : "font-display"} mt-5 text-2xl`}>{value}</div>
               </motion.div>
             ))}
           </div>
@@ -529,7 +529,7 @@ export function PremiumProductDetail({ store, product, related }: PremiumProduct
               <div className={`text-[9px] uppercase tracking-[0.34em] ${surface.eyebrow}`}>
                 Continue the sequence
               </div>
-              <h2 className="font-display mt-3 text-4xl sm:text-5xl">Próximos objetos.</h2>
+              <h2 className={`${store.niche === "fashion" ? "font-sans font-semibold" : "font-display"} mt-3 text-4xl sm:text-5xl`}>Próximos objetos.</h2>
             </div>
             <Sparkles className={`hidden h-7 w-7 sm:block ${surface.eyebrow}`} />
           </div>

@@ -31,6 +31,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { CardFanCarousel } from "@/components/effects/CardFanCarousel";
+import { NicheScrollOdyssey } from "@/components/storefront/niche-scroll-odyssey";
 
 const HERO_IMAGE = "/media/brasa-urbana/hero-brasa-duplo.webp";
 const PROCESS_IMAGE = "/media/brasa-urbana/processo-brasa.webp";
@@ -157,6 +158,25 @@ export function RestaurantStorefront({ store, products, featured }: Props) {
           </Stagger>
         </div>
       </section>
+
+      <NicheScrollOdyssey
+        niche="restaurant"
+        eyebrow="Da faísca à primeira mordida"
+        title="O fogo responde ao seu scroll."
+        scenes={popular.slice(0, 3).map((product, index) => ({
+          number: String(index + 1).padStart(2, "0"),
+          kicker: product.category,
+          title:
+            index === 0
+              ? "A brasa sobe antes do pedido."
+              : index === 1
+                ? "A textura aparece no caminho."
+                : "O desejo vira decisão.",
+          copy: product.description,
+          image: product.images[0] ?? HERO_IMAGE,
+          metric: `${brl(product.salePrice ?? product.price)} · feito no pedido`,
+        }))}
+      />
 
       <div className="border-b border-orange-200/10 bg-[#f15a24] py-3 text-[#190d07]">
         <Marquee speed={26} className="font-black uppercase tracking-[0.18em]">

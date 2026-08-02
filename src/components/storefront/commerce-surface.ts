@@ -21,17 +21,17 @@ export interface CommerceSurface {
 
 export const COMMERCE_SURFACES: Record<StoreNiche, CommerceSurface> = {
   fashion: {
-    shell: "bg-[#f3efe8] text-[#201c19]",
-    panel: "bg-[#fbf8f2]",
-    panelStrong: "bg-[#2a201d] text-[#fbf8f2]",
-    border: "border-[#2a201d]/15",
-    muted: "text-[#756a63]",
-    accent: "bg-[#8f5548]",
-    accentText: "text-[#8f5548]",
-    accentSoft: "bg-[#8f5548]/10",
-    button: "bg-[#2a201d] text-white hover:bg-[#8f5548]",
-    outlineButton: "border-[#2a201d]/20 hover:border-[#2a201d] hover:bg-white/70",
-    eyebrow: "text-[#8f5548]",
+    shell: "bg-[#180c12] text-[#f7eee8]",
+    panel: "bg-[#2b121e]/90",
+    panelStrong: "bg-[#351622] text-[#f7eee8]",
+    border: "border-[#ead1c8]/16",
+    muted: "text-[#d7bfc0]",
+    accent: "bg-[#d49aa7]",
+    accentText: "text-[#e7b4bd]",
+    accentSoft: "bg-[#d49aa7]/12",
+    button: "bg-[#ead1c8] text-[#301622] hover:bg-white",
+    outlineButton: "border-[#ead1c8]/22 hover:border-[#d49aa7] hover:bg-[#d49aa7]/10",
+    eyebrow: "text-[#d9ad72]",
     catalogKicker: "Maison Edit / Curadoria 2026",
     catalogTitle: "Peças que mudam o ritmo de uma sala.",
     catalogCopy:

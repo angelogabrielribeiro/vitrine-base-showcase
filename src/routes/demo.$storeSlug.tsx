@@ -13,6 +13,7 @@ import { StoreFooter } from "@/components/storefront/store-footer";
 import { WhatsappFab } from "@/components/storefront/whatsapp-fab";
 import { DemoBanner } from "@/components/storefront/demo-banner";
 import { LiquidMobileMenu } from "@/components/storefront/liquid-mobile-menu";
+import { StoreCursorShader } from "@/components/storefront/store-cursor-shader";
 import { useEffect } from "react";
 import { seedAllStores } from "@/services/local-repository";
 import { useRepo } from "@/hooks/use-repo";
@@ -67,6 +68,7 @@ function StoreLayout() {
   return (
     <div className={themeScopeClass(store.slug) + " min-h-screen"}>
       <StoreThemeStyle store={store} />
+      <StoreCursorShader niche={store.niche} />
       <DemoBanner />
       <StoreHeader store={store} />
       <main>

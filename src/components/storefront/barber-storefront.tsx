@@ -28,6 +28,7 @@ import { SafeImage } from "@/components/storefront/safe-image";
 import { ProductCard } from "@/components/storefront/product-card";
 import { barberServiceFallback, BARBER_PROFESSIONAL_FALLBACK } from "@/lib/barber-media";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
+import { NicheScrollOdyssey } from "@/components/storefront/niche-scroll-odyssey";
 
 const ICONS: Record<string, typeof Sparkles> = {
   truck: Truck,
@@ -52,6 +53,24 @@ export function BarberStorefront({ store, services, professionals, products }: P
   return (
     <div className="bg-neutral-950 text-neutral-100">
       <BarberHero store={store} spotlight={null} featured={[]} />
+      <NicheScrollOdyssey
+        niche="barber"
+        eyebrow="O corte acontece em camadas"
+        title="Você conduz o ritual."
+        scenes={services.slice(0, 3).map((service, index) => ({
+          number: String(index + 1).padStart(2, "0"),
+          kicker: service.name,
+          title:
+            index === 0
+              ? "Precisão antes do primeiro fio cair."
+              : index === 1
+                ? "A forma aparece enquanto você avança."
+                : "O acabamento muda a presença.",
+          copy: service.description,
+          image: service.image ?? barberServiceFallback(service.slug),
+          metric: `${service.durationMinutes} minutos · ${brl(service.price)}`,
+        }))}
+      />
 
       <TrustStrip store={store} />
       <ServicesEditorial services={services} storeSlug={store.slug} />
@@ -357,7 +376,7 @@ function ProfessionalsStack({ professionals }: { professionals: Professional[] }
 
   const activePro = list[active];
   const firstName = activePro?.name.split(" ")[0] ?? "";
-  const stackStep = capabilities.coarsePointer ? 9 : 22;
+  const stackStep = capabilities.coarsePointer ? 34 : 54;
 
   const cycle = (direction: -1 | 1) => {
     setActive((current) => (current + direction + list.length) % list.length);
@@ -402,7 +421,10 @@ function ProfessionalsStack({ professionals }: { professionals: Professional[] }
               Arraste os cards, conheça cada profissional e escolha quem executa o seu horário.
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-2">
+            <div className="mt-6 flex flex-wrap items-center gap-2">
+              <span className="mr-2 border-b border-amber-300/35 pb-2 text-[9px] font-bold uppercase tracking-[0.28em] text-amber-200/70">
+                {String(list.length).padStart(2, "0")} profissionais ativos
+              </span>
               {list.map((p, i) => (
                 <button
                   key={p.id}
@@ -436,10 +458,10 @@ function ProfessionalsStack({ professionals }: { professionals: Professional[] }
             )}
           </div>
 
-          <div className="relative mx-auto h-[430px] w-[calc(100%_-_1.25rem)] max-w-[360px] sm:h-[440px] sm:w-full">
+          <div className="relative mx-auto h-[440px] w-[calc(100%_-_2.5rem)] max-w-[430px] pr-14 sm:h-[450px] sm:w-full">
             {list.map((p, i) => {
-              const offset = i - active;
-              const isActive = i === active;
+              const slot = (i - active + list.length) % list.length;
+              const isActive = slot === 0;
               return (
                 <motion.article
                   key={p.id}
@@ -459,18 +481,18 @@ function ProfessionalsStack({ professionals }: { professionals: Professional[] }
                     reduce
                       ? { opacity: isActive ? 1 : 0.3 }
                       : {
-                          x: isActive ? 0 : offset * stackStep,
-                          y: isActive ? 0 : Math.abs(offset) * 14,
-                          rotate: isActive ? 0 : offset * 1.8,
-                          scale: isActive ? 1 : 0.93,
-                          opacity: isActive ? 1 : Math.abs(offset) > 2 ? 0 : 0.35,
-                          filter: isActive ? "none" : "brightness(0.55)",
+                          x: slot * stackStep,
+                          y: slot * 18,
+                          rotate: slot * 2.8,
+                          scale: 1 - slot * 0.055,
+                          opacity: 1 - slot * 0.18,
+                          filter: isActive ? "none" : "brightness(0.72)",
                         }
                   }
                   transition={{ duration: 0.5, ease: MOTION.ease }}
                   whileTap={reduce ? undefined : { scale: isActive ? 0.985 : 0.91 }}
                   style={{
-                    zIndex: isActive ? 30 : 10 - Math.abs(offset),
+                    zIndex: 30 - slot,
                     touchAction: "pan-y",
                   }}
                   className="absolute inset-0 w-full cursor-grab overflow-hidden border border-neutral-800 bg-neutral-900 shadow-2xl shadow-black/40 active:cursor-grabbing"
