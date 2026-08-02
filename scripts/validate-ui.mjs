@@ -99,9 +99,20 @@ async function assertNoOverflow(page, label) {
 }
 
 async function assertImagesLoaded(locator, expected, label) {
-  const state = await locator.locator("img").evaluateAll((images) => ({
-    total: images.length,
-    loaded: images.filter((image) => image.complete && image.naturalWidth > 0).length,
+  const images = locator.locator("img");
+  await images.evaluateAll(async (elements) => {
+    for (const image of elements) {
+      image.loading = "eager";
+      image.scrollIntoView({ block: "nearest", inline: "center" });
+      await Promise.race([
+        image.decode().catch(() => undefined),
+        new Promise((resolve) => window.setTimeout(resolve, 2_500)),
+      ]);
+    }
+  });
+  const state = await images.evaluateAll((elements) => ({
+    total: elements.length,
+    loaded: elements.filter((image) => image.complete && image.naturalWidth > 0).length,
   }));
   assert(state.total === expected, `${label}: quantidade de imagens inesperada ${state.total}`);
   assert(
@@ -147,12 +158,16 @@ async function validateHome(browser, config) {
 
     let firstTapActivated = null;
     if (viewport.width < 1024) {
-      const secondCard = showroomCards.nth(1);
+      const inactiveIndex = await showroomCards.evaluateAll((cards) =>
+        cards.findIndex((card) => card.getAttribute("data-active") === "false"),
+      );
+      assert(inactiveIndex >= 0, `${name}: nenhum card inativo disponível para testar o foco`);
+      const targetCard = showroomCards.nth(inactiveIndex);
       const beforeUrl = page.url();
-      await secondCard.dispatchEvent("click");
+      await targetCard.dispatchEvent("click");
       await page.waitForTimeout(700);
       firstTapActivated =
-        page.url() === beforeUrl && (await secondCard.getAttribute("data-active")) === "true";
+        page.url() === beforeUrl && (await targetCard.getAttribute("data-active")) === "true";
       assert(firstTapActivated, `${name}: primeiro toque não focou o card antes de navegar`);
 
       const duplicateJourney = page.getByTestId("universe-journey");
