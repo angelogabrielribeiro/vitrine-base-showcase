@@ -5,6 +5,7 @@ import { useRef } from "react";
 import type { Product, StoreConfig } from "@/types/commerce";
 import { SafeImage } from "@/components/storefront/safe-image";
 import { commerceSurface } from "@/components/storefront/commerce-surface";
+import { brl } from "@/lib/format";
 
 const BACKGROUNDS = {
   fashion:
@@ -73,6 +74,34 @@ export function CatalogExpansionHero({
               style={reduced ? { opacity: 0.28 } : { opacity: overlayOpacity }}
             />
           </motion.div>
+        )}
+
+        {lead && (
+          <motion.aside
+            data-testid="catalog-feature-context"
+            initial={reduced ? false : { opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.18, duration: 0.58 }}
+            className="absolute bottom-7 left-5 z-30 w-[calc(100%_-_2.5rem)] border border-white/20 bg-black/58 p-4 text-white shadow-2xl backdrop-blur-xl sm:bottom-10 sm:left-auto sm:right-8 sm:w-[22rem] sm:p-5 lg:right-12"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className={`text-[8px] font-bold uppercase tracking-[0.3em] ${surface.eyebrow}`}>
+                  Destaque com contexto · {lead.category}
+                </p>
+                <h2 className="mt-2 font-sans text-xl font-semibold leading-tight">{lead.name}</h2>
+              </div>
+              <strong className="shrink-0 text-sm">{brl(lead.salePrice ?? lead.price)}</strong>
+            </div>
+            <p className="mt-3 line-clamp-2 text-xs leading-5 text-white/60">{lead.description}</p>
+            <Link
+              to="/demo/$storeSlug/produto/$productSlug"
+              params={{ storeSlug: store.slug, productSlug: lead.slug }}
+              className="mt-4 inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.24em] text-white transition hover:text-current"
+            >
+              Ver produto <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </motion.aside>
         )}
 
         <motion.div
