@@ -71,8 +71,7 @@ const DEMO_VALUE: Record<
 > = {
   moda: {
     problem: "Coleções espalhadas entre posts, destaques e mensagens.",
-    solution:
-      "Uma vitrine editorial que transforma produto, composição e compra em uma jornada.",
+    solution: "Uma vitrine editorial que transforma produto, composição e compra em uma jornada.",
     highlight: "Moda e varejo",
     accent: "text-[#d58c9a]",
     glow: "from-[#d58c9a]/28 via-transparent to-vb-gold/16",
@@ -80,8 +79,7 @@ const DEMO_VALUE: Record<
   },
   barbearia: {
     problem: "Agenda dependente de trocas manuais de mensagens.",
-    solution:
-      "Serviços, profissionais e horários organizados para o cliente reservar sozinho.",
+    solution: "Serviços, profissionais e horários organizados para o cliente reservar sozinho.",
     highlight: "Serviços e agenda",
     accent: "text-vb-gold",
     glow: "from-vb-gold/28 via-transparent to-[#8a6d36]/18",
@@ -89,8 +87,7 @@ const DEMO_VALUE: Record<
   },
   restaurante: {
     problem: "Cardápio, adicionais e pedidos difíceis de conferir.",
-    solution:
-      "Uma experiência quente e direta para escolher, personalizar e finalizar o pedido.",
+    solution: "Uma experiência quente e direta para escolher, personalizar e finalizar o pedido.",
     highlight: "Pedidos locais",
     accent: "text-[#ff7448]",
     glow: "from-[#ff7448]/28 via-transparent to-vb-gold/14",
@@ -98,8 +95,7 @@ const DEMO_VALUE: Record<
   },
   eletronicos: {
     problem: "Produtos técnicos apresentados sem hierarquia ou contexto.",
-    solution:
-      "Categorias, detalhes e compra organizados em um ambiente digital de alta precisão.",
+    solution: "Categorias, detalhes e compra organizados em um ambiente digital de alta precisão.",
     highlight: "Catálogo técnico",
     accent: "text-vb-cyan",
     glow: "from-vb-cyan/26 via-transparent to-vb-violet/25",
@@ -111,8 +107,7 @@ const PROCESS = [
   {
     step: "01",
     title: "Diagnóstico",
-    description:
-      "Entendemos o negócio, a rotina, o público e o objetivo comercial prioritário.",
+    description: "Entendemos o negócio, a rotina, o público e o objetivo comercial prioritário.",
   },
   {
     step: "02",
@@ -129,8 +124,7 @@ const PROCESS = [
   {
     step: "04",
     title: "Validação",
-    description:
-      "Testamos desktop, mobile e operação; só publicamos depois da sua aprovação.",
+    description: "Testamos desktop, mobile e operação; só publicamos depois da sua aprovação.",
   },
 ];
 
@@ -138,14 +132,12 @@ const INCLUDED = [
   {
     icon: Smartphone,
     title: "Responsividade real",
-    description:
-      "Composição, movimento e hierarquia adaptados para celular e computador.",
+    description: "Composição, movimento e hierarquia adaptados para celular e computador.",
   },
   {
     icon: ShoppingBag,
     title: "Operação conectada",
-    description:
-      "Catálogo, pedidos, serviços, agenda ou checkout entram conforme a necessidade.",
+    description: "Catálogo, pedidos, serviços, agenda ou checkout entram conforme a necessidade.",
   },
   {
     icon: LayoutDashboard,
@@ -156,14 +148,12 @@ const INCLUDED = [
   {
     icon: ShieldCheck,
     title: "Base profissional",
-    description:
-      "Domínio, segurança, banco de dados e permissões planejados para a entrega real.",
+    description: "Domínio, segurança, banco de dados e permissões planejados para a entrega real.",
   },
   {
     icon: Sparkles,
     title: "Identidade própria",
-    description:
-      "Layout, tipografia, cards, transições e conteúdo construídos para cada marca.",
+    description: "Layout, tipografia, cards, transições e conteúdo construídos para cada marca.",
   },
   {
     icon: MessageCircle,
@@ -235,10 +225,7 @@ function Index() {
       </header>
 
       <main id="conteudo">
-        <UniverseShowroomHero
-          proposalUrl={PROPOSAL_URL}
-          demoNotice={DEMO_NOTICE}
-        />
+        <UniverseShowroomHero proposalUrl={PROPOSAL_URL} demoNotice={DEMO_NOTICE} />
 
         <section
           aria-label="Princípios da Vitrine Base"
@@ -253,15 +240,9 @@ function Index() {
                 "Operação conectada",
                 "Clareza para converter",
               ].map((item) => (
-                <span
-                  key={`${group}-${item}`}
-                  className="inline-flex items-center gap-10"
-                >
+                <span key={`${group}-${item}`} className="inline-flex items-center gap-10">
                   {item}
-                  <span
-                    className="h-1.5 w-1.5 rounded-full bg-vb-gold"
-                    aria-hidden="true"
-                  />
+                  <span className="h-1.5 w-1.5 rounded-full bg-vb-gold" aria-hidden="true" />
                 </span>
               )),
             )}
@@ -274,10 +255,7 @@ function Index() {
           id="demonstracoes"
           className="relative scroll-mt-20 overflow-hidden border-b border-white/10 bg-vb-canvas"
         >
-          <div
-            aria-hidden="true"
-            className="vb-noise absolute inset-0 opacity-20"
-          />
+          <div aria-hidden="true" className="vb-noise absolute inset-0 opacity-20" />
           <div className="relative mx-auto max-w-[90rem] px-5 py-24 sm:px-8 sm:py-32 lg:px-12">
             <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
               <div>
@@ -287,9 +265,8 @@ function Index() {
                 </h2>
               </div>
               <p className="max-w-2xl text-base leading-8 text-white/58 lg:justify-self-end lg:text-lg">
-                A estrutura técnica pode ser reaproveitada com responsabilidade.
-                O que o cliente vê, sente e usa é construído a partir da
-                identidade e da operação de cada marca.
+                A estrutura técnica pode ser reaproveitada com responsabilidade. O que o cliente vê,
+                sente e usa é construído a partir da identidade e da operação de cada marca.
               </p>
             </div>
 
@@ -308,11 +285,7 @@ function Index() {
                     transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
                     className="group grid gap-8 py-12 sm:py-16 lg:grid-cols-12 lg:items-center"
                   >
-                    <div
-                      className={
-                        reverse ? "lg:order-2 lg:col-span-7" : "lg:col-span-7"
-                      }
-                    >
+                    <div className={reverse ? "lg:order-2 lg:col-span-7" : "lg:col-span-7"}>
                       <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-vb-elevated p-2 shadow-2xl shadow-black/35">
                         <div
                           aria-hidden="true"
@@ -333,11 +306,7 @@ function Index() {
                       </div>
                     </div>
 
-                    <div
-                      className={
-                        reverse ? "lg:order-1 lg:col-span-5" : "lg:col-span-5"
-                      }
-                    >
+                    <div className={reverse ? "lg:order-1 lg:col-span-5" : "lg:col-span-5"}>
                       <div className="flex items-center gap-4">
                         <span
                           className={`font-display text-5xl font-semibold ${value?.accent ?? "text-vb-gold"}`}
@@ -357,15 +326,11 @@ function Index() {
                       <p className="mt-3 text-xs font-bold uppercase tracking-[0.2em] text-white/38">
                         Problema
                       </p>
-                      <p className="mt-2 text-base leading-7 text-white/62">
-                        {value?.problem}
-                      </p>
+                      <p className="mt-2 text-base leading-7 text-white/62">{value?.problem}</p>
                       <p className="mt-5 text-xs font-bold uppercase tracking-[0.2em] text-white/38">
                         Experiência criada
                       </p>
-                      <p className="mt-2 text-lg leading-8 text-white/82">
-                        {value?.solution}
-                      </p>
+                      <p className="mt-2 text-lg leading-8 text-white/82">{value?.solution}</p>
 
                       <div className="mt-8 flex flex-wrap gap-3">
                         <Link
@@ -449,10 +414,7 @@ function Index() {
                       "Qualidade adaptada à capacidade do dispositivo",
                     ].map((item) => (
                       <li key={item} className="flex gap-3">
-                        <Check
-                          className="mt-1 h-4 w-4 shrink-0 text-vb-gold"
-                          aria-hidden="true"
-                        />
+                        <Check className="mt-1 h-4 w-4 shrink-0 text-vb-gold" aria-hidden="true" />
                         {item}
                       </li>
                     ))}
@@ -463,10 +425,7 @@ function Index() {
           </div>
         </section>
 
-        <section
-          id="processo"
-          className="scroll-mt-20 border-y border-white/10 bg-vb-deep"
-        >
+        <section id="processo" className="scroll-mt-20 border-y border-white/10 bg-vb-deep">
           <div className="mx-auto max-w-[90rem] px-5 py-24 sm:px-8 sm:py-32 lg:px-12">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
@@ -476,8 +435,8 @@ function Index() {
                 </h2>
               </div>
               <p className="max-w-md text-sm leading-7 text-white/55">
-                O prazo é definido depois do escopo. O pagamento é 50% para
-                iniciar e 50% depois da aprovação, antes da publicação.
+                O prazo é definido depois do escopo. O pagamento é 50% para iniciar e 50% depois da
+                aprovação, antes da publicação.
               </p>
             </div>
 
@@ -498,9 +457,7 @@ function Index() {
                   <h3 className="mt-16 font-display text-3xl font-semibold text-white">
                     {item.title}
                   </h3>
-                  <p className="mt-4 text-sm leading-7 text-white/55">
-                    {item.description}
-                  </p>
+                  <p className="mt-4 text-sm leading-7 text-white/55">{item.description}</p>
                   <ChevronRight className="absolute bottom-8 right-8 h-5 w-5 text-white/20 transition group-hover:translate-x-1 group-hover:text-vb-gold" />
                 </motion.article>
               ))}
@@ -518,8 +475,7 @@ function Index() {
               <div>
                 <p className="vb-kicker">O que pode fazer parte</p>
                 <h2 className="mt-5 font-display text-5xl font-semibold leading-[0.92] tracking-[-0.06em] sm:text-6xl">
-                  Tecnologia suficiente para resolver. Nunca só para
-                  impressionar.
+                  Tecnologia suficiente para resolver. Nunca só para impressionar.
                 </h2>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -536,9 +492,7 @@ function Index() {
                     <h3 className="mt-7 font-display text-2xl font-semibold text-white">
                       {item.title}
                     </h3>
-                    <p className="mt-3 text-sm leading-7 text-white/52">
-                      {item.description}
-                    </p>
+                    <p className="mt-3 text-sm leading-7 text-white/52">{item.description}</p>
                   </motion.article>
                 ))}
               </div>
@@ -547,23 +501,17 @@ function Index() {
         </section>
 
         <section className="relative isolate overflow-hidden bg-vb-deep">
-          <div
-            aria-hidden="true"
-            className="vb-pointer-aura absolute inset-0"
-          />
-          <div
-            aria-hidden="true"
-            className="vb-noise absolute inset-0 opacity-30"
-          />
+          <div aria-hidden="true" className="vb-pointer-aura absolute inset-0" />
+          <div aria-hidden="true" className="vb-noise absolute inset-0 opacity-30" />
           <div className="relative mx-auto flex min-h-[70svh] max-w-[90rem] flex-col items-center justify-center px-5 py-24 text-center sm:px-8 lg:px-12">
             <p className="vb-kicker">Seu negócio não precisa parecer pequeno</p>
             <h2 className="mt-6 max-w-6xl font-display text-5xl font-semibold leading-[0.88] tracking-[-0.065em] text-vb-ivory sm:text-7xl lg:text-[7rem]">
               Vamos construir uma presença que seja difícil de esquecer.
             </h2>
             <p className="mt-7 max-w-2xl text-base leading-8 text-white/58">
-              Conte o que você vende, como atende e qual é o principal problema
-              da operação. A partir disso, definimos o projeto certo — sem
-              funcionalidades inventadas e sem promessa vazia.
+              Conte o que você vende, como atende e qual é o principal problema da operação. A
+              partir disso, definimos o projeto certo — sem funcionalidades inventadas e sem
+              promessa vazia.
             </p>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <a
