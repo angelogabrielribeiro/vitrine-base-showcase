@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion, useReducedMotion, AnimatePresence, type PanInfo } from "framer-motion";
 import {
@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import type { StoreConfig, Product, Service, Professional } from "@/types/commerce";
 import { BarberHero } from "@/components/storefront/hero/barber-hero";
-import { SectionReveal, Stagger, StaggerItem, MOTION } from "@/components/motion/primitives";
+import { SectionReveal, MOTION } from "@/components/motion/primitives";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -29,6 +29,9 @@ import { ProductCard } from "@/components/storefront/product-card";
 import { barberServiceFallback, BARBER_PROFESSIONAL_FALLBACK } from "@/lib/barber-media";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 import { NicheScrollOdyssey } from "@/components/storefront/niche-scroll-odyssey";
+import { StoreInstitutional } from "@/components/storefront/store-institutional";
+import { useInView, sequenceDelay } from "@/hooks/use-in-view";
+import { useAdaptiveQuality } from "@/hooks/use-adaptive-quality";
 
 const ICONS: Record<string, typeof Sparkles> = {
   truck: Truck,
@@ -79,6 +82,9 @@ export function BarberStorefront({ store, services, professionals, products }: P
       <ResultsEditorial services={services} />
       <GroomingGrid products={products} storeSlug={store.slug} />
       <ClosingBlock store={store} />
+      <div className="pb-28 md:pb-0">
+        <StoreInstitutional store={store} />
+      </div>
     </div>
   );
 }
@@ -120,15 +126,16 @@ function ServicesEditorial({ services, storeSlug }: { services: Service[]; store
   const items = services.slice(0, 6);
   const [activeIdx, setActiveIdx] = useState(0);
   const reduce = useReducedMotion();
+  const { isMobile } = useAdaptiveQuality();
   const active = items[activeIdx];
   return (
-    <section className="mx-auto max-w-7xl px-6 py-16">
-      <div className="mb-8 flex items-end justify-between gap-6">
-        <div>
+    <section className="mx-auto max-w-7xl px-6 py-20 sm:py-16">
+      <div className="mb-10 flex items-end justify-between gap-6 sm:mb-8">
+        <div className="max-w-[22ch] sm:max-w-none">
           <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">
             Carta de serviços
           </div>
-          <h2 className="mt-2 font-display text-3xl uppercase tracking-tight text-white sm:text-4xl">
+          <h2 className="mt-2 text-balance font-display text-[clamp(1.75rem,7vw,2.5rem)] uppercase leading-tight tracking-tight text-white sm:text-4xl">
             O que se pratica aqui
           </h2>
         </div>
@@ -153,6 +160,7 @@ function ServicesEditorial({ services, storeSlug }: { services: Service[]; store
               storeSlug={storeSlug}
               onActivate={() => setActiveIdx(i)}
               isActive={i === activeIdx}
+              autoActivate={isMobile}
             />
           ))}
         </ul>
@@ -215,36 +223,50 @@ function ServiceRow({
   storeSlug,
   onActivate,
   isActive,
+  autoActivate,
 }: {
   service: Service;
   index: number;
   storeSlug: string;
   onActivate?: () => void;
   isActive?: boolean;
+  autoActivate?: boolean;
 }) {
   const reduce = useReducedMotion();
-  const [active, setActive] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const { ref, inView } = useInView<HTMLLIElement>({ amount: 0.6 });
   const image = service.image;
+
+  // Mobile: acende sozinho ao entrar na viewport, em sequência com o scroll.
+  // Desktop: reage a hover/foco, sem cursor simulado.
+  const active = autoActivate ? inView : hovered;
+
+  useEffect(() => {
+    if (autoActivate && inView) onActivate?.();
+  }, [autoActivate, inView, onActivate]);
 
   return (
     <li
+      ref={ref}
       onMouseEnter={() => {
-        setActive(true);
+        if (autoActivate) return;
+        setHovered(true);
         onActivate?.();
       }}
-      onMouseLeave={() => setActive(false)}
+      onMouseLeave={() => setHovered(false)}
       onFocus={() => {
-        setActive(true);
+        setHovered(true);
         onActivate?.();
       }}
-      onBlur={() => setActive(false)}
+      onBlur={() => setHovered(false)}
       className="group relative"
       data-active={isActive || undefined}
     >
       <Link
         to="/demo/$storeSlug/agendar"
         params={{ storeSlug }}
-        className="relative flex items-center gap-6 overflow-hidden px-2 py-6 outline-none focus-visible:bg-neutral-900/40 sm:px-4 sm:py-7 lg:py-6"
+        style={{ transitionDelay: autoActivate ? `${sequenceDelay(index, 0.06)}s` : undefined }}
+        className="relative flex items-center gap-6 overflow-hidden px-2 py-7 outline-none transition-colors duration-300 focus-visible:bg-neutral-900/40 sm:px-4 sm:py-7 lg:py-6"
       >
         <div
           aria-hidden
@@ -330,35 +352,45 @@ const RITUAL = [
   },
 ];
 
+function RitualStep({ step, index }: { step: (typeof RITUAL)[number]; index: number }) {
+  const { ref, inView } = useInView<HTMLDivElement>({ amount: 0.55 });
+  return (
+    <div
+      ref={ref}
+      style={{ transitionDelay: `${sequenceDelay(index, 0.12)}s` }}
+      data-lit={inView || undefined}
+      className="group relative h-full min-w-[82vw] shrink-0 snap-center overflow-hidden border border-neutral-800 bg-neutral-950/60 p-7 transition-all duration-500 ease-out hover:border-amber-300/35 data-[lit=true]:border-amber-300/35 sm:min-w-0 sm:shrink sm:p-6"
+    >
+      <div className="text-[10px] uppercase tracking-[0.35em] text-amber-200/80">
+        {step.kicker}
+      </div>
+      <h3 className="mt-3 max-w-[18ch] text-balance font-display text-2xl uppercase leading-tight tracking-tight text-white">
+        {step.title}
+      </h3>
+      <p className="mt-3 text-sm leading-relaxed text-neutral-400">{step.body}</p>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-amber-300/[0.08] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100 group-data-[lit=true]:opacity-100"
+      />
+    </div>
+  );
+}
+
 function RitualSteps() {
   return (
     <section className="border-y border-neutral-800/80 bg-neutral-900/40">
-      <div className="mx-auto max-w-6xl px-6 py-14">
-        <div className="mb-8">
+      <div className="mx-auto max-w-6xl px-6 py-20 sm:py-14">
+        <div className="mb-10 max-w-[22ch] sm:mb-8 sm:max-w-none">
           <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">O ritual</div>
-          <h2 className="mt-2 font-display text-3xl uppercase tracking-tight text-white sm:text-4xl">
+          <h2 className="mt-2 text-balance font-display text-[clamp(1.75rem,7vw,2.5rem)] uppercase leading-tight tracking-tight text-white sm:text-4xl">
             Três atos, uma cadeira
           </h2>
         </div>
-        <Stagger className="grid gap-4 sm:grid-cols-3" step={0.08}>
-          {RITUAL.map((r) => (
-            <StaggerItem key={r.kicker}>
-              <div className="relative h-full overflow-hidden border border-neutral-800 bg-neutral-950/60 p-6 transition hover:border-amber-300/40">
-                <div className="text-[10px] uppercase tracking-[0.35em] text-amber-200/80">
-                  {r.kicker}
-                </div>
-                <h3 className="mt-3 font-display text-2xl uppercase tracking-tight text-white">
-                  {r.title}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-neutral-400">{r.body}</p>
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-amber-300/10 blur-2xl"
-                />
-              </div>
-            </StaggerItem>
+        <div className="-mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0">
+          {RITUAL.map((r, i) => (
+            <RitualStep key={r.kicker} step={r} index={i} />
           ))}
-        </Stagger>
+        </div>
       </div>
     </section>
   );
@@ -618,19 +650,46 @@ function ProfessionalsStack({ professionals }: { professionals: Professional[] }
 /* -------------------------------------------------------------------------- */
 /* Resultados — editorial com imagens de serviços já existentes                */
 /* -------------------------------------------------------------------------- */
+function AtmosphereShot({ service, index }: { service: Service; index: number }) {
+  const { ref, inView } = useInView<HTMLElement>({ amount: 0.5 });
+  return (
+    <figure
+      ref={ref}
+      style={{ transitionDelay: `${sequenceDelay(index, 0.08)}s` }}
+      data-lit={inView || undefined}
+      className="group relative min-w-[62vw] shrink-0 snap-center overflow-hidden border border-neutral-800 sm:min-w-0 sm:shrink"
+    >
+      <div className="aspect-[3/4] w-full overflow-hidden">
+        <SafeImage
+          src={service.image}
+          fallbackSrc={barberServiceFallback(service.slug)}
+          alt={service.name}
+          fallbackLabel={service.name}
+          loading="lazy"
+          className="h-full w-full object-cover grayscale transition-all duration-[650ms] ease-out group-hover:scale-[1.04] group-hover:grayscale-0 group-data-[lit=true]:scale-[1.02] group-data-[lit=true]:grayscale-0"
+        />
+      </div>
+      <figcaption className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-neutral-950/95 via-neutral-950/60 to-transparent px-3 py-3 text-[10px] uppercase tracking-[0.25em] text-neutral-200">
+        <span className="truncate">{service.name}</span>
+        <span className="shrink-0 text-amber-200/80">{service.durationMinutes}m</span>
+      </figcaption>
+    </figure>
+  );
+}
+
 function ResultsEditorial({ services }: { services: Service[] }) {
   const shots = services.filter((s) => s.image).slice(0, 4);
   if (shots.length < 2) return null;
 
   return (
     <section className="border-y border-neutral-800/80 bg-neutral-950">
-      <div className="mx-auto max-w-7xl px-6 py-16">
-        <div className="mb-8 flex items-end justify-between gap-6">
-          <div>
+      <div className="mx-auto max-w-7xl px-6 py-20 sm:py-16">
+        <div className="mb-10 flex items-end justify-between gap-6 sm:mb-8">
+          <div className="max-w-[22ch] sm:max-w-none">
             <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">
               Atmosfera
             </div>
-            <h2 className="mt-2 font-display text-3xl uppercase tracking-tight text-white sm:text-4xl">
+            <h2 className="mt-2 text-balance font-display text-[clamp(1.75rem,7vw,2.5rem)] uppercase leading-tight tracking-tight text-white sm:text-4xl">
               Atmosfera Barber Noir
             </h2>
           </div>
@@ -639,26 +698,9 @@ function ResultsEditorial({ services }: { services: Service[] }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="-mx-6 flex snap-x snap-mandatory gap-3 overflow-x-auto px-6 pb-2 sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-3 sm:overflow-visible sm:px-0 sm:pb-0">
           {shots.map((s, i) => (
-            <SectionReveal key={s.id} delay={i * 0.06} y={12}>
-              <figure className="group relative overflow-hidden border border-neutral-800">
-                <div className="aspect-[3/4] w-full overflow-hidden">
-                  <SafeImage
-                    src={s.image}
-                    fallbackSrc={barberServiceFallback(s.slug)}
-                    alt={s.name}
-                    fallbackLabel={s.name}
-                    loading="lazy"
-                    className="h-full w-full object-cover grayscale transition duration-[550ms] ease-out group-hover:scale-[1.04] group-hover:grayscale-0"
-                  />
-                </div>
-                <figcaption className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-neutral-950/95 via-neutral-950/60 to-transparent px-3 py-3 text-[10px] uppercase tracking-[0.25em] text-neutral-200">
-                  <span>{s.name}</span>
-                  <span className="text-amber-200/80">{s.durationMinutes}m</span>
-                </figcaption>
-              </figure>
-            </SectionReveal>
+            <AtmosphereShot key={s.id} service={s} index={i} />
           ))}
         </div>
       </div>
@@ -674,13 +716,13 @@ function GroomingGrid({ products, storeSlug }: { products: Product[]; storeSlug:
   if (list.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-16">
-      <div className="mb-8 flex items-end justify-between gap-6">
-        <div>
+    <section className="mx-auto max-w-6xl px-6 py-20 sm:py-16">
+      <div className="mb-10 flex items-end justify-between gap-6 sm:mb-8">
+        <div className="max-w-[22ch] sm:max-w-none">
           <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">
             Grooming da casa
           </div>
-          <h2 className="mt-2 font-display text-3xl uppercase tracking-tight text-white sm:text-4xl">
+          <h2 className="mt-2 text-balance font-display text-[clamp(1.75rem,7vw,2.5rem)] uppercase leading-tight tracking-tight text-white sm:text-4xl">
             Leve o ritual para casa
           </h2>
         </div>
@@ -688,17 +730,26 @@ function GroomingGrid({ products, storeSlug }: { products: Product[]; storeSlug:
           to="/demo/$storeSlug/produtos"
           params={{ storeSlug }}
           search={{ q: "", cat: "", sort: "" }}
-          className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-amber-200 hover:text-amber-100"
+          className="hidden shrink-0 items-center gap-2 text-xs uppercase tracking-[0.3em] text-amber-200 hover:text-amber-100 sm:inline-flex"
         >
           Ver linha completa <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
         {list.map((p) => (
           <ProductCard key={p.id} product={p} storeSlug={storeSlug} />
         ))}
       </div>
+
+      <Link
+        to="/demo/$storeSlug/produtos"
+        params={{ storeSlug }}
+        search={{ q: "", cat: "", sort: "" }}
+        className="mt-8 inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-amber-200 hover:text-amber-100 sm:hidden"
+      >
+        Ver linha completa <ArrowRight className="h-4 w-4" />
+      </Link>
     </section>
   );
 }

@@ -46,6 +46,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
+import { useInView, sequenceDelay } from "@/hooks/use-in-view";
+import { StoreInstitutional } from "@/components/storefront/store-institutional";
 import { ElectronicsCircuitStory } from "@/components/storefront/electronics-circuit-story";
 import { NovaCoreSpatialCore } from "@/components/storefront/novacore-spatial-core";
 
@@ -123,6 +125,7 @@ export function ElectronicsStorefront({ store, products, featured }: Electronics
       <LabSection store={store} />
       <TrustStrip store={store} />
       <ClosingSection store={store} />
+      <StoreInstitutional store={store} />
     </div>
   );
 }
@@ -396,7 +399,7 @@ function CategoryCommandDeck({ store }: { store: StoreConfig }) {
           <p className="text-[9px] font-bold uppercase tracking-[0.38em] text-cyan-200/70">
             Select interface
           </p>
-          <h2 className="mt-4 max-w-lg text-5xl font-semibold uppercase leading-[0.84] tracking-[-0.055em] sm:text-7xl">
+          <h2 className="mt-4 max-w-[16ch] text-[clamp(2.1rem,8vw,4.5rem)] font-semibold uppercase leading-[0.9] tracking-[-0.02em] sm:tracking-[-0.055em]">
             Escolha uma constelação.
           </h2>
           <p className="mt-6 max-w-md text-sm leading-7 text-slate-400">
@@ -404,7 +407,7 @@ function CategoryCommandDeck({ store }: { store: StoreConfig }) {
             grade comum de departamentos.
           </p>
 
-          <div className="mt-9 grid gap-2">
+          <div className="mt-9 flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 lg:grid lg:overflow-visible lg:pb-0">
             {store.categories.map((category, index) => {
               const Icon = CATEGORY_ICONS[category.slug as keyof typeof CATEGORY_ICONS] ?? Sparkles;
               const isActive = index === active;
@@ -412,11 +415,10 @@ function CategoryCommandDeck({ store }: { store: StoreConfig }) {
                 <button
                   key={category.slug}
                   type="button"
-                  onMouseEnter={() => setActive(index)}
                   onFocus={() => setActive(index)}
                   onClick={() => setActive(index)}
                   className={
-                    "group grid min-h-14 grid-cols-[auto_1fr_auto] items-center gap-4 border px-4 text-left transition duration-500 " +
+                    "group grid min-h-14 shrink-0 snap-start grid-cols-[auto_1fr_auto] items-center gap-4 border px-4 text-left transition duration-500 lg:grid-cols-[auto_1fr_auto] lg:shrink lg:snap-none " +
                     (isActive
                       ? "border-cyan-200/45 bg-cyan-200/[0.08] text-white"
                       : "border-white/8 bg-white/[0.02] text-slate-500 hover:border-white/20 hover:text-white")
@@ -435,60 +437,69 @@ function CategoryCommandDeck({ store }: { store: StoreConfig }) {
           </div>
         </div>
 
-        <div className="relative min-h-[540px] [perspective:1700px]">
-          <motion.div
-            key={current.slug}
-            initial={reduceMotion ? false : { opacity: 0, scale: 0.82, rotateY: -18, rotateX: 8 }}
-            animate={{ opacity: 1, scale: 1, rotateY: 0, rotateX: 0 }}
-            transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute inset-[6%] [transform-style:preserve-3d]"
-          >
+        <div className="relative z-10 flex flex-col gap-5">
+          <div className="relative min-h-[280px] sm:min-h-[420px] lg:min-h-[420px] [perspective:1700px]">
             <motion.div
-              aria-hidden="true"
-              animate={reduceMotion ? undefined : { rotate: 360 }}
-              transition={{ duration: 26, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-              className="absolute inset-[7%] rounded-full border border-cyan-200/20"
+              key={current.slug}
+              initial={reduceMotion ? false : { opacity: 0, scale: 0.82, rotateY: -18, rotateX: 8 }}
+              animate={{ opacity: 1, scale: 1, rotateY: 0, rotateX: 0 }}
+              transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute inset-[6%] [transform-style:preserve-3d]"
             >
-              {Array.from({ length: 8 }).map((_, index) => {
-                const angle = index * 45;
-                return (
-                  <span
-                    key={index}
-                    className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border border-cyan-200/40 bg-[#030611] shadow-[0_0_14px_rgba(103,232,249,.3)]"
-                    style={{ transform: `rotate(${angle}deg) translateY(-220px) rotate(${-angle + 45}deg)` }}
-                  />
-                );
-              })}
-            </motion.div>
-            <div className="absolute inset-[16%] rounded-full border border-violet-200/20 bg-[radial-gradient(circle,rgba(37,99,235,.2),transparent_62%)]" />
-            <motion.div
-              animate={reduceMotion ? undefined : { rotateY: [0, 12, 0, -12, 0], rotateX: [0, -6, 0, 6, 0] }}
-              transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-              className="absolute inset-[25%] grid place-items-center rounded-[2rem] border border-cyan-200/40 bg-[#060b1b]/85 shadow-[0_30px_100px_rgba(0,0,0,.65),0_0_70px_rgba(34,211,238,.13)] backdrop-blur-xl [transform:translateZ(80px)]"
-            >
-              <CurrentIcon className="h-20 w-20 text-cyan-200 drop-shadow-[0_0_22px_rgba(103,232,249,.75)]" />
-            </motion.div>
-
-            <div className="absolute bottom-[10%] left-[7%] right-[7%] grid gap-4 border border-white/10 bg-[#02040c]/82 p-5 backdrop-blur-xl sm:grid-cols-[1fr_auto] sm:items-end">
-              <div>
-                <p className="text-[8px] font-bold uppercase tracking-[0.3em] text-violet-200/65">
-                  Orbit / {String(active + 1).padStart(2, "0")}
-                </p>
-                <h3 className="mt-2 text-3xl font-semibold uppercase tracking-[-0.03em]">
-                  {current.name}
-                </h3>
-                <p className="mt-2 max-w-md text-sm leading-6 text-slate-400">
-                  Curadoria focada em desempenho, integração e longevidade para esta categoria.
-                </p>
-              </div>
-              <Link
-                to="/demo/$storeSlug/categoria/$categorySlug"
-                params={{ storeSlug: store.slug, categorySlug: current.slug }}
-                className="inline-flex min-h-12 items-center gap-3 bg-cyan-300 px-5 text-[9px] font-bold uppercase tracking-[0.24em] text-[#02040c] transition hover:bg-white"
+              <motion.div
+                aria-hidden="true"
+                animate={reduceMotion ? undefined : { rotate: 360 }}
+                transition={{ duration: 26, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                className="absolute inset-[7%] rounded-full border border-cyan-200/20"
               >
-                Abrir órbita <ArrowRight className="h-4 w-4" />
-              </Link>
+                {Array.from({ length: 8 }).map((_, index) => {
+                  const angle = index * 45;
+                  return (
+                    <span
+                      key={index}
+                      className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border border-cyan-200/40 bg-[#030611] shadow-[0_0_14px_rgba(103,232,249,.3)]"
+                      style={{ transform: `rotate(${angle}deg) translateY(-220px) rotate(${-angle + 45}deg)` }}
+                    />
+                  );
+                })}
+              </motion.div>
+              <div className="absolute inset-[16%] rounded-full border border-violet-200/20 bg-[radial-gradient(circle,rgba(37,99,235,.2),transparent_62%)]" />
+              <motion.div
+                animate={reduceMotion ? undefined : { rotateY: [0, 12, 0, -12, 0], rotateX: [0, -6, 0, 6, 0] }}
+                transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                className="absolute inset-[25%] grid place-items-center rounded-[2rem] border border-cyan-200/40 bg-[#060b1b]/85 shadow-[0_30px_100px_rgba(0,0,0,.65),0_0_70px_rgba(34,211,238,.13)] backdrop-blur-xl [transform:translateZ(80px)]"
+              >
+                <CurrentIcon className="h-16 w-16 text-cyan-200 drop-shadow-[0_0_22px_rgba(103,232,249,.75)] sm:h-20 sm:w-20" />
+              </motion.div>
+            </motion.div>
+          </div>
+
+          <motion.div
+            key={`${current.slug}-panel`}
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="relative z-20 grid gap-4 border border-white/10 bg-[#02040c]/92 p-5 backdrop-blur-xl sm:grid-cols-[1fr_auto] sm:items-end"
+          >
+            <BorderTraceFrame index={active} intensity={0.5} />
+            <div>
+              <p className="text-[8px] font-bold uppercase tracking-[0.3em] text-violet-200/65">
+                Orbit / {String(active + 1).padStart(2, "0")}
+              </p>
+              <h3 className="mt-2 max-w-[18ch] text-2xl font-semibold uppercase leading-tight tracking-[-0.02em] sm:text-3xl sm:tracking-[-0.03em]">
+                {current.name}
+              </h3>
+              <p className="mt-2 max-w-md text-sm leading-6 text-slate-400">
+                Curadoria focada em desempenho, integração e longevidade para esta categoria.
+              </p>
             </div>
+            <Link
+              to="/demo/$storeSlug/categoria/$categorySlug"
+              params={{ storeSlug: store.slug, categorySlug: current.slug }}
+              className="inline-flex min-h-12 items-center gap-3 bg-cyan-300 px-5 text-[9px] font-bold uppercase tracking-[0.24em] text-[#02040c] transition hover:bg-white"
+            >
+              Abrir órbita <ArrowRight className="h-4 w-4" />
+            </Link>
           </motion.div>
         </div>
       </div>

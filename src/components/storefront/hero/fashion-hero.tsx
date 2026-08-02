@@ -91,7 +91,7 @@ export function FashionHero({ store, spotlight, featured }: NicheHeroProps) {
               <Link
                 to="/demo/$storeSlug/produto/$productSlug"
                 params={{ storeSlug: store.slug, productSlug: selected.slug }}
-                className="group inline-flex min-h-13 items-center gap-3 bg-[#e9d3c7] px-6 py-4 text-xs font-bold uppercase tracking-[0.2em] text-[#301722] transition hover:bg-white"
+                className="group inline-flex min-h-13 items-center gap-3 bg-[#e9d3c7] px-6 py-4 text-xs font-bold uppercase tracking-[0.2em] text-[#301722] transition hover:bg-[#fbf4f0]"
               >
                 Vestir este look
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

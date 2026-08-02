@@ -1,11 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Check, MousePointer2, Sparkles } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Product, StoreConfig } from "@/types/commerce";
 import { FashionHero } from "@/components/storefront/hero/fashion-hero";
 import type { HeroSpotlight } from "@/components/storefront/hero/niche-hero";
 import { EditorialProductCard } from "@/components/storefront/product-card-editorial";
+import { StoreInstitutional } from "@/components/storefront/store-institutional";
+import { useInView, sequenceDelay } from "@/hooks/use-in-view";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -37,16 +39,31 @@ type Chapter = {
 function FashionChapter({ chapter, index }: { chapter: Chapter; index: number }) {
   const ref = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const on = () => setIsDesktop(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
   });
   const sceneOpacity = useTransform(scrollYProgress, [0, 0.12, 0.76, 0.94], [0.22, 1, 1, 0]);
-  const imageScale = useTransform(scrollYProgress, [0, 0.35, 0.78, 1], [1.18, 1.02, 1, 1.08]);
+  // Enquadramento editorial suave: sem upscale agressivo, ainda mais contido no mobile.
+  const imageScale = useTransform(
+    scrollYProgress,
+    [0, 0.35, 0.78, 1],
+    isDesktop ? [1.06, 1.02, 1, 1.03] : [1.02, 1.01, 1, 1.015],
+  );
   const imageX = useTransform(
     scrollYProgress,
     [0, 0.32, 0.76, 1],
-    [index % 2 === 0 ? -42 : 42, 0, 0, index % 2 === 0 ? 24 : -24],
+    isDesktop
+      ? [index % 2 === 0 ? -18 : 18, 0, 0, index % 2 === 0 ? 10 : -10]
+      : [0, 0, 0, 0],
   );
   const copyY = useTransform(scrollYProgress, [0.08, 0.26, 0.72, 0.9], [42, 0, 0, -34]);
   const copyOpacity = useTransform(scrollYProgress, [0.08, 0.24, 0.72, 0.9], [0, 1, 1, 0]);
@@ -98,7 +115,7 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
               <span className="h-px w-12 bg-[#d8ad72]/55" />
               <span>{chapter.eyebrow}</span>
             </div>
-            <h2 className="mt-6 font-display text-[clamp(3.4rem,8vw,8rem)] font-medium leading-[0.82] tracking-[-0.06em] text-[#f7eee8]">
+            <h2 className="mt-6 max-w-[16ch] hyphens-auto break-words font-display text-[clamp(2.6rem,8vw,8rem)] font-medium leading-[0.9] tracking-[-0.06em] text-[#f7eee8] sm:leading-[0.82]">
               {chapter.title}
             </h2>
             <p className="mt-7 max-w-xl text-base leading-8 text-[#f7eee8]/68 sm:text-lg">
@@ -149,7 +166,7 @@ function AtelierConsole({ store, products }: { store: StoreConfig; products: Pro
             <p className="text-[10px] font-bold uppercase tracking-[0.38em] text-[#d8ad72]">
               Atelier interativo
             </p>
-            <h2 className="mt-5 font-display text-5xl font-medium leading-[0.88] tracking-[-0.055em] sm:text-7xl">
+            <h2 className="mt-5 max-w-[16ch] break-words font-display text-[clamp(2.2rem,7vw,4.5rem)] font-medium leading-[1] tracking-[-0.055em] sm:leading-[0.88] sm:text-7xl">
               Monte a arara. A cena muda com você.
             </h2>
           </div>
@@ -242,6 +259,29 @@ function AtelierConsole({ store, products }: { store: StoreConfig; products: Pro
   );
 }
 
+function EditorialGridItem({
+  product,
+  storeSlug,
+  index,
+}: {
+  product: Product;
+  storeSlug: string;
+  index: number;
+}) {
+  const { ref, inView } = useInView<HTMLDivElement>({ amount: 0.2, once: true });
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 28 }}
+      animate={inView ? { opacity: 1, y: 0 } : undefined}
+      transition={{ duration: 0.65, delay: sequenceDelay(index % 3) }}
+      className={index % 3 === 1 ? "lg:mt-12" : ""}
+    >
+      <EditorialProductCard product={product} storeSlug={storeSlug} aspect="portrait" index={index} />
+    </motion.div>
+  );
+}
+
 export function FashionStorefront({
   store,
   spotlight,
@@ -299,7 +339,7 @@ export function FashionStorefront({
             Manifesto Maison Belle
           </p>
           <div>
-            <h2 className="font-display text-[clamp(3.1rem,7vw,7.2rem)] font-medium leading-[0.86] tracking-[-0.06em]">
+            <h2 className="max-w-[18ch] break-words font-display text-[clamp(2.4rem,7vw,7.2rem)] font-medium leading-[0.95] tracking-[-0.06em] sm:leading-[0.86]">
               Moda não é uma sequência de fotos. É uma sensação que continua.
             </h2>
             <p className="mt-7 max-w-2xl text-base leading-8 text-[#2c1721]/66">
@@ -326,7 +366,7 @@ export function FashionStorefront({
               <p className="text-[10px] font-bold uppercase tracking-[0.38em] text-[#8b3150]">
                 Seleção da estação
               </p>
-              <h2 className="mt-4 font-display text-5xl font-medium tracking-[-0.05em] sm:text-7xl">
+              <h2 className="mt-4 max-w-[16ch] break-words font-display text-[clamp(2.2rem,7vw,4.5rem)] font-medium leading-[1] tracking-[-0.05em] sm:text-7xl">
                 Peças que sustentam a cena.
               </h2>
             </div>
@@ -343,16 +383,12 @@ export function FashionStorefront({
 
           <div className="mt-14 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {editorialGrid.map((product, index) => (
-              <motion.div
+              <EditorialGridItem
                 key={product.id}
-                initial={{ opacity: 0, y: 28 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-8%" }}
-                transition={{ duration: 0.65, delay: (index % 3) * 0.06 }}
-                className={index % 3 === 1 ? "lg:mt-12" : ""}
-              >
-                <EditorialProductCard product={product} storeSlug={store.slug} aspect="portrait" />
-              </motion.div>
+                product={product}
+                storeSlug={store.slug}
+                index={index}
+              />
             ))}
           </div>
         </div>
@@ -382,7 +418,7 @@ export function FashionStorefront({
             <p className="text-[10px] font-bold uppercase tracking-[0.38em] text-[#d8ad72]">
               A Maison
             </p>
-            <h2 className="mt-5 font-display text-5xl font-medium leading-[0.9] tracking-[-0.05em] sm:text-7xl">
+            <h2 className="mt-5 max-w-[16ch] break-words font-display text-[clamp(2.2rem,7vw,4.5rem)] font-medium leading-[1] tracking-[-0.05em] sm:leading-[0.9] sm:text-7xl">
               {store.messages.aboutTitle}
             </h2>
             <p className="mt-7 max-w-2xl text-base leading-8 text-white/65">
@@ -415,9 +451,11 @@ export function FashionStorefront({
         </div>
       </section>
 
+      <StoreInstitutional store={store} />
+
       <section className="relative overflow-hidden bg-[#d8ada7] px-5 py-28 text-center text-[#301622] sm:px-8 sm:py-36">
         <Sparkles className="mx-auto h-6 w-6 text-[#7d3a4e]" />
-        <h2 className="mx-auto mt-7 max-w-5xl font-display text-[clamp(3.3rem,8vw,8rem)] font-medium leading-[0.82] tracking-[-0.065em]">
+        <h2 className="mx-auto mt-7 max-w-[18ch] break-words font-display text-[clamp(2.5rem,8vw,8rem)] font-medium leading-[0.95] tracking-[-0.065em] sm:leading-[0.82]">
           A próxima cena começa no seu guarda-roupa.
         </h2>
         <p className="mx-auto mt-7 max-w-xl text-base leading-8 text-[#301622]/62">

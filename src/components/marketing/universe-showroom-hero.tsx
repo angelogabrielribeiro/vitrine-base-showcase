@@ -10,6 +10,7 @@ import {
 import { ArrowRight, ChevronLeft, ChevronRight, Hand, MessageCircle } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
+import { useAdaptiveQuality } from "@/hooks/use-adaptive-quality";
 import { UNIVERSES, universeHref, type Universe } from "@/components/marketing/universe-data";
 
 const STEP = 360 / UNIVERSES.length;
@@ -113,12 +114,181 @@ function UniversePanel({
   );
 }
 
+function MobileUniverseCard({
+  universe,
+  index,
+  active,
+  offset,
+  tier,
+  onSelect,
+}: {
+  universe: Universe;
+  index: number;
+  active: boolean;
+  offset: number;
+  tier: "off" | "low" | "high";
+  onSelect: (el: HTMLElement | null) => void;
+}) {
+  const depth = tier === "off";
+  const clamped = Math.max(-1, Math.min(1, offset));
+  const scale = depth ? (active ? 1 : 0.95) : Math.max(0.8, 1 - Math.abs(clamped) * 0.34);
+  const rotateY = depth ? 0 : clamped * -22;
+  const translateZ = depth ? 0 : -Math.abs(clamped) * 90;
+  const opacity = Math.max(0.42, 1 - Math.abs(clamped) * 0.85);
+
+  return (
+    <Link
+      ref={onSelect}
+      to="/demo/$storeSlug"
+      params={{ storeSlug: universe.slug }}
+      aria-current={active ? "true" : undefined}
+      aria-label={`${universe.name} — ${universe.label}`}
+      className="relative aspect-[3/4] w-[70vw] max-w-[19rem] shrink-0 snap-center overflow-hidden rounded-[1.75rem] border bg-black/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vb-gold"
+      style={{
+        transform: depth
+          ? undefined
+          : `perspective(1000px) rotateY(${rotateY}deg) translateZ(${translateZ}px) scale(${scale})`,
+        opacity,
+        borderColor: active ? `${universe.accent}66` : "rgba(255,255,255,0.1)",
+        boxShadow: active ? `0 26px 76px -34px ${universe.accent}` : undefined,
+        transformStyle: "preserve-3d",
+      }}
+      onClick={(event) => {
+        if (!active) event.preventDefault();
+      }}
+    >
+      <img
+        src={universe.image}
+        alt={`Prévia da demonstração ${universe.name}`}
+        loading={index === 0 ? "eager" : "lazy"}
+        className="h-full w-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 mix-blend-screen transition-opacity duration-500"
+        style={{
+          opacity: active ? 0.4 : 0.14,
+          background: `radial-gradient(circle at 30% 100%, ${universe.accent}44, transparent 62%)`,
+        }}
+      />
+      <div className="absolute inset-x-0 bottom-0 p-4 text-left">
+        <p className="text-[9px] font-bold uppercase tracking-[0.24em]" style={{ color: universe.accent }}>
+          {universe.number} · {universe.label}
+        </p>
+        <p className="mt-1 font-display text-xl font-semibold text-white">{universe.name}</p>
+      </div>
+    </Link>
+  );
+}
+
+function MobileUniverseCarousel({
+  activeIndex,
+  onActiveChange,
+  tier,
+}: {
+  activeIndex: number;
+  onActiveChange: (index: number) => void;
+  tier: "off" | "low" | "high";
+}) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const cardsRef = useRef<(HTMLElement | null)[]>([]);
+  const [offsets, setOffsets] = useState<number[]>(() => UNIVERSES.map(() => 0));
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    let frame = 0;
+    const measure = () => {
+      const rect = track.getBoundingClientRect();
+      const center = rect.left + rect.width / 2;
+      const next = cardsRef.current.map((card) => {
+        if (!card) return 0;
+        const cardRect = card.getBoundingClientRect();
+        const cardCenter = cardRect.left + cardRect.width / 2;
+        return (cardCenter - center) / rect.width;
+      });
+      setOffsets(next);
+      let nearest = 0;
+      next.forEach((value, i) => {
+        if (Math.abs(value) < Math.abs(next[nearest])) nearest = i;
+      });
+      onActiveChange(nearest);
+    };
+    measure();
+    const onScroll = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(measure);
+    };
+    track.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      track.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      window.cancelAnimationFrame(frame);
+    };
+  }, [onActiveChange]);
+
+  const scrollTo = useCallback((index: number) => {
+    const card = cardsRef.current[index];
+    card?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, []);
+
+  return (
+    <div className="lg:hidden">
+      <div
+        ref={trackRef}
+        className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-[15vw] pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        style={{ scrollBehavior: "smooth" }}
+        role="group"
+        aria-label="Showroom dos universos. Deslize para trocar."
+      >
+        {UNIVERSES.map((universe, index) => (
+          <MobileUniverseCard
+            key={universe.slug}
+            universe={universe}
+            index={index}
+            active={index === activeIndex}
+            offset={offsets[index] ?? 0}
+            tier={tier}
+            onSelect={(el) => {
+              cardsRef.current[index] = el;
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="mt-5 flex items-center justify-center gap-2">
+        {UNIVERSES.map((universe, index) => (
+          <button
+            key={universe.slug}
+            type="button"
+            onClick={() => scrollTo(index)}
+            aria-label={`Ir para ${universe.name}`}
+            aria-current={index === activeIndex ? "true" : undefined}
+            className="grid h-8 w-8 place-items-center"
+          >
+            <span
+              className="block h-2 rounded-full transition-all duration-300"
+              style={{
+                width: index === activeIndex ? "1.5rem" : "0.5rem",
+                background: index === activeIndex ? universe.accent : "rgba(255,255,255,0.22)",
+              }}
+            />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function UniverseShowroomHero({
   proposalUrl,
   demoNotice,
   onActiveChange,
 }: UniverseShowroomHeroProps) {
   const { capabilities } = useCinematicMotion();
+  const { tier } = useAdaptiveQuality();
   const reduced =
     capabilities.hydrated &&
     (capabilities.reducedMotion || capabilities.coarsePointer || capabilities.quality === "economy");
@@ -216,7 +386,7 @@ export function UniverseShowroomHero({
   };
 
   const glowShift = useTransform(rotation, (r) => Math.sin((r * Math.PI) / 180) * 14);
-  const glow = useMotionTemplate`radial-gradient(circle at calc(50% + ${glowShift}%) 46%, ${active.accent}2e, transparent 58%)`;
+  const glow = useMotionTemplate`radial-gradient(circle at calc(50% + ${glowShift}%) 46%, ${active.accent}25, transparent 58%)`;
 
   return (
     <section
@@ -357,6 +527,18 @@ export function UniverseShowroomHero({
         </div>
 
         <div className="relative z-10">
+          <div className="lg:hidden">
+            <MobileUniverseCarousel
+              activeIndex={activeIndex}
+              onActiveChange={(index) => {
+                setActiveIndex(index);
+                idleRef.current = performance.now() + 4200;
+                setExplored(true);
+              }}
+              tier={tier}
+            />
+          </div>
+
           <div
             ref={stageRef}
             role="group"
@@ -376,7 +558,7 @@ export function UniverseShowroomHero({
                 step(-1);
               }
             }}
-            className="relative h-[26rem] w-full select-none rounded-[2rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vb-gold sm:h-[32rem] lg:h-[38rem]"
+            className="relative hidden h-[38rem] w-full select-none rounded-[2rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vb-gold lg:block"
             style={{
               perspective: reduced ? undefined : "1200px",
               touchAction: "pan-y",
@@ -386,7 +568,7 @@ export function UniverseShowroomHero({
             <div
               aria-hidden="true"
               className="absolute inset-[14%] rounded-full border border-white/10"
-              style={{ boxShadow: `0 0 140px -40px ${active.accent}` }}
+              style={{ boxShadow: `0 0 112px -40px ${active.accent}` }}
             />
             <motion.div
               aria-hidden="true"
@@ -438,7 +620,7 @@ export function UniverseShowroomHero({
             )}
           </div>
 
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
+          <div className="mt-5 hidden flex-wrap items-center justify-between gap-4 lg:flex">
             <div className="flex items-center gap-2">
               <button
                 type="button"

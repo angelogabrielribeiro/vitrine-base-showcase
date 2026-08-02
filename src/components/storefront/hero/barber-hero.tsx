@@ -1,22 +1,51 @@
+import { useRef } from "react";
 import { Link } from "@tanstack/react-router";
 import { CalendarDays, MapPin } from "lucide-react";
 import type { NicheHeroProps } from "./niche-hero";
 import { Button } from "@/components/ui/button";
 import { SectionReveal, WordReveal, Stagger, StaggerItem, MOTION } from "@/components/motion/primitives";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform, useMotionValue } from "framer-motion";
+import { useAdaptiveQuality } from "@/hooks/use-adaptive-quality";
 
 /**
  * Barber Noir — cinematográfico, ritual e ambiente.
  * CTA principal único = "Agendar horário". Produto/serviço é ambiente, não protagonista.
+ *
+ * Desktop: profundidade por scroll (parallax leve no fundo) + edge sweep de luz
+ * seguindo o cursor. Mobile: nada de cursor simulado — apenas o reveal automático
+ * de entrada já resolve a cena.
  */
 export function BarberHero({ store }: NicheHeroProps) {
   const banner = store.banners[0];
   const reduce = useReducedMotion();
+  const { isMobile } = useAdaptiveQuality();
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+  const bgY = useTransform(scrollYProgress, [0, 1], [0, isMobile || reduce ? 0 : 90]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, isMobile || reduce ? 0 : 40]);
+
+  // Edge sweep de luz — segue o cursor, apenas desktop (pointer fine).
+  const sweepX = useMotionValue(50);
+  const sweepY = useMotionValue(35);
+  const handlePointerMove = (event: React.PointerEvent<HTMLElement>) => {
+    if (isMobile || event.pointerType !== "mouse") return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    sweepX.set(((event.clientX - rect.left) / rect.width) * 100);
+    sweepY.set(((event.clientY - rect.top) / rect.height) * 100);
+  };
 
   return (
-    <section className="relative isolate min-h-[92vh] overflow-hidden bg-neutral-950 text-neutral-100">
+    <section
+      ref={sectionRef}
+      onPointerMove={handlePointerMove}
+      className="relative isolate min-h-[92vh] overflow-hidden bg-neutral-950 text-neutral-100"
+    >
       {/* Imagem de fundo cinematográfica */}
-      <div className="absolute inset-0">
+      <motion.div className="absolute inset-0" style={{ y: bgY }}>
         <motion.div
           initial={reduce ? undefined : { scale: 1.12 }}
           animate={{ scale: 1 }}
@@ -35,6 +64,20 @@ export function BarberHero({ store }: NicheHeroProps) {
               "repeating-linear-gradient(90deg, transparent 0 68px, rgba(255,255,255,0.05) 68px 69px)",
           }}
         />
+        {/* Edge sweep de luz — só desktop, acompanha o cursor com leve amarelo */}
+        {!isMobile && (
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 hidden mix-blend-soft-light lg:block"
+            style={{
+              background: useTransform(
+                [sweepX, sweepY],
+                ([x, y]: number[]) =>
+                  `radial-gradient(480px circle at ${x}% ${y}%, rgba(217,178,89,0.13), transparent 65%)`,
+              ),
+            }}
+          />
+        )}
         {/* Vinheta */}
         <div
           aria-hidden
@@ -44,7 +87,7 @@ export function BarberHero({ store }: NicheHeroProps) {
               "radial-gradient(ellipse at 50% 40%, transparent 40%, rgba(0,0,0,0.6) 100%)",
           }}
         />
-      </div>
+      </motion.div>
 
       {/* Barra topo */}
       <div className="relative mx-auto flex max-w-6xl items-center justify-between px-6 pt-6 text-[10px] uppercase tracking-[0.4em] text-amber-200/80">
@@ -58,13 +101,16 @@ export function BarberHero({ store }: NicheHeroProps) {
       </div>
 
       {/* Conteúdo hero */}
-      <div className="relative mx-auto flex min-h-[80vh] max-w-6xl flex-col justify-end gap-10 px-6 pb-24 pt-24">
-        <div className="max-w-3xl">
-          <h1 className="font-display text-[clamp(3rem,10vw,7rem)] font-normal uppercase leading-[0.9] tracking-tight text-white">
+      <motion.div
+        style={{ y: contentY }}
+        className="relative mx-auto flex min-h-[80vh] max-w-6xl flex-col justify-end gap-8 px-6 pb-28 pt-24 sm:gap-10 sm:pb-24"
+      >
+        <div className="max-w-[26ch] sm:max-w-3xl">
+          <h1 className="font-display text-[clamp(2.6rem,12vw,7rem)] font-normal uppercase leading-[0.92] tracking-tight text-white">
             <WordReveal text={store.messages.heroTitle} className="block" />
           </h1>
           <SectionReveal delay={0.2}>
-            <p className="mt-8 max-w-xl text-base leading-relaxed text-neutral-300 sm:text-lg">
+            <p className="mt-6 max-w-[42ch] text-base leading-relaxed text-neutral-300 sm:mt-8 sm:max-w-xl sm:text-lg">
               {store.messages.heroSubtitle}
             </p>
           </SectionReveal>
@@ -93,7 +139,7 @@ export function BarberHero({ store }: NicheHeroProps) {
             </Link>
           </StaggerItem>
         </Stagger>
-      </div>
+      </motion.div>
     </section>
   );
 }

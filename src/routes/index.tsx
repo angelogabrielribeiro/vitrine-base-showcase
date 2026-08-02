@@ -270,7 +270,12 @@ function Index() {
               </p>
             </div>
 
-            <div className="mt-20 divide-y divide-white/10 border-y border-white/10">
+            <p className="mt-8 text-sm leading-6 text-white/55 lg:hidden">
+              Você já percorreu os quatro universos no showroom acima. Aqui está o detalhe de cada
+              um, para computador.
+            </p>
+
+            <div className="mt-10 hidden divide-y divide-white/10 border-y border-white/10 lg:mt-20 lg:block">
               {STORES.map((store, index) => {
                 const value = DEMO_VALUE[store.slug];
                 const Icon = NICHE_ICON[store.niche] ?? ShoppingBag;

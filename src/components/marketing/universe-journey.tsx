@@ -271,7 +271,7 @@ export function UniverseJourney({ proposalUrl }: UniverseJourneyProps) {
         </p>
       </div>
 
-      <div aria-label="Capítulos dos quatro universos">
+      <div aria-label="Capítulos dos quatro universos" className="hidden lg:block">
         {UNIVERSES.map((universe, index) =>
           reduced ? (
             <StaticChapter key={universe.slug} universe={universe} />
