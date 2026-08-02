@@ -82,6 +82,7 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
       capabilities.hydrated &&
       capabilities.coarsePointer &&
       capabilities.quality !== "static" &&
+      capabilities.quality !== "economy" &&
       inView);
 
   const handleMove = (event: MouseEvent<HTMLAnchorElement>) => {
@@ -114,6 +115,8 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
       onFocus={() => setHovered(true)}
       onBlur={reset}
       data-mobile-active={String(activeVisual && capabilities.coarsePointer)}
+      data-niche={niche}
+      data-in-view={String(inView)}
       className={`premium-product-card group relative block ${copy.meta}`}
       style={{ transform }}
     >
@@ -140,16 +143,18 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
           animate={
             reduceMotion
               ? undefined
-              : {
-                  opacity: [0.08, 0.34, 0.08],
-                  scale: [0.88, 1.12, 0.88],
-                  rotate: [0, 8, 0],
-                }
+              : activeVisual
+                ? {
+                    opacity: [0.1, 0.42, 0.1],
+                    scale: [0.88, 1.12, 0.88],
+                    rotate: [0, 8, 0],
+                  }
+                : { opacity: 0.06, scale: 0.92, rotate: 0 }
           }
           transition={{
             duration: niche === "restaurant" ? 2.1 : 3.4,
             delay: product.id.length * 0.09,
-            repeat: Number.POSITIVE_INFINITY,
+            repeat: activeVisual ? Number.POSITIVE_INFINITY : 0,
             ease: "easeInOut",
           }}
           className="product-attention-glow pointer-events-none absolute -inset-[35%] z-[1] rounded-full blur-3xl"
@@ -314,11 +319,21 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
           will-change: transform;
         }
         .premium-product-frame {
-          animation: premium-frame-breathe 4.8s ease-in-out infinite;
+          animation: premium-frame-breathe 3.2s ease-in-out infinite;
+          animation-play-state: paused;
+          contain: paint;
         }
+        .premium-product-card[data-in-view="true"] .premium-product-frame,
+        .premium-product-card:hover .premium-product-frame,
+        .premium-product-card:focus-visible .premium-product-frame {
+          animation-play-state: running;
+        }
+        .premium-product-card[data-niche="fashion"] { color: #f7eee8; }
+        .premium-product-card[data-niche="electronics"] { color: #cffafe; }
         @keyframes premium-frame-breathe {
-          0%, 100% { box-shadow: 0 0 0 rgba(255,255,255,0); }
-          50% { box-shadow: 0 22px 60px rgba(0,0,0,.34), 0 0 28px rgba(255,255,255,.08); }
+          0%, 100% { box-shadow: 0 18px 46px rgba(0,0,0,.3), 0 0 0 1px rgba(255,255,255,.05); filter: brightness(.96); }
+          48% { box-shadow: 0 28px 70px rgba(0,0,0,.42), 0 0 24px currentColor, inset 0 0 18px rgba(255,255,255,.1); filter: brightness(1.08); }
+          55% { box-shadow: 0 24px 64px rgba(0,0,0,.4), 0 0 9px currentColor, inset 0 0 8px rgba(255,255,255,.06); filter: brightness(1.02); }
         }
         .premium-product-card .premium-product-image {
           transform: scale(1);
