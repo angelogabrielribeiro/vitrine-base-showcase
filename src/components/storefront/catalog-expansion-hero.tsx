@@ -85,19 +85,17 @@ export function CatalogExpansionHero({
         {lead && (
           <motion.aside
             data-testid="catalog-feature-context"
-            initial={reduced ? false : { opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.18, duration: 0.58 }}
+            initial={false}
             className="absolute bottom-7 left-5 z-30 w-[calc(100%_-_2.5rem)] border border-white/20 bg-black/58 p-4 text-white shadow-2xl backdrop-blur-xl sm:bottom-10 sm:left-auto sm:right-8 sm:w-[22rem] sm:p-5 lg:right-12"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className={`text-[8px] font-bold uppercase tracking-[0.3em] ${surface.eyebrow}`}>
+                <p className="text-[8px] font-bold uppercase tracking-[0.3em] text-white/65">
                   Destaque com contexto · {lead.category}
                 </p>
-                <h2 className="mt-2 font-sans text-xl font-semibold leading-tight">{lead.name}</h2>
+                <h2 className="mt-2 font-sans text-xl font-semibold leading-tight text-white">{lead.name}</h2>
               </div>
-              <strong className="shrink-0 text-sm">{brl(lead.salePrice ?? lead.price)}</strong>
+              <strong className="shrink-0 text-sm text-white">{brl(lead.salePrice ?? lead.price)}</strong>
             </div>
             <p className="mt-3 line-clamp-2 text-xs leading-5 text-white/60">{lead.description}</p>
             <Link
