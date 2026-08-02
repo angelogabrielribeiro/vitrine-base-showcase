@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Grid3X3, Search, SlidersHorizontal, Sparkles } from "lucide-react";
+import { ArrowRight, Grid3X3, Search, SlidersHorizontal } from "lucide-react";
 import type { Product, StoreConfig } from "@/types/commerce";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,8 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ProductCard } from "@/components/storefront/product-card";
-import { SafeImage } from "@/components/storefront/safe-image";
 import { commerceSurface } from "@/components/storefront/commerce-surface";
+import { CatalogExpansionHero } from "@/components/storefront/catalog-expansion-hero";
 
 interface PremiumCatalogPageProps {
   store: StoreConfig;
@@ -35,78 +35,13 @@ export function PremiumCatalogPage({
 }: PremiumCatalogPageProps) {
   const surface = commerceSurface(store.niche);
   const reduceMotion = useReducedMotion();
-  const lead = products[0];
   const isCategory = Boolean(categoryName);
 
   return (
     <main className={`relative isolate min-h-screen overflow-hidden ${surface.shell}`}>
       <AmbientLayer niche={store.niche} />
 
-      <section className={`relative border-b ${surface.border}`}>
-        <div className="mx-auto max-w-7xl px-5 pb-12 pt-10 sm:px-8 sm:pb-16 sm:pt-14 lg:px-10">
-          <div className="flex items-center justify-between gap-4">
-            <Link
-              to="/demo/$storeSlug"
-              params={{ storeSlug: store.slug }}
-              className={`group inline-flex items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.3em] ${surface.muted}`}
-            >
-              <ArrowLeft className="h-3.5 w-3.5 transition group-hover:-translate-x-1" />
-              Voltar à experiência
-            </Link>
-            <div
-              className={`hidden text-[9px] uppercase tracking-[0.34em] sm:block ${surface.muted}`}
-            >
-              {String(products.length).padStart(2, "0")} objetos disponíveis
-            </div>
-          </div>
-
-          <div className="mt-12 grid items-end gap-10 lg:grid-cols-[1.2fr_.8fr]">
-            <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <div
-                className={`inline-flex items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.4em] ${surface.eyebrow}`}
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-                {isCategory ? `${categoryName} / selection` : surface.catalogKicker}
-              </div>
-              <h1 className="font-display mt-5 max-w-4xl text-5xl leading-[0.88] tracking-[-0.045em] sm:text-7xl lg:text-[5.7rem]">
-                {isCategory ? categoryName : surface.catalogTitle}
-              </h1>
-              <p className={`mt-7 max-w-2xl text-sm leading-7 sm:text-base ${surface.muted}`}>
-                {isCategory
-                  ? `${products.length} ${products.length === 1 ? "peça selecionada" : "peças selecionadas"} para esta categoria.`
-                  : surface.catalogCopy}
-              </p>
-            </motion.div>
-
-            {lead && (
-              <motion.div
-                initial={reduceMotion ? false : { opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.15, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                className={`relative hidden min-h-56 overflow-hidden border lg:block ${surface.border} ${surface.panel}`}
-              >
-                <SafeImage
-                  src={lead.images[0]}
-                  alt=""
-                  className="absolute inset-0 h-full w-full object-cover opacity-55 transition duration-1000 hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/20 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-6">
-                  <div className={`text-[8px] uppercase tracking-[0.36em] ${surface.eyebrow}`}>
-                    Lead object
-                  </div>
-                  <div className="mt-2 max-w-xs text-xl font-semibold text-white">{lead.name}</div>
-                </div>
-                <span className="absolute right-4 top-4 h-2 w-2 animate-pulse rounded-full bg-current text-cyan-200" />
-              </motion.div>
-            )}
-          </div>
-        </div>
-      </section>
+      <CatalogExpansionHero store={store} products={products} categoryName={categoryName} />
 
       <section className={`relative border-b ${surface.border} ${surface.panel} backdrop-blur-xl`}>
         <div className="mx-auto max-w-7xl px-5 py-5 sm:px-8 lg:px-10">
