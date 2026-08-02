@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import type { CSSProperties } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import type { Product } from "@/types/commerce";
@@ -46,6 +47,7 @@ export function EditorialProductCard({
       to="/demo/$storeSlug/produto/$productSlug"
       params={{ storeSlug, productSlug: product.slug }}
       data-mobile-active={String(mobileActive)}
+      style={{ "--ep-seq-delay": `${sequenceDelay(index)}s` } as CSSProperties}
       className="ep-card group relative block focus:outline-none focus-visible:outline-none focus-visible:[&_.ep-card-frame]:ring-2 focus-visible:[&_.ep-card-frame]:ring-neutral-900 focus-visible:[&_.ep-card-frame]:ring-offset-2 focus-visible:[&_.ep-card-frame]:ring-offset-neutral-50"
     >
       <motion.div

@@ -82,7 +82,9 @@ export function BarberStorefront({ store, services, professionals, products }: P
       <ResultsEditorial services={services} />
       <GroomingGrid products={products} storeSlug={store.slug} />
       <ClosingBlock store={store} />
-      <StoreInstitutional store={store} />
+      <div className="pb-28 md:pb-0">
+        <StoreInstitutional store={store} />
+      </div>
     </div>
   );
 }
