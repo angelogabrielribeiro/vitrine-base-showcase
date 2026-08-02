@@ -119,7 +119,9 @@ export function UniverseShowroomHero({
   onActiveChange,
 }: UniverseShowroomHeroProps) {
   const { capabilities } = useCinematicMotion();
-  const reduced = capabilities.hydrated && capabilities.reducedMotion;
+  const reduced =
+    capabilities.hydrated &&
+    (capabilities.reducedMotion || capabilities.coarsePointer || capabilities.quality === "economy");
   const rotation = useMotionValue(0);
   const stageRef = useRef<HTMLDivElement>(null);
   const [radius, setRadius] = useState(300);
