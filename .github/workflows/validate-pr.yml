@@ -356,6 +356,8 @@ jobs:
             if ((await professionalButtons.count()) !== 3) {
               throw new Error("Seletor visual da barbearia não mostra os três profissionais");
             }
+            await professionalButtons.first().scrollIntoViewIfNeeded();
+            await page.waitForTimeout(650);
             await page.screenshot({
               path: "artifacts/ui-validation/commerce-barber-professionals.png",
               fullPage: false,
