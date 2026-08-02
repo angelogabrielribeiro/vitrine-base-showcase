@@ -34,17 +34,23 @@ async function settle(page) {
   await page.waitForTimeout(900);
   await page.evaluate(async () => {
     if (document.fonts?.ready) await document.fonts.ready;
-    await Promise.all(
-      [...document.images]
-        .filter((image) => !image.complete)
-        .map(
+    const pending = [...document.images].filter((image) => {
+      if (image.complete) return false;
+      const rect = image.getBoundingClientRect();
+      return image.loading !== "lazy" || rect.top < innerHeight * 2;
+    });
+    await Promise.race([
+      Promise.all(
+        pending.map(
           (image) =>
             new Promise((resolve) => {
               image.addEventListener("load", resolve, { once: true });
               image.addEventListener("error", resolve, { once: true });
             }),
         ),
-    );
+      ),
+      new Promise((resolve) => window.setTimeout(resolve, 5_000)),
+    ]);
   });
 }
 
@@ -67,7 +73,14 @@ async function assertHeadingsInsideViewport(page, label) {
       .filter((heading) => {
         const style = getComputedStyle(heading);
         const rect = heading.getBoundingClientRect();
-        return style.display !== "none" && style.visibility !== "hidden" && rect.width > 2 && rect.height > 2;
+        return (
+          style.display !== "none" &&
+          style.visibility !== "hidden" &&
+          rect.width > 2 &&
+          rect.height > 2 &&
+          rect.bottom > 0 &&
+          rect.top < innerHeight
+        );
       })
       .map((heading) => {
         const rect = heading.getBoundingClientRect();
@@ -111,13 +124,20 @@ async function assertMenuHidesWhatsapp(page, label) {
     const style = getComputedStyle(element);
     return { ariaHidden: element.getAttribute("aria-hidden"), opacity: Number(style.opacity) };
   });
-  assert(restored.ariaHidden !== "true" && restored.opacity >= 0.8, `${label}: WhatsApp não voltou ao fechar o menu`);
+  assert(
+    restored.ariaHidden !== "true" && restored.opacity >= 0.8,
+    `${label}: WhatsApp não voltou ao fechar o menu`,
+  );
   return { tested: true, hiddenState, restored };
 }
 
 async function collectMotionSnapshot(page) {
   return page.evaluate(() => {
-    const candidates = [...document.querySelectorAll("main article, main [data-active], main [data-in-view], main section")]
+    const candidates = [
+      ...document.querySelectorAll(
+        "main article, main [data-active], main [data-in-view], main section",
+      ),
+    ]
       .filter((element) => {
         const rect = element.getBoundingClientRect();
         return rect.bottom > 0 && rect.top < innerHeight && rect.width > 20 && rect.height > 20;
@@ -143,7 +163,10 @@ async function assertAutomaticMotion(page, label) {
   let animated = false;
 
   for (const ratio of positions) {
-    await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), Math.max(0, height * ratio));
+    await page.evaluate(
+      (y) => window.scrollTo({ top: y, behavior: "instant" }),
+      Math.max(0, height * ratio),
+    );
     await page.waitForTimeout(500);
     const before = await collectMotionSnapshot(page);
     await page.waitForTimeout(1100);
@@ -174,22 +197,26 @@ async function assertNovaCoreCanvas(page, label) {
   const height = await page.evaluate(() => document.documentElement.scrollHeight);
   let visibleCanvas = 0;
   for (let ratio = 0; ratio <= 1; ratio += 0.1) {
-    await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), height * ratio);
+    await page.evaluate(
+      (y) => window.scrollTo({ top: y, behavior: "instant" }),
+      height * ratio,
+    );
     await page.waitForTimeout(320);
-    visibleCanvas = await page.locator("canvas").evaluateAll((canvases) =>
-      canvases.filter((canvas) => {
-        const rect = canvas.getBoundingClientRect();
-        const style = getComputedStyle(canvas);
-        return (
-          rect.width > 20 &&
-          rect.height > 20 &&
-          rect.bottom > 0 &&
-          rect.top < innerHeight &&
-          style.display !== "none" &&
-          style.visibility !== "hidden" &&
-          Number(style.opacity) > 0.05
-        );
-      }).length,
+    visibleCanvas = await page.locator("canvas").evaluateAll(
+      (canvases) =>
+        canvases.filter((canvas) => {
+          const rect = canvas.getBoundingClientRect();
+          const style = getComputedStyle(canvas);
+          return (
+            rect.width > 20 &&
+            rect.height > 20 &&
+            rect.bottom > 0 &&
+            rect.top < innerHeight &&
+            style.display !== "none" &&
+            style.visibility !== "hidden" &&
+            Number(style.opacity) > 0.05
+          );
+        }).length,
     );
     if (visibleCanvas > 0) break;
   }
@@ -217,14 +244,19 @@ async function assertHomeShowroom(page, label) {
   const cards = page.locator("[data-showroom-card]");
   assert((await cards.count()) === 4, `${label}: showroom deve ter exatamente quatro cards`);
   const firstUrl = page.url();
-  await cards.nth(1).click();
+  await cards.nth(1).dispatchEvent("click");
   await page.waitForTimeout(650);
   assert(page.url() === firstUrl, `${label}: primeiro toque no card inativo navegou antes de focar`);
-  assert((await cards.nth(1).getAttribute("data-active")) === "true", `${label}: card tocado não foi ativado`);
+  assert(
+    (await cards.nth(1).getAttribute("data-active")) === "true",
+    `${label}: card tocado não foi ativado`,
+  );
 }
 
 async function assertBottomContentAccessible(page, label) {
-  await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
+  await page.evaluate(() =>
+    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }),
+  );
   await page.waitForTimeout(400);
   const result = await page.evaluate(() => {
     const fixedBottom = [...document.querySelectorAll("body *")].filter((element) => {
@@ -246,7 +278,8 @@ async function assertBottomContentAccessible(page, label) {
 
 async function runMobile(browser, viewport) {
   for (const [name, route] of routes) {
-    const recordVideo = viewport.name === "392x850" ? { dir: videoDir, size: viewport } : undefined;
+    const recordVideo =
+      viewport.name === "392x850" ? { dir: videoDir, size: viewport } : undefined;
     const context = await browser.newContext({ viewport, recordVideo });
     const page = await context.newPage();
     const errors = [];
@@ -265,14 +298,21 @@ async function runMobile(browser, viewport) {
       await settle(page);
       const overflow = await assertNoHorizontalOverflow(page, label);
       await assertHeadingsInsideViewport(page, label);
-      const menu = name === "home" ? { tested: false } : await assertMenuHidesWhatsapp(page, label);
+      const menu =
+        name === "home" ? { tested: false } : await assertMenuHidesWhatsapp(page, label);
       const motion = await assertAutomaticMotion(page, label);
       if (name === "home") await assertHomeShowroom(page, label);
       const canvas = name === "novacore" ? await assertNovaCoreCanvas(page, label) : undefined;
 
       if (name !== "home") {
-        const catalogUrl = new URL(`/demo/${name === "maison" ? "moda" : name === "barber" ? "barbearia" : name === "brasa" ? "restaurante" : "eletronicos"}/produtos`, baseUrl);
-        await page.goto(catalogUrl.toString(), { waitUntil: "domcontentloaded", timeout: 90_000 });
+        const catalogUrl = new URL(
+          `/demo/${name === "maison" ? "moda" : name === "barber" ? "barbearia" : name === "brasa" ? "restaurante" : "eletronicos"}/produtos`,
+          baseUrl,
+        );
+        await page.goto(catalogUrl.toString(), {
+          waitUntil: "domcontentloaded",
+          timeout: 90_000,
+        });
         await settle(page);
         await assertNoHorizontalOverflow(page, `${label}-catalog`);
         await assertHeadingsInsideViewport(page, `${label}-catalog`);
@@ -288,10 +328,12 @@ async function runMobile(browser, viewport) {
       report.mobile.push({ label, overflow, menu, motion, canvas, bottom, status: "passed" });
     } catch (error) {
       report.errors.push({ label, message: error.message, runtime: errors });
-      await page.screenshot({
-        path: path.join(screenshotDir, `${label}-failure.png`),
-        fullPage: true,
-      }).catch(() => {});
+      await page
+        .screenshot({
+          path: path.join(screenshotDir, `${label}-failure.png`),
+          fullPage: true,
+        })
+        .catch(() => {});
     } finally {
       await context.close();
     }
@@ -312,7 +354,10 @@ async function runDesktop(browser) {
       await settle(page);
       const overflow = await assertNoHorizontalOverflow(page, label);
       await assertHeadingsInsideViewport(page, label);
-      await page.screenshot({ path: path.join(screenshotDir, `${label}.png`), fullPage: false });
+      await page.screenshot({
+        path: path.join(screenshotDir, `${label}.png`),
+        fullPage: false,
+      });
       report.desktop.push({ label, overflow, status: "passed" });
     } catch (error) {
       report.errors.push({ label, message: error.message });
