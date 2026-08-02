@@ -247,6 +247,8 @@ async function validateHome(browser, config) {
 
     assert(runtimeErrors.length === 0, `${name}: erros de runtime: ${runtimeErrors.join(" | ")}`);
 
+    await configurator.screenshot({ path: `${outputDir}/${name}-configurator.png` });
+
     report.checks.push({
       name,
       status: "passed",
