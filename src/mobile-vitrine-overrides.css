@@ -1,3 +1,10 @@
+@media (max-width: 1023px) {
+  /* O showroom inicial já é a jornada das quatro vitrines no mobile. */
+  #demonstracoes {
+    display: none !important;
+  }
+}
+
 @media (max-width: 767px) {
   /* Maison Belle: cada capítulo vira uma cena editorial legível, sem imagem ampliada atrás do texto. */
   [data-testid="fashion-chapter"] {
