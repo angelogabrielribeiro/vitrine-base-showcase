@@ -154,8 +154,8 @@ export function ElectronicsCircuitStory({
 
             <motion.div
               key={current.id}
-              initial={{ opacity: 0, y: 28, filter: "blur(10px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              initial={{ opacity: 0.62, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
             >
               <p className="mt-8 text-[9px] uppercase tracking-[0.32em] text-violet-200/70">
@@ -284,8 +284,8 @@ function ExplodedProductDeck({
 
       <motion.div
         key={product.id}
-        initial={{ opacity: 0, scale: 0.88, rotateY: -16, filter: "blur(14px)" }}
-        animate={{ opacity: 1, scale: 1, rotateY: 0, filter: "blur(0px)" }}
+        initial={{ opacity: 0.48, scale: 0.94, rotateY: -8 }}
+        animate={{ opacity: 1, scale: 1, rotateY: 0 }}
         transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
         className="absolute inset-[12%_16%] overflow-hidden rounded-[2rem] border border-cyan-200/35 bg-[radial-gradient(circle_at_50%_42%,rgba(37,99,235,.24),transparent_55%),rgba(3,6,17,.9)] p-5 shadow-[0_50px_140px_rgba(0,0,0,.75),0_0_80px_rgba(34,211,238,.13)] backdrop-blur-xl [transform:translateZ(70px)]"
       >
