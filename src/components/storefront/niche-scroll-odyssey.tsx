@@ -2,6 +2,7 @@ import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion
 import { ArrowDown, MousePointer2 } from "lucide-react";
 import { useRef } from "react";
 import type { StoreNiche } from "@/types/commerce";
+import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 
 export type OdysseyScene = {
   number: string;
@@ -122,7 +123,43 @@ export function NicheScrollOdyssey({
   scenes: OdysseyScene[];
 }) {
   const color = COLORS[niche];
+  const { capabilities } = useCinematicMotion();
+  const compact =
+    capabilities.hydrated &&
+    (capabilities.coarsePointer || capabilities.quality === "economy");
   if (!scenes.length) return null;
+
+  if (compact) {
+    return (
+      <section data-testid="niche-scroll-odyssey" className={`${color.shell} px-5 py-16 text-white`}>
+        <p className={`text-[10px] font-bold uppercase tracking-[0.38em] ${color.accent}`}>
+          {eyebrow}
+        </p>
+        <h2 className="mt-5 font-display text-5xl leading-[0.84] tracking-[-0.055em]">
+          {title}
+        </h2>
+        <div className="-mx-5 mt-9 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-5 [scrollbar-width:none]">
+          {scenes.slice(0, 3).map((scene) => (
+            <article
+              key={`${scene.number}-${scene.title}`}
+              data-testid="odyssey-scene"
+              className="relative w-[82vw] max-w-sm shrink-0 snap-center overflow-hidden border border-white/12 bg-black/35"
+            >
+              <img src={scene.image} alt="" className="aspect-[4/5] w-full object-cover" loading="lazy" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-5">
+                <p className={`text-[9px] font-bold uppercase tracking-[0.28em] ${color.accent}`}>
+                  Ato {scene.number} · {scene.kicker}
+                </p>
+                <h3 className="mt-2 font-display text-3xl leading-none">{scene.title}</h3>
+                <p className="mt-3 text-xs leading-5 text-white/62">{scene.copy}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section data-testid="niche-scroll-odyssey" className={`${color.shell} text-white`}>
