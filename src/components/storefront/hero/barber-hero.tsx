@@ -3,17 +3,28 @@ import { Link } from "@tanstack/react-router";
 import { CalendarDays, MapPin } from "lucide-react";
 import type { NicheHeroProps } from "./niche-hero";
 import { Button } from "@/components/ui/button";
-import { SectionReveal, WordReveal, Stagger, StaggerItem, MOTION } from "@/components/motion/primitives";
-import { motion, useReducedMotion, useScroll, useTransform, useMotionValue } from "framer-motion";
+import {
+  SectionReveal,
+  WordReveal,
+  Stagger,
+  StaggerItem,
+  MOTION,
+} from "@/components/motion/primitives";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  useMotionValue,
+} from "framer-motion";
 import { useAdaptiveQuality } from "@/hooks/use-adaptive-quality";
 
 /**
  * Barber Noir — cinematográfico, ritual e ambiente.
  * CTA principal único = "Agendar horário". Produto/serviço é ambiente, não protagonista.
  *
- * Desktop: profundidade por scroll (parallax leve no fundo) + edge sweep de luz
- * seguindo o cursor. Mobile: nada de cursor simulado — apenas o reveal automático
- * de entrada já resolve a cena.
+ * Desktop: profundidade por scroll e luz responsiva ao cursor.
+ * Mobile: reveal e profundidade são conduzidos pelo scroll, sem long press.
  */
 export function BarberHero({ store }: NicheHeroProps) {
   const banner = store.banners[0];
@@ -28,9 +39,14 @@ export function BarberHero({ store }: NicheHeroProps) {
   const bgY = useTransform(scrollYProgress, [0, 1], [0, isMobile || reduce ? 0 : 90]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, isMobile || reduce ? 0 : 40]);
 
-  // Edge sweep de luz — segue o cursor, apenas desktop (pointer fine).
   const sweepX = useMotionValue(50);
   const sweepY = useMotionValue(35);
+  const sweepBackground = useTransform(
+    [sweepX, sweepY],
+    ([x, y]: number[]) =>
+      `radial-gradient(480px circle at ${x}% ${y}%, rgba(217,178,89,0.13), transparent 65%)`,
+  );
+
   const handlePointerMove = (event: React.PointerEvent<HTMLElement>) => {
     if (isMobile || event.pointerType !== "mouse") return;
     const rect = event.currentTarget.getBoundingClientRect();
@@ -44,7 +60,6 @@ export function BarberHero({ store }: NicheHeroProps) {
       onPointerMove={handlePointerMove}
       className="relative isolate min-h-[92vh] overflow-hidden bg-neutral-950 text-neutral-100"
     >
-      {/* Imagem de fundo cinematográfica */}
       <motion.div className="absolute inset-0" style={{ y: bgY }}>
         <motion.div
           initial={reduce ? undefined : { scale: 1.12 }}
@@ -53,9 +68,7 @@ export function BarberHero({ store }: NicheHeroProps) {
           className="h-full w-full bg-cover bg-center"
           style={{ backgroundImage: `url(${banner?.image})` }}
         />
-        {/* Gradiente vertical */}
         <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/70 to-neutral-950/50" />
-        {/* Ranhuras de luz — sem partículas */}
         <div
           aria-hidden
           className="absolute inset-0 opacity-40 mix-blend-soft-light"
@@ -64,21 +77,13 @@ export function BarberHero({ store }: NicheHeroProps) {
               "repeating-linear-gradient(90deg, transparent 0 68px, rgba(255,255,255,0.05) 68px 69px)",
           }}
         />
-        {/* Edge sweep de luz — só desktop, acompanha o cursor com leve amarelo */}
         {!isMobile && (
           <motion.div
             aria-hidden
             className="pointer-events-none absolute inset-0 hidden mix-blend-soft-light lg:block"
-            style={{
-              background: useTransform(
-                [sweepX, sweepY],
-                ([x, y]: number[]) =>
-                  `radial-gradient(480px circle at ${x}% ${y}%, rgba(217,178,89,0.13), transparent 65%)`,
-              ),
-            }}
+            style={{ background: sweepBackground }}
           />
         )}
-        {/* Vinheta */}
         <div
           aria-hidden
           className="absolute inset-0"
@@ -89,7 +94,6 @@ export function BarberHero({ store }: NicheHeroProps) {
         />
       </motion.div>
 
-      {/* Barra topo */}
       <div className="relative mx-auto flex max-w-6xl items-center justify-between px-6 pt-6 text-[10px] uppercase tracking-[0.4em] text-amber-200/80">
         <span className="inline-flex items-center gap-2">
           <span className="h-px w-8 bg-amber-200/60" />
@@ -100,7 +104,6 @@ export function BarberHero({ store }: NicheHeroProps) {
         </span>
       </div>
 
-      {/* Conteúdo hero */}
       <motion.div
         style={{ y: contentY }}
         className="relative mx-auto flex min-h-[80vh] max-w-6xl flex-col justify-end gap-8 px-6 pb-28 pt-24 sm:gap-10 sm:pb-24"
