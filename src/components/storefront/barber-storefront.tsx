@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import type { StoreConfig, Product, Service, Professional } from "@/types/commerce";
 import { BarberHero } from "@/components/storefront/hero/barber-hero";
-import { SectionReveal, Stagger, StaggerItem, MOTION } from "@/components/motion/primitives";
+import { SectionReveal, MOTION } from "@/components/motion/primitives";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -352,35 +352,45 @@ const RITUAL = [
   },
 ];
 
+function RitualStep({ step, index }: { step: (typeof RITUAL)[number]; index: number }) {
+  const { ref, inView } = useInView<HTMLDivElement>({ amount: 0.55 });
+  return (
+    <div
+      ref={ref}
+      style={{ transitionDelay: `${sequenceDelay(index, 0.12)}s` }}
+      data-lit={inView || undefined}
+      className="group relative h-full min-w-[82vw] shrink-0 snap-center overflow-hidden border border-neutral-800 bg-neutral-950/60 p-7 transition-all duration-500 ease-out hover:border-amber-300/35 data-[lit=true]:border-amber-300/35 sm:min-w-0 sm:shrink sm:p-6"
+    >
+      <div className="text-[10px] uppercase tracking-[0.35em] text-amber-200/80">
+        {step.kicker}
+      </div>
+      <h3 className="mt-3 max-w-[18ch] text-balance font-display text-2xl uppercase leading-tight tracking-tight text-white">
+        {step.title}
+      </h3>
+      <p className="mt-3 text-sm leading-relaxed text-neutral-400">{step.body}</p>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-amber-300/[0.08] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100 group-data-[lit=true]:opacity-100"
+      />
+    </div>
+  );
+}
+
 function RitualSteps() {
   return (
     <section className="border-y border-neutral-800/80 bg-neutral-900/40">
-      <div className="mx-auto max-w-6xl px-6 py-14">
-        <div className="mb-8">
+      <div className="mx-auto max-w-6xl px-6 py-20 sm:py-14">
+        <div className="mb-10 max-w-[22ch] sm:mb-8 sm:max-w-none">
           <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">O ritual</div>
-          <h2 className="mt-2 font-display text-3xl uppercase tracking-tight text-white sm:text-4xl">
+          <h2 className="mt-2 text-balance font-display text-[clamp(1.75rem,7vw,2.5rem)] uppercase leading-tight tracking-tight text-white sm:text-4xl">
             Três atos, uma cadeira
           </h2>
         </div>
-        <Stagger className="grid gap-4 sm:grid-cols-3" step={0.08}>
-          {RITUAL.map((r) => (
-            <StaggerItem key={r.kicker}>
-              <div className="relative h-full overflow-hidden border border-neutral-800 bg-neutral-950/60 p-6 transition hover:border-amber-300/40">
-                <div className="text-[10px] uppercase tracking-[0.35em] text-amber-200/80">
-                  {r.kicker}
-                </div>
-                <h3 className="mt-3 font-display text-2xl uppercase tracking-tight text-white">
-                  {r.title}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-neutral-400">{r.body}</p>
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-amber-300/10 blur-2xl"
-                />
-              </div>
-            </StaggerItem>
+        <div className="-mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0">
+          {RITUAL.map((r, i) => (
+            <RitualStep key={r.kicker} step={r} index={i} />
           ))}
-        </Stagger>
+        </div>
       </div>
     </section>
   );
