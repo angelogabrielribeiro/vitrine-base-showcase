@@ -322,9 +322,12 @@ async function validateMobile(browser) {
 const browser = await chromium.launch({
   headless: true,
   args: [
-    "--use-angle=swiftshader-webgl",
+    "--use-gl=angle",
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader",
     "--enable-webgl",
     "--ignore-gpu-blocklist",
+    "--disable-gpu-sandbox",
     "--disable-dev-shm-usage",
   ],
 });
