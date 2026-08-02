@@ -276,7 +276,12 @@ export function RestaurantStorefront({ store, products, featured }: Props) {
           <Stagger className="mt-10 hidden gap-5 sm:grid sm:grid-cols-2 lg:grid-cols-4" step={0.1}>
             {popular.map((product, index) => (
               <StaggerItem key={product.id}>
-                <RestaurantProductCard product={product} storeSlug={store.slug} rank={index + 1} />
+                <RestaurantProductCard
+                  product={product}
+                  storeSlug={store.slug}
+                  rank={index + 1}
+                  index={index}
+                />
               </StaggerItem>
             ))}
           </Stagger>
@@ -519,28 +524,57 @@ function RestaurantProductCard({
   product,
   storeSlug,
   rank,
+  index,
 }: {
   product: Product;
   storeSlug: string;
   rank: number;
+  index: number;
 }) {
   const price = product.salePrice ?? product.price;
   const reduce = useReducedMotion();
+  const { ref, inView } = useInView<HTMLDivElement>({ amount: 0.4, once: false });
+  const delay = sequenceDelay(index);
 
   return (
     <motion.div
+      ref={ref}
       className="h-full"
       initial={reduce ? false : { opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: reduce ? 0 : -4, scale: reduce ? 1 : 1.01 }}
       viewport={{ amount: 0.56 }}
-      transition={{ duration: 0.62, ease: MOTION.ease }}
+      transition={{ duration: 0.62, ease: MOTION.ease, delay }}
       whileTap={reduce ? undefined : { scale: 0.985 }}
     >
       <Link
         to="/demo/$storeSlug/produto/$productSlug"
         params={{ storeSlug, productSlug: product.slug }}
-        className="group block h-full border border-white/10 bg-[#120d0a] transition duration-300 hover:-translate-y-1 hover:border-orange-400/45 hover:shadow-[0_24px_70px_-35px_rgba(241,90,36,.8)] active:border-orange-400/60"
+        className="group relative block h-full overflow-hidden border border-white/10 bg-[#120d0a] transition duration-300 hover:-translate-y-1 active:border-orange-400/50"
       >
+        <motion.span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-10 border border-transparent"
+          initial={false}
+          animate={
+            reduce
+              ? undefined
+              : inView
+                ? {
+                    boxShadow: [
+                      "0 0 0 1px rgba(217,119,6,0.16), 0 14px 40px -28px rgba(194,65,12,0.5)",
+                      "0 0 0 1px rgba(251,146,60,0.4), 0 20px 56px -26px rgba(234,88,12,0.64)",
+                      "0 0 0 1px rgba(217,119,6,0.16), 0 14px 40px -28px rgba(194,65,12,0.5)",
+                    ],
+                  }
+                : { boxShadow: "0 0 0 1px rgba(217,119,6,0.1)" }
+          }
+          transition={{
+            duration: 2.6,
+            repeat: inView ? Number.POSITIVE_INFINITY : 0,
+            ease: "easeInOut",
+            delay,
+          }}
+        />
         <div className="relative aspect-[4/4.7] overflow-hidden bg-[#251811]">
           <motion.div
             className="h-full w-full"
@@ -570,7 +604,9 @@ function RestaurantProductCard({
             <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-orange-300">
               {product.category}
             </span>
-            <h3 className="mt-1 font-display text-3xl uppercase leading-none">{product.name}</h3>
+            <h3 className="mt-1 max-w-[16ch] font-display text-3xl uppercase leading-none">
+              {product.name}
+            </h3>
           </div>
         </div>
         <div className="flex items-center justify-between gap-4 p-5">
