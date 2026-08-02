@@ -54,6 +54,21 @@ export function StoreFooter({ store }: { store: StoreConfig }) {
               </Link>
             </li>
             <li>
+              <Link to="/demo/$storeSlug/entrega" params={{ storeSlug: store.slug }} className="hover:text-primary">
+                Entrega e frete
+              </Link>
+            </li>
+            <li>
+              <Link to="/demo/$storeSlug/faq" params={{ storeSlug: store.slug }} className="hover:text-primary">
+                Perguntas frequentes
+              </Link>
+            </li>
+            <li>
+              <Link to="/demo/$storeSlug/contato" params={{ storeSlug: store.slug }} className="hover:text-primary">
+                Contato
+              </Link>
+            </li>
+            <li>
               <a
                 href={`https://instagram.com/${store.instagram.replace("@", "")}`}
                 target="_blank"
