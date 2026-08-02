@@ -16,9 +16,9 @@ import {
   Utensils,
 } from "lucide-react";
 import { UniverseShowroomHero } from "@/components/marketing/universe-showroom-hero";
-import { ScrollExpandShowcase } from "@/components/marketing/scroll-expand-showcase";
+import { UniverseJourney } from "@/components/marketing/universe-journey";
+import { OfferConfigurator } from "@/components/marketing/offer-configurator";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
-import { PricingPreview } from "@/components/pricing/pricing-page";
 import { STORES } from "@/config/stores";
 import { DEMO_NOTICE } from "@/lib/demo-mode";
 import { whatsappUrl } from "@/lib/whatsapp";
@@ -166,12 +166,6 @@ const INCLUDED = [
 function Index() {
   const { capabilities } = useCinematicMotion();
   const reduceMotion = capabilities.hydrated && capabilities.reducedMotion;
-  const showcaseItems = STORES.map((store) => ({
-    title: store.name,
-    subtitle: DEMO_VALUE[store.slug]?.highlight ?? store.tagline,
-    image: store.banners[0]?.image ?? "",
-  }));
-
   return (
     <div className="min-h-screen overflow-x-clip bg-vb-canvas font-sans text-vb-ivory">
       <a
@@ -251,7 +245,7 @@ function Index() {
           </div>
         </section>
 
-        <ScrollExpandShowcase items={showcaseItems} />
+        <UniverseJourney proposalUrl={PROPOSAL_URL} />
 
         <section
           id="demonstracoes"
@@ -468,7 +462,7 @@ function Index() {
         </section>
 
         <section className="bg-vb-canvas py-8">
-          <PricingPreview />
+          <OfferConfigurator proposalUrl={PROPOSAL_URL} />
         </section>
 
         <section className="border-y border-white/10 bg-vb-canvas">
