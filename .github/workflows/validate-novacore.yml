@@ -1,0 +1,346 @@
+name: Validate NovaCore spatial experience
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "src/components/storefront/electronics-*.tsx"
+      - "src/components/storefront/novacore-*.tsx"
+      - ".github/workflows/validate-novacore.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: novacore-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  visual:
+    name: Record desktop and mobile experience
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.0-noble
+      options: --user 1001
+
+    steps:
+      - name: Checkout pull request branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+
+      - name: Install application dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install matching Playwright library
+        run: npm install --no-save --no-audit --no-fund playwright@1.62.0
+
+      - name: Start application server
+        run: |
+          npm run dev -- --host 0.0.0.0 --port 4173 > /tmp/novacore-server.log 2>&1 &
+          echo $! > /tmp/novacore-server.pid
+
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:4173 > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+
+          cat /tmp/novacore-server.log
+          exit 1
+
+      - name: Record and validate NovaCore
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: |
+          mkdir -p artifacts/novacore-validation/video
+          node --input-type=module <<'NODE'
+          import { chromium } from "playwright";
+          import { writeFile } from "node:fs/promises";
+
+          const baseUrl = process.env.BASE_URL;
+          const route = new URL("/demo/eletronicos", baseUrl).toString();
+          const output = "artifacts/novacore-validation";
+          const report = {
+            route,
+            startedAt: new Date().toISOString(),
+            desktop: {},
+            mobile: {},
+            errors: [],
+          };
+
+          function assert(condition, message) {
+            if (!condition) throw new Error(message);
+          }
+
+          async function waitForInterface(page) {
+            await page.waitForLoadState("networkidle");
+            await page.waitForFunction(
+              () => document.documentElement.dataset.cinematicReady === "true",
+              undefined,
+              { timeout: 30_000 },
+            );
+            await page.evaluate(async () => {
+              document.documentElement.style.scrollBehavior = "auto";
+              document.body.style.scrollBehavior = "auto";
+              if (document.fonts?.ready) await document.fonts.ready;
+            });
+            await page.waitForTimeout(900);
+          }
+
+          function collectRuntimeErrors(page, label) {
+            page.on("pageerror", (error) => report.errors.push(`${label}: ${error.message}`));
+            page.on("console", (message) => {
+              if (message.type() === "error") {
+                report.errors.push(`${label}: console.error: ${message.text()}`);
+              }
+            });
+          }
+
+          async function sectionFromHeading(page, name) {
+            const heading = page.getByRole("heading", { name }).first();
+            await heading.waitFor({ state: "visible", timeout: 30_000 });
+            return heading.locator("xpath=ancestor::section[1]");
+          }
+
+          async function scrollJourney(page, step, pause) {
+            const height = await page.evaluate(() => document.documentElement.scrollHeight);
+            for (let y = 0; y < height; y += step) {
+              await page.evaluate((top) => window.scrollTo(0, top), y);
+              await page.waitForTimeout(pause);
+            }
+            await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+            await page.waitForTimeout(700);
+          }
+
+          const browser = await chromium.launch({ headless: true });
+
+          try {
+            const desktop = await browser.newContext({
+              viewport: { width: 1440, height: 900 },
+              deviceScaleFactor: 1,
+              recordVideo: {
+                dir: `${output}/video`,
+                size: { width: 1440, height: 900 },
+              },
+            });
+            await desktop.addInitScript(() => {
+              const nativeMatchMedia = window.matchMedia.bind(window);
+              window.matchMedia = (query) => {
+                const result = nativeMatchMedia(query);
+                const matches =
+                  query === "(hover: hover) and (pointer: fine)"
+                    ? true
+                    : query === "(pointer: coarse)"
+                      ? false
+                      : result.matches;
+                return {
+                  matches,
+                  media: result.media,
+                  onchange: result.onchange,
+                  addListener: result.addListener.bind(result),
+                  removeListener: result.removeListener.bind(result),
+                  addEventListener: result.addEventListener.bind(result),
+                  removeEventListener: result.removeEventListener.bind(result),
+                  dispatchEvent: result.dispatchEvent.bind(result),
+                };
+              };
+              Object.defineProperty(navigator, "hardwareConcurrency", {
+                configurable: true,
+                value: 8,
+              });
+              Object.defineProperty(navigator, "deviceMemory", {
+                configurable: true,
+                value: 8,
+              });
+            });
+
+            const desktopPage = await desktop.newPage();
+            collectRuntimeErrors(desktopPage, "desktop");
+            const desktopResponse = await desktopPage.goto(route, {
+              waitUntil: "domcontentloaded",
+              timeout: 90_000,
+            });
+            assert(desktopResponse?.ok(), `Desktop respondeu com ${desktopResponse?.status()}`);
+            await waitForInterface(desktopPage);
+
+            const desktopQuality = await desktopPage.locator("html").getAttribute("data-motion-quality");
+            const desktopCanvases = await desktopPage.locator("canvas").count();
+            assert(
+              desktopQuality === "cinematic" || desktopQuality === "balanced",
+              `Qualidade desktop inesperada: ${desktopQuality}`,
+            );
+            assert(desktopCanvases >= 2, `Esperados ao menos dois canvases interativos, encontrados ${desktopCanvases}`);
+
+            const hero = await sectionFromHeading(desktopPage, /The future\s*is not flat/i);
+            await hero.screenshot({ path: `${output}/desktop-01-hero.png` });
+            await desktopPage.mouse.move(1120, 390);
+            await desktopPage.waitForTimeout(650);
+            await hero.screenshot({ path: `${output}/desktop-02-hero-reactive.png` });
+
+            const story = desktopPage.getByTestId("electronics-circuit-story");
+            const storyMetrics = await story.evaluate((element) => ({
+              top: element.getBoundingClientRect().top + window.scrollY,
+              height: element.getBoundingClientRect().height,
+            }));
+            await desktopPage.evaluate(
+              ({ top, height }) => window.scrollTo(0, top + (height - window.innerHeight) * 0.52),
+              storyMetrics,
+            );
+            await desktopPage.waitForTimeout(1100);
+            await desktopPage.screenshot({ path: `${output}/desktop-03-exploded-story.png` });
+
+            const categories = await sectionFromHeading(desktopPage, /Escolha uma constelação/i);
+            await categories.scrollIntoViewIfNeeded();
+            await desktopPage.waitForTimeout(900);
+            const categoryButtons = categories.getByRole("button");
+            assert((await categoryButtons.count()) >= 4, "Órbitas de categoria incompletas");
+            await categoryButtons.nth(2).click();
+            await desktopPage.waitForTimeout(700);
+            await desktopPage.screenshot({ path: `${output}/desktop-04-category-orbits.png` });
+
+            const showroom = desktopPage.locator("#showroom");
+            await showroom.scrollIntoViewIfNeeded();
+            await desktopPage.waitForTimeout(900);
+            const orbitButtons = showroom.locator('button[aria-label^="Trazer "]');
+            const orbitCount = await orbitButtons.count();
+            assert(orbitCount >= 4, `Showroom expôs somente ${orbitCount} nós orbitais`);
+            const showroomHeading = showroom.locator("h3").first();
+            const beforeProduct = (await showroomHeading.textContent())?.trim();
+            await orbitButtons.nth(Math.min(2, orbitCount - 1)).click();
+            await desktopPage.waitForTimeout(900);
+            const afterProduct = (await showroomHeading.textContent())?.trim();
+            assert(beforeProduct !== afterProduct, "Showroom não alterou o produto central");
+            await desktopPage.screenshot({ path: `${output}/desktop-05-orbital-showroom.png` });
+
+            const systems = await sectionFromHeading(desktopPage, /Hardware que responde/i);
+            await systems.scrollIntoViewIfNeeded();
+            await desktopPage.waitForTimeout(700);
+            const cards = systems.locator("article");
+            const cardCount = await cards.count();
+            assert(cardCount >= 4, `Grade espacial expôs somente ${cardCount} cards`);
+            const firstCard = cards.first();
+            const cardBox = await firstCard.boundingBox();
+            assert(cardBox, "Primeiro card não possui área interativa");
+            await desktopPage.mouse.move(cardBox.x + cardBox.width * 0.78, cardBox.y + cardBox.height * 0.32);
+            await desktopPage.waitForTimeout(700);
+            const cardTransform = await firstCard.evaluate((element) => getComputedStyle(element).transform);
+            assert(cardTransform && cardTransform !== "none", "Card não respondeu ao cursor com profundidade");
+            await desktopPage.screenshot({ path: `${output}/desktop-06-spatial-cards.png` });
+
+            const lab = await sectionFromHeading(desktopPage, /Nada entra sem provar/i);
+            await lab.scrollIntoViewIfNeeded();
+            await desktopPage.waitForTimeout(700);
+            const labButtons = lab.getByRole("button");
+            assert((await labButtons.count()) >= 3, "Laboratório não expôs três diagnósticos");
+            await labButtons.nth(1).click();
+            await desktopPage.waitForTimeout(800);
+            await desktopPage.screenshot({ path: `${output}/desktop-07-lab.png` });
+
+            const desktopOverflow = await desktopPage.evaluate(
+              () => document.documentElement.scrollWidth > window.innerWidth + 1,
+            );
+            assert(!desktopOverflow, "NovaCore desktop possui overflow horizontal");
+
+            await desktopPage.evaluate(() => window.scrollTo(0, 0));
+            await desktopPage.waitForTimeout(700);
+            await scrollJourney(desktopPage, 520, 90);
+            await desktopPage.screenshot({ path: `${output}/desktop-08-full.png`, fullPage: true });
+
+            report.desktop = {
+              quality: desktopQuality,
+              canvases: desktopCanvases,
+              categoryButtons: await categoryButtons.count(),
+              orbitButtons: orbitCount,
+              productBefore: beforeProduct,
+              productAfter: afterProduct,
+              cards: cardCount,
+              cardTransform,
+              overflow: desktopOverflow,
+            };
+            await desktop.close();
+
+            const mobile = await browser.newContext({
+              viewport: { width: 390, height: 844 },
+              deviceScaleFactor: 1,
+              hasTouch: true,
+              isMobile: true,
+              recordVideo: {
+                dir: `${output}/video`,
+                size: { width: 390, height: 844 },
+              },
+            });
+            const mobilePage = await mobile.newPage();
+            collectRuntimeErrors(mobilePage, "mobile");
+            const mobileResponse = await mobilePage.goto(route, {
+              waitUntil: "domcontentloaded",
+              timeout: 90_000,
+            });
+            assert(mobileResponse?.ok(), `Mobile respondeu com ${mobileResponse?.status()}`);
+            await waitForInterface(mobilePage);
+
+            const mobileQuality = await mobilePage.locator("html").getAttribute("data-motion-quality");
+            const mobileCanvases = await mobilePage.locator("canvas").count();
+            assert(mobileQuality === "economy", `Mobile deveria usar economy, encontrado ${mobileQuality}`);
+            assert(mobileCanvases === 0, `Mobile iniciou ${mobileCanvases} canvases WebGL`);
+
+            const mobileHero = await sectionFromHeading(mobilePage, /The future\s*is not flat/i);
+            await mobileHero.screenshot({ path: `${output}/mobile-01-hero.png` });
+            const mobileStory = mobilePage.getByTestId("electronics-circuit-story");
+            await mobileStory.scrollIntoViewIfNeeded();
+            await mobilePage.waitForTimeout(700);
+            assert((await mobileStory.locator(".sticky").count()) === 0, "Story mobile manteve sticky pesado");
+            await mobilePage.screenshot({ path: `${output}/mobile-02-story.png` });
+
+            const mobileShowroom = mobilePage.locator("#showroom");
+            await mobileShowroom.scrollIntoViewIfNeeded();
+            await mobilePage.waitForTimeout(700);
+            await mobilePage.screenshot({ path: `${output}/mobile-03-showroom.png` });
+
+            const mobileOverflow = await mobilePage.evaluate(
+              () => document.documentElement.scrollWidth > window.innerWidth + 1,
+            );
+            assert(!mobileOverflow, "NovaCore mobile possui overflow horizontal");
+
+            await mobilePage.evaluate(() => window.scrollTo(0, 0));
+            await mobilePage.waitForTimeout(500);
+            await scrollJourney(mobilePage, 420, 70);
+            report.mobile = {
+              quality: mobileQuality,
+              canvases: mobileCanvases,
+              overflow: mobileOverflow,
+            };
+            await mobile.close();
+
+            assert(report.errors.length === 0, `Erros de runtime: ${report.errors.join(" | ")}`);
+            report.status = "passed";
+            report.finishedAt = new Date().toISOString();
+            await writeFile(`${output}/report.json`, JSON.stringify(report, null, 2));
+          } catch (error) {
+            report.status = "failed";
+            report.failure = error instanceof Error ? error.message : String(error);
+            report.finishedAt = new Date().toISOString();
+            await writeFile(`${output}/report.json`, JSON.stringify(report, null, 2));
+            throw error;
+          } finally {
+            await browser.close();
+          }
+          NODE
+
+      - name: Copy server log
+        if: always()
+        run: |
+          cp /tmp/novacore-server.log artifacts/novacore-validation/server.log || true
+
+      - name: Upload NovaCore screenshots, recordings and report
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: novacore-validation
+          path: artifacts/novacore-validation
+          if-no-files-found: error
+          retention-days: 14
