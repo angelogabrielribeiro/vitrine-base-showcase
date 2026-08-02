@@ -43,7 +43,7 @@ const TONES: Record<StoreConfig["niche"], Tone> = {
   },
   restaurant: {
     section: "bg-[#160805] text-[#fff2e4]",
-    kicker: "text-[#f0a martins]",
+    kicker: "text-[#f2a24a]",
     title: "font-display",
     body: "text-[#fff2e4]/64",
     card: "border-[#e2762c]/25 bg-[#1e0b06]",
