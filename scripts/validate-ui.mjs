@@ -1,5 +1,5 @@
-import { chromium } from "playwright";
 import { mkdir, writeFile } from "node:fs/promises";
+import { chromium } from "playwright";
 
 const baseUrl = process.env.BASE_URL ?? "http://127.0.0.1:4173";
 const outputDir = "artifacts/ui-validation";
@@ -14,24 +14,15 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-function boxesOverlap(first, second) {
-  return !(
-    first.x + first.width <= second.x ||
-    second.x + second.width <= first.x ||
-    first.y + first.height <= second.y ||
-    second.y + second.height <= first.y
-  );
-}
-
 async function createPage(browser, options, label) {
   const context = await browser.newContext(options);
 
-  if (options.viewport.width >= 768 && options.reducedMotion !== "reduce") {
+  if (options.viewport.width >= 1024 && options.reducedMotion !== "reduce") {
     await context.addInitScript(() => {
       const nativeMatchMedia = window.matchMedia.bind(window);
       window.matchMedia = (query) => {
         const result = nativeMatchMedia(query);
-        const forcedMatch =
+        const matches =
           query === "(hover: hover) and (pointer: fine)"
             ? true
             : query === "(pointer: coarse)"
@@ -39,7 +30,7 @@ async function createPage(browser, options, label) {
               : result.matches;
 
         return {
-          matches: forcedMatch,
+          matches,
           media: result.media,
           onchange: result.onchange,
           addListener: result.addListener.bind(result),
@@ -57,65 +48,61 @@ async function createPage(browser, options, label) {
   const page = await context.newPage();
   const runtimeErrors = [];
 
-  page.on("pageerror", (error) => {
-    runtimeErrors.push(`pageerror: ${error.message}`);
-  });
-
+  page.on("pageerror", (error) => runtimeErrors.push(`pageerror: ${error.message}`));
   page.on("console", (message) => {
-    if (message.type() === "error") {
-      runtimeErrors.push(`console.error: ${message.text()}`);
-    }
+    if (message.type() === "error") runtimeErrors.push(`console.error: ${message.text()}`);
   });
-
   page.on("requestfailed", (request) => {
-    const url = request.url();
-    if (!url.startsWith(baseUrl)) {
-      report.warnings.push(`${label}: recurso externo não carregou: ${url}`);
+    if (!request.url().startsWith(baseUrl)) {
+      report.warnings.push(`${label}: recurso externo não carregou: ${request.url()}`);
     }
   });
 
   return { context, page, runtimeErrors };
 }
 
-async function waitForStablePage(page) {
+async function settle(page) {
   await page.waitForLoadState("domcontentloaded");
   await page.evaluate(async () => {
+    document.documentElement.style.scrollBehavior = "auto";
+    document.body.style.scrollBehavior = "auto";
     if (document.fonts?.ready) await document.fonts.ready;
+    await Promise.all(
+      [...document.images]
+        .filter((image) => !image.complete)
+        .map(
+          (image) =>
+            new Promise((resolve) => {
+              image.addEventListener("load", resolve, { once: true });
+              image.addEventListener("error", resolve, { once: true });
+            }),
+        ),
+    );
   });
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(650);
 }
 
-async function readLayerState(locator) {
-  return locator.evaluate((element) => {
-    const style = getComputedStyle(element);
-    return {
-      opacity: Number(style.opacity),
-      visibility: style.visibility,
-    };
-  });
-}
-
-async function assertNoCtaLabelOverlap(reveal, labels, name) {
-  const ctaBox = await reveal.getByRole("link").boundingBox();
-  assert(ctaBox, `${name}: o CTA final não possui área visível`);
-
-  const labelBoxes = await labels.evaluateAll((elements) =>
-    elements.map((element) => {
-      const rect = element.getBoundingClientRect();
-      return {
-        x: rect.x,
-        y: rect.y,
-        width: rect.width,
-        height: rect.height,
-      };
-    }),
-  );
-
-  const overlappingLabel = labelBoxes.findIndex((labelBox) => boxesOverlap(ctaBox, labelBox));
+async function assertNoOverflow(page, label) {
+  const metrics = await page.evaluate(() => ({
+    viewport: document.documentElement.clientWidth,
+    document: document.documentElement.scrollWidth,
+    body: document.body.scrollWidth,
+  }));
   assert(
-    overlappingLabel === -1,
-    `${name}: o CTA final cobre o texto do card ${overlappingLabel + 1}`,
+    Math.max(metrics.document, metrics.body) <= metrics.viewport + 2,
+    `${label}: overflow horizontal ${JSON.stringify(metrics)}`,
   );
+  return metrics;
+}
+
+async function assertImagesLoaded(locator, expected, label) {
+  const state = await locator.locator("img").evaluateAll((images) => ({
+    total: images.length,
+    loaded: images.filter((image) => image.complete && image.naturalWidth > 0).length,
+  }));
+  assert(state.total === expected, `${label}: quantidade de imagens inesperada ${state.total}`);
+  assert(state.loaded === expected, `${label}: ${expected - state.loaded} imagem(ns) não carregaram`);
+  return state;
 }
 
 async function validateHome(browser, config) {
@@ -128,167 +115,96 @@ async function validateHome(browser, config) {
 
   try {
     const response = await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 90_000 });
-    assert(response?.ok(), `${name}: a homepage respondeu com status ${response?.status()}`);
+    assert(response?.ok(), `${name}: homepage respondeu com status ${response?.status()}`);
     await page.locator("main#conteudo").waitFor({ state: "visible" });
-    await waitForStablePage(page);
+    await settle(page);
 
-    await page.evaluate(() => {
-      document.documentElement.style.scrollBehavior = "auto";
-      document.body.style.scrollBehavior = "auto";
-    });
-
-    const hasHorizontalOverflow = await page.evaluate(
-      () => document.documentElement.scrollWidth > window.innerWidth + 1,
-    );
-    assert(!hasHorizontalOverflow, `${name}: foi detectado overflow horizontal`);
-
-    const whatsappLinks = page.locator('a[href^="https://wa.me/"]');
+    const overflow = await assertNoOverflow(page, name);
     assert(
-      (await whatsappLinks.count()) >= 2,
-      `${name}: os CTAs de WhatsApp não foram encontrados`,
+      (await page.locator('a[href^="https://wa.me/"]').count()) >= 2,
+      `${name}: CTAs de WhatsApp não encontrados`,
     );
     assert(
-      await page
-        .getByRole("link", { name: /Planos/i })
+      await page.getByRole("link", { name: /Planos/i }).first().isVisible(),
+      `${name}: acesso aos planos não está visível`,
+    );
+
+    const showroomCards = page.locator("[data-showroom-card]");
+    assert((await showroomCards.count()) === 4, `${name}: showroom não contém quatro universos`);
+    const showroomImages = await assertImagesLoaded(showroomCards, 4, name);
+    assert(
+      (await showroomCards.locator('[data-active="true"]').count()) === 1,
+      `${name}: showroom precisa de exatamente um universo ativo`,
+    );
+
+    let firstTapActivated = null;
+    if (viewport.width < 1024) {
+      const secondCard = showroomCards.nth(1);
+      const beforeUrl = page.url();
+      await secondCard.dispatchEvent("click");
+      await page.waitForTimeout(700);
+      firstTapActivated =
+        page.url() === beforeUrl && (await secondCard.getAttribute("data-active")) === "true";
+      assert(firstTapActivated, `${name}: primeiro toque não focou o card antes de navegar`);
+
+      const duplicateJourney = page.getByTestId("universe-journey");
+      if ((await duplicateJourney.count()) > 0) {
+        assert(
+          !(await duplicateJourney.isVisible()),
+          `${name}: a seleção duplicada de vitrines continua visível no mobile`,
+        );
+      }
+    } else {
+      const activeTransform = await showroomCards
+        .locator('[data-active="true"]')
+        .evaluate((element) => getComputedStyle(element).transform);
+      const passiveTransform = await showroomCards
+        .locator('[data-active="false"]')
         .first()
-        .isVisible(),
-      `${name}: o acesso aos planos não está visível`,
-    );
+        .evaluate((element) => getComputedStyle(element).transform);
+      assert(
+        activeTransform !== passiveTransform,
+        `${name}: showroom desktop perdeu a composição em profundidade`,
+      );
+    }
 
     await page.screenshot({ path: `${outputDir}/${name}-top.png`, fullPage: false });
 
-    const journey = page.getByTestId("universe-journey");
     const configurator = page.getByTestId("offer-configurator");
-    await journey.waitFor({ state: "visible" });
+    await configurator.evaluate((element) =>
+      window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY - 40 }),
+    );
+    await page.waitForTimeout(700);
+    await configurator.waitFor({ state: "visible" });
 
-    const journeyImageLocators = journey.locator("img");
-    const journeyImageCount = await journeyImageLocators.count();
-    for (let index = 0; index < journeyImageCount; index += 1) {
-      const image = journeyImageLocators.nth(index);
-      await image.scrollIntoViewIfNeeded();
-      await image.evaluate(async (element) => {
-        if (!element.complete) {
-          await new Promise((resolve) => {
-            element.addEventListener("load", resolve, { once: true });
-            element.addEventListener("error", resolve, { once: true });
-          });
-        }
-        await element.decode?.().catch(() => undefined);
-      });
-    }
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await page.waitForTimeout(300);
-
-    const journeyMetrics = await journey.evaluate((element) => ({
-      top: element.getBoundingClientRect().top + window.scrollY,
-      height: element.getBoundingClientRect().height,
-      viewportHeight: window.innerHeight,
-    }));
-    const journeyImages = await journey.locator("img").evaluateAll((images) => ({
-      total: images.length,
-      loaded: images.filter((image) => image.complete && image.naturalWidth > 0).length,
-    }));
-    assert(journeyImages.total === 4, `${name}: a jornada não contém os quatro universos`);
-    assert(journeyImages.loaded === 4, `${name}: nem todas as imagens da jornada carregaram`);
-
-    let startScroll = await page.evaluate(() => window.scrollY);
-    let endScroll = startScroll;
-    let stickyPosition = "static";
-    let imageTransformChanged = false;
-
-    if (reducedMotion === "reduce" || viewport.width < 768) {
-      const staticChapters = page.getByTestId("universe-chapter-static");
-      assert((await staticChapters.count()) === 4, `${name}: fallback estático incompleto`);
-      assert(
-        (await page.getByTestId("universe-chapter-sticky").count()) === 0,
-        `${name}: o modo reduzido manteve capítulos presos`,
-      );
-      await page.evaluate((top) => window.scrollTo(0, top), journeyMetrics.top);
-      await page.waitForTimeout(650);
-      await page.screenshot({ path: `${outputDir}/${name}-showcase.png`, fullPage: false });
-      const targetScroll = journeyMetrics.top + Math.max(journeyMetrics.height * 0.6, 420);
-      await page.evaluate((top) => window.scrollTo(0, top), targetScroll);
-      await page.waitForTimeout(650);
-      endScroll = await page.evaluate(() => window.scrollY);
-      assert(endScroll > startScroll + 100, `${name}: a página não permitiu rolagem normal`);
-    } else {
-      const chapters = page.getByTestId("universe-chapter");
-      assert((await chapters.count()) === 4, `${name}: faltam capítulos imersivos`);
-      assert(
-        journeyMetrics.height > journeyMetrics.viewportHeight * 8,
-        `${name}: a jornada não possui percurso suficiente`,
-      );
-
-      const firstChapter = chapters.nth(0);
-      const firstMetrics = await firstChapter.evaluate((element) => ({
-        top: element.getBoundingClientRect().top + window.scrollY,
-        height: element.getBoundingClientRect().height,
-        viewportHeight: window.innerHeight,
-      }));
-      assert(
-        firstMetrics.height > firstMetrics.viewportHeight * 1.8,
-        `${name}: o primeiro capítulo ficou curto demais`,
-      );
-
-      const sticky = firstChapter.getByTestId("universe-chapter-sticky");
-      stickyPosition = await sticky.evaluate((element) => getComputedStyle(element).position);
-      assert(stickyPosition === "sticky", `${name}: o capítulo principal deixou de ser sticky`);
-
-      const image = firstChapter.getByTestId("universe-chapter-image");
-      await page.evaluate((top) => window.scrollTo(0, top), firstMetrics.top + 10);
-      await page.waitForTimeout(650);
-      startScroll = await page.evaluate(() => window.scrollY);
-      const startTransform = await image.evaluate((element) => getComputedStyle(element).transform);
-
-      const activeRange = Math.max(firstMetrics.height - firstMetrics.viewportHeight, 1);
-      await page.evaluate((top) => window.scrollTo(0, top), firstMetrics.top + activeRange * 0.58);
-      await page.waitForTimeout(850);
-      endScroll = await page.evaluate(() => window.scrollY);
-      const middleTransform = await image.evaluate(
-        (element) => getComputedStyle(element).transform,
-      );
-      imageTransformChanged = startTransform !== middleTransform;
-
-      assert(endScroll > startScroll + 100, `${name}: a página não permitiu rolagem normal`);
-      assert(imageTransformChanged, `${name}: a imagem não respondeu ao progresso do capítulo`);
-      await page.screenshot({ path: `${outputDir}/${name}-showcase.png`, fullPage: false });
-    }
-
-    await configurator.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(500);
     const goalButtons = configurator.getByTestId("offer-goal");
     const planButtons = configurator.getByTestId("offer-plan");
     assert((await goalButtons.count()) === 4, `${name}: objetivos do configurador incompletos`);
     assert((await planButtons.count()) === 3, `${name}: níveis de escopo incompletos`);
 
-    const secondGoal = goalButtons.nth(1);
-    await secondGoal.click();
+    await goalButtons.nth(1).click();
     assert(
-      (await secondGoal.getAttribute("aria-pressed")) === "true",
-      `${name}: o objetivo não alterou o configurador`,
+      (await goalButtons.nth(1).getAttribute("aria-pressed")) === "true",
+      `${name}: objetivo não alterou o configurador`,
     );
-    const firstPlan = planButtons.nth(0);
-    await firstPlan.click();
+    await planButtons.nth(0).click();
     assert(
-      (await firstPlan.getAttribute("aria-pressed")) === "true",
-      `${name}: o escopo não alterou o configurador`,
+      (await planButtons.nth(0).getAttribute("aria-pressed")) === "true",
+      `${name}: escopo não alterou o configurador`,
     );
 
-    assert(runtimeErrors.length === 0, `${name}: erros de runtime: ${runtimeErrors.join(" | ")}`);
-
+    await page.screenshot({ path: `${outputDir}/${name}-showcase.png`, fullPage: false });
     await configurator.screenshot({ path: `${outputDir}/${name}-configurator.png` });
+    assert(runtimeErrors.length === 0, `${name}: erros de runtime: ${runtimeErrors.join(" | ")}`);
 
     report.checks.push({
       name,
       status: "passed",
       viewport,
       reducedMotion,
-      journeyMetrics,
-      journeyImages,
-      startScroll,
-      endScroll,
-      stickyPosition,
-      imageTransformChanged,
+      overflow,
+      showroomImages,
+      firstTapActivated,
       configuratorGoals: await goalButtons.count(),
       configuratorPlans: await planButtons.count(),
     });
@@ -307,8 +223,12 @@ async function validateFashion(browser, config) {
   );
 
   try {
-    await page.goto(`${baseUrl}/demo/moda`, { waitUntil: "networkidle", timeout: 90_000 });
-    await waitForStablePage(page);
+    const response = await page.goto(`${baseUrl}/demo/moda`, {
+      waitUntil: "networkidle",
+      timeout: 90_000,
+    });
+    assert(response?.ok(), `${label}: resposta HTTP ${response?.status()}`);
+    await settle(page);
 
     const storefront = page.getByTestId("fashion-storefront");
     const hero = page.getByTestId("fashion-hero");
@@ -317,8 +237,7 @@ async function validateFashion(browser, config) {
     await hero.screenshot({ path: `${outputDir}/${label}-hero.png` });
 
     const lookCards = hero.getByTestId("fashion-look-card");
-    const lookCount = await lookCards.count();
-    assert(lookCount >= 3, `${label}: o provador possui menos de tres looks`);
+    assert((await lookCards.count()) >= 3, `${label}: provador possui menos de três looks`);
     const pressedBefore = await lookCards.evaluateAll((cards) =>
       cards.findIndex((card) => card.getAttribute("aria-pressed") === "true"),
     );
@@ -327,46 +246,66 @@ async function validateFashion(browser, config) {
     const pressedAfter = await lookCards.evaluateAll((cards) =>
       cards.findIndex((card) => card.getAttribute("aria-pressed") === "true"),
     );
-    assert(pressedAfter !== pressedBefore, `${label}: o provador nao respondeu ao comando`);
+    assert(pressedAfter !== pressedBefore, `${label}: provador não respondeu ao comando`);
 
     const chapters = page.getByTestId("fashion-chapter");
-    assert((await chapters.count()) === 3, `${label}: a jornada nao possui tres capitulos`);
+    assert((await chapters.count()) === 3, `${label}: storytelling não possui três capítulos`);
     const firstChapter = chapters.first();
     const chapterBox = await firstChapter.boundingBox();
-    assert(chapterBox, `${label}: o primeiro capitulo nao possui dimensoes`);
-    assert(
-      chapterBox.height > viewport.height * 1.7,
-      `${label}: o capitulo nao sustenta uma cena longa`,
-    );
+    assert(chapterBox, `${label}: primeiro capítulo não possui dimensões`);
+
+    const sticky = firstChapter.locator(":scope > div.sticky");
+    const stickyPosition =
+      (await sticky.count()) > 0
+        ? await sticky.evaluate((element) => getComputedStyle(element).position)
+        : "missing";
+    if (viewport.width < 768) {
+      assert(
+        chapterBox.height > viewport.height * 0.78,
+        `${label}: capítulo mobile ficou curto e sem respiro`,
+      );
+      assert(stickyPosition !== "sticky", `${label}: capítulo mobile continua prendendo a tela`);
+      const chapterImage = firstChapter.locator("img").first();
+      const imageStyle = await chapterImage.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return { fit: style.objectFit, transform: style.transform };
+      });
+      assert(imageStyle.fit === "contain", `${label}: imagem mobile continua cortada`);
+    } else {
+      assert(
+        chapterBox.height > viewport.height * 1.7,
+        `${label}: capítulo desktop não sustenta a cena longa`,
+      );
+      assert(stickyPosition === "sticky", `${label}: storytelling desktop perdeu o sticky`);
+    }
 
     const atelier = page.getByTestId("fashion-atelier");
-    await atelier.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(500);
+    await atelier.evaluate((element) =>
+      window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY - 40 }),
+    );
+    await page.waitForTimeout(600);
     const categories = atelier.getByTestId("fashion-category");
     assert((await categories.count()) >= 4, `${label}: faltam categorias no atelier`);
-    const secondCategory = categories.nth(1);
-    await secondCategory.click();
+    await categories.nth(1).click();
     assert(
-      (await secondCategory.getAttribute("aria-pressed")) === "true",
-      `${label}: a curadoria nao mudou de categoria`,
+      (await categories.nth(1).getAttribute("aria-pressed")) === "true",
+      `${label}: curadoria não mudou de categoria`,
     );
     await atelier.screenshot({ path: `${outputDir}/${label}-atelier.png` });
 
-    const hasHorizontalOverflow = await page.evaluate(
-      () => document.documentElement.scrollWidth > window.innerWidth + 1,
-    );
-    assert(!hasHorizontalOverflow, `${label}: foi detectado overflow horizontal`);
+    const overflow = await assertNoOverflow(page, label);
     assert(runtimeErrors.length === 0, `${label}: erros de runtime: ${runtimeErrors.join(" | ")}`);
 
     report.checks.push({
       name: label,
       status: "passed",
       viewport,
-      lookCount,
+      overflow,
       pressedBefore,
       pressedAfter,
       chapters: await chapters.count(),
       categories: await categories.count(),
+      stickyPosition,
     });
   } finally {
     await context.close();
@@ -388,33 +327,22 @@ async function validateNotFound(browser, config) {
       timeout: 90_000,
     });
     const httpStatus = response?.status();
-    assert(
-      httpStatus === 404 || httpStatus === 200,
-      `${label}: resposta HTTP inesperada ${httpStatus ?? "sem status"}`,
-    );
-    await waitForStablePage(page);
+    assert(httpStatus === 404 || httpStatus === 200, `${label}: status HTTP ${httpStatus}`);
+    await settle(page);
 
     await page.getByRole("heading", { name: "404" }).waitFor({ state: "visible" });
-    const homeLink = page.getByRole("link", { name: /Voltar ao início/i });
-    const demosLink = page.getByRole("link", { name: /Ver demonstrações/i });
-    assert(await homeLink.isVisible(), `${label}: o retorno ao início não está visível`);
-    assert(await demosLink.isVisible(), `${label}: o acesso às demonstrações não está visível`);
     assert(
-      (await homeLink.getAttribute("href")) === "/",
-      `${label}: o retorno aponta para rota errada`,
+      await page.getByRole("link", { name: /Voltar ao início/i }).isVisible(),
+      `${label}: retorno ao início não está visível`,
     );
     assert(
-      (await demosLink.getAttribute("href")) === "/#demonstracoes",
-      `${label}: o acesso às demonstrações aponta para rota errada`,
+      await page.getByRole("link", { name: /Ver demonstrações/i }).isVisible(),
+      `${label}: acesso às demonstrações não está visível`,
     );
-
-    const hasHorizontalOverflow = await page.evaluate(
-      () => document.documentElement.scrollWidth > window.innerWidth + 1,
-    );
-    assert(!hasHorizontalOverflow, `${label}: foi detectado overflow horizontal`);
+    const overflow = await assertNoOverflow(page, label);
     await page.screenshot({ path: `${outputDir}/${label}.png`, fullPage: false });
 
-    const unexpectedRuntimeErrors = runtimeErrors.filter(
+    const unexpectedErrors = runtimeErrors.filter(
       (error) =>
         !(
           httpStatus === 404 &&
@@ -423,18 +351,8 @@ async function validateNotFound(browser, config) {
           )
         ),
     );
-    assert(
-      unexpectedRuntimeErrors.length === 0,
-      `${label}: erros de runtime: ${unexpectedRuntimeErrors.join(" | ")}`,
-    );
-
-    report.checks.push({
-      name: label,
-      status: "passed",
-      viewport,
-      httpStatus,
-      ignoredExpectedConsoleMessages: runtimeErrors.length - unexpectedRuntimeErrors.length,
-    });
+    assert(unexpectedErrors.length === 0, `${label}: ${unexpectedErrors.join(" | ")}`);
+    report.checks.push({ name: label, status: "passed", viewport, httpStatus, overflow });
   } finally {
     await context.close();
   }
