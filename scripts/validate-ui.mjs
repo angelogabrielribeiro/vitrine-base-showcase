@@ -28,7 +28,6 @@ async function createPage(browser, options, label) {
             : query === "(pointer: coarse)"
               ? false
               : result.matches;
-
         return {
           matches,
           media: result.media,
@@ -47,7 +46,6 @@ async function createPage(browser, options, label) {
 
   const page = await context.newPage();
   const runtimeErrors = [];
-
   page.on("pageerror", (error) => runtimeErrors.push(`pageerror: ${error.message}`));
   page.on("console", (message) => {
     if (message.type() === "error") runtimeErrors.push(`console.error: ${message.text()}`);
@@ -57,7 +55,6 @@ async function createPage(browser, options, label) {
       report.warnings.push(`${label}: recurso externo não carregou: ${request.url()}`);
     }
   });
-
   return { context, page, runtimeErrors };
 }
 
@@ -130,12 +127,11 @@ async function validateHome(browser, config) {
     );
 
     const showroomCards = page.locator("[data-showroom-card]");
+    const activeCards = page.locator('[data-showroom-card][data-active="true"]');
+    const passiveCards = page.locator('[data-showroom-card][data-active="false"]');
     assert((await showroomCards.count()) === 4, `${name}: showroom não contém quatro universos`);
+    assert((await activeCards.count()) === 1, `${name}: showroom precisa de um universo ativo`);
     const showroomImages = await assertImagesLoaded(showroomCards, 4, name);
-    assert(
-      (await showroomCards.locator('[data-active="true"]').count()) === 1,
-      `${name}: showroom precisa de exatamente um universo ativo`,
-    );
 
     let firstTapActivated = null;
     if (viewport.width < 1024) {
@@ -151,15 +147,14 @@ async function validateHome(browser, config) {
       if ((await duplicateJourney.count()) > 0) {
         assert(
           !(await duplicateJourney.isVisible()),
-          `${name}: a seleção duplicada de vitrines continua visível no mobile`,
+          `${name}: seleção duplicada de vitrines continua visível no mobile`,
         );
       }
     } else {
-      const activeTransform = await showroomCards
-        .locator('[data-active="true"]')
-        .evaluate((element) => getComputedStyle(element).transform);
-      const passiveTransform = await showroomCards
-        .locator('[data-active="false"]')
+      const activeTransform = await activeCards.evaluate(
+        (element) => getComputedStyle(element).transform,
+      );
+      const passiveTransform = await passiveCards
         .first()
         .evaluate((element) => getComputedStyle(element).transform);
       assert(
@@ -181,7 +176,6 @@ async function validateHome(browser, config) {
     const planButtons = configurator.getByTestId("offer-plan");
     assert((await goalButtons.count()) === 4, `${name}: objetivos do configurador incompletos`);
     assert((await planButtons.count()) === 3, `${name}: níveis de escopo incompletos`);
-
     await goalButtons.nth(1).click();
     assert(
       (await goalButtons.nth(1).getAttribute("aria-pressed")) === "true",
@@ -230,9 +224,8 @@ async function validateFashion(browser, config) {
     assert(response?.ok(), `${label}: resposta HTTP ${response?.status()}`);
     await settle(page);
 
-    const storefront = page.getByTestId("fashion-storefront");
     const hero = page.getByTestId("fashion-hero");
-    await storefront.waitFor({ state: "visible" });
+    await page.getByTestId("fashion-storefront").waitFor({ state: "visible" });
     await hero.waitFor({ state: "visible" });
     await hero.screenshot({ path: `${outputDir}/${label}-hero.png` });
 
@@ -253,24 +246,23 @@ async function validateFashion(browser, config) {
     const firstChapter = chapters.first();
     const chapterBox = await firstChapter.boundingBox();
     assert(chapterBox, `${label}: primeiro capítulo não possui dimensões`);
-
     const sticky = firstChapter.locator(":scope > div.sticky");
     const stickyPosition =
       (await sticky.count()) > 0
         ? await sticky.evaluate((element) => getComputedStyle(element).position)
         : "missing";
+
     if (viewport.width < 768) {
       assert(
         chapterBox.height > viewport.height * 0.78,
         `${label}: capítulo mobile ficou curto e sem respiro`,
       );
       assert(stickyPosition !== "sticky", `${label}: capítulo mobile continua prendendo a tela`);
-      const chapterImage = firstChapter.locator("img").first();
-      const imageStyle = await chapterImage.evaluate((element) => {
-        const style = getComputedStyle(element);
-        return { fit: style.objectFit, transform: style.transform };
-      });
-      assert(imageStyle.fit === "contain", `${label}: imagem mobile continua cortada`);
+      const imageFit = await firstChapter
+        .locator("img")
+        .first()
+        .evaluate((element) => getComputedStyle(element).objectFit);
+      assert(imageFit === "contain", `${label}: imagem mobile continua cortada`);
     } else {
       assert(
         chapterBox.height > viewport.height * 1.7,
@@ -295,7 +287,6 @@ async function validateFashion(browser, config) {
 
     const overflow = await assertNoOverflow(page, label);
     assert(runtimeErrors.length === 0, `${label}: erros de runtime: ${runtimeErrors.join(" | ")}`);
-
     report.checks.push({
       name: label,
       status: "passed",
@@ -329,7 +320,6 @@ async function validateNotFound(browser, config) {
     const httpStatus = response?.status();
     assert(httpStatus === 404 || httpStatus === 200, `${label}: status HTTP ${httpStatus}`);
     await settle(page);
-
     await page.getByRole("heading", { name: "404" }).waitFor({ state: "visible" });
     assert(
       await page.getByRole("link", { name: /Voltar ao início/i }).isVisible(),
