@@ -101,10 +101,9 @@ function resolveQuality({
   if (reducedMotion) return "static";
   if (preference !== "auto") return preference;
   if (saveData || cores <= 2 || memory <= 2) return "economy";
-  if (viewportWidth < 640 && (cores < 4 || memory < 4)) return "economy";
-  if (!precisePointer || viewportWidth < 1024 || cores <= 4 || memory <= 4) {
-    return "balanced";
-  }
+  // Touch navigation must remain immediate even on powerful phones.
+  if (!precisePointer || viewportWidth < 768) return "economy";
+  if (viewportWidth < 1024 || cores <= 4 || memory <= 4) return "balanced";
   if (viewportWidth >= 1280 && cores >= 8 && memory >= 8) return "cinematic";
   return "balanced";
 }
