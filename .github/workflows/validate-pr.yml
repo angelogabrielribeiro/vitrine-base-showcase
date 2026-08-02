@@ -299,8 +299,18 @@ jobs:
                 timeout: 90_000,
               });
 
-              if ((await page.getByTestId("catalog-expansion-hero").count()) !== 1) {
-                throw new Error(`${slug}: hero expansivo do catálogo não foi renderizado`);
+              const catalogHero = page.getByTestId("catalog-expansion-hero");
+              try {
+                await catalogHero.waitFor({ state: "attached", timeout: 15_000 });
+              } catch {
+                await page.screenshot({
+                  path: `artifacts/ui-validation/commerce-${slug}-catalog-failure.png`,
+                  fullPage: false,
+                });
+                const catalogBody = (await page.locator("body").innerText()).slice(0, 600);
+                throw new Error(
+                  `${slug}: hero do catálogo ausente em ${page.url()} · ${catalogBody}`,
+                );
               }
               if ((await page.getByTestId("catalog-feature-context").count()) !== 1) {
                 throw new Error(`${slug}: produto em destaque continua sem contexto`);
