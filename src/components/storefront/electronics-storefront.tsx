@@ -407,7 +407,7 @@ function CategoryCommandDeck({ store }: { store: StoreConfig }) {
             grade comum de departamentos.
           </p>
 
-          <div className="mt-9 grid gap-2">
+          <div className="mt-9 flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 lg:grid lg:overflow-visible lg:pb-0">
             {store.categories.map((category, index) => {
               const Icon = CATEGORY_ICONS[category.slug as keyof typeof CATEGORY_ICONS] ?? Sparkles;
               const isActive = index === active;
@@ -415,11 +415,10 @@ function CategoryCommandDeck({ store }: { store: StoreConfig }) {
                 <button
                   key={category.slug}
                   type="button"
-                  onMouseEnter={() => setActive(index)}
                   onFocus={() => setActive(index)}
                   onClick={() => setActive(index)}
                   className={
-                    "group grid min-h-14 grid-cols-[auto_1fr_auto] items-center gap-4 border px-4 text-left transition duration-500 " +
+                    "group grid min-h-14 shrink-0 snap-start grid-cols-[auto_1fr_auto] items-center gap-4 border px-4 text-left transition duration-500 lg:grid-cols-[auto_1fr_auto] lg:shrink lg:snap-none " +
                     (isActive
                       ? "border-cyan-200/45 bg-cyan-200/[0.08] text-white"
                       : "border-white/8 bg-white/[0.02] text-slate-500 hover:border-white/20 hover:text-white")
