@@ -116,7 +116,7 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
       onBlur={reset}
       data-mobile-active={String(activeVisual && capabilities.coarsePointer)}
       data-niche={niche}
-      data-in-view={String(inView)}
+      data-in-view={String(inView && capabilities.quality !== "economy")}
       className={`premium-product-card group relative block ${copy.meta}`}
       style={{ transform }}
     >
