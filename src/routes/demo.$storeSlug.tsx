@@ -14,6 +14,7 @@ import { WhatsappFab } from "@/components/storefront/whatsapp-fab";
 import { DemoBanner } from "@/components/storefront/demo-banner";
 import { LiquidMobileMenu } from "@/components/storefront/liquid-mobile-menu";
 import { StoreCursorShader } from "@/components/storefront/store-cursor-shader";
+import { MobileMenuProvider } from "@/components/storefront/mobile-menu-state";
 import { useEffect } from "react";
 import { seedAllStores } from "@/services/local-repository";
 import { useRepo } from "@/hooks/use-repo";
@@ -66,18 +67,22 @@ function StoreLayout() {
   // Esconde o menu flutuante no formulário final do checkout para não cobrir o botão.
   const hideFloatingMenu = pathname.endsWith(`/demo/${storeSlug}/checkout`);
   return (
-    <div className={themeScopeClass(store.slug) + " min-h-screen"}>
-      <StoreThemeStyle store={store} />
-      <StoreCursorShader niche={store.niche} />
-      <DemoBanner />
-      <StoreHeader store={store} />
-      <main>
-        <Outlet />
-      </main>
-      <StoreFooter store={store} />
-      <WhatsappFab store={store} />
-      <LiquidMobileMenu store={store} hide={hideFloatingMenu} />
-    </div>
+    <MobileMenuProvider>
+      <div className={themeScopeClass(store.slug) + " min-h-screen overflow-x-hidden"}>
+        <StoreThemeStyle store={store} />
+        <StoreCursorShader niche={store.niche} />
+        <DemoBanner />
+        <StoreHeader store={store} />
+        <main>
+          <Outlet />
+        </main>
+        {/* Reserva de espaço para a barra flutuante mobile: nada fica escondido atrás dela. */}
+        <div aria-hidden className="h-24 md:hidden" />
+        <StoreFooter store={store} />
+        <WhatsappFab store={store} />
+        <LiquidMobileMenu store={store} hide={hideFloatingMenu} />
+      </div>
+    </MobileMenuProvider>
   );
 }
 
