@@ -98,7 +98,10 @@ async function assertImagesLoaded(locator, expected, label) {
     loaded: images.filter((image) => image.complete && image.naturalWidth > 0).length,
   }));
   assert(state.total === expected, `${label}: quantidade de imagens inesperada ${state.total}`);
-  assert(state.loaded === expected, `${label}: ${expected - state.loaded} imagem(ns) não carregaram`);
+  assert(
+    state.loaded === expected,
+    `${label}: ${expected - state.loaded} imagem(ns) não carregaram`,
+  );
   return state;
 }
 
@@ -122,7 +125,10 @@ async function validateHome(browser, config) {
       `${name}: CTAs de WhatsApp não encontrados`,
     );
     assert(
-      await page.getByRole("link", { name: /Planos/i }).first().isVisible(),
+      await page
+        .getByRole("link", { name: /Planos/i })
+        .first()
+        .isVisible(),
       `${name}: acesso aos planos não está visível`,
     );
 
