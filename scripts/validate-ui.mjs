@@ -64,17 +64,23 @@ async function settle(page) {
     document.documentElement.style.scrollBehavior = "auto";
     document.body.style.scrollBehavior = "auto";
     if (document.fonts?.ready) await document.fonts.ready;
-    await Promise.all(
-      [...document.images]
-        .filter((image) => !image.complete)
-        .map(
+    const pending = [...document.images].filter((image) => {
+      if (image.complete) return false;
+      const rect = image.getBoundingClientRect();
+      return image.loading !== "lazy" || rect.top < innerHeight * 2;
+    });
+    await Promise.race([
+      Promise.all(
+        pending.map(
           (image) =>
             new Promise((resolve) => {
               image.addEventListener("load", resolve, { once: true });
               image.addEventListener("error", resolve, { once: true });
             }),
         ),
-    );
+      ),
+      new Promise((resolve) => window.setTimeout(resolve, 5_000)),
+    ]);
   });
   await page.waitForTimeout(650);
 }
