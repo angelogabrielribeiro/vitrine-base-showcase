@@ -223,36 +223,50 @@ function ServiceRow({
   storeSlug,
   onActivate,
   isActive,
+  autoActivate,
 }: {
   service: Service;
   index: number;
   storeSlug: string;
   onActivate?: () => void;
   isActive?: boolean;
+  autoActivate?: boolean;
 }) {
   const reduce = useReducedMotion();
-  const [active, setActive] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const { ref, inView } = useInView<HTMLLIElement>({ amount: 0.6 });
   const image = service.image;
+
+  // Mobile: acende sozinho ao entrar na viewport, em sequência com o scroll.
+  // Desktop: reage a hover/foco, sem cursor simulado.
+  const active = autoActivate ? inView : hovered;
+
+  useEffect(() => {
+    if (autoActivate && inView) onActivate?.();
+  }, [autoActivate, inView, onActivate]);
 
   return (
     <li
+      ref={ref}
       onMouseEnter={() => {
-        setActive(true);
+        if (autoActivate) return;
+        setHovered(true);
         onActivate?.();
       }}
-      onMouseLeave={() => setActive(false)}
+      onMouseLeave={() => setHovered(false)}
       onFocus={() => {
-        setActive(true);
+        setHovered(true);
         onActivate?.();
       }}
-      onBlur={() => setActive(false)}
+      onBlur={() => setHovered(false)}
       className="group relative"
       data-active={isActive || undefined}
     >
       <Link
         to="/demo/$storeSlug/agendar"
         params={{ storeSlug }}
-        className="relative flex items-center gap-6 overflow-hidden px-2 py-6 outline-none focus-visible:bg-neutral-900/40 sm:px-4 sm:py-7 lg:py-6"
+        style={{ transitionDelay: autoActivate ? `${sequenceDelay(index, 0.06)}s` : undefined }}
+        className="relative flex items-center gap-6 overflow-hidden px-2 py-7 outline-none transition-colors duration-300 focus-visible:bg-neutral-900/40 sm:px-4 sm:py-7 lg:py-6"
       >
         <div
           aria-hidden

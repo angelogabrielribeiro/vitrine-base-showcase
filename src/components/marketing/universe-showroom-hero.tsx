@@ -10,6 +10,7 @@ import {
 import { ArrowRight, ChevronLeft, ChevronRight, Hand, MessageCircle } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
+import { useAdaptiveQuality } from "@/hooks/use-adaptive-quality";
 import { UNIVERSES, universeHref, type Universe } from "@/components/marketing/universe-data";
 
 const STEP = 360 / UNIVERSES.length;
