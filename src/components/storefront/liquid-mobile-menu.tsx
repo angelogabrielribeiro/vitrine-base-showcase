@@ -14,6 +14,7 @@ import {
 import type { StoreConfig } from "@/types/commerce";
 import { useCart } from "@/hooks/use-cart";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { useMobileMenuState } from "@/components/storefront/mobile-menu-state";
 
 /**
  * Menu flutuante mobile inspirado no comportamento "Liquid Morph":
@@ -28,6 +29,13 @@ export function LiquidMobileMenu({ store, hide = false }: { store: StoreConfig; 
   const { count } = useCart(store.slug);
   const hydrated = useHydrated();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { setMenuOpen } = useMobileMenuState();
+
+  // Sincroniza estado global (o FAB do WhatsApp desaparece com o menu aberto).
+  useEffect(() => {
+    setMenuOpen(open);
+  }, [open, setMenuOpen]);
+  useEffect(() => () => setMenuOpen(false), [setMenuOpen]);
 
   // Fecha ao navegar
   useEffect(() => {
@@ -63,7 +71,7 @@ export function LiquidMobileMenu({ store, hide = false }: { store: StoreConfig; 
   return (
     <div
       ref={containerRef}
-      className="fixed inset-x-0 bottom-4 z-40 mx-auto flex justify-center md:hidden print:hidden"
+      className="fixed inset-x-0 bottom-4 z-50 mx-auto flex justify-center px-4 md:hidden print:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div
