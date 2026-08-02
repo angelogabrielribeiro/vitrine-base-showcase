@@ -117,13 +117,13 @@ export function ElectronicsCircuitStory({
               animate={{ opacity: 1, y: 0, clipPath: "inset(0 0 0% 0)" }}
               transition={{ duration: 0.5 }}
             >
-              <h2 className="mt-5 text-[clamp(3.8rem,7vw,7.7rem)] font-semibold uppercase leading-[0.76] tracking-[-0.07em]">
+              <h2 className="mt-4 text-[clamp(3rem,5vw,5.2rem)] font-semibold uppercase leading-[0.84] tracking-[-0.055em]">
                 {current.name}
               </h2>
-              <p className="mt-7 max-w-lg text-base leading-8 text-slate-300/70">
+              <p className="mt-5 max-w-lg text-base leading-7 text-slate-300/74">
                 {current.description}
               </p>
-              <div className="mt-7 grid max-w-lg grid-cols-3 gap-px bg-cyan-200/15">
+              <div className="mt-5 grid max-w-lg grid-cols-3 gap-px bg-cyan-200/15">
                 {[
                   [Zap, `${82 + active * 6}%`, "performance"],
                   [Cpu, `${12 - active * 2} ms`, "resposta"],
@@ -146,7 +146,7 @@ export function ElectronicsCircuitStory({
               <Link
                 to="/demo/$storeSlug/produto/$productSlug"
                 params={{ storeSlug: store.slug, productSlug: current.slug }}
-                className="mt-8 inline-flex min-h-13 items-center gap-3 bg-cyan-300 px-6 text-[10px] font-bold uppercase tracking-[0.26em] text-[#030611] transition hover:bg-white"
+                className="mt-6 inline-flex min-h-13 items-center gap-3 bg-cyan-300 px-6 text-[10px] font-bold uppercase tracking-[0.26em] text-[#030611] transition hover:bg-white"
               >
                 Abrir diagnóstico <ArrowRight className="h-4 w-4" />
               </Link>
