@@ -165,7 +165,11 @@ const INCLUDED = [
 
 function Index() {
   const { capabilities } = useCinematicMotion();
-  const reduceMotion = capabilities.hydrated && capabilities.reducedMotion;
+  const reduceMotion =
+    capabilities.hydrated &&
+    (capabilities.reducedMotion ||
+      capabilities.coarsePointer ||
+      capabilities.quality === "economy");
   return (
     <div className="min-h-screen overflow-x-clip bg-vb-canvas font-sans text-vb-ivory">
       <a

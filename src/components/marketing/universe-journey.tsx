@@ -253,7 +253,9 @@ function ImmersiveChapter({ universe, index }: { universe: Universe; index: numb
 
 export function UniverseJourney({ proposalUrl }: UniverseJourneyProps) {
   const { capabilities } = useCinematicMotion();
-  const reduced = capabilities.hydrated && capabilities.reducedMotion;
+  const reduced =
+    capabilities.hydrated &&
+    (capabilities.reducedMotion || capabilities.coarsePointer || capabilities.quality === "economy");
 
   return (
     <section id="experiencia" data-testid="universe-journey" className="relative scroll-mt-20 bg-vb-deep text-white">

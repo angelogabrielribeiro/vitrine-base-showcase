@@ -139,6 +139,36 @@ jobs:
           const baseUrl = process.env.BASE_URL;
           const browser = await chromium.launch({ headless: true });
           const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+          await context.addInitScript(() => {
+            const nativeMatchMedia = window.matchMedia.bind(window);
+            window.matchMedia = (query) => {
+              const result = nativeMatchMedia(query);
+              const matches =
+                query === "(hover: hover) and (pointer: fine)"
+                  ? true
+                  : query === "(pointer: coarse)"
+                    ? false
+                    : result.matches;
+              return {
+                matches,
+                media: result.media,
+                onchange: result.onchange,
+                addListener: result.addListener.bind(result),
+                removeListener: result.removeListener.bind(result),
+                addEventListener: result.addEventListener.bind(result),
+                removeEventListener: result.removeEventListener.bind(result),
+                dispatchEvent: result.dispatchEvent.bind(result),
+              };
+            };
+            Object.defineProperty(navigator, "hardwareConcurrency", {
+              configurable: true,
+              value: 8,
+            });
+            Object.defineProperty(navigator, "deviceMemory", {
+              configurable: true,
+              value: 8,
+            });
+          });
           const page = await context.newPage();
 
           try {
@@ -263,10 +293,43 @@ jobs:
               }
 
               if (
-                slug !== "moda" &&
+                slug === "barbearia" &&
                 (await page.getByTestId("odyssey-scene").count()) !== 3
               ) {
-                throw new Error(`${slug}: narrativa de scroll não possui três atos`);
+                throw new Error("barbearia: narrativa preservada não possui três atos");
+              }
+              if (
+                slug === "restaurante" &&
+                (await page.getByTestId("restaurant-fire-deck").count()) !== 1
+              ) {
+                throw new Error("Brasa Urbana não renderizou o deck interativo de fogo");
+              }
+              if (
+                slug === "eletronicos" &&
+                (await page.getByTestId("electronics-circuit-story").count()) !== 1
+              ) {
+                throw new Error("NovaCore não renderizou a narrativa própria de circuitos");
+              }
+
+              if (slug === "restaurante" || slug === "eletronicos") {
+                const story =
+                  slug === "restaurante"
+                    ? page.getByTestId("restaurant-fire-deck")
+                    : page.getByTestId("electronics-circuit-story");
+                const storyMetrics = await story.evaluate((element) => ({
+                  top: element.getBoundingClientRect().top + window.scrollY,
+                  height: element.getBoundingClientRect().height,
+                }));
+                await page.evaluate(
+                  ({ top, height }) =>
+                    window.scrollTo(0, top + Math.max(0, height - window.innerHeight) * 0.48),
+                  storyMetrics,
+                );
+                await page.waitForTimeout(900);
+                await page.screenshot({
+                  path: `artifacts/ui-validation/commerce-${slug}-story.png`,
+                  fullPage: false,
+                });
               }
 
               await page.goto(new URL(`/demo/${slug}/produtos`, baseUrl).toString(), {
@@ -274,8 +337,21 @@ jobs:
                 timeout: 90_000,
               });
 
-              if ((await page.getByTestId("catalog-expansion-hero").count()) !== 1) {
-                throw new Error(`${slug}: hero expansivo do catálogo não foi renderizado`);
+              const catalogHero = page.getByTestId("catalog-expansion-hero");
+              try {
+                await catalogHero.waitFor({ state: "attached", timeout: 15_000 });
+              } catch {
+                await page.screenshot({
+                  path: `artifacts/ui-validation/commerce-${slug}-catalog-failure.png`,
+                  fullPage: false,
+                });
+                const catalogBody = (await page.locator("body").innerText()).slice(0, 600);
+                throw new Error(
+                  `${slug}: hero do catálogo ausente em ${page.url()} · ${catalogBody}`,
+                );
+              }
+              if ((await page.getByTestId("catalog-feature-context").count()) !== 1) {
+                throw new Error(`${slug}: produto em destaque continua sem contexto`);
               }
 
               const productLinks = page.locator('a[href*="/produto/"]');
@@ -297,6 +373,36 @@ jobs:
             }
             await page.screenshot({
               path: "artifacts/ui-validation/commerce-fashion-catalog.png",
+              fullPage: false,
+            });
+
+            const firstFashionCard = page.locator('[data-niche="fashion"]').first();
+            await firstFashionCard.scrollIntoViewIfNeeded();
+            await firstFashionCard.hover();
+            await page.waitForTimeout(650);
+            const fashionCardGlow = await firstFashionCard
+              .locator(".premium-product-frame")
+              .evaluate((element) => getComputedStyle(element).boxShadow);
+            if (!fashionCardGlow || fashionCardGlow === "none") {
+              throw new Error("Cards Maison Belle não exibem borda luminosa");
+            }
+            await page.screenshot({
+              path: "artifacts/ui-validation/commerce-fashion-cards.png",
+              fullPage: false,
+            });
+            const fashionFooter = page.locator("footer").first();
+            await fashionFooter.scrollIntoViewIfNeeded();
+            await page.waitForTimeout(300);
+            const fashionFooterBackground = await fashionFooter.evaluate(
+              (element) => getComputedStyle(element).backgroundColor,
+            );
+            const footerChannels =
+              fashionFooterBackground.match(/\d+(?:\.\d+)?/g)?.slice(0, 3).map(Number) ?? [];
+            if (footerChannels.length === 3 && footerChannels.every((value) => value > 160)) {
+              throw new Error(`Rodapé Maison Belle continua claro: ${fashionFooterBackground}`);
+            }
+            await page.screenshot({
+              path: "artifacts/ui-validation/commerce-fashion-footer.png",
               fullPage: false,
             });
 
@@ -362,6 +468,48 @@ jobs:
               path: "artifacts/ui-validation/commerce-barber-professionals.png",
               fullPage: false,
             });
+
+            const mobileContext = await browser.newContext({
+              viewport: { width: 390, height: 844 },
+              hasTouch: true,
+              isMobile: true,
+            });
+            const mobilePage = await mobileContext.newPage();
+            await mobilePage.goto(baseUrl, { waitUntil: "networkidle", timeout: 90_000 });
+            await mobilePage.waitForFunction(
+              () => document.documentElement.dataset.cinematicReady === "true",
+            );
+            const mobileQuality = await mobilePage.locator("html").getAttribute("data-motion-quality");
+            if (mobileQuality !== "economy") {
+              throw new Error(`Mobile deveria usar movimento econômico, encontrado: ${mobileQuality}`);
+            }
+            const directStoreLinks = mobilePage.locator(
+              '#inicio [role="group"] a[href^="/demo/"]',
+            );
+            if ((await directStoreLinks.count()) !== 4) {
+              throw new Error("Showroom mobile não expôs quatro links diretos e tocáveis");
+            }
+            await directStoreLinks.first().scrollIntoViewIfNeeded();
+            await mobilePage.screenshot({
+              path: "artifacts/ui-validation/mobile-direct-store-links.png",
+              fullPage: false,
+            });
+            await directStoreLinks.first().click();
+            await mobilePage.waitForURL(/\/demo\//, { timeout: 20_000 });
+            if ((await mobilePage.locator('[data-testid="store-cursor-shader"] canvas').count()) !== 0) {
+              throw new Error("Shader WebGL do cursor foi iniciado no touch");
+            }
+            await mobilePage.goto(new URL("/demo/restaurante/produtos", baseUrl).toString(), {
+              waitUntil: "networkidle",
+              timeout: 90_000,
+            });
+            const compactCatalogHeight = await mobilePage
+              .getByTestId("catalog-expansion-hero")
+              .evaluate((element) => element.getBoundingClientRect().height);
+            if (compactCatalogHeight > 900) {
+              throw new Error(`Hero mobile ainda prende scroll demais: ${compactCatalogHeight}px`);
+            }
+            await mobileContext.close();
           } finally {
             await browser.close();
           }

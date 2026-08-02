@@ -40,8 +40,16 @@ export function StoreHeader({ store }: { store: StoreConfig }) {
     });
   };
 
+  const immersiveFashion = store.niche === "fashion";
+
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/95 backdrop-blur">
+    <header
+      className={`sticky top-0 z-40 border-b backdrop-blur-xl ${
+        immersiveFashion
+          ? "border-[#d49aa7]/18 bg-[#180c12]/95 text-[#f7eee8] [&_.text-muted-foreground]:!text-[#d7bbc2] [&_input]:border-[#d49aa7]/25 [&_input]:bg-[#28121b] [&_input]:text-[#f7eee8] [&_input]:placeholder:text-[#b9929c] [&_button:hover]:bg-white/10"
+          : "border-border/60 bg-background/95"
+      }`}
+    >
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4">
         <Link
           to="/demo/$storeSlug"

@@ -17,7 +17,7 @@ export function StoreCursorShader({ niche }: { niche: StoreNiche }) {
 
   useEffect(() => {
     const container = ref.current;
-    if (!container || !capabilities.hydrated) return;
+    if (!container || !capabilities.hydrated || !capabilities.precisePointer) return;
 
     let pointerX = window.innerWidth * 0.5;
     let pointerY = window.innerHeight * 0.45;
@@ -68,11 +68,11 @@ export function StoreCursorShader({ niche }: { niche: StoreNiche }) {
         vec2 aspect = vec2(safe.x / safe.y, 1.0);
         float distanceToPointer = length((uv - p) * aspect);
         float ring = sin(distanceToPointer * 54.0 - time * (2.0 + velocity * 5.0));
-        float halo = exp(-distanceToPointer * (7.2 - velocity * 1.8));
+        float halo = exp(-distanceToPointer * (10.8 - velocity * 1.2));
         float sparks = smoothstep(.93, 1.0, sin((uv.x + uv.y) * 72.0 + time * 2.4 + hash(floor(uv * 36.0)) * 6.0));
         float energy = halo * (.28 + .18 * ring + velocity * .34) + sparks * halo * .16;
         vec3 color = mix(colorA, colorB, .5 + .5 * sin(time * .7 + distanceToPointer * 18.0));
-        float alpha = clamp(energy, 0.0, .5);
+        float alpha = clamp(energy, 0.0, .36);
         gl_FragColor = vec4(color * (energy * 1.45), alpha);
       }
     `;
@@ -100,7 +100,7 @@ export function StoreCursorShader({ niche }: { niche: StoreNiche }) {
     scene.add(new THREE.Mesh(geometry, material));
 
     try {
-      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
     } catch {
       geometry.dispose();
       material.dispose();
@@ -124,13 +124,17 @@ export function StoreCursorShader({ niche }: { niche: StoreNiche }) {
     observer.observe(container);
     resize();
 
-    const render = () => {
+    let lastFrame = 0;
+    const render = (timestamp = 0) => {
       if (!renderer) return;
-      uniforms.time.value += 0.022;
-      uniforms.velocity.value += (velocity - uniforms.velocity.value) * 0.12;
-      velocity *= 0.9;
-      uniforms.pointer.value.set(pointerX / window.innerWidth, 1 - pointerY / window.innerHeight);
-      renderer.render(scene, camera);
+      if (timestamp - lastFrame >= 30) {
+        lastFrame = timestamp;
+        uniforms.time.value += 0.032;
+        uniforms.velocity.value += (velocity - uniforms.velocity.value) * 0.12;
+        velocity *= 0.86;
+        uniforms.pointer.value.set(pointerX / window.innerWidth, 1 - pointerY / window.innerHeight);
+        renderer.render(scene, camera);
+      }
       animationId = window.requestAnimationFrame(render);
     };
     render();
@@ -145,7 +149,14 @@ export function StoreCursorShader({ niche }: { niche: StoreNiche }) {
       geometry.dispose();
       material.dispose();
     };
-  }, [capabilities.allow3D, capabilities.dpr, capabilities.hydrated, palette.a, palette.b]);
+  }, [
+    capabilities.allow3D,
+    capabilities.dpr,
+    capabilities.hydrated,
+    capabilities.precisePointer,
+    palette.a,
+    palette.b,
+  ]);
 
   return (
     <div
@@ -155,7 +166,7 @@ export function StoreCursorShader({ niche }: { niche: StoreNiche }) {
       className="pointer-events-none fixed inset-0 z-[35] hidden overflow-hidden mix-blend-screen sm:block motion-reduce:hidden"
     >
       <span
-        className="absolute h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
+        className="absolute h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl"
         style={{
           left: "var(--cursor-x, 50vw)",
           top: "var(--cursor-y, 45vh)",
