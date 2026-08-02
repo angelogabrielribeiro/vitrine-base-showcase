@@ -126,19 +126,23 @@ export function TechnologyShader({ className }: TechnologyShaderProps) {
     resizeObserver.observe(container);
     const intersectionObserver = new IntersectionObserver(([entry]) => {
       visible = entry?.isIntersecting ?? true;
+      if (visible && !animationId) {
+        animationId = window.requestAnimationFrame(render);
+      }
     });
     intersectionObserver.observe(container);
     resize();
 
-    const render = () => {
-      if (!renderer) return;
-      if (visible) {
-        uniforms.time.value += 0.045;
-        renderer.render(scene, camera);
+    function render() {
+      if (!renderer || !visible || document.hidden) {
+        animationId = 0;
+        return;
       }
+      uniforms.time.value += 0.045;
+      renderer.render(scene, camera);
       animationId = window.requestAnimationFrame(render);
-    };
-    render();
+    }
+    animationId = window.requestAnimationFrame(render);
 
     return () => {
       window.cancelAnimationFrame(animationId);
