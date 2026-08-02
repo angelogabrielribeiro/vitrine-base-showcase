@@ -14,6 +14,8 @@ import {
   CursorParallax,
   useCinematicMotion,
 } from "@/components/motion/cinematic-motion-system";
+import { useInView, sequenceDelay } from "@/hooks/use-in-view";
+import { useAdaptiveQuality } from "@/hooks/use-adaptive-quality";
 
 export function RestaurantFireDeck({
   store,
@@ -60,12 +62,13 @@ export function RestaurantFireDeck({
         <p className="text-[10px] font-bold uppercase tracking-[0.34em] text-orange-300">
           Fogo sob comando
         </p>
-        <h2 className="mt-4 max-w-2xl font-display text-5xl uppercase leading-[0.88]">
+        <h2 className="mt-4 max-w-[16ch] font-display text-[clamp(2.6rem,10vw,3.5rem)] uppercase leading-[0.88]">
           Três desejos. Nenhum espaço morto.
         </h2>
-        <div className="-mx-5 mt-9 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-5 [scrollbar-width:none]">
+
+        <div className="mt-9 space-y-6">
           {items.map((product, index) => (
-            <CompactFoodCard
+            <FireScene
               key={product.id}
               product={product}
               storeSlug={store.slug}
@@ -88,14 +91,18 @@ export function RestaurantFireDeck({
       <div className="sticky top-16 h-[calc(100svh-4rem)] overflow-hidden">
         <motion.div
           aria-hidden="true"
-          className="absolute inset-0 bg-[radial-gradient(circle_at_65%_58%,rgba(255,91,31,.55),transparent_28%),radial-gradient(circle_at_25%_85%,rgba(255,184,55,.22),transparent_25%)]"
-          style={{ opacity: heat }}
+          className="absolute inset-0"
+          style={{
+            opacity: heat,
+            backgroundImage:
+              "radial-gradient(circle at 65% 58%, rgba(255,91,31,.55), transparent 28%), radial-gradient(circle at 25% 85%, rgba(255,184,55,.22), transparent 25%)",
+          }}
         />
         <div className="absolute inset-0 opacity-15 [background-image:linear-gradient(rgba(255,255,255,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.06)_1px,transparent_1px)] [background-size:58px_58px]" />
         <FireField />
 
         <div className="relative mx-auto grid h-full max-w-[94rem] items-center gap-10 px-6 lg:grid-cols-[.72fr_1.28fr] lg:px-12">
-          <div className="relative z-20">
+          <div className="relative z-30">
             <p className="text-[10px] font-bold uppercase tracking-[0.38em] text-orange-300">
               <Flame className="mr-2 inline h-4 w-4" /> Câmara de desejo · 0
               {active + 1}
@@ -106,7 +113,7 @@ export function RestaurantFireDeck({
               animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
               transition={{ duration: 0.46 }}
             >
-              <h2 className="mt-4 max-w-2xl font-display text-[clamp(3.2rem,5.2vw,5.5rem)] uppercase leading-[0.84] tracking-[-0.05em]">
+              <h2 className="mt-4 max-w-[15ch] font-display text-[clamp(2.6rem,5.2vw,5.5rem)] uppercase leading-[0.86] tracking-[-0.03em]">
                 {current.name}
               </h2>
               <p className="mt-5 max-w-lg text-base leading-7 text-orange-50/72">
@@ -165,28 +172,24 @@ export function RestaurantFireDeck({
             >
               {items.map((product, index) => {
                 const offset = index - active;
+                const isActive = index === active;
                 return (
                   <motion.article
                     key={product.id}
                     animate={{
-                      x: offset * 118,
-                      y: Math.abs(offset) * 34,
-                      rotateY: offset * -13,
-                      rotateZ: offset * 3.2,
-                      scale: index === active ? 1 : 0.82,
-                      opacity:
-                        Math.abs(offset) > 1
-                          ? 0.34
-                          : index === active
-                            ? 1
-                            : 0.68,
-                      filter:
-                        index === active ? "brightness(1)" : "brightness(.55)",
+                      x: offset * 82,
+                      y: Math.abs(offset) * 22,
+                      rotateY: offset * -9,
+                      rotateZ: offset * 2,
+                      scale: isActive ? 1 : 0.8,
+                      opacity: Math.abs(offset) > 1 ? 0 : isActive ? 1 : 0.42,
+                      filter: isActive ? "brightness(1)" : "brightness(.5)",
                     }}
                     transition={{ duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute inset-[5%_13%] overflow-hidden border border-orange-200/20 bg-black shadow-[0_50px_130px_rgba(0,0,0,.72)]"
+                    className="absolute inset-[6%_16%] overflow-hidden border border-orange-200/20 bg-black shadow-[0_50px_130px_rgba(0,0,0,.72)]"
                     style={{
-                      zIndex: 20 - Math.abs(offset),
+                      zIndex: isActive ? 20 : 10 - Math.abs(offset),
+                      pointerEvents: isActive ? "auto" : "none",
                       transformStyle: "preserve-3d",
                     }}
                   >
@@ -196,12 +199,14 @@ export function RestaurantFireDeck({
                       className="h-full w-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#120603] via-transparent to-orange-200/[0.06]" />
-                    <div className={`absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6 transition-opacity duration-500 ${index === active ? "opacity-100" : "opacity-15"}`}>
+                    <div
+                      className={`absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6 transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-0"}`}
+                    >
                       <div>
                         <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-orange-300">
                           Brasa 0{index + 1}
                         </p>
-                        <p className="mt-2 font-display text-3xl uppercase">
+                        <p className="mt-2 max-w-[14ch] font-display text-3xl uppercase leading-none">
                           {product.name}
                         </p>
                       </div>
@@ -220,7 +225,7 @@ export function RestaurantFireDeck({
   );
 }
 
-function CompactFoodCard({
+function FireScene({
   product,
   storeSlug,
   index,
@@ -229,52 +234,120 @@ function CompactFoodCard({
   storeSlug: string;
   index: number;
 }) {
+  const { ref, inView } = useInView<HTMLDivElement>({ amount: 0.35, once: false });
+  const delay = sequenceDelay(index);
+
   return (
-    <Link
-      to="/demo/$storeSlug/produto/$productSlug"
-      params={{ storeSlug, productSlug: product.slug }}
-      className="relative w-[84vw] max-w-sm shrink-0 snap-center overflow-hidden border border-orange-300/20 bg-[#241008]"
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 26 }}
+      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 26 }}
+      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay }}
+      className="relative isolate overflow-hidden border border-orange-300/20 bg-[#1a0d07]"
     >
-      <img
-        src={product.images[0]}
-        alt=""
-        className="aspect-[4/5] w-full object-cover"
+      <motion.span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-20 border border-transparent"
+        animate={
+          inView
+            ? {
+                boxShadow: [
+                  "0 0 0 1px rgba(217,119,6,0.18)",
+                  "0 0 0 1px rgba(251,146,60,0.42), 0 18px 46px -30px rgba(220,38,38,0.55)",
+                  "0 0 0 1px rgba(217,119,6,0.18)",
+                ],
+              }
+            : { boxShadow: "0 0 0 1px rgba(217,119,6,0.08)" }
+        }
+        transition={{ duration: 2.6, repeat: inView ? Number.POSITIVE_INFINITY : 0, delay }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 p-5">
-        <p className="text-[9px] font-bold uppercase tracking-[0.28em] text-orange-300">
-          Fogo 0{index + 1}
-        </p>
-        <h3 className="mt-2 font-display text-3xl uppercase">{product.name}</h3>
-        <p className="mt-2 text-lg font-bold text-orange-100">
-          {brl(product.salePrice ?? product.price)}
+      <div className="relative aspect-[16/11] w-full overflow-hidden">
+        <img src={product.images[0]} alt="" className="h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#140804] via-transparent to-transparent" />
+        <p className="absolute left-4 top-4 z-10 text-[9px] font-bold uppercase tracking-[0.3em] text-orange-300">
+          Brasa 0{index + 1}
         </p>
       </div>
-    </Link>
+      <div className="relative z-10 p-5">
+        <h3 className="max-w-[16ch] font-display text-2xl uppercase leading-[0.94]">
+          {product.name}
+        </h3>
+        <p className="mt-2 line-clamp-2 max-w-md text-xs leading-6 text-orange-50/65">
+          {product.description}
+        </p>
+        <div className="mt-4 flex items-center justify-between gap-4">
+          <strong className="text-lg text-orange-200">
+            {brl(product.salePrice ?? product.price)}
+          </strong>
+          <Link
+            to="/demo/$storeSlug/produto/$productSlug"
+            params={{ storeSlug, productSlug: product.slug }}
+            className="inline-flex min-h-11 items-center gap-2 border border-orange-300/35 bg-orange-500 px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[#160703] transition hover:bg-orange-300"
+          >
+            Pedir <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      </div>
+    </motion.div>
   );
 }
 
+const FLAME_SPECS = [
+  { left: 4, w: 30, h: 128, dur: 1.6, delay: -0.1, drift: -6, tip: "50% 8% 62% 4% 42% 96% 58% 92%" },
+  { left: 12, w: 22, h: 96, dur: 1.15, delay: -0.55, drift: 9, tip: "46% 4% 70% 10% 38% 94% 66% 88%" },
+  { left: 20, w: 34, h: 150, dur: 1.85, delay: -0.9, drift: -11, tip: "54% 6% 58% 2% 46% 98% 52% 90%" },
+  { left: 28, w: 20, h: 84, dur: 1.02, delay: -0.28, drift: 7, tip: "42% 10% 74% 6% 34% 92% 68% 86%" },
+  { left: 36, w: 28, h: 118, dur: 1.42, delay: -1.15, drift: -8, tip: "50% 4% 64% 8% 40% 96% 60% 90%" },
+  { left: 44, w: 24, h: 104, dur: 1.28, delay: -0.42, drift: 10, tip: "48% 8% 66% 4% 36% 94% 64% 92%" },
+  { left: 52, w: 32, h: 140, dur: 1.7, delay: -0.72, drift: -9, tip: "52% 6% 60% 2% 44% 98% 56% 88%" },
+  { left: 60, w: 22, h: 90, dur: 1.08, delay: -1.3, drift: 8, tip: "44% 10% 72% 6% 38% 92% 62% 90%" },
+  { left: 68, w: 30, h: 132, dur: 1.55, delay: -0.18, drift: -10, tip: "50% 4% 58% 8% 42% 96% 58% 94%" },
+  { left: 76, w: 20, h: 80, dur: 0.98, delay: -0.62, drift: 6, tip: "46% 8% 70% 4% 36% 94% 64% 88%" },
+  { left: 84, w: 26, h: 112, dur: 1.35, delay: -1.02, drift: -7, tip: "48% 6% 64% 10% 40% 96% 60% 90%" },
+  { left: 92, w: 24, h: 98, dur: 1.18, delay: -0.36, drift: 9, tip: "44% 4% 68% 8% 38% 98% 62% 92%" },
+];
+
+/** Chama procedural: pontas finas e irregulares, altura/velocidade variáveis por labareda. */
 function FireField() {
+  const { tier, isMobile } = useAdaptiveQuality();
+  const { ref, inView } = useInView<HTMLDivElement>({ amount: 0.1 });
+
+  if (tier === "off") return null;
+
+  const specs = isMobile || tier === "low" ? FLAME_SPECS.slice(0, 6) : FLAME_SPECS;
+
   return (
     <div
+      ref={ref}
       aria-hidden="true"
-      className="pointer-events-none absolute inset-x-0 bottom-0 h-44 overflow-hidden opacity-70"
+      className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-48 overflow-hidden opacity-80"
     >
-      {Array.from({ length: 12 }).map((_, index) => (
+      <div className="absolute inset-x-0 bottom-0 h-16 bg-[radial-gradient(60%_100%_at_50%_100%,rgba(255,214,120,.85),rgba(255,120,30,.35)_55%,transparent_85%)] blur-[6px]" />
+      {specs.map((f, index) => (
         <span
           key={index}
-          className="fire-tongue absolute bottom-[-45%] rounded-[50%_50%_30%_30%] bg-gradient-to-t from-red-600 via-orange-400 to-yellow-200 blur-[2px]"
+          className="fire-tongue absolute bottom-[-30%] bg-gradient-to-t from-red-600 via-orange-400 to-yellow-200"
           style={{
-            left: `${index * 9 - 3}%`,
-            width: `${55 + (index % 4) * 12}px`,
-            height: `${110 + (index % 5) * 18}px`,
-            animationDelay: `${index * -0.17}s`,
+            left: `${f.left}%`,
+            width: `${f.w}px`,
+            height: `${f.h}px`,
+            clipPath: `polygon(${f.tip})`,
+            filter: "blur(1px)",
+            mixBlendMode: "screen",
+            animationDuration: `${f.dur}s`,
+            animationDelay: `${f.delay}s`,
+            animationPlayState: inView ? "running" : "paused",
+            ["--drift" as string]: `${f.drift}px`,
           }}
         />
       ))}
       <style>{`
-        .fire-tongue { animation: fire-dance 1.35s ease-in-out infinite alternate; transform-origin: 50% 100%; mix-blend-mode: screen; }
-        @keyframes fire-dance { from { transform: translateY(18px) scaleX(.72) rotate(-5deg); opacity: .35; } to { transform: translateY(-25px) scaleX(1.08) rotate(7deg); opacity: .9; } }
+        .fire-tongue { transform-origin: 50% 100%; animation-name: fire-dance; animation-iteration-count: infinite; animation-timing-function: ease-in-out; animation-direction: alternate; }
+        @keyframes fire-dance {
+          0% { transform: translateY(14px) translateX(0) scaleX(.78) scaleY(.88) rotate(-4deg); opacity: .55; }
+          45% { transform: translateY(-6px) translateX(calc(var(--drift) * .4)) scaleX(1.05) scaleY(1.06) rotate(2deg); opacity: .95; }
+          100% { transform: translateY(-30px) translateX(var(--drift)) scaleX(.92) scaleY(1.18) rotate(6deg); opacity: .75; }
+        }
         @media (prefers-reduced-motion: reduce) { .fire-tongue { animation: none; } }
       `}</style>
     </div>

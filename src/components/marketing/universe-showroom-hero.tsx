@@ -288,6 +288,7 @@ export function UniverseShowroomHero({
   onActiveChange,
 }: UniverseShowroomHeroProps) {
   const { capabilities } = useCinematicMotion();
+  const { tier } = useAdaptiveQuality();
   const reduced =
     capabilities.hydrated &&
     (capabilities.reducedMotion || capabilities.coarsePointer || capabilities.quality === "economy");
@@ -385,7 +386,7 @@ export function UniverseShowroomHero({
   };
 
   const glowShift = useTransform(rotation, (r) => Math.sin((r * Math.PI) / 180) * 14);
-  const glow = useMotionTemplate`radial-gradient(circle at calc(50% + ${glowShift}%) 46%, ${active.accent}2e, transparent 58%)`;
+  const glow = useMotionTemplate`radial-gradient(circle at calc(50% + ${glowShift}%) 46%, ${active.accent}25, transparent 58%)`;
 
   return (
     <section
@@ -526,6 +527,18 @@ export function UniverseShowroomHero({
         </div>
 
         <div className="relative z-10">
+          <div className="lg:hidden">
+            <MobileUniverseCarousel
+              activeIndex={activeIndex}
+              onActiveChange={(index) => {
+                setActiveIndex(index);
+                idleRef.current = performance.now() + 4200;
+                setExplored(true);
+              }}
+              tier={tier}
+            />
+          </div>
+
           <div
             ref={stageRef}
             role="group"
@@ -545,7 +558,7 @@ export function UniverseShowroomHero({
                 step(-1);
               }
             }}
-            className="relative h-[26rem] w-full select-none rounded-[2rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vb-gold sm:h-[32rem] lg:h-[38rem]"
+            className="relative hidden h-[38rem] w-full select-none rounded-[2rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vb-gold lg:block"
             style={{
               perspective: reduced ? undefined : "1200px",
               touchAction: "pan-y",
@@ -555,7 +568,7 @@ export function UniverseShowroomHero({
             <div
               aria-hidden="true"
               className="absolute inset-[14%] rounded-full border border-white/10"
-              style={{ boxShadow: `0 0 140px -40px ${active.accent}` }}
+              style={{ boxShadow: `0 0 112px -40px ${active.accent}` }}
             />
             <motion.div
               aria-hidden="true"
@@ -607,7 +620,7 @@ export function UniverseShowroomHero({
             )}
           </div>
 
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
+          <div className="mt-5 hidden flex-wrap items-center justify-between gap-4 lg:flex">
             <div className="flex items-center gap-2">
               <button
                 type="button"

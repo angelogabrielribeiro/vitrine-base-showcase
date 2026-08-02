@@ -716,13 +716,13 @@ function GroomingGrid({ products, storeSlug }: { products: Product[]; storeSlug:
   if (list.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-16">
-      <div className="mb-8 flex items-end justify-between gap-6">
-        <div>
+    <section className="mx-auto max-w-6xl px-6 py-20 sm:py-16">
+      <div className="mb-10 flex items-end justify-between gap-6 sm:mb-8">
+        <div className="max-w-[22ch] sm:max-w-none">
           <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">
             Grooming da casa
           </div>
-          <h2 className="mt-2 font-display text-3xl uppercase tracking-tight text-white sm:text-4xl">
+          <h2 className="mt-2 text-balance font-display text-[clamp(1.75rem,7vw,2.5rem)] uppercase leading-tight tracking-tight text-white sm:text-4xl">
             Leve o ritual para casa
           </h2>
         </div>
@@ -730,17 +730,26 @@ function GroomingGrid({ products, storeSlug }: { products: Product[]; storeSlug:
           to="/demo/$storeSlug/produtos"
           params={{ storeSlug }}
           search={{ q: "", cat: "", sort: "" }}
-          className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-amber-200 hover:text-amber-100"
+          className="hidden shrink-0 items-center gap-2 text-xs uppercase tracking-[0.3em] text-amber-200 hover:text-amber-100 sm:inline-flex"
         >
           Ver linha completa <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
         {list.map((p) => (
           <ProductCard key={p.id} product={p} storeSlug={storeSlug} />
         ))}
       </div>
+
+      <Link
+        to="/demo/$storeSlug/produtos"
+        params={{ storeSlug }}
+        search={{ q: "", cat: "", sort: "" }}
+        className="mt-8 inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-amber-200 hover:text-amber-100 sm:hidden"
+      >
+        Ver linha completa <ArrowRight className="h-4 w-4" />
+      </Link>
     </section>
   );
 }

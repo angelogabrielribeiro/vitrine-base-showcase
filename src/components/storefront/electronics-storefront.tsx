@@ -46,6 +46,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
+import { useInView, sequenceDelay } from "@/hooks/use-in-view";
+import { StoreInstitutional } from "@/components/storefront/store-institutional";
 import { ElectronicsCircuitStory } from "@/components/storefront/electronics-circuit-story";
 import { NovaCoreSpatialCore } from "@/components/storefront/novacore-spatial-core";
 
@@ -123,6 +125,7 @@ export function ElectronicsStorefront({ store, products, featured }: Electronics
       <LabSection store={store} />
       <TrustStrip store={store} />
       <ClosingSection store={store} />
+      <StoreInstitutional store={store} />
     </div>
   );
 }
@@ -396,7 +399,7 @@ function CategoryCommandDeck({ store }: { store: StoreConfig }) {
           <p className="text-[9px] font-bold uppercase tracking-[0.38em] text-cyan-200/70">
             Select interface
           </p>
-          <h2 className="mt-4 max-w-lg text-5xl font-semibold uppercase leading-[0.84] tracking-[-0.055em] sm:text-7xl">
+          <h2 className="mt-4 max-w-[16ch] text-[clamp(2.1rem,8vw,4.5rem)] font-semibold uppercase leading-[0.9] tracking-[-0.02em] sm:tracking-[-0.055em]">
             Escolha uma constelação.
           </h2>
           <p className="mt-6 max-w-md text-sm leading-7 text-slate-400">

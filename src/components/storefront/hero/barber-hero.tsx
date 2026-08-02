@@ -73,7 +73,7 @@ export function BarberHero({ store }: NicheHeroProps) {
               background: useTransform(
                 [sweepX, sweepY],
                 ([x, y]: number[]) =>
-                  `radial-gradient(480px circle at ${x}% ${y}%, rgba(217,178,89,0.16), transparent 65%)`,
+                  `radial-gradient(480px circle at ${x}% ${y}%, rgba(217,178,89,0.13), transparent 65%)`,
               ),
             }}
           />
