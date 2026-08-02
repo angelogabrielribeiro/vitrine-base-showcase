@@ -86,7 +86,7 @@ export function ElectronicsStorefront({ store, products, featured }: Electronics
   const showcase = (featured.length ? featured : activeProducts).slice(0, 6);
 
   return (
-    <div className="overflow-hidden bg-[#050714] text-white">
+    <div className="overflow-x-clip bg-[#050714] text-white">
       <NovaHero store={store} product={showcase[0] ?? activeProducts[0]} />
       <ElectronicsCircuitStory store={store} products={showcase} />
       <SignalRail />
