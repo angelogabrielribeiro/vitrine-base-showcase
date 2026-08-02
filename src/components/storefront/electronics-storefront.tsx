@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/accordion";
 import { TechnologyShader } from "./technology-shader";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
-import { NicheScrollOdyssey } from "@/components/storefront/niche-scroll-odyssey";
+import { ElectronicsCircuitStory } from "@/components/storefront/electronics-circuit-story";
 
 type ElectronicsStorefrontProps = {
   store: StoreConfig;
@@ -88,24 +88,7 @@ export function ElectronicsStorefront({ store, products, featured }: Electronics
   return (
     <div className="overflow-hidden bg-[#050714] text-white">
       <NovaHero store={store} product={showcase[0] ?? activeProducts[0]} />
-      <NicheScrollOdyssey
-        niche="electronics"
-        eyebrow="Sistema explorável"
-        title="A máquina revela o que existe por dentro."
-        scenes={showcase.slice(0, 3).map((product, index) => ({
-          number: String(index + 1).padStart(2, "0"),
-          kicker: product.category,
-          title:
-            index === 0
-              ? "Potência que entra em foco."
-              : index === 1
-                ? "Cada camada expõe um sinal."
-                : "A escolha fecha o circuito.",
-          copy: product.description,
-          image: product.images[0] ?? store.banners[0]?.image ?? "",
-          metric: `${brl(product.salePrice ?? product.price)} · bancada verificada`,
-        }))}
-      />
+      <ElectronicsCircuitStory store={store} products={showcase} />
       <SignalRail />
       <CategoryCommand store={store} />
       <ProductFan store={store} products={showcase} />
