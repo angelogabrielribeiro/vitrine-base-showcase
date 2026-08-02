@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { useRef } from "react";
 import type { Product } from "@/types/commerce";
 import { brl } from "@/lib/format";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
+import { useInView, sequenceDelay } from "@/hooks/use-in-view";
 
 /**
  * Card editorial da Maison Belle.
@@ -16,14 +16,15 @@ export function EditorialProductCard({
   product,
   storeSlug,
   aspect = "portrait",
+  index = 0,
 }: {
   product: Product;
   storeSlug: string;
   aspect?: "portrait" | "square";
+  index?: number;
 }) {
   const reduce = useReducedMotion();
-  const cardRef = useRef<HTMLAnchorElement>(null);
-  const inView = useInView(cardRef, { amount: 0.58 });
+  const { ref: cardRef, inView } = useInView<HTMLAnchorElement>({ amount: 0.58 });
   const { capabilities } = useCinematicMotion();
   const mobileActive =
     !reduce &&

@@ -32,6 +32,8 @@ import {
 } from "@/components/ui/accordion";
 import { CardFanCarousel } from "@/components/effects/CardFanCarousel";
 import { RestaurantFireDeck } from "@/components/storefront/restaurant-fire-deck";
+import { StoreInstitutional } from "@/components/storefront/store-institutional";
+import { useInView, sequenceDelay } from "@/hooks/use-in-view";
 
 const HERO_IMAGE = "/media/brasa-urbana/hero-brasa-duplo.webp";
 const PROCESS_IMAGE = "/media/brasa-urbana/processo-brasa.webp";
@@ -322,7 +324,7 @@ export function RestaurantStorefront({ store, products, featured }: Props) {
               </p>
             </SectionReveal>
 
-            <Stagger className="mt-8 grid grid-cols-2 gap-px bg-white/10 sm:grid-cols-3">
+            <Stagger className="mt-8 grid grid-cols-1 gap-px bg-white/10 sm:grid-cols-3">
               {["Blend 2×180g", "Cheddar cremoso", "Bacon crocante"].map((item) => (
                 <StaggerItem
                   key={item}
@@ -484,6 +486,8 @@ export function RestaurantStorefront({ store, products, featured }: Props) {
           </Accordion>
         </div>
       </section>
+
+      <StoreInstitutional store={store} />
 
       <section className="relative isolate overflow-hidden px-5 py-24 text-center sm:px-8 lg:py-32">
         <div

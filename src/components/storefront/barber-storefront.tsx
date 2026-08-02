@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion, useReducedMotion, AnimatePresence, type PanInfo } from "framer-motion";
 import {
@@ -29,6 +29,9 @@ import { ProductCard } from "@/components/storefront/product-card";
 import { barberServiceFallback, BARBER_PROFESSIONAL_FALLBACK } from "@/lib/barber-media";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 import { NicheScrollOdyssey } from "@/components/storefront/niche-scroll-odyssey";
+import { StoreInstitutional } from "@/components/storefront/store-institutional";
+import { useInView, sequenceDelay } from "@/hooks/use-in-view";
+import { useAdaptiveQuality } from "@/hooks/use-adaptive-quality";
 
 const ICONS: Record<string, typeof Sparkles> = {
   truck: Truck,
@@ -79,6 +82,7 @@ export function BarberStorefront({ store, services, professionals, products }: P
       <ResultsEditorial services={services} />
       <GroomingGrid products={products} storeSlug={store.slug} />
       <ClosingBlock store={store} />
+      <StoreInstitutional store={store} />
     </div>
   );
 }
