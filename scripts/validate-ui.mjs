@@ -196,7 +196,7 @@ async function validateHome(browser, config) {
     let stickyPosition = "static";
     let imageTransformChanged = false;
 
-    if (reducedMotion === "reduce") {
+    if (reducedMotion === "reduce" || viewport.width < 768) {
       const staticChapters = page.getByTestId("universe-chapter-static");
       assert((await staticChapters.count()) === 4, `${name}: fallback estático incompleto`);
       assert(
