@@ -108,6 +108,9 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        <span aria-hidden="true" className="sr-only">
+          Vitrine Base — experiência comercial interativa
+        </span>
         {children}
         <Scripts />
       </body>
