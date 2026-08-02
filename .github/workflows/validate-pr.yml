@@ -378,10 +378,11 @@ jobs:
 
             const firstFashionCard = page.locator('[data-niche="fashion"]').first();
             await firstFashionCard.scrollIntoViewIfNeeded();
+            await firstFashionCard.hover();
             await page.waitForTimeout(650);
-            const fashionCardGlow = await firstFashionCard.evaluate(
-              (element) => getComputedStyle(element).boxShadow,
-            );
+            const fashionCardGlow = await firstFashionCard
+              .locator(".premium-product-frame")
+              .evaluate((element) => getComputedStyle(element).boxShadow);
             if (!fashionCardGlow || fashionCardGlow === "none") {
               throw new Error("Cards Maison Belle não exibem borda luminosa");
             }
