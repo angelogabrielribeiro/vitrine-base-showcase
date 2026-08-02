@@ -139,6 +139,36 @@ jobs:
           const baseUrl = process.env.BASE_URL;
           const browser = await chromium.launch({ headless: true });
           const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+          await context.addInitScript(() => {
+            const nativeMatchMedia = window.matchMedia.bind(window);
+            window.matchMedia = (query) => {
+              const result = nativeMatchMedia(query);
+              const matches =
+                query === "(hover: hover) and (pointer: fine)"
+                  ? true
+                  : query === "(pointer: coarse)"
+                    ? false
+                    : result.matches;
+              return {
+                matches,
+                media: result.media,
+                onchange: result.onchange,
+                addListener: result.addListener.bind(result),
+                removeListener: result.removeListener.bind(result),
+                addEventListener: result.addEventListener.bind(result),
+                removeEventListener: result.removeEventListener.bind(result),
+                dispatchEvent: result.dispatchEvent.bind(result),
+              };
+            };
+            Object.defineProperty(navigator, "hardwareConcurrency", {
+              configurable: true,
+              value: 8,
+            });
+            Object.defineProperty(navigator, "deviceMemory", {
+              configurable: true,
+              value: 8,
+            });
+          });
           const page = await context.newPage();
 
           try {
