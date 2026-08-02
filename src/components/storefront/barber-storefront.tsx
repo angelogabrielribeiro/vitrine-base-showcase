@@ -650,19 +650,46 @@ function ProfessionalsStack({ professionals }: { professionals: Professional[] }
 /* -------------------------------------------------------------------------- */
 /* Resultados — editorial com imagens de serviços já existentes                */
 /* -------------------------------------------------------------------------- */
+function AtmosphereShot({ service, index }: { service: Service; index: number }) {
+  const { ref, inView } = useInView<HTMLElement>({ amount: 0.5 });
+  return (
+    <figure
+      ref={ref}
+      style={{ transitionDelay: `${sequenceDelay(index, 0.08)}s` }}
+      data-lit={inView || undefined}
+      className="group relative min-w-[62vw] shrink-0 snap-center overflow-hidden border border-neutral-800 sm:min-w-0 sm:shrink"
+    >
+      <div className="aspect-[3/4] w-full overflow-hidden">
+        <SafeImage
+          src={service.image}
+          fallbackSrc={barberServiceFallback(service.slug)}
+          alt={service.name}
+          fallbackLabel={service.name}
+          loading="lazy"
+          className="h-full w-full object-cover grayscale transition-all duration-[650ms] ease-out group-hover:scale-[1.04] group-hover:grayscale-0 group-data-[lit=true]:scale-[1.02] group-data-[lit=true]:grayscale-0"
+        />
+      </div>
+      <figcaption className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-neutral-950/95 via-neutral-950/60 to-transparent px-3 py-3 text-[10px] uppercase tracking-[0.25em] text-neutral-200">
+        <span className="truncate">{service.name}</span>
+        <span className="shrink-0 text-amber-200/80">{service.durationMinutes}m</span>
+      </figcaption>
+    </figure>
+  );
+}
+
 function ResultsEditorial({ services }: { services: Service[] }) {
   const shots = services.filter((s) => s.image).slice(0, 4);
   if (shots.length < 2) return null;
 
   return (
     <section className="border-y border-neutral-800/80 bg-neutral-950">
-      <div className="mx-auto max-w-7xl px-6 py-16">
-        <div className="mb-8 flex items-end justify-between gap-6">
-          <div>
+      <div className="mx-auto max-w-7xl px-6 py-20 sm:py-16">
+        <div className="mb-10 flex items-end justify-between gap-6 sm:mb-8">
+          <div className="max-w-[22ch] sm:max-w-none">
             <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">
               Atmosfera
             </div>
-            <h2 className="mt-2 font-display text-3xl uppercase tracking-tight text-white sm:text-4xl">
+            <h2 className="mt-2 text-balance font-display text-[clamp(1.75rem,7vw,2.5rem)] uppercase leading-tight tracking-tight text-white sm:text-4xl">
               Atmosfera Barber Noir
             </h2>
           </div>
@@ -671,26 +698,9 @@ function ResultsEditorial({ services }: { services: Service[] }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="-mx-6 flex snap-x snap-mandatory gap-3 overflow-x-auto px-6 pb-2 sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-3 sm:overflow-visible sm:px-0 sm:pb-0">
           {shots.map((s, i) => (
-            <SectionReveal key={s.id} delay={i * 0.06} y={12}>
-              <figure className="group relative overflow-hidden border border-neutral-800">
-                <div className="aspect-[3/4] w-full overflow-hidden">
-                  <SafeImage
-                    src={s.image}
-                    fallbackSrc={barberServiceFallback(s.slug)}
-                    alt={s.name}
-                    fallbackLabel={s.name}
-                    loading="lazy"
-                    className="h-full w-full object-cover grayscale transition duration-[550ms] ease-out group-hover:scale-[1.04] group-hover:grayscale-0"
-                  />
-                </div>
-                <figcaption className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-neutral-950/95 via-neutral-950/60 to-transparent px-3 py-3 text-[10px] uppercase tracking-[0.25em] text-neutral-200">
-                  <span>{s.name}</span>
-                  <span className="text-amber-200/80">{s.durationMinutes}m</span>
-                </figcaption>
-              </figure>
-            </SectionReveal>
+            <AtmosphereShot key={s.id} service={s} index={i} />
           ))}
         </div>
       </div>
