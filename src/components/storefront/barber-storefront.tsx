@@ -28,6 +28,7 @@ import { SafeImage } from "@/components/storefront/safe-image";
 import { ProductCard } from "@/components/storefront/product-card";
 import { barberServiceFallback, BARBER_PROFESSIONAL_FALLBACK } from "@/lib/barber-media";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
+import { NicheScrollOdyssey } from "@/components/storefront/niche-scroll-odyssey";
 
 const ICONS: Record<string, typeof Sparkles> = {
   truck: Truck,
@@ -52,6 +53,24 @@ export function BarberStorefront({ store, services, professionals, products }: P
   return (
     <div className="bg-neutral-950 text-neutral-100">
       <BarberHero store={store} spotlight={null} featured={[]} />
+      <NicheScrollOdyssey
+        niche="barber"
+        eyebrow="O corte acontece em camadas"
+        title="Você conduz o ritual."
+        scenes={services.slice(0, 3).map((service, index) => ({
+          number: String(index + 1).padStart(2, "0"),
+          kicker: service.name,
+          title:
+            index === 0
+              ? "Precisão antes do primeiro fio cair."
+              : index === 1
+                ? "A forma aparece enquanto você avança."
+                : "O acabamento muda a presença.",
+          copy: service.description,
+          image: service.image ?? barberServiceFallback(service.slug),
+          metric: `${service.durationMinutes} minutos · ${brl(service.price)}`,
+        }))}
+      />
 
       <TrustStrip store={store} />
       <ServicesEditorial services={services} storeSlug={store.slug} />
