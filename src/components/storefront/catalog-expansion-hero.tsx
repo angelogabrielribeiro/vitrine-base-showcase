@@ -5,6 +5,7 @@ import { useRef } from "react";
 import type { Product, StoreConfig } from "@/types/commerce";
 import { SafeImage } from "@/components/storefront/safe-image";
 import { commerceSurface } from "@/components/storefront/commerce-surface";
+import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 import { brl } from "@/lib/format";
 
 const BACKGROUNDS = {
@@ -28,7 +29,12 @@ export function CatalogExpansionHero({
   categoryName?: string;
 }) {
   const ref = useRef<HTMLElement>(null);
-  const reduced = useReducedMotion();
+  const prefersReduced = useReducedMotion();
+  const { capabilities } = useCinematicMotion();
+  const reduced =
+    prefersReduced ||
+    (capabilities.hydrated &&
+      (capabilities.coarsePointer || capabilities.quality === "economy"));
   const surface = commerceSurface(store.niche);
   const lead = products[0];
   const title = categoryName ?? surface.catalogTitle;
@@ -49,10 +55,10 @@ export function CatalogExpansionHero({
     <section
       ref={ref}
       data-testid="catalog-expansion-hero"
-      className="relative min-h-[185svh] border-b border-white/12 text-white"
+      className={`relative border-b border-white/12 text-white ${reduced ? "min-h-[calc(100svh-4rem)]" : "min-h-[185svh]"}`}
       style={{ background: BACKGROUNDS[store.niche] }}
     >
-      <div className="sticky top-[4.5rem] h-[calc(100svh-4.5rem)] overflow-hidden">
+      <div className={reduced ? "relative h-[calc(100svh-4rem)] overflow-hidden" : "sticky top-[4.5rem] h-[calc(100svh-4.5rem)] overflow-hidden"}>
         <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:72px_72px]" />
 
         {lead && (
