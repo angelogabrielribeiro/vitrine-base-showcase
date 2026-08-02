@@ -23,9 +23,9 @@ const CARD_COPY: Record<
     code: "MB atelier",
     cta: "Descobrir peça",
     icon: Sparkles,
-    frame: "bg-[#e9e1d8] border-[#2a201d]/15",
-    meta: "text-[#211c19]",
-    accent: "text-[#8f5548]",
+    frame: "bg-[#321520] border-[#d49aa7]/24",
+    meta: "text-[#f7eee8]",
+    accent: "text-[#d9ad72]",
   },
   barber: {
     code: "BN grooming",
@@ -134,6 +134,37 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
             <SafeImage src={secondaryImage} alt="" className="h-full w-full object-cover" />
           </div>
         )}
+
+        <motion.span
+          aria-hidden="true"
+          animate={
+            reduceMotion
+              ? undefined
+              : {
+                  opacity: [0.08, 0.34, 0.08],
+                  scale: [0.88, 1.12, 0.88],
+                  rotate: [0, 8, 0],
+                }
+          }
+          transition={{
+            duration: niche === "restaurant" ? 2.1 : 3.4,
+            delay: product.id.length * 0.09,
+            repeat: Number.POSITIVE_INFINITY,
+            ease: "easeInOut",
+          }}
+          className="product-attention-glow pointer-events-none absolute -inset-[35%] z-[1] rounded-full blur-3xl"
+          style={{
+            background:
+              niche === "electronics"
+                ? "radial-gradient(circle, rgba(103,232,249,.58), transparent 58%)"
+                : niche === "restaurant"
+                  ? "radial-gradient(circle, rgba(255,100,43,.66), transparent 58%)"
+                  : niche === "barber"
+                    ? "radial-gradient(circle, rgba(217,177,102,.48), transparent 58%)"
+                    : "radial-gradient(circle, rgba(212,154,167,.46), transparent 58%)",
+            mixBlendMode: "screen",
+          }}
+        />
 
         <div
           aria-hidden="true"
@@ -282,6 +313,13 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
           transition: transform 650ms cubic-bezier(.22,1,.36,1);
           will-change: transform;
         }
+        .premium-product-frame {
+          animation: premium-frame-breathe 4.8s ease-in-out infinite;
+        }
+        @keyframes premium-frame-breathe {
+          0%, 100% { box-shadow: 0 0 0 rgba(255,255,255,0); }
+          50% { box-shadow: 0 22px 60px rgba(0,0,0,.34), 0 0 28px rgba(255,255,255,.08); }
+        }
         .premium-product-card .premium-product-image {
           transform: scale(1);
           transition: transform 850ms cubic-bezier(.22,1,.36,1), filter 650ms ease;
@@ -347,6 +385,8 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
         }
         @media (prefers-reduced-motion: reduce) {
           .premium-product-card { transform: none !important; transition: none !important; }
+          .premium-product-frame { animation: none !important; }
+          .product-attention-glow { display: none !important; }
           .premium-product-card .premium-product-image { transform: none !important; transition: none !important; }
           .premium-fashion-reveal { display: none !important; }
         }
