@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { ArrowDown, ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { useRef } from "react";
 import type { Product, StoreConfig } from "@/types/commerce";
 import { SafeImage } from "@/components/storefront/safe-image";
