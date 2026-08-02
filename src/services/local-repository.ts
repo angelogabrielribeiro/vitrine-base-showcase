@@ -31,7 +31,7 @@ const SESSION_KEY = "vitrine:session";
  * vez por versão, no browser. Nunca limpa outras chaves.
  */
 const BARBER_MEDIA_VERSION_KEY = "vitrine:barbearia:media-version";
-const BARBER_MEDIA_VERSION = 4;
+const BARBER_MEDIA_VERSION = 5;
 let barberMediaMigrated = false;
 
 function migrateBarberMediaIfNeeded(): void {
@@ -69,6 +69,18 @@ function migrateBarberMediaIfNeeded(): void {
         return { ...s, image: src.image };
       });
       localStorage.setItem(key("barbearia", "services"), JSON.stringify(updated));
+    }
+
+    const rawProfessionals = localStorage.getItem(key("barbearia", "professionals"));
+    if (rawProfessionals) {
+      const stored = JSON.parse(rawProfessionals) as Professional[];
+      const seed = DEMO_PROFESSIONALS_BY_STORE["barbearia"] ?? [];
+      const storedIds = new Set(stored.map((professional) => professional.id));
+      const missing = seed.filter((professional) => !storedIds.has(professional.id));
+      localStorage.setItem(
+        key("barbearia", "professionals"),
+        JSON.stringify([...stored, ...missing]),
+      );
     }
 
     localStorage.setItem(BARBER_MEDIA_VERSION_KEY, String(BARBER_MEDIA_VERSION));
