@@ -126,15 +126,16 @@ function ServicesEditorial({ services, storeSlug }: { services: Service[]; store
   const items = services.slice(0, 6);
   const [activeIdx, setActiveIdx] = useState(0);
   const reduce = useReducedMotion();
+  const { isMobile } = useAdaptiveQuality();
   const active = items[activeIdx];
   return (
-    <section className="mx-auto max-w-7xl px-6 py-16">
-      <div className="mb-8 flex items-end justify-between gap-6">
-        <div>
+    <section className="mx-auto max-w-7xl px-6 py-20 sm:py-16">
+      <div className="mb-10 flex items-end justify-between gap-6 sm:mb-8">
+        <div className="max-w-[22ch] sm:max-w-none">
           <div className="text-[10px] uppercase tracking-[0.4em] text-amber-200/80">
             Carta de serviços
           </div>
-          <h2 className="mt-2 font-display text-3xl uppercase tracking-tight text-white sm:text-4xl">
+          <h2 className="mt-2 text-balance font-display text-[clamp(1.75rem,7vw,2.5rem)] uppercase leading-tight tracking-tight text-white sm:text-4xl">
             O que se pratica aqui
           </h2>
         </div>
@@ -159,6 +160,7 @@ function ServicesEditorial({ services, storeSlug }: { services: Service[]; store
               storeSlug={storeSlug}
               onActivate={() => setActiveIdx(i)}
               isActive={i === activeIdx}
+              autoActivate={isMobile}
             />
           ))}
         </ul>

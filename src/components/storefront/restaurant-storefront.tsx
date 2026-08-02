@@ -494,7 +494,7 @@ export function RestaurantStorefront({ store, products, featured }: Props) {
 
       <StoreInstitutional store={store} />
 
-      <section className="relative isolate overflow-hidden px-5 py-24 text-center sm:px-8 lg:py-32">
+      <section className="relative isolate overflow-hidden px-5 pb-32 pt-24 text-center sm:px-8 lg:pb-32 lg:pt-32">
         <div
           aria-hidden
           className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_100%,rgba(241,90,36,.35),transparent_48%)]"
