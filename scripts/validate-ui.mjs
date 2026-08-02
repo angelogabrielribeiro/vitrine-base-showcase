@@ -25,6 +25,35 @@ function boxesOverlap(first, second) {
 
 async function createPage(browser, options, label) {
   const context = await browser.newContext(options);
+
+  if (options.viewport.width >= 768 && options.reducedMotion !== "reduce") {
+    await context.addInitScript(() => {
+      const nativeMatchMedia = window.matchMedia.bind(window);
+      window.matchMedia = (query) => {
+        const result = nativeMatchMedia(query);
+        const forcedMatch =
+          query === "(hover: hover) and (pointer: fine)"
+            ? true
+            : query === "(pointer: coarse)"
+              ? false
+              : result.matches;
+
+        return {
+          matches: forcedMatch,
+          media: result.media,
+          onchange: result.onchange,
+          addListener: result.addListener.bind(result),
+          removeListener: result.removeListener.bind(result),
+          addEventListener: result.addEventListener.bind(result),
+          removeEventListener: result.removeEventListener.bind(result),
+          dispatchEvent: result.dispatchEvent.bind(result),
+        };
+      };
+      Object.defineProperty(navigator, "hardwareConcurrency", { configurable: true, value: 8 });
+      Object.defineProperty(navigator, "deviceMemory", { configurable: true, value: 8 });
+    });
+  }
+
   const page = await context.newPage();
   const runtimeErrors = [];
 
