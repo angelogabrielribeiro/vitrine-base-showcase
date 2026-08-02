@@ -316,8 +316,16 @@ jobs:
                   slug === "restaurante"
                     ? page.getByTestId("restaurant-fire-deck")
                     : page.getByTestId("electronics-circuit-story");
-                await story.scrollIntoViewIfNeeded();
-                await page.waitForTimeout(500);
+                const storyMetrics = await story.evaluate((element) => ({
+                  top: element.getBoundingClientRect().top + window.scrollY,
+                  height: element.getBoundingClientRect().height,
+                }));
+                await page.evaluate(
+                  ({ top, height }) =>
+                    window.scrollTo(0, top + Math.max(0, height - window.innerHeight) * 0.48),
+                  storyMetrics,
+                );
+                await page.waitForTimeout(900);
                 await page.screenshot({
                   path: `artifacts/ui-validation/commerce-${slug}-story.png`,
                   fullPage: false,
@@ -365,6 +373,35 @@ jobs:
             }
             await page.screenshot({
               path: "artifacts/ui-validation/commerce-fashion-catalog.png",
+              fullPage: false,
+            });
+
+            const firstFashionCard = page.locator('[data-niche="fashion"]').first();
+            await firstFashionCard.scrollIntoViewIfNeeded();
+            await page.waitForTimeout(650);
+            const fashionCardGlow = await firstFashionCard.evaluate(
+              (element) => getComputedStyle(element).boxShadow,
+            );
+            if (!fashionCardGlow || fashionCardGlow === "none") {
+              throw new Error("Cards Maison Belle não exibem borda luminosa");
+            }
+            await page.screenshot({
+              path: "artifacts/ui-validation/commerce-fashion-cards.png",
+              fullPage: false,
+            });
+            const fashionFooter = page.locator("footer").first();
+            await fashionFooter.scrollIntoViewIfNeeded();
+            await page.waitForTimeout(300);
+            const fashionFooterBackground = await fashionFooter.evaluate(
+              (element) => getComputedStyle(element).backgroundColor,
+            );
+            const footerChannels =
+              fashionFooterBackground.match(/\d+(?:\.\d+)?/g)?.slice(0, 3).map(Number) ?? [];
+            if (footerChannels.length === 3 && footerChannels.every((value) => value > 160)) {
+              throw new Error(`Rodapé Maison Belle continua claro: ${fashionFooterBackground}`);
+            }
+            await page.screenshot({
+              path: "artifacts/ui-validation/commerce-fashion-footer.png",
               fullPage: false,
             });
 
