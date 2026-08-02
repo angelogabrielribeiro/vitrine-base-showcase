@@ -106,13 +106,13 @@ export function RestaurantFireDeck({
               animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
               transition={{ duration: 0.46 }}
             >
-              <h2 className="mt-5 max-w-2xl font-display text-[clamp(4rem,7vw,7.4rem)] uppercase leading-[0.78] tracking-[-0.055em]">
+              <h2 className="mt-4 max-w-2xl font-display text-[clamp(3.2rem,5.2vw,5.5rem)] uppercase leading-[0.84] tracking-[-0.05em]">
                 {current.name}
               </h2>
-              <p className="mt-7 max-w-lg text-base leading-8 text-orange-50/68">
+              <p className="mt-5 max-w-lg text-base leading-7 text-orange-50/72">
                 {current.description}
               </p>
-              <div className="mt-7 flex flex-wrap items-center gap-5">
+              <div className="mt-5 flex flex-wrap items-center gap-5">
                 <strong className="text-3xl text-orange-200">
                   {brl(current.salePrice ?? current.price)}
                 </strong>
@@ -123,12 +123,12 @@ export function RestaurantFireDeck({
               <Link
                 to="/demo/$storeSlug/produto/$productSlug"
                 params={{ storeSlug: store.slug, productSlug: current.slug }}
-                className="mt-8 inline-flex min-h-13 items-center gap-3 border border-orange-300/35 bg-orange-500 px-6 text-[10px] font-bold uppercase tracking-[0.24em] text-[#160703] transition hover:bg-orange-300"
+                className="mt-6 inline-flex min-h-13 items-center gap-3 border border-orange-300/35 bg-orange-500 px-6 text-[10px] font-bold uppercase tracking-[0.24em] text-[#160703] transition hover:bg-orange-300"
               >
                 Abrir pedido <ArrowRight className="h-4 w-4" />
               </Link>
             </motion.div>
-            <div className="mt-9 flex items-center gap-3">
+            <div className="mt-7 flex items-center gap-3">
               {items.map((product, index) => (
                 <button
                   key={product.id}
@@ -196,7 +196,7 @@ export function RestaurantFireDeck({
                       className="h-full w-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#120603] via-transparent to-orange-200/[0.06]" />
-                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6">
+                    <div className={`absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6 transition-opacity duration-500 ${index === active ? "opacity-100" : "opacity-15"}`}>
                       <div>
                         <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-orange-300">
                           Brasa 0{index + 1}
