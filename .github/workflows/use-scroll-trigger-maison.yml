@@ -1,0 +1,43 @@
+name: Use Maison scroll trigger
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "scripts/use-scroll-trigger-maison.py"
+      - ".github/workflows/use-scroll-trigger-maison.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/maison-scroll-layout-stage
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install --no-audit --no-fund
+      - run: python scripts/use-scroll-trigger-maison.py
+
+      - name: Format and validate
+        run: |
+          npx prettier --write src/components/storefront/fashion-storefront.tsx
+          npx eslint src/components/storefront/fashion-storefront.tsx
+          npm run build
+
+      - name: Commit scroll controller
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/storefront/fashion-storefront.tsx
+          git commit -m "Estabiliza revelação por scroll da Maison [maison scroll trigger]"
+          git push origin HEAD:fix/maison-scroll-layout-stage
