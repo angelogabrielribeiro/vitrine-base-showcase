@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Check, MousePointer2, Sparkles } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import type { Product, StoreConfig } from "@/types/commerce";
 import { FashionHero } from "@/components/storefront/hero/fashion-hero";
 import type { HeroSpotlight } from "@/components/storefront/hero/niche-hero";
@@ -37,17 +37,8 @@ type Chapter = {
 };
 
 function FashionChapter({ chapter, index }: { chapter: Chapter; index: number }) {
-  const ref = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    const onChange = () => setIsDesktop(mq.matches);
-    onChange();
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
+  const { ref, inView } = useInView<HTMLElement>({ amount: 0.16, rootMargin: "0px" });
 
   const chapterTransition = { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const };
 
@@ -61,10 +52,9 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
         <div className="absolute inset-y-0 left-5 hidden w-px bg-[#ead1c8]/16 lg:block">
           <motion.div
             className="h-full w-px origin-top bg-[#c99a55] shadow-[0_0_20px_rgba(201,154,85,.52)]"
-            initial={reduceMotion ? false : { scaleY: 0 }}
-            whileInView={reduceMotion ? undefined : { scaleY: 1 }}
-            viewport={{ once: false, amount: 0.24 }}
-            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            initial={false}
+            animate={{ scaleY: reduceMotion || inView ? 1 : 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           />
         </div>
 
@@ -74,13 +64,12 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
         >
           <motion.figure
             data-testid="fashion-chapter-media"
-            initial={reduceMotion ? false : { opacity: 0, y: 24, scale: 0.99 }}
-            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
-            viewport={{
-              once: false,
-              amount: isDesktop ? 0.2 : 0.16,
-              margin: "0px 0px -4% 0px",
-            }}
+            initial={false}
+            animate={
+              reduceMotion || inView
+                ? { opacity: 1, y: 0, scale: 1 }
+                : { opacity: 0, y: 24, scale: 0.99 }
+            }
             transition={chapterTransition}
             className={`relative mx-auto aspect-[4/5] w-full max-w-[34rem] overflow-hidden border border-[#ead1c8]/18 bg-[#3d1828] p-2 shadow-[0_28px_80px_rgba(15,4,10,.34)] ${
               index % 2 === 0 ? "lg:order-2" : "lg:order-1"
@@ -101,13 +90,12 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
 
           <motion.div
             data-testid="fashion-chapter-copy"
-            initial={reduceMotion ? false : { opacity: 0, x: index % 2 === 0 ? -20 : 20, y: 14 }}
-            whileInView={reduceMotion ? undefined : { opacity: 1, x: 0, y: 0 }}
-            viewport={{
-              once: false,
-              amount: isDesktop ? 0.18 : 0.1,
-              margin: "0px 0px -2% 0px",
-            }}
+            initial={false}
+            animate={
+              reduceMotion || inView
+                ? { opacity: 1, x: 0, y: 0 }
+                : { opacity: 0, x: index % 2 === 0 ? -20 : 20, y: 14 }
+            }
             transition={{ ...chapterTransition, delay: reduceMotion ? 0 : 0.05 }}
             className={`max-w-2xl ${index % 2 === 0 ? "lg:order-1" : "lg:order-2"}`}
           >
