@@ -96,50 +96,38 @@ async function inspectChapters(page, scenario) {
   const targetBox = await target.boundingBox();
   assert(targetBox, `${scenario.name}: capítulo de teste sem posição`);
 
-  if (scenario.mobile) {
-    await page.evaluate(
-      ({ top, height }) =>
-        window.scrollTo({ top: Math.max(0, top - height * 0.95), behavior: "instant" }),
-      { top: targetBox.y, height: scenario.height },
-    );
-    await page.waitForTimeout(120);
-    const before = Number(await copy.evaluate((node) => getComputedStyle(node).opacity));
-    await page.evaluate(
-      ({ top, height }) =>
-        window.scrollTo({ top: Math.max(0, top - height * 0.18), behavior: "instant" }),
-      { top: targetBox.y, height: scenario.height },
-    );
-    await page.waitForTimeout(850);
-    const after = await copy.evaluate((node) => {
-      const rect = node.getBoundingClientRect();
-      return {
-        opacity: Number(getComputedStyle(node).opacity),
-        visible: rect.top < innerHeight && rect.bottom > 0,
-      };
-    });
-    assert(before < 0.5, `${scenario.name}: storytelling já nasce totalmente revelado (${before})`);
-    assert(
-      after.visible && after.opacity > 0.82,
-      `${scenario.name}: storytelling não conclui enquanto visível`,
-    );
-  } else {
-    await page.evaluate(
-      (top) => window.scrollTo({ top: top + 5, behavior: "instant" }),
-      targetBox.y,
-    );
-    await page.waitForTimeout(180);
-    const before = Number(await copy.evaluate((node) => getComputedStyle(node).opacity));
-    await page.evaluate(
-      ({ top, height }) => window.scrollTo({ top: top + height * 0.26, behavior: "instant" }),
-      { top: targetBox.y, height: targetBox.height },
-    );
-    await page.waitForTimeout(260);
-    const after = Number(await copy.evaluate((node) => getComputedStyle(node).opacity));
-    assert(
-      after > before + 0.35,
-      `${scenario.name}: progresso do storytelling não responde ao scroll`,
-    );
-  }
+  await page.evaluate(
+    ({ top, height }) =>
+      window.scrollTo({
+        top: Math.max(0, top - height * 0.85),
+        behavior: "instant",
+      }),
+    { top: targetBox.y, height: scenario.height },
+  );
+  await page.waitForTimeout(140);
+  const before = Number(await copy.evaluate((node) => getComputedStyle(node).opacity));
+
+  await page.evaluate(
+    ({ top, height }) =>
+      window.scrollTo({
+        top: Math.max(0, top - height * 0.12),
+        behavior: "instant",
+      }),
+    { top: targetBox.y, height: scenario.height },
+  );
+  await page.waitForTimeout(720);
+  const after = await copy.evaluate((node) => {
+    const rect = node.getBoundingClientRect();
+    return {
+      opacity: Number(getComputedStyle(node).opacity),
+      visible: rect.top < innerHeight && rect.bottom > 0,
+    };
+  });
+  assert(before < 0.5, `${scenario.name}: storytelling já nasce totalmente revelado (${before})`);
+  assert(
+    after.visible && after.opacity > 0.82,
+    `${scenario.name}: storytelling não conclui enquanto visível (${after.opacity})`,
+  );
 
   return metrics;
 }

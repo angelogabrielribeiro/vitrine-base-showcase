@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Check, MousePointer2, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Product, StoreConfig } from "@/types/commerce";
@@ -49,30 +49,22 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end end"],
-  });
-  const sceneOpacity = useTransform(scrollYProgress, [0, 0.08, 0.82, 0.98], [0.3, 1, 1, 0.24]);
-  const imageScale = useTransform(scrollYProgress, [0, 0.28, 0.78, 1], [1.015, 1, 1, 1.01]);
-  const imageY = useTransform(scrollYProgress, [0, 0.3, 0.8, 1], [14, 0, 0, -8]);
-  const copyY = useTransform(scrollYProgress, [0.02, 0.18, 0.82, 0.96], [34, 0, 0, -24]);
-  const copyOpacity = useTransform(scrollYProgress, [0.02, 0.16, 0.84, 0.97], [0, 1, 1, 0.16]);
-  const lineScale = useTransform(scrollYProgress, [0.06, 0.84], [0, 1]);
-
-  const mobileTransition = { duration: 0.62, ease: [0.22, 1, 0.36, 1] as const };
+  const chapterTransition = { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const };
 
   return (
     <section
       ref={ref}
       data-testid="fashion-chapter"
-      className="relative border-t border-[#ead1c8]/12 bg-[#25131d] py-16 lg:min-h-[145svh] lg:py-0"
+      className="relative border-t border-[#ead1c8]/12 bg-[#25131d] py-16 lg:min-h-[128svh] lg:py-0"
     >
       <div className="relative overflow-hidden lg:sticky lg:top-[4.5rem] lg:h-[calc(100svh-4.5rem)]">
         <div className="absolute inset-y-0 left-5 hidden w-px bg-[#ead1c8]/16 lg:block">
           <motion.div
             className="h-full w-px origin-top bg-[#c99a55] shadow-[0_0_20px_rgba(201,154,85,.52)]"
-            style={reduceMotion ? { scaleY: 1 } : { scaleY: lineScale }}
+            initial={reduceMotion ? false : { scaleY: 0 }}
+            whileInView={reduceMotion ? undefined : { scaleY: 1 }}
+            viewport={{ once: false, amount: 0.24 }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           />
         </div>
 
@@ -82,15 +74,14 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
         >
           <motion.figure
             data-testid="fashion-chapter-media"
-            initial={reduceMotion || isDesktop ? false : { opacity: 0, y: 30, scale: 0.985 }}
-            whileInView={reduceMotion || isDesktop ? undefined : { opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: false, amount: 0.3, margin: "0px 0px -12% 0px" }}
-            transition={mobileTransition}
-            style={
-              reduceMotion || !isDesktop
-                ? undefined
-                : { opacity: sceneOpacity, scale: imageScale, y: imageY }
-            }
+            initial={reduceMotion ? false : { opacity: 0, y: 24, scale: 0.99 }}
+            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+            viewport={{
+              once: false,
+              amount: isDesktop ? 0.2 : 0.16,
+              margin: "0px 0px -4% 0px",
+            }}
+            transition={chapterTransition}
             className={`relative mx-auto aspect-[4/5] w-full max-w-[34rem] overflow-hidden border border-[#ead1c8]/18 bg-[#3d1828] p-2 shadow-[0_28px_80px_rgba(15,4,10,.34)] ${
               index % 2 === 0 ? "lg:order-2" : "lg:order-1"
             }`}
@@ -110,15 +101,14 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
 
           <motion.div
             data-testid="fashion-chapter-copy"
-            initial={
-              reduceMotion || isDesktop
-                ? false
-                : { opacity: 0, x: index % 2 === 0 ? -24 : 24, y: 18 }
-            }
-            whileInView={reduceMotion || isDesktop ? undefined : { opacity: 1, x: 0, y: 0 }}
-            viewport={{ once: false, amount: 0.36, margin: "0px 0px -10% 0px" }}
-            transition={{ ...mobileTransition, delay: reduceMotion ? 0 : 0.08 }}
-            style={reduceMotion || !isDesktop ? undefined : { opacity: copyOpacity, y: copyY }}
+            initial={reduceMotion ? false : { opacity: 0, x: index % 2 === 0 ? -20 : 20, y: 14 }}
+            whileInView={reduceMotion ? undefined : { opacity: 1, x: 0, y: 0 }}
+            viewport={{
+              once: false,
+              amount: isDesktop ? 0.18 : 0.1,
+              margin: "0px 0px -2% 0px",
+            }}
+            transition={{ ...chapterTransition, delay: reduceMotion ? 0 : 0.05 }}
             className={`max-w-2xl ${index % 2 === 0 ? "lg:order-1" : "lg:order-2"}`}
           >
             <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-[0.34em] text-[#d8ad72]">
