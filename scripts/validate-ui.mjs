@@ -273,7 +273,7 @@ async function validateFashion(browser, config) {
     const firstChapter = chapters.first();
     const chapterBox = await firstChapter.boundingBox();
     assert(chapterBox, `${label}: primeiro capítulo não possui dimensões`);
-    const sticky = firstChapter.locator(":scope > div.sticky");
+    const sticky = firstChapter.locator(":scope > div").first();
     const stickyPosition =
       (await sticky.count()) > 0
         ? await sticky.evaluate((element) => getComputedStyle(element).position)
