@@ -63,7 +63,9 @@ try {
         );
 
         const menuButton = page.getByRole("button", { name: /Menu/i }).last();
-        const fab = page.locator('a[data-whatsapp-fab][aria-label="Falar no WhatsApp"]');
+        const fab = page.locator(
+          'a[data-whatsapp-fab][aria-label="Falar no WhatsApp"]',
+        );
         await menuButton.waitFor({ state: "visible", timeout: 15_000 });
         await fab.waitFor({ state: "visible", timeout: 15_000 });
 
@@ -83,11 +85,23 @@ try {
             rootState: document.documentElement.dataset.mobileMenuOpen,
           };
         });
-        assert(hidden.display === "none", `${label}: WhatsApp continua ocupando a tela`);
-        assert(hidden.pointerEvents === "none", `${label}: WhatsApp continua interceptando toque`);
-        assert(hidden.ariaHidden === "true", `${label}: WhatsApp não foi ocultado para leitor de tela`);
+        assert(
+          hidden.display === "none",
+          `${label}: WhatsApp continua ocupando a tela`,
+        );
+        assert(
+          hidden.pointerEvents === "none",
+          `${label}: WhatsApp continua interceptando toque`,
+        );
+        assert(
+          hidden.ariaHidden === "true",
+          `${label}: WhatsApp não foi ocultado para leitor de tela`,
+        );
         assert(hidden.tabIndex === "-1", `${label}: WhatsApp continua focável`);
-        assert(hidden.rootState === "true", `${label}: estado global do menu não foi sincronizado`);
+        assert(
+          hidden.rootState === "true",
+          `${label}: estado global do menu não foi sincronizado`,
+        );
 
         await page.getByRole("button", { name: "Fechar menu" }).click();
         await panel.waitFor({ state: "detached", timeout: 5_000 });
@@ -105,12 +119,30 @@ try {
           };
         });
         assert(restored.display !== "none", `${label}: WhatsApp não reapareceu`);
-        assert(restored.pointerEvents !== "none", `${label}: WhatsApp não recuperou o toque`);
-        assert(restored.opacity > 0.9, `${label}: WhatsApp reapareceu transparente`);
-        assert(restored.ariaHidden !== "true", `${label}: aria-hidden não foi restaurado`);
-        assert(restored.tabIndex !== "-1", `${label}: foco não foi restaurado`);
-        assert(restored.rootState === undefined, `${label}: estado global ficou preso`);
-        assert(runtimeErrors.length === 0, `${label}: erros de runtime: ${runtimeErrors.join(" | ")}`);
+        assert(
+          restored.pointerEvents !== "none",
+          `${label}: WhatsApp não recuperou o toque`,
+        );
+        assert(
+          restored.opacity > 0.9,
+          `${label}: WhatsApp reapareceu transparente`,
+        );
+        assert(
+          restored.ariaHidden !== "true",
+          `${label}: aria-hidden não foi restaurado`,
+        );
+        assert(
+          restored.tabIndex !== "-1",
+          `${label}: foco não foi restaurado`,
+        );
+        assert(
+          restored.rootState === undefined,
+          `${label}: estado global ficou preso`,
+        );
+        assert(
+          runtimeErrors.length === 0,
+          `${label}: erros de runtime: ${runtimeErrors.join(" | ")}`,
+        );
 
         report.scenarios.push({ label, hidden, restored, status: "passed" });
         await page.screenshot({
@@ -137,9 +169,14 @@ try {
 }
 
 report.status = report.errors.length === 0 ? "passed" : "failed";
-fs.writeFileSync(path.join(outputDir, "report.json"), JSON.stringify(report, null, 2));
+fs.writeFileSync(
+  path.join(outputDir, "report.json"),
+  JSON.stringify(report, null, 2),
+);
 console.log(JSON.stringify(report, null, 2));
 
 if (report.errors.length > 0) {
-  throw new Error(`Falha em ${report.errors.length} cenário(s) de menu/WhatsApp`);
+  throw new Error(
+    `Falha em ${report.errors.length} cenário(s) de menu/WhatsApp`,
+  );
 }
