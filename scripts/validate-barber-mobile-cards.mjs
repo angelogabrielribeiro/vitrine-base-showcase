@@ -1,0 +1,232 @@
+import fs from "node:fs";
+import path from "node:path";
+import { chromium } from "playwright";
+
+const baseUrl = process.env.BASE_URL ?? "http://127.0.0.1:4173";
+const outputDir = "artifacts/barber-mobile-cards";
+fs.mkdirSync(outputDir, { recursive: true });
+
+const viewports = [
+  { name: "360x800", width: 360, height: 800 },
+  { name: "392x850", width: 392, height: 850 },
+  { name: "430x932", width: 430, height: 932 },
+];
+
+const report = { scenarios: [], errors: [] };
+const browser = await chromium.launch({
+  headless: true,
+  args: [
+    "--use-gl=angle",
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader",
+    "--enable-webgl",
+    "--ignore-gpu-blocklist",
+    "--disable-dev-shm-usage",
+  ],
+});
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+async function waitForLit(locator, attribute) {
+  await locator.scrollIntoViewIfNeeded();
+  await locator.page().waitForTimeout(850);
+  await locator.page().waitForFunction(
+    ({ selector, attribute }) =>
+      [...document.querySelectorAll(selector)].some(
+        (element) => element.getAttribute(attribute) === "true",
+      ),
+    { selector: await locator.evaluate((element) => {
+      const marker = `stage-${Math.random().toString(36).slice(2)}`;
+      element.setAttribute("data-stage-marker", marker);
+      return `[data-stage-marker="${marker}"]`;
+    }), attribute },
+    { timeout: 5_000 },
+  );
+}
+
+try {
+  for (const viewport of viewports) {
+    const label = `barber-${viewport.name}`;
+    const context = await browser.newContext({
+      viewport: { width: viewport.width, height: viewport.height },
+      isMobile: true,
+      hasTouch: true,
+      deviceScaleFactor: 1,
+    });
+    const page = await context.newPage();
+    const runtimeErrors = [];
+    page.on("pageerror", (error) => runtimeErrors.push(error.message));
+
+    try {
+      const response = await page.goto(`${baseUrl}/demo/barbearia`, {
+        waitUntil: "domcontentloaded",
+        timeout: 90_000,
+      });
+      assert(response?.ok(), `${label}: HTTP ${response?.status()}`);
+      await page.waitForFunction(
+        () => document.documentElement.dataset.cinematicReady === "true",
+        undefined,
+        { timeout: 30_000 },
+      );
+      await page.waitForTimeout(500);
+
+      const width = await page.evaluate(() => ({
+        viewport: innerWidth,
+        document: document.documentElement.scrollWidth,
+      }));
+      assert(
+        width.document <= width.viewport + 1,
+        `${label}: overflow horizontal do documento (${width.document} > ${width.viewport})`,
+      );
+
+      const servicesSection = page
+        .getByRole("heading", { name: "O que se pratica aqui" })
+        .locator("xpath=ancestor::section[1]");
+      const serviceRows = servicesSection.locator("li");
+      assert((await serviceRows.count()) >= 3, `${label}: carta de serviços incompleta`);
+      const serviceTarget = serviceRows.nth(1);
+      await serviceTarget.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(900);
+      const serviceState = await serviceTarget.evaluate((element) => {
+        const link = element.querySelector("a");
+        const title = element.querySelector("h3");
+        return {
+          active: element.getAttribute("data-active"),
+          background: link ? getComputedStyle(link).backgroundImage : "none",
+          shadow: link ? getComputedStyle(link).boxShadow : "none",
+          titleColor: title ? getComputedStyle(title).color : "",
+        };
+      });
+      assert(serviceState.active === "true", `${label}: serviço não acendeu com o scroll`);
+      assert(serviceState.background !== "none", `${label}: serviço ativo sem iluminação`);
+      assert(serviceState.shadow !== "none", `${label}: serviço ativo sem profundidade`);
+
+      const ritualSection = page
+        .getByRole("heading", { name: "Três atos, uma cadeira" })
+        .locator("xpath=ancestor::section[1]");
+      const ritualCard = ritualSection.locator("[data-lit]").first();
+      await ritualCard.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(900);
+      const ritualState = await ritualCard.evaluate((element) => ({
+        lit: element.getAttribute("data-lit"),
+        shadow: getComputedStyle(element).boxShadow,
+      }));
+      assert(ritualState.lit === "true", `${label}: card do ritual não acendeu no scroll`);
+      assert(ritualState.shadow !== "none", `${label}: card do ritual sem glow automático`);
+      const ritualRail = ritualSection.locator('[class*="snap-x"][class*="overflow-x-auto"]');
+      const ritualRailState = await ritualRail.evaluate((element) => ({
+        scrollWidth: element.scrollWidth,
+        clientWidth: element.clientWidth,
+        touchAction: getComputedStyle(element).touchAction,
+      }));
+      assert(
+        ritualRailState.scrollWidth > ritualRailState.clientWidth,
+        `${label}: trilho do ritual deixou de ser navegável`,
+      );
+
+      const atmosphereSection = page
+        .getByRole("heading", { name: "Atmosfera Barber Noir" })
+        .locator("xpath=ancestor::section[1]");
+      const atmosphereCard = atmosphereSection.locator("figure").nth(1);
+      await atmosphereCard.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(900);
+      const atmosphereState = await atmosphereCard.evaluate((element) => {
+        const image = element.querySelector("img");
+        const pseudo = getComputedStyle(element, "::after");
+        return {
+          lit: element.getAttribute("data-lit"),
+          shadow: getComputedStyle(element).boxShadow,
+          filter: image ? getComputedStyle(image).filter : "",
+          scan: pseudo.animationName,
+        };
+      });
+      assert(
+        atmosphereState.lit === "true",
+        `${label}: quadro de atmosfera não acendeu no scroll`,
+      );
+      assert(atmosphereState.shadow !== "none", `${label}: atmosfera sem glow automático`);
+      assert(
+        atmosphereState.scan === "barber-mobile-scan",
+        `${label}: varredura dourada não está ativa`,
+      );
+      assert(
+        !/grayscale\(1\)/.test(atmosphereState.filter),
+        `${label}: atmosfera continua totalmente cinza`,
+      );
+
+      const groomingSection = page
+        .getByRole("heading", { name: "Leve o ritual para casa" })
+        .locator("xpath=ancestor::section[1]");
+      const productCard = groomingSection.locator('.premium-product-card[data-niche="barber"]').first();
+      await productCard.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(1_100);
+      const productState = await productCard.evaluate((element) => {
+        const frame = element.querySelector(".premium-product-frame");
+        const glow = element.querySelector(".product-attention-glow");
+        return {
+          mobileActive: element.getAttribute("data-mobile-active"),
+          inView: element.getAttribute("data-in-view"),
+          animationName: frame ? getComputedStyle(frame).animationName : "none",
+          animationPlayState: frame ? getComputedStyle(frame).animationPlayState : "paused",
+          glowOpacity: glow ? Number(getComputedStyle(glow).opacity) : 0,
+        };
+      });
+      assert(productState.inView === "true", `${label}: produto não reconheceu entrada na viewport`);
+      assert(
+        productState.mobileActive === "true",
+        `${label}: produto ainda depende de toque prolongado`,
+      );
+      assert(
+        productState.animationName === "premium-frame-breathe" &&
+          productState.animationPlayState === "running",
+        `${label}: borda do produto não anima automaticamente`,
+      );
+      assert(productState.glowOpacity > 0.08, `${label}: glow do produto não ficou visível`);
+      assert(runtimeErrors.length === 0, `${label}: erros de runtime: ${runtimeErrors.join(" | ")}`);
+
+      const scenario = {
+        label,
+        width,
+        serviceState,
+        ritualState,
+        ritualRailState,
+        atmosphereState,
+        productState,
+        status: "passed",
+      };
+      report.scenarios.push(scenario);
+      await page.screenshot({
+        path: path.join(outputDir, `${label}.png`),
+        fullPage: false,
+        animations: "disabled",
+        caret: "hide",
+        timeout: 60_000,
+      });
+    } catch (error) {
+      report.errors.push({ label, message: error.message, runtimeErrors });
+      await page
+        .screenshot({
+          path: path.join(outputDir, `${label}-failure.png`),
+          fullPage: false,
+          animations: "disabled",
+          caret: "hide",
+          timeout: 60_000,
+        })
+        .catch(() => {});
+    } finally {
+      await context.close();
+    }
+  }
+} finally {
+  await browser.close();
+}
+
+report.status = report.errors.length === 0 ? "passed" : "failed";
+fs.writeFileSync(path.join(outputDir, "report.json"), JSON.stringify(report, null, 2));
+console.log(JSON.stringify(report, null, 2));
+
+if (report.errors.length > 0) {
+  throw new Error(`Falha em ${report.errors.length} cenário(s) da Barber Noir mobile`);
+}
