@@ -281,6 +281,20 @@
   .premium-product-card .premium-product-frame {
     animation-play-state: running !important;
   }
+
+  /* O glow dos produtos Barber pulsa de forma automática e discreta. O estado
+     in-view continua aumentando a intensidade, mas não é pré-requisito visual. */
+  .store-theme-barbearia .premium-product-card .product-attention-glow {
+    animation: barber-product-ambient 6.6s ease-in-out infinite;
+  }
+
+  .store-theme-barbearia .premium-product-card:nth-child(2n) .product-attention-glow {
+    animation-delay: -2.2s;
+  }
+
+  .store-theme-barbearia .premium-product-card:nth-child(3n) .product-attention-glow {
+    animation-delay: -4.4s;
+  }
 }
 
 @keyframes vitrine-ambient-wine {
@@ -348,6 +362,19 @@
   }
 }
 
+@keyframes barber-product-ambient {
+  0%,
+  100% {
+    opacity: 0.07;
+    filter: brightness(0.94);
+  }
+  44%,
+  58% {
+    opacity: 0.2;
+    filter: brightness(1.08);
+  }
+}
+
 @keyframes barber-mobile-scan {
   0%,
   18% {
@@ -379,7 +406,8 @@
   .store-theme-barbearia main figure[class*="snap-center"],
   .store-theme-barbearia main figure[class*="snap-center"] img,
   .store-theme-barbearia main figure[class*="snap-center"]::after,
-  .store-theme-barbearia main ul[class*="divide-y"] > li > a::before {
+  .store-theme-barbearia main ul[class*="divide-y"] > li > a::before,
+  .store-theme-barbearia .premium-product-card .product-attention-glow {
     animation: none !important;
   }
 }
