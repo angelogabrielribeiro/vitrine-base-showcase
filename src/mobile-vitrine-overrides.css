@@ -189,8 +189,29 @@
     display: none;
   }
 
-  /* Carta de serviços: iluminação automática comandada pela posição no scroll,
-     sem depender de clique, long press ou estado :active. */
+  /* Cada serviço emite um pulso ambiente defasado. A interação fica aparente
+     durante o scroll mesmo quando nenhum item recebeu clique ou long press. */
+  .store-theme-barbearia main ul[class*="divide-y"] > li > a::before {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(90deg, rgb(245 158 11 / 14%), transparent 68%);
+    box-shadow: inset 1px 0 0 rgb(252 211 77 / 38%);
+    opacity: 0.06;
+    animation: barber-service-ambient 6.8s ease-in-out infinite;
+  }
+
+  .store-theme-barbearia main ul[class*="divide-y"] > li:nth-child(2n) > a::before {
+    animation-delay: -2.2s;
+  }
+
+  .store-theme-barbearia main ul[class*="divide-y"] > li:nth-child(3n) > a::before {
+    animation-delay: -4.4s;
+  }
+
+  /* O estado ativo existente continua mais forte que o pulso ambiente. */
   .store-theme-barbearia main li[data-active="true"] > a {
     background: linear-gradient(90deg, rgb(245 158 11 / 12%), rgb(23 23 23 / 34%) 58%, transparent);
     box-shadow:
@@ -270,6 +291,19 @@
   }
 }
 
+@keyframes barber-service-ambient {
+  0%,
+  100% {
+    opacity: 0.04;
+    filter: brightness(0.96);
+  }
+  42%,
+  58% {
+    opacity: 0.28;
+    filter: brightness(1.08);
+  }
+}
+
 @keyframes barber-mobile-scan {
   0%,
   18% {
@@ -298,7 +332,8 @@
   .store-theme-moda main article,
   .store-theme-barbearia main article,
   [data-ambient-card],
-  .store-theme-barbearia main figure[data-lit="true"]::after {
+  .store-theme-barbearia main figure[data-lit="true"]::after,
+  .store-theme-barbearia main ul[class*="divide-y"] > li > a::before {
     animation: none !important;
   }
 }
