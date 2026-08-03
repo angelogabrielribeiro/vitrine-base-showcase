@@ -228,7 +228,14 @@ async function assertCatalogComposition(page, label) {
   const context = page.getByTestId("catalog-feature-context");
   if (!(await context.count())) return { tested: false };
   const contextBox = await context.boundingBox();
-  const heading = page.getByTestId("catalog-expansion-hero").locator("h1").first();
+  const hero = page.getByTestId("catalog-expansion-hero");
+  const heroBox = await hero.boundingBox();
+  assert(heroBox, `${label}: hero de catálogo sem área medível`);
+  assert(
+    heroBox.height <= 900,
+    `${label}: hero de catálogo alto demais (${Math.round(heroBox.height)}px)`,
+  );
+  const heading = hero.locator("h1").first();
   const headingBox = await heading.boundingBox();
   assert(contextBox && headingBox, `${label}: composição do destaque não pôde ser medida`);
   const overlap = Math.max(
@@ -237,7 +244,7 @@ async function assertCatalogComposition(page, label) {
       Math.max(contextBox.y, headingBox.y),
   );
   assert(overlap <= 2, `${label}: painel de produto cobre o título (${overlap}px)`);
-  return { tested: true, overlap };
+  return { tested: true, overlap, heroHeight: Math.round(heroBox.height) };
 }
 
 async function assertHomeShowroom(page, label) {
@@ -369,7 +376,9 @@ async function runDesktop(browser) {
 const browser = await chromium.launch({
   headless: true,
   args: [
-    "--use-angle=swiftshader-webgl",
+    "--use-gl=angle",
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader",
     "--enable-webgl",
     "--ignore-gpu-blocklist",
     "--disable-dev-shm-usage",
