@@ -1,4 +1,4 @@
-# Final user-triggered regression for automatic mobile interactions in Barber Noir.
+# Final regression after correcting the ritual-card selector.
 name: Validate Barber mobile cards
 
 on:
