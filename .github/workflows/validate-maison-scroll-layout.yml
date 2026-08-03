@@ -39,6 +39,9 @@ jobs:
 
       - name: Check and build
         run: |
+          mkdir -p artifacts/maison-scroll-layout
+          npx prettier --write scripts/validate-maison-scroll-layout.mjs
+          cp scripts/validate-maison-scroll-layout.mjs artifacts/maison-scroll-layout/formatted-validation.mjs
           npx prettier --check \
             src/components/storefront/fashion-storefront.tsx \
             src/components/storefront/product-card-editorial.tsx \
@@ -54,7 +57,6 @@ jobs:
 
       - name: Start preview server
         run: |
-          mkdir -p artifacts/maison-scroll-layout
           npm run dev -- --host 0.0.0.0 --port 4173 > artifacts/maison-scroll-layout/server.log 2>&1 &
           for attempt in $(seq 1 90); do
             if curl --fail --silent http://127.0.0.1:4173 > /dev/null; then
