@@ -1,4 +1,4 @@
-# Clean final regression for automatic Barber Noir mobile interactions.
+# Final clean regression after the automatic product-glow fallback.
 name: Validate Barber mobile cards
 
 on:
