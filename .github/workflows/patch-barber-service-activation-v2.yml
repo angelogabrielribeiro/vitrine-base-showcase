@@ -1,3 +1,4 @@
+# Temporary branch-only patch runner for the deterministic mobile service state.
 name: Patch Barber service activation v2
 
 on:
