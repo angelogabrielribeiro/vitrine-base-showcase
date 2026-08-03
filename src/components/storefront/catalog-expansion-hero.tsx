@@ -102,7 +102,7 @@ export function CatalogExpansionHero({
       <section
         ref={ref}
         data-testid="catalog-expansion-hero"
-        className="relative overflow-hidden border-b border-white/12 px-5 pb-14 pt-7 text-white"
+        className="relative overflow-hidden border-b border-white/12 px-4 pb-8 pt-5 text-white"
         style={{ background: BACKGROUNDS[store.niche] }}
       >
         <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,.07)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.07)_1px,transparent_1px)] [background-size:52px_52px]" />
@@ -115,19 +115,19 @@ export function CatalogExpansionHero({
             <ArrowLeft className="h-4 w-4" /> Voltar à experiência
           </Link>
 
-          <div className="mt-8">
+          <div className="mt-4">
             <p className={`text-[9px] font-bold uppercase tracking-[0.34em] ${surface.eyebrow}`}>
               <Sparkles className="mr-2 inline h-4 w-4" />
               {categoryName ?? surface.catalogKicker}
             </p>
             <h1
-              className={`mt-4 max-w-[12ch] text-[clamp(2.35rem,11vw,3.6rem)] font-semibold leading-[0.9] tracking-[-0.045em] ${
+              className={`mt-3 max-w-[14ch] text-[clamp(1.95rem,8.6vw,2.7rem)] font-semibold leading-[0.92] tracking-[-0.04em] ${
                 store.niche === "fashion" ? "font-sans" : "font-display"
               }`}
             >
               {title}
             </h1>
-            <p className="mt-4 max-w-[36ch] text-sm leading-6 text-white/64">
+            <p className="mt-3 line-clamp-3 max-w-[40ch] text-[0.8rem] leading-5 text-white/64">
               {categoryName
                 ? `${products.length} ${products.length === 1 ? "produto selecionado" : "produtos selecionados"}, organizados sem sobrepor imagem, nome e preço.`
                 : surface.catalogCopy}
@@ -140,25 +140,25 @@ export function CatalogExpansionHero({
                 initial={prefersReduced ? false : { opacity: 0, y: 24, rotateX: 6 }}
                 animate={{ opacity: 1, y: 0, rotateX: 0 }}
                 transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-                className="relative mt-9 aspect-[4/5] overflow-hidden border border-white/18 bg-black/24 shadow-[0_32px_90px_rgba(0,0,0,.45)] [perspective:1000px]"
+                className="relative mt-5 aspect-[16/10] overflow-hidden border border-white/18 bg-black/24 shadow-[0_24px_70px_rgba(0,0,0,.45)] [perspective:1000px]"
               >
                 <SafeImage
                   src={lead.images[0]}
                   alt={lead.name}
-                  className="h-full w-full object-contain p-3 saturate-[1.06]"
+                  className="h-full w-full object-contain p-2 saturate-[1.06]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/38 via-transparent to-white/[0.03]" />
-                <span className={`absolute left-4 top-4 text-[8px] font-bold uppercase tracking-[0.3em] ${surface.eyebrow}`}>
+                <span className={`absolute left-3 top-3 text-[8px] font-bold uppercase tracking-[0.3em] ${surface.eyebrow}`}>
                   Seleção {categoryName ?? store.name}
                 </span>
               </motion.div>
-              <div className="mt-4">
+              <div className="mt-3">
                 <FeatureContext store={store} lead={lead} />
               </div>
             </>
           )}
 
-          <div className="mt-6 flex snap-x gap-2 overflow-x-auto pb-1">
+          <div className="mt-4 flex snap-x gap-2 overflow-x-auto pb-1">
             {surface.proof.map((item, index) => (
               <span
                 key={item}
