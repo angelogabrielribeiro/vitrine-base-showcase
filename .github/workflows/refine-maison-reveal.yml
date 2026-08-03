@@ -26,7 +26,27 @@ jobs:
           node-version: 22
 
       - run: npm install --no-audit --no-fund
-      - run: python scripts/refine-maison-reveal.py
+
+      - name: Make test replacement deterministic
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("scripts/refine-maison-reveal.py")
+          content = path.read_text()
+          start = content.index("test, count = re.subn(")
+          end = content.index("test_path.write_text(test)", start)
+          exact = '''block_start = test.index(
+              '  if (scenario.mobile) {',
+              test.index('const targetBox = await target.boundingBox();'),
+          )
+          block_end = test.index('\n\n  return metrics;', block_start)
+          test = test[:block_start] + replacement + test[block_end:]
+
+          '''
+          path.write_text(content[:start] + exact + content[end:])
+          PY
+          python scripts/refine-maison-reveal.py
 
       - name: Format and validate
         run: |
