@@ -175,11 +175,125 @@
   .store-theme-barbearia main article:nth-of-type(3n) {
     animation-delay: -3.4s;
   }
+
+  /* Barber Noir: os trilhos permanecem horizontais de propósito, mas o documento
+     não cria overflow lateral e o gesto mantém o scroll vertical disponível. */
+  .store-theme-barbearia main [class*="snap-x"][class*="overflow-x-auto"] {
+    overscroll-behavior-inline: contain;
+    scroll-padding-inline: 1.5rem;
+    scrollbar-width: none;
+    touch-action: pan-x pan-y;
+  }
+
+  .store-theme-barbearia main [class*="snap-x"][class*="overflow-x-auto"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Cada serviço emite um pulso ambiente defasado. A interação fica aparente
+     durante o scroll mesmo quando nenhum item recebeu clique ou long press. */
+  .store-theme-barbearia main ul[class*="divide-y"] > li > a::before {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(90deg, rgb(245 158 11 / 14%), transparent 68%);
+    box-shadow: inset 1px 0 0 rgb(252 211 77 / 38%);
+    opacity: 0.06;
+    animation: barber-service-ambient 6.8s ease-in-out infinite;
+  }
+
+  .store-theme-barbearia main ul[class*="divide-y"] > li:nth-child(2n) > a::before {
+    animation-delay: -2.2s;
+  }
+
+  .store-theme-barbearia main ul[class*="divide-y"] > li:nth-child(3n) > a::before {
+    animation-delay: -4.4s;
+  }
+
+  /* O estado ativo existente continua mais forte que o pulso ambiente. */
+  .store-theme-barbearia main li[data-active="true"] > a {
+    background: linear-gradient(90deg, rgb(245 158 11 / 12%), rgb(23 23 23 / 34%) 58%, transparent);
+    box-shadow:
+      inset 2px 0 0 rgb(252 211 77 / 72%),
+      0 18px 46px -34px rgb(245 158 11 / 78%);
+  }
+
+  .store-theme-barbearia main li[data-active="true"] h3 {
+    color: rgb(254 243 199);
+    text-shadow: 0 0 22px rgb(245 158 11 / 24%);
+  }
+
+  /* Ritual e atmosfera: o IntersectionObserver reforça o card visível. */
+  .store-theme-barbearia main [data-lit="true"] {
+    border-color: rgb(252 211 77 / 46%) !important;
+    box-shadow:
+      0 18px 48px -34px rgb(245 158 11 / 80%),
+      inset 0 0 0 1px rgb(252 211 77 / 8%);
+  }
+
+  .store-theme-barbearia main figure[data-lit="true"] figcaption {
+    color: rgb(254 243 199);
+  }
+
+  /* Atmosfera: todos os quadros respiram e recebem varredura automaticamente.
+     O data-lit apenas aumenta a intensidade do quadro central. */
+  .store-theme-barbearia main figure[class*="snap-center"] {
+    animation: barber-atmosphere-ambient 7.2s ease-in-out infinite;
+  }
+
+  .store-theme-barbearia main figure[class*="snap-center"]:nth-child(2n) {
+    animation-delay: -2.4s;
+  }
+
+  .store-theme-barbearia main figure[class*="snap-center"]:nth-child(3n) {
+    animation-delay: -4.8s;
+  }
+
+  .store-theme-barbearia main figure[class*="snap-center"] img {
+    animation: barber-atmosphere-image 7.2s ease-in-out infinite;
+  }
+
+  .store-theme-barbearia main figure[class*="snap-center"]::after {
+    position: absolute;
+    inset: -55% -120%;
+    z-index: 2;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(
+      112deg,
+      transparent 43%,
+      rgb(252 211 77 / 13%) 49%,
+      rgb(255 255 255 / 8%) 51%,
+      transparent 57%
+    );
+    animation: barber-mobile-scan 5.4s ease-in-out infinite;
+  }
+
+  /* Produtos da casa: a borda ambiente fica visível durante o scroll, não só no toque. */
+  .store-theme-barbearia .premium-product-card[data-in-view="true"] .premium-product-frame {
+    border-color: rgb(252 211 77 / 34%);
+    box-shadow: 0 20px 50px -34px rgb(245 158 11 / 72%);
+  }
 }
 
 @media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
   .premium-product-card .premium-product-frame {
     animation-play-state: running !important;
+  }
+
+  /* O glow dos produtos Barber pulsa de forma automática e discreta. O estado
+     in-view continua aumentando a intensidade, mas não é pré-requisito visual. */
+  .store-theme-barbearia .premium-product-card .product-attention-glow {
+    animation: barber-product-ambient 6.6s ease-in-out infinite;
+  }
+
+  .store-theme-barbearia .premium-product-card:nth-child(2n) .product-attention-glow {
+    animation-delay: -2.2s;
+  }
+
+  .store-theme-barbearia .premium-product-card:nth-child(3n) .product-attention-glow {
+    animation-delay: -4.4s;
   }
 }
 
@@ -209,6 +323,77 @@
   }
 }
 
+@keyframes barber-service-ambient {
+  0%,
+  100% {
+    opacity: 0.04;
+    filter: brightness(0.96);
+  }
+  42%,
+  58% {
+    opacity: 0.28;
+    filter: brightness(1.08);
+  }
+}
+
+@keyframes barber-atmosphere-ambient {
+  0%,
+  100% {
+    border-color: rgb(252 211 77 / 16%);
+    box-shadow: 0 12px 34px -30px rgb(245 158 11 / 36%);
+  }
+  46%,
+  58% {
+    border-color: rgb(252 211 77 / 42%);
+    box-shadow:
+      0 22px 52px -30px rgb(245 158 11 / 76%),
+      inset 0 0 0 1px rgb(252 211 77 / 7%);
+  }
+}
+
+@keyframes barber-atmosphere-image {
+  0%,
+  100% {
+    filter: grayscale(0.82) brightness(0.92);
+  }
+  46%,
+  58% {
+    filter: grayscale(0.12) brightness(1.05) saturate(1.06);
+  }
+}
+
+@keyframes barber-product-ambient {
+  0%,
+  100% {
+    opacity: 0.07;
+    filter: brightness(0.94);
+  }
+  44%,
+  58% {
+    opacity: 0.2;
+    filter: brightness(1.08);
+  }
+}
+
+@keyframes barber-mobile-scan {
+  0%,
+  18% {
+    transform: translate3d(-28%, 0, 0);
+    opacity: 0;
+  }
+  32% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 0.8;
+  }
+  86%,
+  100% {
+    transform: translate3d(28%, 0, 0);
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-testid="fashion-chapter"] *,
   [data-testid="fashion-atelier"] * {
@@ -217,7 +402,12 @@
 
   .store-theme-moda main article,
   .store-theme-barbearia main article,
-  [data-ambient-card] {
+  [data-ambient-card],
+  .store-theme-barbearia main figure[class*="snap-center"],
+  .store-theme-barbearia main figure[class*="snap-center"] img,
+  .store-theme-barbearia main figure[class*="snap-center"]::after,
+  .store-theme-barbearia main ul[class*="divide-y"] > li > a::before,
+  .store-theme-barbearia .premium-product-card .product-attention-glow {
     animation: none !important;
   }
 }
