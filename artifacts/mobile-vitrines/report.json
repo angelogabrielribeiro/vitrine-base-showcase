@@ -1,0 +1,143 @@
+{
+  "mobile": [
+    {
+      "label": "home-392x850",
+      "overflow": {
+        "viewport": 392,
+        "document": 392,
+        "body": 392
+      },
+      "menu": {
+        "tested": false
+      },
+      "motion": true,
+      "bottom": {
+        "footer": true,
+        "blocked": false,
+        "fixed": 0
+      },
+      "status": "passed"
+    }
+  ],
+  "desktop": [
+    {
+      "label": "home-desktop",
+      "overflow": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440
+      },
+      "status": "passed"
+    },
+    {
+      "label": "maison-desktop",
+      "overflow": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440
+      },
+      "status": "passed"
+    },
+    {
+      "label": "barber-desktop",
+      "overflow": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440
+      },
+      "status": "passed"
+    },
+    {
+      "label": "brasa-desktop",
+      "overflow": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440
+      },
+      "status": "passed"
+    },
+    {
+      "label": "novacore-desktop",
+      "overflow": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440
+      },
+      "status": "passed"
+    }
+  ],
+  "errors": [
+    {
+      "label": "home-360x800",
+      "message": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"domcontentloaded\"\n",
+      "runtime": []
+    },
+    {
+      "label": "maison-360x800",
+      "message": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/demo/moda\nCall log:\n  - navigating to \"http://localhost:8080/demo/moda\", waiting until \"domcontentloaded\"\n",
+      "runtime": []
+    },
+    {
+      "label": "barber-360x800",
+      "message": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/demo/barbearia\nCall log:\n  - navigating to \"http://localhost:8080/demo/barbearia\", waiting until \"domcontentloaded\"\n",
+      "runtime": []
+    },
+    {
+      "label": "brasa-360x800",
+      "message": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/demo/restaurante\nCall log:\n  - navigating to \"http://localhost:8080/demo/restaurante\", waiting until \"domcontentloaded\"\n",
+      "runtime": []
+    },
+    {
+      "label": "novacore-360x800",
+      "message": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/demo/eletronicos\nCall log:\n  - navigating to \"http://localhost:8080/demo/eletronicos\", waiting until \"domcontentloaded\"\n",
+      "runtime": []
+    },
+    {
+      "label": "maison-392x850",
+      "message": "maison-392x850: WhatsApp sem aria-hidden no menu aberto",
+      "runtime": [
+        "console: A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\n%s%s https://react.dev/link/hydration-mismatch \n\n  ...\n    <CatchBoundary getResetKey={function getResetKey} onCatch={function onCatch} errorComponent={function errorComponent}>\n      <CatchBoundaryImpl getResetKey={function getResetKey} onCatch={function onCatch}>\n        <MatchInnerImpl matchId=\"/demo/$sto...\">\n          <Lazy>\n            <StoreLayout>\n              <MobileMenuProvider data-tsd-source=\"/src/route...\">\n                <div className=\"store-them...\" data-tsd-source=\"/src/route...\">\n                  <StoreThemeStyle>\n                  <StoreCursorShader>\n                  <DemoBanner>\n                  <StoreHeader store={{id:\"moda\", ...}} data-tsd-source=\"/src/route...\">\n                    <header className={\"sticky t...\"} data-tsd-source=\"/src/compo...\">\n                      <div className=\"mx-auto fl...\" data-tsd-source=\"/src/compo...\">\n                        <a>\n                        <nav>\n                        <div className=\"ml-auto fl...\" data-tsd-source=\"/src/compo...\">\n                          <form onSubmit={function submit} className=\"hidden md:...\" data-tsd-source=\"/src/compo...\">\n                            <div className=\"relative\" data-tsd-source=\"/src/compo...\">\n                              <Search>\n                              <_c value=\"\" onChange={function onChange} placeholder=\"Buscar\" className=\"h-9 w-56 pl-8\" ...>\n                                <input\n                                  type={undefined}\n                                  className=\"flex rounded-md border border-input bg-transparent px-3 py-1 text-base sh...\"\n                                  ref={null}\n                                  value=\"\"\n                                  onChange={function onChange}\n                                  placeholder=\"Buscar\"\n                                  aria-label=\"Buscar\"\n                                  data-tsd-source=\"/src/components/storefront/store-header.tsx:96:15\"\n-                                 style={{caret-color:\"transparent\"}}\n                                >\n                          ...\n                  ...\n"
+      ]
+    },
+    {
+      "label": "barber-392x850",
+      "message": "barber-392x850: WhatsApp sem aria-hidden no menu aberto",
+      "runtime": []
+    },
+    {
+      "label": "brasa-392x850",
+      "message": "brasa-392x850: WhatsApp sem aria-hidden no menu aberto",
+      "runtime": []
+    },
+    {
+      "label": "novacore-392x850",
+      "message": "novacore-392x850: WhatsApp sem aria-hidden no menu aberto",
+      "runtime": []
+    },
+    {
+      "label": "home-430x932",
+      "message": "home-430x932: conteúdo final coberto por navegação fixa",
+      "runtime": []
+    },
+    {
+      "label": "maison-430x932",
+      "message": "maison-430x932: WhatsApp sem aria-hidden no menu aberto",
+      "runtime": []
+    },
+    {
+      "label": "barber-430x932",
+      "message": "barber-430x932: WhatsApp sem aria-hidden no menu aberto",
+      "runtime": []
+    },
+    {
+      "label": "brasa-430x932",
+      "message": "brasa-430x932: WhatsApp sem aria-hidden no menu aberto",
+      "runtime": []
+    },
+    {
+      "label": "novacore-430x932",
+      "message": "novacore-430x932: WhatsApp sem aria-hidden no menu aberto",
+      "runtime": []
+    }
+  ]
+}

@@ -102,8 +102,7 @@
   }
 
   /* NovaCore: reduz a órbita, não o conteúdo; painel permanece em fluxo abaixo da cena. */
-  [class*="min-h-[280px]"][class*="perspective:1700px"]
-    > [class*="transform-style:preserve-3d"] {
+  [class*="min-h-[280px]"][class*="perspective:1700px"] > [class*="transform-style:preserve-3d"] {
     scale: 0.62;
     transform-origin: center;
   }
@@ -112,8 +111,7 @@
     min-height: 430px !important;
   }
 
-  [class*="min-h-[620px]"][class*="perspective:1800px"]
-    > [class*="transform-style:preserve-3d"] {
+  [class*="min-h-[620px]"][class*="perspective:1800px"] > [class*="transform-style:preserve-3d"] {
     inset: 16% 11% !important;
   }
 
@@ -128,11 +126,65 @@
   main {
     scroll-padding-bottom: 7.5rem;
   }
+
+  /* Movimento ambiente automático no touch: luz e borda respirando, sem transform
+     (o transform continua livre para os reveals do Framer Motion) e sem depender de toque. */
+  .store-theme-moda main article,
+  .store-theme-moda [data-ambient-card] {
+    animation: vitrine-ambient-wine 6.4s ease-in-out infinite alternate;
+  }
+
+  .store-theme-barbearia main article,
+  .store-theme-barbearia [data-ambient-card] {
+    animation: vitrine-ambient-gold 7.1s ease-in-out infinite alternate;
+  }
+
+  .store-theme-moda main article:nth-of-type(2n),
+  .store-theme-barbearia main article:nth-of-type(2n) {
+    animation-delay: -1.7s;
+  }
+
+  .store-theme-moda main article:nth-of-type(3n),
+  .store-theme-barbearia main article:nth-of-type(3n) {
+    animation-delay: -3.4s;
+  }
+}
+
+@keyframes vitrine-ambient-wine {
+  from {
+    box-shadow: 0 10px 26px -20px rgb(122 32 58 / 34%);
+    border-color: rgb(212 154 167 / 16%);
+    filter: brightness(1);
+  }
+  to {
+    box-shadow: 0 20px 46px -18px rgb(176 92 112 / 38%);
+    border-color: rgb(212 154 167 / 34%);
+    filter: brightness(1.045);
+  }
+}
+
+@keyframes vitrine-ambient-gold {
+  from {
+    box-shadow: 0 10px 26px -20px rgb(120 92 24 / 30%);
+    border-color: rgb(244 200 102 / 14%);
+    filter: brightness(1);
+  }
+  to {
+    box-shadow: 0 20px 46px -18px rgb(214 172 84 / 34%);
+    border-color: rgb(244 200 102 / 32%);
+    filter: brightness(1.04);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   [data-testid="fashion-chapter"] *,
   [data-testid="fashion-atelier"] * {
     scroll-behavior: auto !important;
+  }
+
+  .store-theme-moda main article,
+  .store-theme-barbearia main article,
+  [data-ambient-card] {
+    animation: none !important;
   }
 }

@@ -178,9 +178,9 @@ async function assertAutomaticMotion(page, label) {
       const next = after[index];
       return Boolean(
         next &&
-          (item.transform !== next.transform ||
-            item.boxShadow !== next.boxShadow ||
-            item.opacity !== next.opacity),
+        (item.transform !== next.transform ||
+          item.boxShadow !== next.boxShadow ||
+          item.opacity !== next.opacity),
       );
     });
     if (runningCss || changed) {
@@ -197,10 +197,7 @@ async function assertNovaCoreCanvas(page, label) {
   const height = await page.evaluate(() => document.documentElement.scrollHeight);
   let visibleCanvas = 0;
   for (let ratio = 0; ratio <= 1; ratio += 0.1) {
-    await page.evaluate(
-      (y) => window.scrollTo({ top: y, behavior: "instant" }),
-      height * ratio,
-    );
+    await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), height * ratio);
     await page.waitForTimeout(320);
     visibleCanvas = await page.locator("canvas").evaluateAll(
       (canvases) =>
@@ -228,7 +225,14 @@ async function assertCatalogComposition(page, label) {
   const context = page.getByTestId("catalog-feature-context");
   if (!(await context.count())) return { tested: false };
   const contextBox = await context.boundingBox();
-  const heading = page.getByTestId("catalog-expansion-hero").locator("h1").first();
+  const hero = page.getByTestId("catalog-expansion-hero");
+  const heroBox = await hero.boundingBox();
+  assert(heroBox, `${label}: hero de catálogo sem área medível`);
+  assert(
+    heroBox.height <= 900,
+    `${label}: hero de catálogo alto demais (${Math.round(heroBox.height)}px)`,
+  );
+  const heading = hero.locator("h1").first();
   const headingBox = await heading.boundingBox();
   assert(contextBox && headingBox, `${label}: composição do destaque não pôde ser medida`);
   const overlap = Math.max(
@@ -237,7 +241,7 @@ async function assertCatalogComposition(page, label) {
       Math.max(contextBox.y, headingBox.y),
   );
   assert(overlap <= 2, `${label}: painel de produto cobre o título (${overlap}px)`);
-  return { tested: true, overlap };
+  return { tested: true, overlap, heroHeight: Math.round(heroBox.height) };
 }
 
 async function assertHomeShowroom(page, label) {
@@ -246,7 +250,10 @@ async function assertHomeShowroom(page, label) {
   const firstUrl = page.url();
   await cards.nth(1).dispatchEvent("click");
   await page.waitForTimeout(650);
-  assert(page.url() === firstUrl, `${label}: primeiro toque no card inativo navegou antes de focar`);
+  assert(
+    page.url() === firstUrl,
+    `${label}: primeiro toque no card inativo navegou antes de focar`,
+  );
   assert(
     (await cards.nth(1).getAttribute("data-active")) === "true",
     `${label}: card tocado não foi ativado`,
@@ -270,7 +277,11 @@ async function assertBottomContentAccessible(page, label) {
     const x = Math.min(innerWidth - 8, Math.max(8, rect.left + rect.width / 2));
     const y = Math.min(innerHeight - 8, Math.max(8, rect.top + Math.min(rect.height / 2, 24)));
     const top = document.elementFromPoint(x, y);
-    return { footer: true, blocked: Boolean(top && !footer.contains(top)), fixed: fixedBottom.length };
+    return {
+      footer: true,
+      blocked: Boolean(top && !footer.contains(top)),
+      fixed: fixedBottom.length,
+    };
   });
   assert(!result.blocked, `${label}: conteúdo final coberto por navegação fixa`);
   return result;
@@ -278,8 +289,7 @@ async function assertBottomContentAccessible(page, label) {
 
 async function runMobile(browser, viewport) {
   for (const [name, route] of routes) {
-    const recordVideo =
-      viewport.name === "392x850" ? { dir: videoDir, size: viewport } : undefined;
+    const recordVideo = viewport.name === "392x850" ? { dir: videoDir, size: viewport } : undefined;
     const context = await browser.newContext({ viewport, recordVideo });
     const page = await context.newPage();
     const errors = [];
@@ -298,8 +308,7 @@ async function runMobile(browser, viewport) {
       await settle(page);
       const overflow = await assertNoHorizontalOverflow(page, label);
       await assertHeadingsInsideViewport(page, label);
-      const menu =
-        name === "home" ? { tested: false } : await assertMenuHidesWhatsapp(page, label);
+      const menu = name === "home" ? { tested: false } : await assertMenuHidesWhatsapp(page, label);
       const motion = await assertAutomaticMotion(page, label);
       if (name === "home") await assertHomeShowroom(page, label);
       const canvas = name === "novacore" ? await assertNovaCoreCanvas(page, label) : undefined;
@@ -369,7 +378,9 @@ async function runDesktop(browser) {
 const browser = await chromium.launch({
   headless: true,
   args: [
-    "--use-angle=swiftshader-webgl",
+    "--use-gl=angle",
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader",
     "--enable-webgl",
     "--ignore-gpu-blocklist",
     "--disable-dev-shm-usage",

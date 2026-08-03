@@ -44,6 +44,21 @@ function collectRuntimeErrors(page, label) {
   });
 }
 
+async function clipShot(page, locator, file) {
+  await locator.scrollIntoViewIfNeeded();
+  const box = await locator.boundingBox();
+  if (!box) throw new Error(`Sem bounding box para ${file}`);
+  const viewport = page.viewportSize() ?? { width: 1440, height: 900 };
+  const clip = {
+    x: Math.max(0, box.x),
+    y: Math.max(0, box.y),
+    width: Math.min(box.width, viewport.width - Math.max(0, box.x)),
+    height: Math.min(box.height, viewport.height - Math.max(0, box.y)),
+  };
+  // Elementos continuamente animados nunca estabilizam: usar page.screenshot com clip.
+  await page.screenshot({ path: file, clip, animations: "disabled" });
+}
+
 async function sectionFromHeading(page, name) {
   const heading = page.getByRole("heading", { name }).first();
   await heading.waitFor({ state: "attached", timeout: 30_000 });
@@ -87,12 +102,18 @@ async function assertHeadingsInside(page, label) {
 async function waitForCanvas(page, label) {
   const canvas = page.locator("canvas").first();
   await canvas.waitFor({ state: "visible", timeout: 30_000 });
-  const visible = await page.locator("canvas").evaluateAll((canvases) =>
-    canvases.filter((item) => {
-      const rect = item.getBoundingClientRect();
-      const style = getComputedStyle(item);
-      return rect.width > 20 && rect.height > 20 && style.display !== "none" && Number(style.opacity) > 0.05;
-    }).length,
+  const visible = await page.locator("canvas").evaluateAll(
+    (canvases) =>
+      canvases.filter((item) => {
+        const rect = item.getBoundingClientRect();
+        const style = getComputedStyle(item);
+        return (
+          rect.width > 20 &&
+          rect.height > 20 &&
+          style.display !== "none" &&
+          Number(style.opacity) > 0.05
+        );
+      }).length,
   );
   assert(visible >= 1, `${label}: nenhum canvas WebGL visível`);
   return visible;
@@ -117,7 +138,9 @@ async function scrollJourney(page, step, pause) {
     await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), y);
     await page.waitForTimeout(pause);
   }
-  await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
+  await page.evaluate(() =>
+    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }),
+  );
   await page.waitForTimeout(550);
 }
 
@@ -166,10 +189,10 @@ async function validateDesktop(browser) {
     await assertHeadingsInside(page, "desktop");
 
     const hero = await sectionFromHeading(page, /The future\s*is not flat/i);
-    await hero.screenshot({ path: path.join(output, "desktop-01-hero.png") });
+    await clipShot(page, hero, path.join(output, "desktop-01-hero.png"));
     await page.mouse.move(1120, 390);
     await page.waitForTimeout(650);
-    await hero.screenshot({ path: path.join(output, "desktop-02-hero-reactive.png") });
+    await clipShot(page, hero, path.join(output, "desktop-02-hero-reactive.png"));
 
     const story = page.getByTestId("electronics-circuit-story");
     const metrics = await story.evaluate((element) => ({
@@ -177,11 +200,18 @@ async function validateDesktop(browser) {
       height: element.getBoundingClientRect().height,
     }));
     await page.evaluate(
-      ({ top, height }) => window.scrollTo({ top: top + Math.max(0, height - innerHeight) * 0.52, behavior: "instant" }),
+      ({ top, height }) =>
+        window.scrollTo({
+          top: top + Math.max(0, height - innerHeight) * 0.52,
+          behavior: "instant",
+        }),
       metrics,
     );
     await page.waitForTimeout(900);
-    await page.screenshot({ path: path.join(output, "desktop-03-story.png") });
+    await page.screenshot({
+      path: path.join(output, "desktop-03-story.png"),
+      animations: "disabled",
+    });
 
     const categories = await sectionFromHeading(page, /Escolha uma constelação/i);
     await categories.scrollIntoViewIfNeeded();
@@ -197,7 +227,10 @@ async function validateDesktop(browser) {
     );
     assert(firstActive !== nextActive, "Seleção de categoria não alterou a cena");
     const borderTrace = await assertBorderTrace(page, "desktop");
-    await page.screenshot({ path: path.join(output, "desktop-04-category-orbits.png") });
+    await page.screenshot({
+      path: path.join(output, "desktop-04-category-orbits.png"),
+      animations: "disabled",
+    });
 
     const showroom = page.locator("#showroom");
     await showroom.scrollIntoViewIfNeeded();
@@ -211,7 +244,10 @@ async function validateDesktop(browser) {
     await page.waitForTimeout(750);
     const afterProduct = (await heading.textContent())?.trim();
     assert(beforeProduct !== afterProduct, "Showroom não trocou o produto central");
-    await page.screenshot({ path: path.join(output, "desktop-05-showroom.png") });
+    await page.screenshot({
+      path: path.join(output, "desktop-05-showroom.png"),
+      animations: "disabled",
+    });
 
     const systems = await sectionFromHeading(page, /Hardware que responde/i);
     await systems.scrollIntoViewIfNeeded();
@@ -224,13 +260,22 @@ async function validateDesktop(browser) {
     assert(cardBox, "Card sem área interativa");
     await page.mouse.move(cardBox.x + cardBox.width * 0.78, cardBox.y + cardBox.height * 0.32);
     await page.waitForTimeout(600);
-    const cardTransform = await firstCard.evaluate((element) => getComputedStyle(element).transform);
+    const cardTransform = await firstCard.evaluate(
+      (element) => getComputedStyle(element).transform,
+    );
     assert(cardTransform !== "none", "Card desktop não reage em profundidade");
-    await page.screenshot({ path: path.join(output, "desktop-06-product-cards.png") });
+    await page.screenshot({
+      path: path.join(output, "desktop-06-product-cards.png"),
+      animations: "disabled",
+    });
 
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
     await scrollJourney(page, 520, 75);
-    await page.screenshot({ path: path.join(output, "desktop-07-full.png"), fullPage: true });
+    await page.screenshot({
+      path: path.join(output, "desktop-07-full.png"),
+      fullPage: true,
+      animations: "disabled",
+    });
 
     report.desktop = {
       quality,
@@ -271,13 +316,16 @@ async function validateMobile(browser) {
     await assertHeadingsInside(page, "mobile");
 
     const hero = await sectionFromHeading(page, /The future\s*is not flat/i);
-    await hero.screenshot({ path: path.join(output, "mobile-01-hero.png") });
+    await clipShot(page, hero, path.join(output, "mobile-01-hero.png"));
 
     const story = page.getByTestId("electronics-circuit-story");
     await story.scrollIntoViewIfNeeded();
     await page.waitForTimeout(650);
     assert((await story.locator(".sticky").count()) === 0, "Story mobile manteve sticky pesado");
-    await page.screenshot({ path: path.join(output, "mobile-02-story.png") });
+    await page.screenshot({
+      path: path.join(output, "mobile-02-story.png"),
+      animations: "disabled",
+    });
 
     const categories = await sectionFromHeading(page, /Escolha uma constelação/i);
     await categories.scrollIntoViewIfNeeded();
@@ -294,18 +342,28 @@ async function validateMobile(browser) {
     );
     assert(beforeActive !== afterActive, "Categoria mobile não altera a cena");
     const borderTrace = await assertBorderTrace(page, "mobile");
-    await page.screenshot({ path: path.join(output, "mobile-03-categories.png") });
+    await page.screenshot({
+      path: path.join(output, "mobile-03-categories.png"),
+      animations: "disabled",
+    });
 
     const showroom = page.locator("#showroom");
     await showroom.scrollIntoViewIfNeeded();
     await page.waitForTimeout(650);
-    await page.screenshot({ path: path.join(output, "mobile-04-showroom.png") });
+    await page.screenshot({
+      path: path.join(output, "mobile-04-showroom.png"),
+      animations: "disabled",
+    });
 
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
     await scrollJourney(page, 360, 65);
     await assertNoOverflow(page, "mobile-after-scroll");
     await assertHeadingsInside(page, "mobile-after-scroll");
-    await page.screenshot({ path: path.join(output, "mobile-05-full.png"), fullPage: true });
+    await page.screenshot({
+      path: path.join(output, "mobile-05-full.png"),
+      fullPage: true,
+      animations: "disabled",
+    });
 
     report.mobile = {
       quality,
@@ -339,7 +397,7 @@ try {
   report.status = "passed";
 } catch (error) {
   report.status = "failed";
-  report.failure = error instanceof Error ? error.stack ?? error.message : String(error);
+  report.failure = error instanceof Error ? (error.stack ?? error.message) : String(error);
   process.exitCode = 1;
 } finally {
   report.finishedAt = new Date().toISOString();
