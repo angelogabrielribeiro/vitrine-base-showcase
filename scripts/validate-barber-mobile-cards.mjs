@@ -29,26 +29,6 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-async function waitForLit(locator, attribute) {
-  await locator.scrollIntoViewIfNeeded();
-  await locator.page().waitForTimeout(850);
-  await locator.page().waitForFunction(
-    ({ selector, attribute }) =>
-      [...document.querySelectorAll(selector)].some(
-        (element) => element.getAttribute(attribute) === "true",
-      ),
-    {
-      selector: await locator.evaluate((element) => {
-        const marker = `stage-${Math.random().toString(36).slice(2)}`;
-        element.setAttribute("data-stage-marker", marker);
-        return `[data-stage-marker="${marker}"]`;
-      }),
-      attribute,
-    },
-    { timeout: 5_000 },
-  );
-}
-
 try {
   for (const viewport of viewports) {
     const label = `barber-${viewport.name}`;
