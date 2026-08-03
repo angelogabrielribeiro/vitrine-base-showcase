@@ -7,13 +7,19 @@ on:
     paths:
       - "scripts/apply-maison-stage.py"
       - ".github/workflows/apply-maison-stage.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "scripts/apply-maison-stage.py"
+      - ".github/workflows/apply-maison-stage.yml"
 
 permissions:
   contents: write
 
 jobs:
   apply:
-    if: ${{ !contains(github.event.head_commit.message, '[maison patch]') }}
+    if: ${{ github.event_name == 'pull_request' || !contains(github.event.head_commit.message, '[maison patch]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -57,5 +63,3 @@ jobs:
             src/mobile-vitrine-overrides.css
           git commit -m "Corrige scroll e composição da Maison Belle [maison patch]"
           git push origin HEAD:fix/maison-scroll-layout-stage
-
-# trigger: 2026-08-03T16:18-03:00
