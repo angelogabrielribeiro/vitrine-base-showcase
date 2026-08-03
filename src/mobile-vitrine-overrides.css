@@ -117,14 +117,33 @@
 
   /* Evita nomes técnicos e títulos editoriais ultrapassando 360–430 px. */
   [data-testid="electronics-circuit-story"] h2,
-  [data-testid="electronics-circuit-story"] h3 {
+  [data-testid="electronics-circuit-story"] h3,
+  .premium-product-card h3 {
     max-width: 100% !important;
     overflow-wrap: anywhere;
+  }
+
+  .premium-product-card h3 {
+    padding-left: 0.25rem;
   }
 
   /* Cards e painéis devem manter distância da navegação inferior fixa. */
   main {
     scroll-padding-bottom: 7.5rem;
+  }
+
+  body footer {
+    position: relative;
+    z-index: 60;
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+  }
+
+  /* Fallback imediato entre o toque e o commit do React. */
+  html[data-mobile-menu-open="true"] a[data-whatsapp-fab] {
+    visibility: hidden !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+    transform: scale(0.9) !important;
   }
 
   /* Movimento ambiente automático no touch: luz e borda respirando, sem transform
@@ -147,6 +166,12 @@
   .store-theme-moda main article:nth-of-type(3n),
   .store-theme-barbearia main article:nth-of-type(3n) {
     animation-delay: -3.4s;
+  }
+}
+
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  .premium-product-card .premium-product-frame {
+    animation-play-state: running !important;
   }
 }
 

@@ -94,11 +94,13 @@ export function StoreHeader({ store }: { store: StoreConfig }) {
             <div className="relative">
               <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
+                suppressHydrationWarning
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Buscar"
                 className="h-9 w-56 pl-8"
                 aria-label="Buscar"
+                style={{ caretColor: "auto" }}
               />
             </div>
           </form>
@@ -161,10 +163,12 @@ export function StoreHeader({ store }: { store: StoreConfig }) {
             <div className="relative">
               <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
+                suppressHydrationWarning
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Buscar produtos"
                 className="pl-8"
+                style={{ caretColor: "auto" }}
                 autoFocus
               />
             </div>
