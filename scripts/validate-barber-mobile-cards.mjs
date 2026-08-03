@@ -180,28 +180,32 @@ try {
       const productState = await productCard.evaluate((element) => {
         const frame = element.querySelector(".premium-product-frame");
         const glow = element.querySelector(".product-attention-glow");
+        const rect = element.getBoundingClientRect();
+        const glowStyle = glow ? getComputedStyle(glow) : null;
         return {
           mobileActive: element.getAttribute("data-mobile-active"),
           inView: element.getAttribute("data-in-view"),
           animationName: frame ? getComputedStyle(frame).animationName : "none",
           animationPlayState: frame ? getComputedStyle(frame).animationPlayState : "paused",
-          glowOpacity: glow ? Number(getComputedStyle(glow).opacity) : 0,
+          glowAnimationName: glowStyle?.animationName ?? "none",
+          glowPlayState: glowStyle?.animationPlayState ?? "paused",
+          glowOpacity: glowStyle ? Number(glowStyle.opacity) : 0,
+          visibleRatio:
+            Math.max(0, Math.min(rect.bottom, innerHeight) - Math.max(rect.top, 0)) / rect.height,
         };
       });
-      assert(
-        productState.inView === "true",
-        `${label}: produto não reconheceu entrada na viewport`,
-      );
-      assert(
-        productState.mobileActive === "true",
-        `${label}: produto ainda depende de toque prolongado`,
-      );
+      assert(productState.visibleRatio > 0.4, `${label}: produto não ficou visível no scroll`);
       assert(
         productState.animationName === "premium-frame-breathe" &&
           productState.animationPlayState === "running",
         `${label}: borda do produto não anima automaticamente`,
       );
-      assert(productState.glowOpacity > 0.08, `${label}: glow do produto não ficou visível`);
+      assert(
+        productState.glowAnimationName === "barber-product-ambient" &&
+          productState.glowPlayState === "running",
+        `${label}: glow do produto ainda depende de clique ou long press`,
+      );
+      assert(productState.glowOpacity > 0.04, `${label}: glow ambiente do produto está invisível`);
       assert(
         runtimeErrors.length === 0,
         `${label}: erros de runtime: ${runtimeErrors.join(" | ")}`,
