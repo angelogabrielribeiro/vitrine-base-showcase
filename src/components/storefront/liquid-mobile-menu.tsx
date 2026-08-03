@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef } from "react";
 import {
   CalendarDays,
   Home,
@@ -25,34 +25,93 @@ export function LiquidMobileMenu({ store, hide = false }: { store: StoreConfig; 
   const panelId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
   const firstItemRef = useRef<HTMLAnchorElement>(null);
+  const previousPathname = useRef<string | null>(null);
   const { count } = useCart(store.slug);
   const hydrated = useHydrated();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  // Estado único e compartilhado: abrir/fechar já esconde/restaura o FAB do WhatsApp
-  // na mesma chamada, sem depender de efeito posterior.
   const { menuOpen: open, setMenuOpen: setOpen } = useMobileMenuState();
 
-  useEffect(() => () => setOpen(false), [setOpen]);
+  /**
+   * Atualiza o estado React e o estado visual do FAB na mesma chamada.
+   * O ajuste direto no DOM é um fallback transitório para o intervalo entre
+   * o evento de toque e o commit do React — os atributos finais continuam
+   * sendo controlados pelo componente WhatsappFab.
+   */
+  const updateOpen = useCallback(
+    (next: boolean) => {
+      setOpen(next);
+      if (typeof document === "undefined") return;
 
-  // Fecha ao navegar
+      const root = document.documentElement;
+      if (next) root.dataset.mobileMenuOpen = "true";
+      else delete root.dataset.mobileMenuOpen;
+
+      const fab = document.querySelector<HTMLAnchorElement>(
+        'a[data-whatsapp-fab][aria-label="Falar no WhatsApp"]',
+      );
+      if (!fab) return;
+
+      if (next) {
+        fab.setAttribute("aria-hidden", "true");
+        fab.setAttribute("tabindex", "-1");
+        fab.style.pointerEvents = "none";
+        fab.style.visibility = "hidden";
+        fab.style.opacity = "0";
+      } else {
+        fab.removeAttribute("aria-hidden");
+        fab.removeAttribute("tabindex");
+        fab.style.removeProperty("pointer-events");
+        fab.style.removeProperty("visibility");
+        fab.style.removeProperty("opacity");
+      }
+    },
+    [setOpen],
+  );
+
+  // Fecha apenas quando a rota realmente muda. O efeito inicial não disputa
+  // com o primeiro toque no botão em páginas que ainda estão hidratando.
   useEffect(() => {
-    setOpen(false);
-  }, [pathname, setOpen]);
+    if (previousPathname.current === null) {
+      previousPathname.current = pathname;
+      return;
+    }
+    if (previousPathname.current === pathname) return;
+    previousPathname.current = pathname;
+    updateOpen(false);
+  }, [pathname, updateOpen]);
 
-  // Escape + clique fora
+  useEffect(
+    () => () => {
+      if (typeof document === "undefined") return;
+      delete document.documentElement.dataset.mobileMenuOpen;
+      const fab = document.querySelector<HTMLAnchorElement>('a[data-whatsapp-fab]');
+      fab?.removeAttribute("aria-hidden");
+      fab?.removeAttribute("tabindex");
+      fab?.style.removeProperty("pointer-events");
+      fab?.style.removeProperty("visibility");
+      fab?.style.removeProperty("opacity");
+    },
+    [],
+  );
+
+  // Escape + toque/clique fora.
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    const onDown = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") updateOpen(false);
+    };
+    const onDown = (event: PointerEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        updateOpen(false);
+      }
     };
     document.addEventListener("keydown", onKey);
-    document.addEventListener("mousedown", onDown);
+    document.addEventListener("pointerdown", onDown);
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("pointerdown", onDown);
     };
-  }, [open, setOpen]);
+  }, [open, updateOpen]);
 
   useEffect(() => {
     if (open) firstItemRef.current?.focus();
@@ -68,6 +127,7 @@ export function LiquidMobileMenu({ store, hide = false }: { store: StoreConfig; 
   return (
     <div
       ref={containerRef}
+      data-mobile-menu-open={open ? "true" : "false"}
       className="fixed inset-x-0 bottom-4 z-50 mx-auto flex justify-center px-4 md:hidden print:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
@@ -95,7 +155,7 @@ export function LiquidMobileMenu({ store, hide = false }: { store: StoreConfig; 
                 type="button"
                 aria-expanded={false}
                 aria-controls={panelId}
-                onClick={() => setOpen(true)}
+                onClick={() => updateOpen(true)}
                 className="flex items-center gap-2 px-5 py-3 text-sm font-semibold"
               >
                 <span className="grid h-6 w-6 place-items-center rounded-full bg-primary-foreground/15">
@@ -109,7 +169,7 @@ export function LiquidMobileMenu({ store, hide = false }: { store: StoreConfig; 
               type="button"
               aria-expanded={false}
               aria-controls={panelId}
-              onClick={() => setOpen(true)}
+              onClick={() => updateOpen(true)}
               className="relative flex items-center gap-2 px-5 py-3 text-sm font-semibold"
             >
               <span className="grid h-6 w-6 place-items-center rounded-full bg-primary-foreground/15">
@@ -137,7 +197,7 @@ export function LiquidMobileMenu({ store, hide = false }: { store: StoreConfig; 
               <button
                 type="button"
                 aria-label="Fechar menu"
-                onClick={() => setOpen(false)}
+                onClick={() => updateOpen(false)}
                 className="grid h-8 w-8 place-items-center rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20"
               >
                 <X className="h-4 w-4" />
