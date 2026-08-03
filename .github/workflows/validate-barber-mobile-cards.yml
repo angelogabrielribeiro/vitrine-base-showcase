@@ -1,4 +1,4 @@
-# Final regression after correcting the ritual-card selector.
+# Clean final regression for automatic Barber Noir mobile interactions.
 name: Validate Barber mobile cards
 
 on:
