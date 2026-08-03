@@ -1,0 +1,81 @@
+# Validação final limpa da Etapa 1A da Maison Belle — mobile e desktop.
+name: Validate Maison scroll layout
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "src/components/storefront/fashion-storefront.tsx"
+      - "src/components/storefront/product-card-editorial.tsx"
+      - "src/components/storefront/store-cursor-shader.tsx"
+      - "src/mobile-vitrine-overrides.css"
+      - "scripts/validate-maison-scroll-layout.mjs"
+      - ".github/workflows/validate-maison-scroll-layout.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maison-scroll-layout-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.0-noble
+      options: --user 1001
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+
+      - name: Install dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npm install --no-save --no-audit --no-fund playwright@1.62.0
+
+      - name: Check and build
+        run: |
+          mkdir -p artifacts/maison-scroll-layout
+          npx prettier --check \
+            src/components/storefront/fashion-storefront.tsx \
+            src/components/storefront/product-card-editorial.tsx \
+            src/components/storefront/store-cursor-shader.tsx \
+            src/mobile-vitrine-overrides.css \
+            scripts/validate-maison-scroll-layout.mjs
+          npx eslint \
+            src/components/storefront/fashion-storefront.tsx \
+            src/components/storefront/product-card-editorial.tsx \
+            src/components/storefront/store-cursor-shader.tsx
+          node --check scripts/validate-maison-scroll-layout.mjs
+          npm run build
+
+      - name: Start preview server
+        run: |
+          npm run dev -- --host 0.0.0.0 --port 4173 > artifacts/maison-scroll-layout/server.log 2>&1 &
+          for attempt in $(seq 1 90); do
+            if curl --fail --silent http://127.0.0.1:4173 > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat artifacts/maison-scroll-layout/server.log
+          exit 1
+
+      - name: Run focused Maison regression
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: node scripts/validate-maison-scroll-layout.mjs
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maison-scroll-layout-${{ github.run_id }}
+          path: artifacts/maison-scroll-layout
+          if-no-files-found: warn
+          retention-days: 14
