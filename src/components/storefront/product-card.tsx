@@ -76,14 +76,14 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
     !reduceMotion &&
     typeof window !== "undefined" &&
     window.matchMedia?.("(hover: hover) and (pointer: fine)").matches;
-  const activeVisual =
-    hovered ||
-    (!reduceMotion &&
-      capabilities.hydrated &&
-      capabilities.coarsePointer &&
-      capabilities.quality !== "static" &&
-      capabilities.quality !== "economy" &&
-      inView);
+  const allowEconomyAmbient = niche === "barber";
+  const ambientInView =
+    capabilities.hydrated &&
+    capabilities.coarsePointer &&
+    capabilities.quality !== "static" &&
+    (capabilities.quality !== "economy" || allowEconomyAmbient) &&
+    inView;
+  const activeVisual = hovered || (!reduceMotion && ambientInView);
 
   const handleMove = (event: MouseEvent<HTMLAnchorElement>) => {
     if (!canTilt || !ref.current) return;
@@ -116,7 +116,7 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
       onBlur={reset}
       data-mobile-active={String(activeVisual && capabilities.coarsePointer)}
       data-niche={niche}
-      data-in-view={String(inView && capabilities.quality !== "economy")}
+      data-in-view={String(ambientInView)}
       className={`premium-product-card group relative block ${copy.meta}`}
       style={{ transform }}
     >
