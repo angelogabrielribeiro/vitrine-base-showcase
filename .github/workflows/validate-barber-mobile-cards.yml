@@ -1,151 +1,74 @@
-name: Apply final Barber product ambient fallback
+# Clean final regression for automatic Barber Noir mobile interactions.
+name: Validate Barber mobile cards
 
 on:
   pull_request:
     branches:
       - main
     paths:
+      - "src/mobile-vitrine-overrides.css"
+      - "src/components/storefront/product-card.tsx"
+      - "scripts/validate-barber-mobile-cards.mjs"
       - ".github/workflows/validate-barber-mobile-cards.yml"
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: barber-mobile-cards-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  patch:
-    if: github.event.pull_request.head.ref == 'fix/barber-mobile-cards-stage'
+  validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.0-noble
+      options: --user 1001
 
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
-      - name: Add product ambient fallback and update validation
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          css_path = Path("src/mobile-vitrine-overrides.css")
-          css = css_path.read_text(encoding="utf-8").rstrip()
-          if "@keyframes barber-product-ambient" not in css:
-              css += '''
-
-@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
-  /* O produto Barber mantém um glow ambiente discreto antes de o
-     IntersectionObserver promover o card para o destaque principal. */
-  .store-theme-barbearia .premium-product-card .product-attention-glow {
-    animation: barber-product-ambient 6.6s ease-in-out infinite;
-  }
-
-  .store-theme-barbearia .premium-product-card:nth-child(2n) .product-attention-glow {
-    animation-delay: -2.2s;
-  }
-
-  .store-theme-barbearia .premium-product-card:nth-child(3n) .product-attention-glow {
-    animation-delay: -4.4s;
-  }
-}
-
-@keyframes barber-product-ambient {
-  0%,
-  100% {
-    opacity: 0.07;
-    filter: brightness(0.94);
-  }
-  44%,
-  58% {
-    opacity: 0.2;
-    filter: brightness(1.08);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .store-theme-barbearia .premium-product-card .product-attention-glow {
-    animation: none !important;
-  }
-}
-'''
-          css_path.write_text(css + "\n", encoding="utf-8")
-
-          test_path = Path("scripts/validate-barber-mobile-cards.mjs")
-          test = test_path.read_text(encoding="utf-8")
-
-          old_return = '''        return {
-          mobileActive: element.getAttribute("data-mobile-active"),
-          inView: element.getAttribute("data-in-view"),
-          animationName: frame ? getComputedStyle(frame).animationName : "none",
-          animationPlayState: frame ? getComputedStyle(frame).animationPlayState : "paused",
-          glowOpacity: glow ? Number(getComputedStyle(glow).opacity) : 0,
-        };'''
-          new_return = '''        const rect = element.getBoundingClientRect();
-        const glowStyle = glow ? getComputedStyle(glow) : null;
-        return {
-          mobileActive: element.getAttribute("data-mobile-active"),
-          inView: element.getAttribute("data-in-view"),
-          animationName: frame ? getComputedStyle(frame).animationName : "none",
-          animationPlayState: frame ? getComputedStyle(frame).animationPlayState : "paused",
-          glowAnimationName: glowStyle?.animationName ?? "none",
-          glowPlayState: glowStyle?.animationPlayState ?? "paused",
-          glowOpacity: glowStyle ? Number(glowStyle.opacity) : 0,
-          visibleRatio:
-            Math.max(0, Math.min(rect.bottom, innerHeight) - Math.max(rect.top, 0)) / rect.height,
-        };'''
-          if old_return not in test:
-              raise SystemExit("Product-state return block not found")
-          test = test.replace(old_return, new_return, 1)
-
-          old_assertions = '''      assert(
-        productState.inView === "true",
-        `${label}: produto não reconheceu entrada na viewport`,
-      );
-      assert(
-        productState.mobileActive === "true",
-        `${label}: produto ainda depende de toque prolongado`,
-      );
-      assert(
-        productState.animationName === "premium-frame-breathe" &&
-          productState.animationPlayState === "running",
-        `${label}: borda do produto não anima automaticamente`,
-      );
-      assert(productState.glowOpacity > 0.08, `${label}: glow do produto não ficou visível`);'''
-          new_assertions = '''      assert(productState.visibleRatio > 0.4, `${label}: produto não ficou visível no scroll`);
-      assert(
-        productState.animationName === "premium-frame-breathe" &&
-          productState.animationPlayState === "running",
-        `${label}: borda do produto não anima automaticamente`,
-      );
-      assert(
-        productState.glowAnimationName === "barber-product-ambient" &&
-          productState.glowPlayState === "running",
-        `${label}: glow do produto ainda depende de clique ou long press`,
-      );
-      assert(productState.glowOpacity > 0.04, `${label}: glow ambiente do produto está invisível`);'''
-          if old_assertions not in test:
-              raise SystemExit("Product-state assertion block not found")
-          test_path.write_text(test.replace(old_assertions, new_assertions, 1), encoding="utf-8")
-          PY
-
-      - name: Format and validate patch
+      - name: Install dependencies
         run: |
           npm install --no-audit --no-fund
-          npx prettier --write \
+          npm install --no-save --no-audit --no-fund playwright@1.62.0
+
+      - name: Check and build
+        run: |
+          npx prettier --check \
             src/mobile-vitrine-overrides.css \
+            src/components/storefront/product-card.tsx \
             scripts/validate-barber-mobile-cards.mjs
-          git checkout -- package-lock.json 2>/dev/null || true
+          npx eslint src/components/storefront/product-card.tsx
           node --check scripts/validate-barber-mobile-cards.mjs
           npm run build
 
-      - name: Restore validation workflow and commit
+      - name: Start preview server
         run: |
-          git checkout HEAD^ -- .github/workflows/validate-barber-mobile-cards.yml
-          git rm .github/workflows/patch-barber-product-ambient.yml
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            .github/workflows/validate-barber-mobile-cards.yml \
-            src/mobile-vitrine-overrides.css \
-            scripts/validate-barber-mobile-cards.mjs
-          git commit -m "Make Barber product glow independent from touch"
-          git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          mkdir -p artifacts/barber-mobile-cards
+          npm run dev -- --host 0.0.0.0 --port 4173 > artifacts/barber-mobile-cards/server.log 2>&1 &
+          for attempt in $(seq 1 90); do
+            if curl --fail --silent http://127.0.0.1:4173 > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat artifacts/barber-mobile-cards/server.log
+          exit 1
+
+      - name: Run focused Barber regression
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: node scripts/validate-barber-mobile-cards.mjs
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: barber-mobile-cards-${{ github.run_id }}
+          path: artifacts/barber-mobile-cards
+          if-no-files-found: warn
+          retention-days: 14
