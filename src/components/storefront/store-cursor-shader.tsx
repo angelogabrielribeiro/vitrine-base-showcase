@@ -3,11 +3,38 @@ import * as THREE from "three";
 import type { StoreNiche } from "@/types/commerce";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 
-const PALETTES: Record<StoreNiche, { a: string; b: string; fallback: string }> = {
-  fashion: { a: "#d49aa7", b: "#c99a55", fallback: "rgba(212,154,167,.24)" },
-  barber: { a: "#f4c866", b: "#a86b23", fallback: "rgba(244,200,102,.2)" },
-  restaurant: { a: "#ff642b", b: "#ffbd4a", fallback: "rgba(255,100,43,.22)" },
-  electronics: { a: "#67e8f9", b: "#8b5cf6", fallback: "rgba(103,232,249,.22)" },
+const PALETTES: Record<
+  StoreNiche,
+  { a: string; b: string; fallback: string; falloff: number; fallbackSize: number }
+> = {
+  fashion: {
+    a: "#d49aa7",
+    b: "#c99a55",
+    fallback: "rgba(212,154,167,.24)",
+    falloff: 11.9,
+    fallbackSize: 5.4,
+  },
+  barber: {
+    a: "#f4c866",
+    b: "#a86b23",
+    fallback: "rgba(244,200,102,.2)",
+    falloff: 10.8,
+    fallbackSize: 6,
+  },
+  restaurant: {
+    a: "#ff642b",
+    b: "#ffbd4a",
+    fallback: "rgba(255,100,43,.22)",
+    falloff: 10.8,
+    fallbackSize: 6,
+  },
+  electronics: {
+    a: "#67e8f9",
+    b: "#8b5cf6",
+    fallback: "rgba(103,232,249,.22)",
+    falloff: 10.8,
+    fallbackSize: 6,
+  },
 };
 
 export function StoreCursorShader({ niche }: { niche: StoreNiche }) {
@@ -54,6 +81,7 @@ export function StoreCursorShader({ niche }: { niche: StoreNiche }) {
       uniform vec2 pointer;
       uniform float time;
       uniform float velocity;
+      uniform float falloff;
       uniform vec3 colorA;
       uniform vec3 colorB;
 
@@ -68,7 +96,7 @@ export function StoreCursorShader({ niche }: { niche: StoreNiche }) {
         vec2 aspect = vec2(safe.x / safe.y, 1.0);
         float distanceToPointer = length((uv - p) * aspect);
         float ring = sin(distanceToPointer * 54.0 - time * (2.0 + velocity * 5.0));
-        float halo = exp(-distanceToPointer * (10.8 - velocity * 1.2));
+        float halo = exp(-distanceToPointer * (falloff - velocity * 1.2));
         float sparks = smoothstep(.93, 1.0, sin((uv.x + uv.y) * 72.0 + time * 2.4 + hash(floor(uv * 36.0)) * 6.0));
         float energy = halo * (.28 + .18 * ring + velocity * .34) + sparks * halo * .16;
         vec3 color = mix(colorA, colorB, .5 + .5 * sin(time * .7 + distanceToPointer * 18.0));
@@ -86,6 +114,7 @@ export function StoreCursorShader({ niche }: { niche: StoreNiche }) {
       pointer: { value: new THREE.Vector2(0.5, 0.55) },
       time: { value: 0 },
       velocity: { value: 0 },
+      falloff: { value: palette.falloff },
       colorA: { value: new THREE.Color(palette.a) },
       colorB: { value: new THREE.Color(palette.b) },
     };
@@ -100,7 +129,11 @@ export function StoreCursorShader({ niche }: { niche: StoreNiche }) {
     scene.add(new THREE.Mesh(geometry, material));
 
     try {
-      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
+      renderer = new THREE.WebGLRenderer({
+        alpha: true,
+        antialias: false,
+        powerPreference: "high-performance",
+      });
     } catch {
       geometry.dispose();
       material.dispose();
@@ -156,6 +189,7 @@ export function StoreCursorShader({ niche }: { niche: StoreNiche }) {
     capabilities.precisePointer,
     palette.a,
     palette.b,
+    palette.falloff,
   ]);
 
   return (
@@ -166,8 +200,10 @@ export function StoreCursorShader({ niche }: { niche: StoreNiche }) {
       className="pointer-events-none fixed inset-0 z-[35] hidden overflow-hidden mix-blend-screen sm:block motion-reduce:hidden"
     >
       <span
-        className="absolute h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl"
+        className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl"
         style={{
+          width: `${palette.fallbackSize}rem`,
+          height: `${palette.fallbackSize}rem`,
           left: "var(--cursor-x, 50vw)",
           top: "var(--cursor-y, 45vh)",
           background: `radial-gradient(circle, ${palette.fallback}, transparent 68%)`,

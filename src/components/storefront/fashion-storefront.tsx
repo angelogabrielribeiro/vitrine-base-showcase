@@ -40,88 +40,99 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
   const ref = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
   const [isDesktop, setIsDesktop] = useState(false);
+
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");
-    const on = () => setIsDesktop(mq.matches);
-    on();
-    mq.addEventListener("change", on);
-    return () => mq.removeEventListener("change", on);
+    const onChange = () => setIsDesktop(mq.matches);
+    onChange();
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
   }, []);
+
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
   });
-  const sceneOpacity = useTransform(scrollYProgress, [0, 0.12, 0.76, 0.94], [0.22, 1, 1, 0]);
-  // Enquadramento editorial suave: sem upscale agressivo, ainda mais contido no mobile.
-  const imageScale = useTransform(
-    scrollYProgress,
-    [0, 0.35, 0.78, 1],
-    isDesktop ? [1.06, 1.02, 1, 1.03] : [1.02, 1.01, 1, 1.015],
-  );
-  const imageX = useTransform(
-    scrollYProgress,
-    [0, 0.32, 0.76, 1],
-    isDesktop
-      ? [index % 2 === 0 ? -18 : 18, 0, 0, index % 2 === 0 ? 10 : -10]
-      : [0, 0, 0, 0],
-  );
-  const copyY = useTransform(scrollYProgress, [0.08, 0.26, 0.72, 0.9], [42, 0, 0, -34]);
-  const copyOpacity = useTransform(scrollYProgress, [0.08, 0.24, 0.72, 0.9], [0, 1, 1, 0]);
-  const lineScale = useTransform(scrollYProgress, [0.12, 0.85], [0, 1]);
+  const sceneOpacity = useTransform(scrollYProgress, [0, 0.08, 0.82, 0.98], [0.3, 1, 1, 0.24]);
+  const imageScale = useTransform(scrollYProgress, [0, 0.28, 0.78, 1], [1.015, 1, 1, 1.01]);
+  const imageY = useTransform(scrollYProgress, [0, 0.3, 0.8, 1], [14, 0, 0, -8]);
+  const copyY = useTransform(scrollYProgress, [0.02, 0.18, 0.82, 0.96], [34, 0, 0, -24]);
+  const copyOpacity = useTransform(scrollYProgress, [0.02, 0.16, 0.84, 0.97], [0, 1, 1, 0.16]);
+  const lineScale = useTransform(scrollYProgress, [0.06, 0.84], [0, 1]);
+
+  const mobileTransition = { duration: 0.62, ease: [0.22, 1, 0.36, 1] as const };
 
   return (
     <section
       ref={ref}
       data-testid="fashion-chapter"
-      className="relative min-h-[190svh] border-t border-[#ead1c8]/12 bg-[#25131d] sm:min-h-[210svh]"
+      className="relative border-t border-[#ead1c8]/12 bg-[#25131d] py-16 lg:min-h-[145svh] lg:py-0"
     >
-      <div className="sticky top-[4.5rem] h-[calc(100svh-4.5rem)] overflow-hidden">
-        <motion.div
-          className="absolute inset-0"
-          style={reduceMotion ? undefined : { opacity: sceneOpacity }}
-        >
-          <motion.img
-            src={chapter.image}
-            alt=""
-            aria-hidden="true"
-            loading={index === 0 ? "eager" : "lazy"}
-            className="h-full w-full object-cover"
-            style={
-              reduceMotion
-                ? { objectPosition: chapter.objectPosition }
-                : { objectPosition: chapter.objectPosition, scale: imageScale, x: imageX }
-            }
-          />
-          <div
-            className={`absolute inset-0 ${index % 2 === 0 ? "bg-gradient-to-r" : "bg-gradient-to-l"} from-[#25131d]/95 via-[#3d1828]/65 to-[#25131d]/20`}
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(37,19,29,.82),transparent_42%,rgba(37,19,29,.2))]" />
-        </motion.div>
-
+      <div className="relative overflow-hidden lg:sticky lg:top-[4.5rem] lg:h-[calc(100svh-4.5rem)]">
         <div className="absolute inset-y-0 left-5 hidden w-px bg-[#ead1c8]/16 lg:block">
           <motion.div
-            className="h-full w-px origin-top bg-[#c99a55] shadow-[0_0_24px_rgba(201,154,85,.65)]"
+            className="h-full w-px origin-top bg-[#c99a55] shadow-[0_0_20px_rgba(201,154,85,.52)]"
             style={reduceMotion ? { scaleY: 1 } : { scaleY: lineScale }}
           />
         </div>
 
-        <div className="relative mx-auto flex h-full max-w-[100rem] items-center px-5 sm:px-8 lg:px-16">
+        <div
+          data-fashion-chapter-layout
+          className="relative mx-auto grid h-auto max-w-[96rem] items-center gap-9 px-5 sm:px-8 lg:h-full lg:grid-cols-2 lg:gap-16 lg:px-16"
+        >
+          <motion.figure
+            data-testid="fashion-chapter-media"
+            initial={reduceMotion || isDesktop ? false : { opacity: 0, y: 30, scale: 0.985 }}
+            whileInView={reduceMotion || isDesktop ? undefined : { opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: false, amount: 0.3, margin: "0px 0px -12% 0px" }}
+            transition={mobileTransition}
+            style={
+              reduceMotion || !isDesktop
+                ? undefined
+                : { opacity: sceneOpacity, scale: imageScale, y: imageY }
+            }
+            className={`relative mx-auto aspect-[4/5] w-full max-w-[34rem] overflow-hidden border border-[#ead1c8]/18 bg-[#3d1828] p-2 shadow-[0_28px_80px_rgba(15,4,10,.34)] ${
+              index % 2 === 0 ? "lg:order-2" : "lg:order-1"
+            }`}
+          >
+            <img
+              src={chapter.image}
+              alt={chapter.title}
+              loading={index === 0 ? "eager" : "lazy"}
+              className="h-full w-full bg-[#3d1828] object-contain"
+              style={{ objectPosition: chapter.objectPosition }}
+            />
+            <span className="pointer-events-none absolute inset-2 bg-[linear-gradient(to_top,rgba(37,19,29,.24),transparent_44%)]" />
+            <figcaption className="absolute bottom-5 left-5 text-[9px] font-bold uppercase tracking-[0.28em] text-[#f7eee8]/58">
+              Cena {chapter.number} · {chapter.eyebrow}
+            </figcaption>
+          </motion.figure>
+
           <motion.div
-            className={`max-w-3xl ${index % 2 === 1 ? "lg:ml-auto" : ""}`}
-            style={reduceMotion ? undefined : { opacity: copyOpacity, y: copyY }}
+            data-testid="fashion-chapter-copy"
+            initial={
+              reduceMotion || isDesktop
+                ? false
+                : { opacity: 0, x: index % 2 === 0 ? -24 : 24, y: 18 }
+            }
+            whileInView={reduceMotion || isDesktop ? undefined : { opacity: 1, x: 0, y: 0 }}
+            viewport={{ once: false, amount: 0.36, margin: "0px 0px -10% 0px" }}
+            transition={{ ...mobileTransition, delay: reduceMotion ? 0 : 0.08 }}
+            style={reduceMotion || !isDesktop ? undefined : { opacity: copyOpacity, y: copyY }}
+            className={`max-w-2xl ${index % 2 === 0 ? "lg:order-1" : "lg:order-2"}`}
           >
             <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-[0.34em] text-[#d8ad72]">
               <span>{chapter.number}</span>
               <span className="h-px w-12 bg-[#d8ad72]/55" />
               <span>{chapter.eyebrow}</span>
             </div>
-            <h2 className="mt-6 max-w-[16ch] hyphens-auto break-words font-display text-[clamp(2.6rem,8vw,8rem)] font-medium leading-[0.9] tracking-[-0.06em] text-[#f7eee8] sm:leading-[0.82]">
+            <h2 className="mt-6 max-w-[14ch] hyphens-auto break-words font-display text-[clamp(2.5rem,7vw,6.6rem)] font-medium leading-[0.92] tracking-[-0.055em] text-[#f7eee8] sm:leading-[0.86]">
               {chapter.title}
             </h2>
-            <p className="mt-7 max-w-xl text-base leading-8 text-[#f7eee8]/68 sm:text-lg">
+            <p className="mt-6 max-w-xl text-base leading-7 text-[#f7eee8]/70 sm:text-lg sm:leading-8">
               {chapter.body}
             </p>
-            <div className="mt-8 flex flex-wrap gap-2">
+            <div className="mt-7 flex flex-wrap gap-2">
               {chapter.notes.map((note) => (
                 <span
                   key={note}
@@ -131,14 +142,14 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
                 </span>
               ))}
             </div>
-            <p className="mt-8 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-white/38">
+            <p className="mt-7 hidden items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-white/38 lg:inline-flex">
               <MousePointer2 className="h-4 w-4 text-[#c99a55]" /> Continue rolando para atravessar
               o editorial
             </p>
           </motion.div>
         </div>
 
-        <span className="absolute bottom-5 right-6 font-display text-[22vw] leading-none text-[#ead1c8]/[0.035]">
+        <span className="pointer-events-none absolute bottom-4 right-6 hidden font-display text-[16vw] leading-none text-[#ead1c8]/[0.025] lg:block">
           {chapter.number}
         </span>
       </div>
@@ -193,11 +204,21 @@ function AtelierConsole({ store, products }: { store: StoreConfig; products: Pro
                 </button>
               ))}
             </div>
+            <p
+              data-testid="fashion-atelier-swipe-hint"
+              className="mt-5 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#ead1c8]/55 lg:hidden"
+            >
+              <ArrowRight className="h-3.5 w-3.5 text-[#d8ad72]" /> Deslize para explorar a arara
+            </p>
           </div>
         </div>
 
-        <div className="mt-16 grid min-h-[36rem] gap-10 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
-          <div className="relative h-[32rem]" style={{ perspective: "1200px" }}>
+        <div className="mt-12 grid min-h-[36rem] gap-10 sm:mt-16 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
+          <div
+            data-testid="fashion-atelier-rail"
+            className="relative h-[32rem]"
+            style={{ perspective: "1200px" }}
+          >
             {selection.map((product, index) => {
               const center = (selection.length - 1) / 2;
               const offset = index - center;
@@ -221,9 +242,9 @@ function AtelierConsole({ store, products }: { store: StoreConfig; products: Pro
                     src={product.images[0]}
                     alt={product.name}
                     loading="lazy"
-                    className="h-full w-full object-cover"
+                    className="h-full w-full bg-[#3d1828] object-contain p-1.5"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#25131d]/86 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#25131d]/72 via-transparent to-transparent" />
                   <p className="absolute inset-x-4 bottom-4 font-display text-xl leading-tight">
                     {product.name}
                   </p>
@@ -277,7 +298,12 @@ function EditorialGridItem({
       transition={{ duration: 0.65, delay: sequenceDelay(index % 3) }}
       className={index % 3 === 1 ? "lg:mt-12" : ""}
     >
-      <EditorialProductCard product={product} storeSlug={storeSlug} aspect="portrait" index={index} />
+      <EditorialProductCard
+        product={product}
+        storeSlug={storeSlug}
+        aspect="portrait"
+        index={index}
+      />
     </motion.div>
   );
 }
@@ -359,8 +385,15 @@ export function FashionStorefront({
 
       <AtelierConsole store={store} products={products} />
 
-      <section className="bg-[#f5eee8] px-5 py-24 sm:px-8 sm:py-32">
-        <div className="mx-auto max-w-[84rem]">
+      <section
+        data-testid="fashion-selection"
+        className="relative overflow-hidden bg-[#d9b5b1] px-5 py-20 sm:px-8 sm:py-24"
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#4a192b]/58 to-transparent"
+        />
+        <div className="relative mx-auto max-w-[84rem]">
           <div className="flex flex-wrap items-end justify-between gap-8">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.38em] text-[#8b3150]">
