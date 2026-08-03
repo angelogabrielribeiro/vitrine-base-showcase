@@ -80,21 +80,27 @@ try {
       await centerInViewport(serviceTarget);
       const serviceState = await serviceTarget.evaluate((element) => {
         const link = element.querySelector("a");
-        const title = element.querySelector("h3");
         const rect = element.getBoundingClientRect();
+        const ambient = link ? getComputedStyle(link, "::before") : null;
         return {
           active: element.getAttribute("data-active"),
-          background: link ? getComputedStyle(link).backgroundImage : "none",
-          shadow: link ? getComputedStyle(link).boxShadow : "none",
-          titleColor: title ? getComputedStyle(title).color : "",
+          ambientAnimation: ambient?.animationName ?? "none",
+          ambientPlayState: ambient?.animationPlayState ?? "paused",
+          ambientOpacity: ambient ? Number(ambient.opacity) : 0,
           visibleRatio:
             Math.max(0, Math.min(rect.bottom, innerHeight) - Math.max(rect.top, 0)) / rect.height,
         };
       });
       assert(serviceState.visibleRatio >= 0.6, `${label}: serviço não foi centralizado pelo teste`);
-      assert(serviceState.active === "true", `${label}: serviço não acendeu com o scroll`);
-      assert(serviceState.background !== "none", `${label}: serviço ativo sem iluminação`);
-      assert(serviceState.shadow !== "none", `${label}: serviço ativo sem profundidade`);
+      assert(
+        serviceState.ambientAnimation === "barber-service-ambient",
+        `${label}: serviço sem pulso ambiente automático`,
+      );
+      assert(
+        serviceState.ambientPlayState === "running",
+        `${label}: pulso do serviço depende de toque`,
+      );
+      assert(serviceState.ambientOpacity > 0, `${label}: pulso do serviço está invisível`);
 
       const ritualSection = page
         .getByRole("heading", { name: "Três atos, uma cadeira" })
@@ -116,6 +122,11 @@ try {
       assert(
         ritualRailState.scrollWidth > ritualRailState.clientWidth,
         `${label}: trilho do ritual deixou de ser navegável`,
+      );
+      assert(
+        ritualRailState.touchAction.includes("pan-x") &&
+          ritualRailState.touchAction.includes("pan-y"),
+        `${label}: trilho bloqueia um dos eixos de navegação`,
       );
 
       const atmosphereSection = page
