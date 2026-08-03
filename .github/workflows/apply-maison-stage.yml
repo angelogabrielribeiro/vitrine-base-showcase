@@ -57,3 +57,5 @@ jobs:
             src/mobile-vitrine-overrides.css
           git commit -m "Corrige scroll e composição da Maison Belle [maison patch]"
           git push origin HEAD:fix/maison-scroll-layout-stage
+
+# trigger: 2026-08-03T16:18-03:00
