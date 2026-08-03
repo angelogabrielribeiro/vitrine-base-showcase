@@ -292,8 +292,8 @@ async function validateFashion(browser, config) {
       assert(imageFit === "contain", `${label}: imagem mobile continua cortada`);
     } else {
       assert(
-        chapterBox.height > viewport.height * 1.7,
-        `${label}: capítulo desktop não sustenta a cena longa`,
+        chapterBox.height >= viewport.height * 1.2 && chapterBox.height <= viewport.height * 1.5,
+        `${label}: capítulo desktop saiu do intervalo editorial compacto`,
       );
       assert(stickyPosition === "sticky", `${label}: storytelling desktop perdeu o sticky`);
     }
