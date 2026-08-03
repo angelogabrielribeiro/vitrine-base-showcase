@@ -66,7 +66,10 @@ async function inspectChapters(page, scenario) {
 
   for (const [index, item] of metrics.entries()) {
     assert(item.objectFit === "contain", `${scenario.name}: imagem ${index + 1} ainda usa crop`);
-    assert(item.mediaWidth <= scenario.width - (scenario.mobile ? 24 : 80), `${scenario.name}: mídia ${index + 1} extrapola a viewport`);
+    assert(
+      item.mediaWidth <= scenario.width - (scenario.mobile ? 24 : 80),
+      `${scenario.name}: mídia ${index + 1} extrapola a viewport`,
+    );
     if (scenario.mobile) {
       assert(
         item.height <= scenario.height * 1.38,
@@ -95,13 +98,15 @@ async function inspectChapters(page, scenario) {
 
   if (scenario.mobile) {
     await page.evaluate(
-      ({ top, height }) => window.scrollTo({ top: Math.max(0, top - height * 0.95), behavior: "instant" }),
+      ({ top, height }) =>
+        window.scrollTo({ top: Math.max(0, top - height * 0.95), behavior: "instant" }),
       { top: targetBox.y, height: scenario.height },
     );
     await page.waitForTimeout(120);
     const before = Number(await copy.evaluate((node) => getComputedStyle(node).opacity));
     await page.evaluate(
-      ({ top, height }) => window.scrollTo({ top: Math.max(0, top - height * 0.18), behavior: "instant" }),
+      ({ top, height }) =>
+        window.scrollTo({ top: Math.max(0, top - height * 0.18), behavior: "instant" }),
       { top: targetBox.y, height: scenario.height },
     );
     await page.waitForTimeout(850);
@@ -113,9 +118,15 @@ async function inspectChapters(page, scenario) {
       };
     });
     assert(before < 0.5, `${scenario.name}: storytelling já nasce totalmente revelado (${before})`);
-    assert(after.visible && after.opacity > 0.82, `${scenario.name}: storytelling não conclui enquanto visível`);
+    assert(
+      after.visible && after.opacity > 0.82,
+      `${scenario.name}: storytelling não conclui enquanto visível`,
+    );
   } else {
-    await page.evaluate((top) => window.scrollTo({ top: top + 5, behavior: "instant" }), targetBox.y);
+    await page.evaluate(
+      (top) => window.scrollTo({ top: top + 5, behavior: "instant" }),
+      targetBox.y,
+    );
     await page.waitForTimeout(180);
     const before = Number(await copy.evaluate((node) => getComputedStyle(node).opacity));
     await page.evaluate(
@@ -124,7 +135,10 @@ async function inspectChapters(page, scenario) {
     );
     await page.waitForTimeout(260);
     const after = Number(await copy.evaluate((node) => getComputedStyle(node).opacity));
-    assert(after > before + 0.35, `${scenario.name}: progresso do storytelling não responde ao scroll`);
+    assert(
+      after > before + 0.35,
+      `${scenario.name}: progresso do storytelling não responde ao scroll`,
+    );
   }
 
   return metrics;
@@ -151,8 +165,14 @@ async function inspectAtelierMobile(page, scenario) {
     };
   });
   assert(state.scrollWidth > state.clientWidth, `${scenario.name}: arara deixou de ser navegável`);
-  assert(state.left >= -2 && state.right <= scenario.width + 2, `${scenario.name}: trilho da arara extrapola a tela`);
-  assert(state.cardWidth < scenario.width - 24, `${scenario.name}: card da arara ocupa/corta a tela inteira`);
+  assert(
+    state.left >= -2 && state.right <= scenario.width + 2,
+    `${scenario.name}: trilho da arara extrapola a tela`,
+  );
+  assert(
+    state.cardWidth < scenario.width - 24,
+    `${scenario.name}: card da arara ocupa/corta a tela inteira`,
+  );
   assert(
     state.touchAction.includes("pan-x") && state.touchAction.includes("pan-y"),
     `${scenario.name}: gesto da arara bloqueia um eixo`,
@@ -169,9 +189,16 @@ async function inspectSelection(page, scenario) {
   const selection = page.getByTestId("fashion-selection");
   await selection.scrollIntoViewIfNeeded();
   const background = await selection.evaluate((node) => getComputedStyle(node).backgroundColor);
-  const channels = background.match(/\d+(?:\.\d+)?/g)?.slice(0, 3).map(Number) ?? [];
+  const channels =
+    background
+      .match(/\d+(?:\.\d+)?/g)
+      ?.slice(0, 3)
+      .map(Number) ?? [];
   assert(channels.length === 3, `${scenario.name}: fundo da seleção não pôde ser lido`);
-  assert(Math.max(...channels) < 235, `${scenario.name}: seção clara continua estourada (${background})`);
+  assert(
+    Math.max(...channels) < 235,
+    `${scenario.name}: seção clara continua estourada (${background})`,
+  );
   return background;
 }
 
@@ -180,7 +207,10 @@ async function inspectDesktopCardAndCursor(page, scenario) {
   const card = selection.locator(".ep-card").first();
   await card.scrollIntoViewIfNeeded();
   await page.waitForTimeout(650);
-  assert((await card.getAttribute("data-in-view")) === "true", `${scenario.name}: card não ativa ao entrar na tela`);
+  assert(
+    (await card.getAttribute("data-in-view")) === "true",
+    `${scenario.name}: card não ativa ao entrar na tela`,
+  );
 
   const frame = card.locator(".ep-card-frame");
   const ambient = await frame.evaluate((node) => ({
@@ -208,24 +238,41 @@ async function inspectDesktopCardAndCursor(page, scenario) {
         playState: frameNode ? getComputedStyle(frameNode).animationPlayState : "missing",
       };
     });
-    assert(!after.clipPath.includes("inset(0px"), `${scenario.name}: imagem ficou presa após o hover`);
+    assert(
+      !after.clipPath.includes("inset(0px"),
+      `${scenario.name}: imagem ficou presa após o hover`,
+    );
     assert(after.ctaOpacity < 0.12, `${scenario.name}: CTA ficou preso após o hover`);
     assert(after.playState === "running", `${scenario.name}: brilho não retomou após o hover`);
   }
 
-  const cursorSize = await page.getByTestId("store-cursor-shader").locator("span").evaluate((node) => {
-    const style = getComputedStyle(node);
-    return { width: Number.parseFloat(style.width), height: Number.parseFloat(style.height) };
-  });
-  assert(cursorSize.width >= 82 && cursorSize.width <= 89, `${scenario.name}: halo Maison não reduziu cerca de 10% (${cursorSize.width}px)`);
-  assert(Math.abs(cursorSize.width - cursorSize.height) < 1, `${scenario.name}: halo do cursor deformado`);
+  const cursorSize = await page
+    .getByTestId("store-cursor-shader")
+    .locator("span")
+    .evaluate((node) => {
+      const style = getComputedStyle(node);
+      return { width: Number.parseFloat(style.width), height: Number.parseFloat(style.height) };
+    });
+  assert(
+    cursorSize.width >= 82 && cursorSize.width <= 89,
+    `${scenario.name}: halo Maison não reduziu cerca de 10% (${cursorSize.width}px)`,
+  );
+  assert(
+    Math.abs(cursorSize.width - cursorSize.height) < 1,
+    `${scenario.name}: halo do cursor deformado`,
+  );
 
   return { ambient, cursorSize };
 }
 
 const browser = await chromium.launch({
   headless: true,
-  args: ["--disable-dev-shm-usage", "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
+  args: [
+    "--disable-dev-shm-usage",
+    "--use-gl=angle",
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader",
+  ],
 });
 
 try {
@@ -252,7 +299,10 @@ try {
       const atelier = scenario.mobile ? await inspectAtelierMobile(page, scenario) : null;
       const selection = await inspectSelection(page, scenario);
       const desktop = scenario.mobile ? null : await inspectDesktopCardAndCursor(page, scenario);
-      assert(runtimeErrors.length === 0, `${scenario.name}: erros de runtime ${runtimeErrors.join(" | ")}`);
+      assert(
+        runtimeErrors.length === 0,
+        `${scenario.name}: erros de runtime ${runtimeErrors.join(" | ")}`,
+      );
 
       await page.screenshot({
         path: path.join(outputDir, `${scenario.name}.png`),
