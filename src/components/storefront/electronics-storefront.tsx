@@ -658,6 +658,7 @@ function OrbitalShowroom({
                 <div className="absolute left-5 top-5 border border-cyan-200/20 bg-[#02040c]/78 px-3 py-2 text-[8px] font-bold uppercase tracking-[0.28em] text-cyan-100 backdrop-blur">
                   Core object / {String(active + 1).padStart(2, "0")}
                 </div>
+                <BorderTraceFrame index={active} intensity={0.45} />
               </div>
             </motion.div>
           </div>
