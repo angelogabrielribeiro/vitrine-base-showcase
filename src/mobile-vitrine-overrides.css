@@ -115,6 +115,14 @@
     inset: 16% 11% !important;
   }
 
+  /* O título da constelação precisa respeitar o conteúdo útil de 320 px em aparelhos de 360 px. */
+  h2[class*="max-w-[16ch]"][class*="uppercase"] {
+    max-width: calc(100vw - 2.5rem) !important;
+    font-size: clamp(2rem, 7.2vw, 3.4rem) !important;
+    letter-spacing: -0.02em !important;
+    overflow-wrap: anywhere;
+  }
+
   /* Evita nomes técnicos e títulos editoriais ultrapassando 360–430 px. */
   [data-testid="electronics-circuit-story"] h2,
   [data-testid="electronics-circuit-story"] h3,
