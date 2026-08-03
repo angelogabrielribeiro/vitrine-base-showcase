@@ -30,41 +30,37 @@ jobs:
           path = Path("src/components/storefront/barber-storefront.tsx")
           text = path.read_text(encoding="utf-8")
 
-          old_start = '''  const isTouch = capabilities.coarsePointer;
-          const [activeService, setActiveService] = useState(0);
-
+          old_state = '''  const active = items[activeIdx];
           return (
-            <section className="bg-[#0f0f12] px-5 py-24 sm:px-8 lg:px-12 lg:py-36">'''
-          new_start = '''  const isTouch = capabilities.coarsePointer;
-          const [activeService, setActiveService] = useState(0);
+            <section className="mx-auto max-w-7xl px-6 py-20 sm:py-16">'''
+          new_state = '''  const active = items[activeIdx];
           const sectionRef = useRef<HTMLElement>(null);
 
           useEffect(() => {
-            if (!isTouch) return;
+            if (!isMobile) return;
 
             let frame = 0;
             const updateActiveService = () => {
               window.cancelAnimationFrame(frame);
               frame = window.requestAnimationFrame(() => {
-                const cards = sectionRef.current?.querySelectorAll<HTMLElement>(
+                const rows = sectionRef.current?.querySelectorAll<HTMLElement>(
                   "[data-service-index]",
                 );
-                if (!cards?.length) return;
+                if (!rows?.length) return;
 
                 const viewportCenter = window.innerHeight / 2;
                 let nearestIndex = 0;
                 let nearestDistance = Number.POSITIVE_INFINITY;
 
-                cards.forEach((card) => {
-                  const rect = card.getBoundingClientRect();
-                  const cardCenter = rect.top + rect.height / 2;
-                  const distance = Math.abs(cardCenter - viewportCenter);
+                rows.forEach((row) => {
+                  const rect = row.getBoundingClientRect();
+                  const distance = Math.abs(rect.top + rect.height / 2 - viewportCenter);
                   if (distance >= nearestDistance) return;
                   nearestDistance = distance;
-                  nearestIndex = Number(card.dataset.serviceIndex ?? 0);
+                  nearestIndex = Number(row.dataset.serviceIndex ?? 0);
                 });
 
-                setActiveService(nearestIndex);
+                setActiveIdx(nearestIndex);
               });
             };
 
@@ -76,63 +72,44 @@ jobs:
               window.removeEventListener("scroll", updateActiveService);
               window.removeEventListener("resize", updateActiveService);
             };
-          }, [isTouch]);
+          }, [isMobile]);
 
           return (
-            <section
-              ref={sectionRef}
-              className="bg-[#0f0f12] px-5 py-24 sm:px-8 lg:px-12 lg:py-36"
-            >'''
+            <section ref={sectionRef} className="mx-auto max-w-7xl px-6 py-20 sm:py-16">'''
+          if old_state not in text:
+            raise SystemExit("ServicesEditorial state block not found")
+          text = text.replace(old_state, new_state, 1)
 
-          if old_start not in text:
-            raise SystemExit("ServiceMenuSection start block not found")
-          text = text.replace(old_start, new_start, 1)
+          old_observer = '''  const reduce = useReducedMotion();
+          const [hovered, setHovered] = useState(false);
+          const { ref, inView } = useInView<HTMLLIElement>({ amount: 0.6 });
+          const image = service.image;
 
-          old_call = '''                    active={activeService === index}
-                    onActivate={() => setActiveService(index)}
-                    isTouch={isTouch}'''
-          new_call = '''                    active={activeService === index}
-                    isTouch={isTouch}'''
-          if old_call not in text:
-            raise SystemExit("ServiceCard call block not found")
-          text = text.replace(old_call, new_call, 1)
-
-          old_signature = '''  active,
-          onActivate,
-          isTouch,
-        }: {
-          service: BarberService;
-          index: number;
-          store: StoreConfig;
-          active: boolean;
-          onActivate: () => void;
-          isTouch: boolean;
-        }) {
-          const ref = useRef<HTMLLIElement>(null);
-          const inView = useInView(ref, { amount: 0.6 });
+          // Mobile: acende sozinho ao entrar na viewport, em sequência com o scroll.
+          // Desktop: reage a hover/foco, sem cursor simulado.
+          const active = autoActivate ? inView : hovered;
 
           useEffect(() => {
-            if (inView) onActivate();
-          }, [inView, onActivate]);
+            if (autoActivate && inView) onActivate?.();
+          }, [autoActivate, inView, onActivate]);
 
           return (
-            <motion.li
+            <li
               ref={ref}'''
-          new_signature = '''  active,
-          isTouch,
-        }: {
-          service: BarberService;
-          index: number;
-          store: StoreConfig;
-          active: boolean;
-          isTouch: boolean;
-        }) {
+          new_observer = '''  const reduce = useReducedMotion();
+          const [hovered, setHovered] = useState(false);
+          const image = service.image;
+
+          // Mobile: a linha mais próxima do centro da viewport acende automaticamente.
+          // Desktop: reage a hover/foco, sem cursor simulado.
+          const active = autoActivate ? Boolean(isActive) : hovered;
+
           return (
-            <motion.li
+            <li
               data-service-index={index}'''
-          if old_signature not in text:
-            raise SystemExit("ServiceCard observer block not found")
-          text = text.replace(old_signature, new_signature, 1)
+          if old_observer not in text:
+            raise SystemExit("ServiceRow observer block not found")
+          text = text.replace(old_observer, new_observer, 1)
 
           path.write_text(text, encoding="utf-8")
           PY
