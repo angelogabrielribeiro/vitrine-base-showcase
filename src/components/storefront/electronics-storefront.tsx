@@ -23,19 +23,8 @@ import {
   Watch,
   Zap,
 } from "lucide-react";
-import {
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useSpring,
-  useTransform,
-} from "framer-motion";
-import {
-  useEffect,
-  useMemo,
-  useState,
-  type PointerEvent as ReactPointerEvent,
-} from "react";
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "framer-motion";
+import { useEffect, useMemo, useState, type PointerEvent as ReactPointerEvent } from "react";
 import type { Product, StoreConfig } from "@/types/commerce";
 import { brl } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -173,7 +162,11 @@ function NovaHero({ store, product }: { store: StoreConfig; product?: Product })
                   key={line}
                   initial={reduceMotion ? false : { opacity: 0, y: 70, filter: "blur(16px)" }}
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{ delay: 0.08 + index * 0.12, duration: 0.82, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{
+                    delay: 0.08 + index * 0.12,
+                    duration: 0.82,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
                   className={
                     "block " +
                     (index === 1
@@ -269,13 +262,21 @@ function NovaHero({ store, product }: { store: StoreConfig; product?: Product })
                     loading="eager"
                     className="h-full w-full object-contain p-8 drop-shadow-[0_36px_50px_rgba(0,0,0,.62)]"
                     animate={reduceMotion ? undefined : { y: [0, -10, 0], rotate: [0, 0.8, 0] }}
-                    transition={{ duration: 6.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                    transition={{
+                      duration: 6.2,
+                      repeat: Number.POSITIVE_INFINITY,
+                      ease: "easeInOut",
+                    }}
                   />
                   <motion.span
                     aria-hidden="true"
                     className="absolute inset-x-8 h-px bg-gradient-to-r from-transparent via-cyan-200 to-transparent shadow-[0_0_24px_rgba(103,232,249,.95)]"
                     animate={reduceMotion ? undefined : { top: ["12%", "88%", "12%"] }}
-                    transition={{ duration: 6.8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                    transition={{
+                      duration: 6.8,
+                      repeat: Number.POSITIVE_INFINITY,
+                      ease: "easeInOut",
+                    }}
                   />
                   <div className="absolute left-5 top-5 flex items-center gap-2 border border-cyan-200/20 bg-[#02040c]/80 px-3 py-2 text-[8px] font-bold uppercase tracking-[0.28em] text-cyan-100 backdrop-blur">
                     <ScanLine className="h-3.5 w-3.5" /> Flagship live object
@@ -299,7 +300,11 @@ function NovaHero({ store, product }: { store: StoreConfig; product?: Product })
                 </div>
                 <FloatingBadge className="-left-4 top-[18%]" label="Thermal" value="Stable" />
                 <FloatingBadge className="-right-3 top-[34%]" label="Response" value="08 ms" />
-                <FloatingBadge className="bottom-[19%] -right-1" label="Protocol" value="NC verified" />
+                <FloatingBadge
+                  className="bottom-[19%] -right-1"
+                  label="Protocol"
+                  value="NC verified"
+                />
               </motion.div>
             </motion.div>
           )}
@@ -368,13 +373,7 @@ function SignalRail() {
   );
 }
 
-function BorderTraceFrame({
-  index = 0,
-  intensity = 0.5,
-}: {
-  index?: number;
-  intensity?: number;
-}) {
+function BorderTraceFrame({ index = 0, intensity = 0.5 }: { index?: number; intensity?: number }) {
   const reduceMotion = useReducedMotion();
   const opacity = Math.max(0.12, Math.min(0.55, intensity));
 
@@ -497,14 +496,20 @@ function CategoryCommandDeck({ store }: { store: StoreConfig }) {
                     <span
                       key={index}
                       className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border border-cyan-200/40 bg-[#030611] shadow-[0_0_14px_rgba(103,232,249,.3)]"
-                      style={{ transform: `rotate(${angle}deg) translateY(-220px) rotate(${-angle + 45}deg)` }}
+                      style={{
+                        transform: `rotate(${angle}deg) translateY(-220px) rotate(${-angle + 45}deg)`,
+                      }}
                     />
                   );
                 })}
               </motion.div>
               <div className="absolute inset-[16%] rounded-full border border-violet-200/20 bg-[radial-gradient(circle,rgba(37,99,235,.2),transparent_62%)]" />
               <motion.div
-                animate={reduceMotion ? undefined : { rotateY: [0, 12, 0, -12, 0], rotateX: [0, -6, 0, 6, 0] }}
+                animate={
+                  reduceMotion
+                    ? undefined
+                    : { rotateY: [0, 12, 0, -12, 0], rotateX: [0, -6, 0, 6, 0] }
+                }
                 transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
                 className="absolute inset-[25%] grid place-items-center rounded-[2rem] border border-cyan-200/40 bg-[#060b1b]/85 shadow-[0_30px_100px_rgba(0,0,0,.65),0_0_70px_rgba(34,211,238,.13)] backdrop-blur-xl [transform:translateZ(80px)]"
               >
@@ -575,7 +580,10 @@ function OrbitalShowroom({
   if (!current) return null;
 
   return (
-    <section id="showroom" className="relative overflow-hidden border-b border-white/10 bg-[#02040c]">
+    <section
+      id="showroom"
+      className="relative overflow-hidden border-b border-white/10 bg-[#02040c]"
+    >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(37,99,235,.18),transparent_34%),radial-gradient(circle_at_80%_70%,rgba(124,58,237,.12),transparent_34%)]" />
       <div
         className="relative mx-auto max-w-[96rem] px-5 py-20 sm:px-8 lg:px-12 lg:py-28 xl:px-16"
@@ -628,7 +636,11 @@ function OrbitalShowroom({
                   transition={{ type: "spring", stiffness: 170, damping: 24 }}
                   className="absolute z-20 h-20 w-20 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border border-cyan-200/30 bg-[#060b1b] p-1 shadow-[0_0_35px_rgba(34,211,238,.12)] transition hover:border-cyan-200/70"
                 >
-                  <img src={product.images[0]} alt="" className="h-full w-full rounded-full object-cover" />
+                  <img
+                    src={product.images[0]}
+                    alt=""
+                    className="h-full w-full rounded-full object-cover"
+                  />
                 </motion.button>
               );
             })}
@@ -653,7 +665,11 @@ function OrbitalShowroom({
                   draggable={false}
                   className="h-full w-full object-contain p-7 drop-shadow-[0_30px_45px_rgba(0,0,0,.55)]"
                   animate={reduceMotion ? undefined : { y: [0, -9, 0] }}
-                  transition={{ duration: 5.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                  transition={{
+                    duration: 5.2,
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: "easeInOut",
+                  }}
                 />
                 <div className="absolute left-5 top-5 border border-cyan-200/20 bg-[#02040c]/78 px-3 py-2 text-[8px] font-bold uppercase tracking-[0.28em] text-cyan-100 backdrop-blur">
                   Core object / {String(active + 1).padStart(2, "0")}
@@ -843,7 +859,11 @@ function SpatialProductCard({
               "inset(0 100% 99% 0)",
             ],
           }}
-          transition={{ duration: 5.4 + (index % 3), repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+          transition={{
+            duration: 5.4 + (index % 3),
+            repeat: Number.POSITIVE_INFINITY,
+            ease: "linear",
+          }}
         />
       )}
       <motion.div
@@ -922,7 +942,8 @@ function LabSection({ store }: { store: StoreConfig }) {
             Nada entra sem provar.
           </h2>
           <p className="mt-6 max-w-md text-sm leading-7 text-slate-400">
-            {store.messages.aboutBody} Aqui, o teste deixa de ser rodapé e vira parte da experiência.
+            {store.messages.aboutBody} Aqui, o teste deixa de ser rodapé e vira parte da
+            experiência.
           </p>
 
           <div className="mt-9 grid gap-2">
@@ -951,7 +972,9 @@ function LabSection({ store }: { store: StoreConfig }) {
                     </span>
                     <span className="mt-1 block text-sm font-semibold">{test.title}</span>
                   </span>
-                  <ChevronRight className={isActive ? "h-4 w-4 text-cyan-200" : "h-4 w-4 text-slate-700"} />
+                  <ChevronRight
+                    className={isActive ? "h-4 w-4 text-cyan-200" : "h-4 w-4 text-slate-700"}
+                  />
                 </button>
               );
             })}
@@ -1007,7 +1030,11 @@ function LabSection({ store }: { store: StoreConfig }) {
 
               <div className="relative mt-10 h-44 overflow-hidden border border-white/10 bg-[#02040c] p-5">
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(103,232,249,.07)_1px,transparent_1px),linear-gradient(90deg,rgba(103,232,249,.07)_1px,transparent_1px)] bg-[size:28px_28px]" />
-                <svg viewBox="0 0 900 180" className="relative h-full w-full" preserveAspectRatio="none">
+                <svg
+                  viewBox="0 0 900 180"
+                  className="relative h-full w-full"
+                  preserveAspectRatio="none"
+                >
                   <defs>
                     <linearGradient id={`lab-signal-${active}`} x1="0" x2="1">
                       <stop offset="0" stopColor="#67e8f9" stopOpacity=".15" />
@@ -1060,7 +1087,11 @@ function TrustStrip({ store }: { store: StoreConfig }) {
               <motion.span
                 aria-hidden="true"
                 animate={{ x: ["-110%", "110%"] }}
-                transition={{ duration: 5 + index, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                transition={{
+                  duration: 5 + index,
+                  repeat: Number.POSITIVE_INFINITY,
+                  ease: "linear",
+                }}
                 className="absolute inset-y-0 w-24 bg-gradient-to-r from-transparent via-cyan-200/[0.06] to-transparent"
               />
               <Icon className="relative h-5 w-5 shrink-0 text-cyan-200" />

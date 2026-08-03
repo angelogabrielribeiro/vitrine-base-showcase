@@ -148,7 +148,9 @@ export function CatalogExpansionHero({
                   className="h-full w-full object-contain p-2 saturate-[1.06]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/38 via-transparent to-white/[0.03]" />
-                <span className={`absolute left-3 top-3 text-[8px] font-bold uppercase tracking-[0.3em] ${surface.eyebrow}`}>
+                <span
+                  className={`absolute left-3 top-3 text-[8px] font-bold uppercase tracking-[0.3em] ${surface.eyebrow}`}
+                >
                   Seleção {categoryName ?? store.name}
                 </span>
               </motion.div>
