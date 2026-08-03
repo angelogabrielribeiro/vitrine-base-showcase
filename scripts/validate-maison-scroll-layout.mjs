@@ -145,7 +145,6 @@ async function inspectChapters(page, scenario) {
       opacity: copyNode ? Number(getComputedStyle(copyNode).opacity) : 0,
       copyVisible: Boolean(copyRect && copyRect.top < innerHeight && copyRect.bottom > 0),
       targetVisibleRatio: visibleHeight / targetRect.height,
-      revealDuration,
     };
   });
   assert(before < 0.5, `${scenario.name}: storytelling já nasce totalmente revelado (${before})`);
