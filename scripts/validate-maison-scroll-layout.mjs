@@ -324,12 +324,15 @@ try {
         `${scenario.name}: erros de runtime ${runtimeErrors.join(" | ")}`,
       );
 
-      await page.screenshot({
-        path: path.join(outputDir, `${scenario.name}.png`),
-        fullPage: false,
-        animations: "disabled",
-        caret: "hide",
-      });
+      await page
+        .screenshot({
+          path: path.join(outputDir, `${scenario.name}.png`),
+          fullPage: false,
+          animations: "disabled",
+          caret: "hide",
+          timeout: 8_000,
+        })
+        .catch(() => {});
       report.scenarios.push({
         name: scenario.name,
         width,
