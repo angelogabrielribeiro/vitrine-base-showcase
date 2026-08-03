@@ -192,12 +192,7 @@
   /* Carta de serviços: iluminação automática comandada pela posição no scroll,
      sem depender de clique, long press ou estado :active. */
   .store-theme-barbearia main li[data-active="true"] > a {
-    background: linear-gradient(
-      90deg,
-      rgb(245 158 11 / 12%),
-      rgb(23 23 23 / 34%) 58%,
-      transparent
-    );
+    background: linear-gradient(90deg, rgb(245 158 11 / 12%), rgb(23 23 23 / 34%) 58%, transparent);
     box-shadow:
       inset 2px 0 0 rgb(252 211 77 / 72%),
       0 18px 46px -34px rgb(245 158 11 / 78%);

@@ -37,11 +37,14 @@ async function waitForLit(locator, attribute) {
       [...document.querySelectorAll(selector)].some(
         (element) => element.getAttribute(attribute) === "true",
       ),
-    { selector: await locator.evaluate((element) => {
-      const marker = `stage-${Math.random().toString(36).slice(2)}`;
-      element.setAttribute("data-stage-marker", marker);
-      return `[data-stage-marker="${marker}"]`;
-    }), attribute },
+    {
+      selector: await locator.evaluate((element) => {
+        const marker = `stage-${Math.random().toString(36).slice(2)}`;
+        element.setAttribute("data-stage-marker", marker);
+        return `[data-stage-marker="${marker}"]`;
+      }),
+      attribute,
+    },
     { timeout: 5_000 },
   );
 }
@@ -142,10 +145,7 @@ try {
           scan: pseudo.animationName,
         };
       });
-      assert(
-        atmosphereState.lit === "true",
-        `${label}: quadro de atmosfera não acendeu no scroll`,
-      );
+      assert(atmosphereState.lit === "true", `${label}: quadro de atmosfera não acendeu no scroll`);
       assert(atmosphereState.shadow !== "none", `${label}: atmosfera sem glow automático`);
       assert(
         atmosphereState.scan === "barber-mobile-scan",
@@ -159,7 +159,9 @@ try {
       const groomingSection = page
         .getByRole("heading", { name: "Leve o ritual para casa" })
         .locator("xpath=ancestor::section[1]");
-      const productCard = groomingSection.locator('.premium-product-card[data-niche="barber"]').first();
+      const productCard = groomingSection
+        .locator('.premium-product-card[data-niche="barber"]')
+        .first();
       await productCard.scrollIntoViewIfNeeded();
       await page.waitForTimeout(1_100);
       const productState = await productCard.evaluate((element) => {
@@ -173,7 +175,10 @@ try {
           glowOpacity: glow ? Number(getComputedStyle(glow).opacity) : 0,
         };
       });
-      assert(productState.inView === "true", `${label}: produto não reconheceu entrada na viewport`);
+      assert(
+        productState.inView === "true",
+        `${label}: produto não reconheceu entrada na viewport`,
+      );
       assert(
         productState.mobileActive === "true",
         `${label}: produto ainda depende de toque prolongado`,
@@ -184,7 +189,10 @@ try {
         `${label}: borda do produto não anima automaticamente`,
       );
       assert(productState.glowOpacity > 0.08, `${label}: glow do produto não ficou visível`);
-      assert(runtimeErrors.length === 0, `${label}: erros de runtime: ${runtimeErrors.join(" | ")}`);
+      assert(
+        runtimeErrors.length === 0,
+        `${label}: erros de runtime: ${runtimeErrors.join(" | ")}`,
+      );
 
       const scenario = {
         label,
