@@ -175,6 +175,72 @@
   .store-theme-barbearia main article:nth-of-type(3n) {
     animation-delay: -3.4s;
   }
+
+  /* Barber Noir: os trilhos permanecem horizontais de propósito, mas o documento
+     não cria overflow lateral e o gesto mantém o scroll vertical disponível. */
+  .store-theme-barbearia main [class*="snap-x"][class*="overflow-x-auto"] {
+    overscroll-behavior-inline: contain;
+    scroll-padding-inline: 1.5rem;
+    scrollbar-width: none;
+    touch-action: pan-x pan-y;
+  }
+
+  .store-theme-barbearia main [class*="snap-x"][class*="overflow-x-auto"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Carta de serviços: iluminação automática comandada pela posição no scroll,
+     sem depender de clique, long press ou estado :active. */
+  .store-theme-barbearia main li[data-active="true"] > a {
+    background: linear-gradient(
+      90deg,
+      rgb(245 158 11 / 12%),
+      rgb(23 23 23 / 34%) 58%,
+      transparent
+    );
+    box-shadow:
+      inset 2px 0 0 rgb(252 211 77 / 72%),
+      0 18px 46px -34px rgb(245 158 11 / 78%);
+  }
+
+  .store-theme-barbearia main li[data-active="true"] h3 {
+    color: rgb(254 243 199);
+    text-shadow: 0 0 22px rgb(245 158 11 / 24%);
+  }
+
+  /* Ritual e atmosfera: o próprio IntersectionObserver acende o card visível. */
+  .store-theme-barbearia main [data-lit="true"] {
+    border-color: rgb(252 211 77 / 46%) !important;
+    box-shadow:
+      0 18px 48px -34px rgb(245 158 11 / 80%),
+      inset 0 0 0 1px rgb(252 211 77 / 8%);
+  }
+
+  .store-theme-barbearia main figure[data-lit="true"] figcaption {
+    color: rgb(254 243 199);
+  }
+
+  .store-theme-barbearia main figure[data-lit="true"]::after {
+    position: absolute;
+    inset: -55% -120%;
+    z-index: 2;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(
+      112deg,
+      transparent 43%,
+      rgb(252 211 77 / 13%) 49%,
+      rgb(255 255 255 / 8%) 51%,
+      transparent 57%
+    );
+    animation: barber-mobile-scan 5.4s ease-in-out infinite;
+  }
+
+  /* Produtos da casa: a borda ambiente fica visível durante o scroll, não só no toque. */
+  .store-theme-barbearia .premium-product-card[data-in-view="true"] .premium-product-frame {
+    border-color: rgb(252 211 77 / 34%);
+    box-shadow: 0 20px 50px -34px rgb(245 158 11 / 72%);
+  }
 }
 
 @media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
@@ -209,6 +275,25 @@
   }
 }
 
+@keyframes barber-mobile-scan {
+  0%,
+  18% {
+    transform: translate3d(-28%, 0, 0);
+    opacity: 0;
+  }
+  32% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 0.8;
+  }
+  86%,
+  100% {
+    transform: translate3d(28%, 0, 0);
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-testid="fashion-chapter"] *,
   [data-testid="fashion-atelier"] * {
@@ -217,7 +302,8 @@
 
   .store-theme-moda main article,
   .store-theme-barbearia main article,
-  [data-ambient-card] {
+  [data-ambient-card],
+  .store-theme-barbearia main figure[data-lit="true"]::after {
     animation: none !important;
   }
 }
