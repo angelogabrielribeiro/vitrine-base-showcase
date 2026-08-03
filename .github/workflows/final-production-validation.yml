@@ -1,0 +1,86 @@
+name: Final production validation
+
+on:
+  push:
+    branches:
+      - validate/final-production
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: final-production-validation
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.0-noble
+      options: --user 1001
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: validate/final-production
+
+      - name: Install dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npm install --no-save --no-audit --no-fund playwright@1.62.0
+
+      - name: Static validation
+        run: |
+          npx prettier --check \
+            src/components/storefront/liquid-mobile-menu.tsx \
+            src/components/storefront/whatsapp-fab.tsx \
+            src/components/storefront/catalog-expansion-hero.tsx \
+            src/routes/__root.tsx \
+            src/mobile-vitrine-overrides.css \
+            src/components/storefront/electronics-storefront.tsx \
+            scripts/validate-novacore.mjs \
+            scripts/validate-mobile-vitrines.mjs
+          npx eslint \
+            src/components/storefront/liquid-mobile-menu.tsx \
+            src/components/storefront/whatsapp-fab.tsx \
+            src/components/storefront/catalog-expansion-hero.tsx \
+            src/routes/__root.tsx \
+            src/components/storefront/electronics-storefront.tsx
+          npm run build
+
+      - name: Browser validation
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: |
+          mkdir -p artifacts/final-production
+          npm run dev -- --host 0.0.0.0 --port 4173 > artifacts/final-production/server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+
+          for attempt in $(seq 1 90); do
+            if curl --fail --silent http://127.0.0.1:4173 > /dev/null; then
+              break
+            fi
+            if [ "$attempt" -eq 90 ]; then
+              cat artifacts/final-production/server.log
+              exit 1
+            fi
+            sleep 1
+          done
+
+          node scripts/validate-mobile-vitrines.mjs 2>&1 | tee artifacts/final-production/mobile-validation.log
+          node scripts/validate-novacore.mjs 2>&1 | tee artifacts/final-production/novacore-validation.log
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-production-validation-${{ github.run_id }}
+          path: |
+            artifacts/final-production
+            artifacts/mobile-vitrines
+            artifacts/novacore-validation
+          if-no-files-found: warn
+          retention-days: 14
