@@ -5,13 +5,16 @@ on:
   push:
     branches:
       - validate/final-production
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: final-production-validation
+  group: final-production-validation-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -25,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: validate/final-production
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
       - name: Install dependencies
         run: |
