@@ -92,6 +92,32 @@ try {
         };
       });
       assert(serviceState.visibleRatio >= 0.6, `${label}: serviço não foi centralizado pelo teste`);
+      const serviceSelection = await serviceRows.evaluateAll((rows) => {
+        const viewportCenter = innerHeight / 2;
+        const states = rows.map((row, index) => {
+          const rect = row.getBoundingClientRect();
+          return {
+            index,
+            active: row.getAttribute("data-active") === "true",
+            distance: Math.abs(rect.top + rect.height / 2 - viewportCenter),
+          };
+        });
+        return {
+          activeIndexes: states.filter((state) => state.active).map((state) => state.index),
+          nearestIndex: states.reduce((nearest, state) =>
+            state.distance < nearest.distance ? state : nearest,
+          ).index,
+        };
+      });
+      assert(serviceState.active === "true", `${label}: serviço central não recebeu data-active=true`);
+      assert(
+        serviceSelection.activeIndexes.length === 1,
+        `${label}: mais de um serviço ficou ativo (${serviceSelection.activeIndexes.join(", ")})`,
+      );
+      assert(
+        serviceSelection.activeIndexes[0] === serviceSelection.nearestIndex,
+        `${label}: serviço ativo não é o mais próximo do centro`,
+      );
       assert(
         serviceState.ambientAnimation === "barber-service-ambient",
         `${label}: serviço sem pulso ambiente automático`,
@@ -215,6 +241,7 @@ try {
         label,
         width,
         serviceState,
+        serviceSelection,
         ritualState,
         ritualRailState,
         atmosphereState,
