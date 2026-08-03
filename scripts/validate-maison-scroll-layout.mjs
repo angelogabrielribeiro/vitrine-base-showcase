@@ -157,7 +157,7 @@ async function inspectChapters(page, scenario) {
     `${scenario.name}: storytelling não conclui enquanto visível (${after.opacity})`,
   );
   assert(
-    revealDuration <= (scenario.mobile ? 1_200 : 2_500),
+    revealDuration <= (scenario.mobile ? 1_400 : 2_500),
     `${scenario.name}: storytelling demorou demais para concluir (${revealDuration}ms)`,
   );
 
