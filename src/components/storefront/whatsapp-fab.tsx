@@ -7,16 +7,18 @@ export function WhatsappFab({ store, message }: { store: StoreConfig; message?: 
   const url = waStore(store, message ?? `Olá, ${store.name}! Vim pelo site.`);
   const isBarber = store.niche === "barber";
   const { menuOpen } = useMobileMenuState();
+
   return (
     <a
       href={url}
       target="_blank"
       rel="noreferrer"
       aria-label="Falar no WhatsApp"
+      data-whatsapp-fab
       aria-hidden={menuOpen ? true : undefined}
       tabIndex={menuOpen ? -1 : undefined}
       className={
-        "fixed right-5 z-30 inline-flex items-center justify-center rounded-full bg-green-500 text-white shadow-xl transition-[opacity,transform] duration-200 hover:scale-105 hover:bg-green-600 md:z-40 " +
+        "fixed right-5 z-30 inline-flex items-center justify-center rounded-full bg-green-500 text-white shadow-xl transition-[opacity,transform,visibility] duration-200 hover:scale-105 hover:bg-green-600 md:z-40 " +
         (menuOpen
           ? "invisible scale-90 opacity-0 md:visible md:scale-100 md:opacity-100 "
           : "visible opacity-100 ") +
