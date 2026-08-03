@@ -1,0 +1,62 @@
+name: Apply Barber service center source
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/barber-service-source.trigger"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-barber-service-center-source
+  cancel-in-progress: false
+
+jobs:
+  patch:
+    if: github.event.pull_request.head.ref == 'fix/barber-mobile-cards-stage'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/barber-mobile-cards-stage
+          fetch-depth: 0
+
+      - name: Apply deterministic service activation
+        run: python scripts/apply-barber-service-center-fix.py
+
+      - name: Format and check source
+        run: |
+          npm install --no-audit --no-fund
+          npx prettier --write src/components/storefront/barber-storefront.tsx
+          git checkout -- package-lock.json 2>/dev/null || true
+          npx eslint src/components/storefront/barber-storefront.tsx
+          npm run build
+
+      - name: Commit source patch and remove branch helpers
+        run: |
+          git rm \
+            scripts/apply-barber-service-center-fix.py \
+            .github/barber-service-source.trigger
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/storefront/barber-storefront.tsx
+          git commit -m "Make Barber service activation follow viewport center"
+          git push origin HEAD:fix/barber-mobile-cards-stage
+
+      - name: Remove branch helpers after failure
+        if: failure()
+        run: |
+          git fetch origin fix/barber-mobile-cards-stage
+          git reset --hard origin/fix/barber-mobile-cards-stage
+          git rm -f \
+            scripts/apply-barber-service-center-fix.py \
+            .github/barber-service-source.trigger
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Remove failed Barber service source helpers"
+          git push origin HEAD:fix/barber-mobile-cards-stage
