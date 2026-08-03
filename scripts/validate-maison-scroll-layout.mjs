@@ -100,7 +100,7 @@ async function inspectChapters(page, scenario) {
   await page.evaluate(
     ({ top, height }) =>
       window.scrollTo({
-        top: Math.max(0, top - height * 0.88),
+        top: Math.max(0, top - height * 1.05),
         behavior: "instant",
       }),
     { top: targetDocumentTop, height: scenario.height },

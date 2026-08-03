@@ -38,7 +38,7 @@ type Chapter = {
 
 function FashionChapter({ chapter, index }: { chapter: Chapter; index: number }) {
   const reduceMotion = useReducedMotion();
-  const { ref, inView } = useInView<HTMLElement>({ amount: 0.16, rootMargin: "0px" });
+  const { ref, inView } = useInView<HTMLElement>({ amount: 0, rootMargin: "0px" });
 
   const chapterTransition = { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const };
 
