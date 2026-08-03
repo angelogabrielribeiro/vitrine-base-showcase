@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Check, MousePointer2, Sparkles } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Product, StoreConfig } from "@/types/commerce";
 import { FashionHero } from "@/components/storefront/hero/fashion-hero";
 import type { HeroSpotlight } from "@/components/storefront/hero/niche-hero";
@@ -37,8 +37,36 @@ type Chapter = {
 };
 
 function FashionChapter({ chapter, index }: { chapter: Chapter; index: number }) {
+  const ref = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
-  const { ref, inView } = useInView<HTMLElement>({ amount: 0, rootMargin: "0px" });
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    let frame = 0;
+
+    const update = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        const element = ref.current;
+        if (!element) return;
+
+        const rect = element.getBoundingClientRect();
+        const entersBeforeCenter = rect.top < window.innerHeight * 0.88;
+        const remainsOnScreen = rect.bottom > window.innerHeight * 0.12;
+        setInView(entersBeforeCenter && remainsOnScreen);
+      });
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
 
   const chapterTransition = { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const };
 
