@@ -1,4 +1,4 @@
-# Regressão final limpa da Etapa 1A da Maison Belle.
+# Regressão final da Etapa 1A com controlador direto de scroll.
 name: Validate Maison scroll layout
 
 on:
