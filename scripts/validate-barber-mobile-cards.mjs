@@ -109,7 +109,10 @@ try {
           ).index,
         };
       });
-      assert(serviceState.active === "true", `${label}: serviço central não recebeu data-active=true`);
+      assert(
+        serviceState.active === "true",
+        `${label}: serviço central não recebeu data-active=true`,
+      );
       assert(
         serviceSelection.activeIndexes.length === 1,
         `${label}: mais de um serviço ficou ativo (${serviceSelection.activeIndexes.join(", ")})`,

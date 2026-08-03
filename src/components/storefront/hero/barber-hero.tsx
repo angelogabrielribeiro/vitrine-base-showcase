@@ -10,13 +10,7 @@ import {
   StaggerItem,
   MOTION,
 } from "@/components/motion/primitives";
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-  useMotionValue,
-} from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform, useMotionValue } from "framer-motion";
 import { useAdaptiveQuality } from "@/hooks/use-adaptive-quality";
 
 /**
@@ -42,12 +36,8 @@ export function BarberHero({ store }: NicheHeroProps) {
     const scheduleUpdate = () => {
       window.cancelAnimationFrame(frame);
       frame = window.requestAnimationFrame(() => {
-        const list = document.querySelector(
-          '.store-theme-barbearia main ul[class*="divide-y"]',
-        );
-        const rows = list
-          ? Array.from(list.querySelectorAll<HTMLElement>(":scope > li"))
-          : [];
+        const list = document.querySelector('.store-theme-barbearia main ul[class*="divide-y"]');
+        const rows = list ? Array.from(list.querySelectorAll<HTMLElement>(":scope > li")) : [];
         if (!rows.length) return;
 
         if (list !== observedList) {
