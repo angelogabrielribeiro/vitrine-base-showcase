@@ -34,3 +34,5 @@ jobs:
           git add scripts/validate-maison-scroll-layout.mjs
           git commit -m "Formata regressão visual da Maison"
           git push origin HEAD:fix/maison-scroll-layout-stage
+
+# trigger: format Maison validation
