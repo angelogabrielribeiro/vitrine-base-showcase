@@ -29,6 +29,13 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+async function centerInViewport(locator, delay = 900) {
+  await locator.evaluate((element) => {
+    element.scrollIntoView({ behavior: "instant", block: "center", inline: "center" });
+  });
+  await locator.page().waitForTimeout(delay);
+}
+
 try {
   for (const viewport of viewports) {
     const label = `barber-${viewport.name}`;
@@ -70,18 +77,21 @@ try {
       const serviceRows = servicesSection.locator("li");
       assert((await serviceRows.count()) >= 3, `${label}: carta de serviços incompleta`);
       const serviceTarget = serviceRows.nth(1);
-      await serviceTarget.scrollIntoViewIfNeeded();
-      await page.waitForTimeout(900);
+      await centerInViewport(serviceTarget);
       const serviceState = await serviceTarget.evaluate((element) => {
         const link = element.querySelector("a");
         const title = element.querySelector("h3");
+        const rect = element.getBoundingClientRect();
         return {
           active: element.getAttribute("data-active"),
           background: link ? getComputedStyle(link).backgroundImage : "none",
           shadow: link ? getComputedStyle(link).boxShadow : "none",
           titleColor: title ? getComputedStyle(title).color : "",
+          visibleRatio:
+            Math.max(0, Math.min(rect.bottom, innerHeight) - Math.max(rect.top, 0)) / rect.height,
         };
       });
+      assert(serviceState.visibleRatio >= 0.6, `${label}: serviço não foi centralizado pelo teste`);
       assert(serviceState.active === "true", `${label}: serviço não acendeu com o scroll`);
       assert(serviceState.background !== "none", `${label}: serviço ativo sem iluminação`);
       assert(serviceState.shadow !== "none", `${label}: serviço ativo sem profundidade`);
@@ -90,8 +100,7 @@ try {
         .getByRole("heading", { name: "Três atos, uma cadeira" })
         .locator("xpath=ancestor::section[1]");
       const ritualCard = ritualSection.locator("[data-lit]").first();
-      await ritualCard.scrollIntoViewIfNeeded();
-      await page.waitForTimeout(900);
+      await centerInViewport(ritualCard);
       const ritualState = await ritualCard.evaluate((element) => ({
         lit: element.getAttribute("data-lit"),
         shadow: getComputedStyle(element).boxShadow,
@@ -113,8 +122,7 @@ try {
         .getByRole("heading", { name: "Atmosfera Barber Noir" })
         .locator("xpath=ancestor::section[1]");
       const atmosphereCard = atmosphereSection.locator("figure").nth(1);
-      await atmosphereCard.scrollIntoViewIfNeeded();
-      await page.waitForTimeout(900);
+      await centerInViewport(atmosphereCard);
       const atmosphereState = await atmosphereCard.evaluate((element) => {
         const image = element.querySelector("img");
         const pseudo = getComputedStyle(element, "::after");
@@ -142,8 +150,7 @@ try {
       const productCard = groomingSection
         .locator('.premium-product-card[data-niche="barber"]')
         .first();
-      await productCard.scrollIntoViewIfNeeded();
-      await page.waitForTimeout(1_100);
+      await centerInViewport(productCard, 1_100);
       const productState = await productCard.evaluate((element) => {
         const frame = element.querySelector(".premium-product-frame");
         const glow = element.querySelector(".product-attention-glow");
