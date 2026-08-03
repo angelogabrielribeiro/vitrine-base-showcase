@@ -124,7 +124,7 @@ replacement = '''  await page.evaluate(
 '''
 
 test, count = re.subn(
-    r'  if \(scenario\.mobile\) \{.*?  \}\n\n  return metrics;',
+    r'  if \(scenario\.mobile\) \{.*?\n  return metrics;',
     replacement + '\n  return metrics;',
     test,
     count=1,
