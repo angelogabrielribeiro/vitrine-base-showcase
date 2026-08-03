@@ -9,6 +9,7 @@ on:
       - "src/mobile-vitrine-overrides.css"
       - "src/components/storefront/product-card.tsx"
       - "src/components/storefront/barber-storefront.tsx"
+      - "src/components/storefront/hero/barber-hero.tsx"
       - "scripts/validate-barber-mobile-cards.mjs"
       - ".github/workflows/validate-barber-mobile-cards.yml"
 
@@ -43,10 +44,12 @@ jobs:
             src/mobile-vitrine-overrides.css \
             src/components/storefront/product-card.tsx \
             src/components/storefront/barber-storefront.tsx \
+            src/components/storefront/hero/barber-hero.tsx \
             scripts/validate-barber-mobile-cards.mjs
           npx eslint \
             src/components/storefront/product-card.tsx \
-            src/components/storefront/barber-storefront.tsx
+            src/components/storefront/barber-storefront.tsx \
+            src/components/storefront/hero/barber-hero.tsx
           node --check scripts/validate-barber-mobile-cards.mjs
           npm run build
 
