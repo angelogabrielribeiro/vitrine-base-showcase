@@ -1,0 +1,138 @@
+@media (max-width: 1023px) {
+  /* O showroom inicial já é a jornada das quatro vitrines no mobile. */
+  [data-testid="universe-journey"],
+  #demonstracoes {
+    display: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Maison Belle: cada capítulo vira uma cena editorial legível, sem imagem ampliada atrás do texto. */
+  [data-testid="fashion-chapter"] {
+    min-height: auto !important;
+    padding: 4.5rem 1.25rem;
+  }
+
+  [data-testid="fashion-chapter"] > div.sticky {
+    position: relative !important;
+    top: auto !important;
+    display: grid !important;
+    height: auto !important;
+    gap: 1.75rem;
+    overflow: visible !important;
+  }
+
+  [data-testid="fashion-chapter"] > div.sticky > div.absolute.inset-0 {
+    position: relative !important;
+    inset: auto !important;
+    aspect-ratio: 4 / 5;
+    overflow: hidden !important;
+    border: 1px solid rgb(234 209 200 / 18%);
+    background: #3d1828;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  [data-testid="fashion-chapter"] > div.sticky > div.absolute.inset-0 > img {
+    object-fit: contain !important;
+    object-position: center !important;
+    padding: 0.35rem;
+    background: #3d1828;
+    transform: none !important;
+  }
+
+  [data-testid="fashion-chapter"] > div.sticky > div.relative {
+    display: block !important;
+    height: auto !important;
+    padding: 0 !important;
+  }
+
+  [data-testid="fashion-chapter"] > div.sticky > div.relative > div {
+    max-width: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  [data-testid="fashion-chapter"] h2 {
+    max-width: 12ch !important;
+    font-size: clamp(2.25rem, 11vw, 3.4rem) !important;
+    line-height: 0.94 !important;
+    letter-spacing: -0.045em !important;
+  }
+
+  [data-testid="fashion-chapter"] p {
+    max-width: 36ch !important;
+  }
+
+  [data-testid="fashion-chapter"] span.absolute,
+  [data-testid="fashion-chapter"] p:has(.lucide-mouse-pointer-2) {
+    display: none !important;
+  }
+
+  /* A arara deixa de ser um leque absoluto espremido e vira trilho horizontal tocável. */
+  [data-testid="fashion-atelier"] [class*="mt-16"][class*="min-h"] {
+    min-height: 0 !important;
+    gap: 2rem !important;
+  }
+
+  [data-testid="fashion-atelier"] [class*="mt-16"][class*="min-h"] > div:first-child {
+    display: flex !important;
+    height: auto !important;
+    gap: 1rem;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory;
+    perspective: none !important;
+    padding: 0.5rem 10vw 1rem 0;
+  }
+
+  [data-testid="fashion-atelier"] [class*="mt-16"][class*="min-h"] > div:first-child > div {
+    position: relative !important;
+    inset: auto !important;
+    width: min(72vw, 18rem) !important;
+    height: 27rem !important;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  [data-testid="fashion-atelier"] [class*="border-l"] {
+    border-left: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  /* NovaCore: reduz a órbita, não o conteúdo; painel permanece em fluxo abaixo da cena. */
+  [class*="min-h-[280px]"][class*="perspective:1700px"]
+    > [class*="transform-style:preserve-3d"] {
+    scale: 0.62;
+    transform-origin: center;
+  }
+
+  [class*="min-h-[620px]"][class*="perspective:1800px"] {
+    min-height: 430px !important;
+  }
+
+  [class*="min-h-[620px]"][class*="perspective:1800px"]
+    > [class*="transform-style:preserve-3d"] {
+    inset: 16% 11% !important;
+  }
+
+  /* Evita nomes técnicos e títulos editoriais ultrapassando 360–430 px. */
+  [data-testid="electronics-circuit-story"] h2,
+  [data-testid="electronics-circuit-story"] h3 {
+    max-width: 100% !important;
+    overflow-wrap: anywhere;
+  }
+
+  /* Cards e painéis devem manter distância da navegação inferior fixa. */
+  main {
+    scroll-padding-bottom: 7.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-testid="fashion-chapter"] *,
+  [data-testid="fashion-atelier"] * {
+    scroll-behavior: auto !important;
+  }
+}

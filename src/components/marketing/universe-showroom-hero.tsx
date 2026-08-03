@@ -1,19 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import {
-  animate,
-  motion,
-  useMotionTemplate,
-  useMotionValue,
-  useTransform,
-  AnimatePresence,
-} from "framer-motion";
-import { ArrowRight, ChevronLeft, ChevronRight, Hand, MessageCircle } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowRight, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 import { useAdaptiveQuality } from "@/hooks/use-adaptive-quality";
 import { UNIVERSES, universeHref, type Universe } from "@/components/marketing/universe-data";
-
-const STEP = 360 / UNIVERSES.length;
 
 type UniverseShowroomHeroProps = {
   proposalUrl: string;
@@ -21,265 +12,12 @@ type UniverseShowroomHeroProps = {
   onActiveChange?: (universe: Universe) => void;
 };
 
-function normalizeIndex(rotation: number) {
-  const raw = Math.round(-rotation / STEP) % UNIVERSES.length;
-  return (raw + UNIVERSES.length) % UNIVERSES.length;
-}
-
-function UniversePanel({
-  universe,
-  index,
-  rotation,
-  radius,
-  active,
-  onSelect,
-  reduced,
-}: {
-  universe: Universe;
-  index: number;
-  rotation: ReturnType<typeof useMotionValue<number>>;
-  radius: number;
-  active: boolean;
-  onSelect: () => void;
-  reduced: boolean;
-}) {
-  const angle = useTransform(rotation, (r) => r + index * STEP);
-  const depth = useTransform(rotation, (r) => Math.cos(((r + index * STEP) * Math.PI) / 180));
-  const opacity = useTransform(depth, (c) => 0.24 + 0.76 * Math.max(0, (c + 1) / 2) ** 2.2);
-  const blur = useTransform(depth, (c) => `blur(${(Math.max(0, 1 - (c + 1) / 2) * 5).toFixed(2)}px)`);
-  const lift = useTransform(depth, (c) => -18 * Math.max(0, c));
-  const transform = useMotionTemplate`rotateY(${angle}deg) translateZ(${radius}px)`;
-
-  return (
-    <motion.button
-      type="button"
-      onClick={onSelect}
-      aria-label={`${universe.name} — ${universe.label}`}
-      aria-current={active ? "true" : undefined}
-      className="absolute left-1/2 top-1/2 h-[62%] w-[58%] max-w-[22rem] -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-[1.75rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vb-gold sm:w-[46%]"
-      style={{ transform, opacity, filter: reduced ? undefined : blur, transformStyle: "preserve-3d" }}
-      whileTap={{ scale: 0.965 }}
-      transition={{ duration: 0.2 }}
-    >
-      <motion.div
-        className="relative h-full w-full overflow-hidden rounded-[1.75rem] border bg-black/50 p-2 shadow-2xl shadow-black/60 backdrop-blur-xl"
-        style={{
-          y: reduced ? 0 : lift,
-          borderColor: active ? `${universe.accent}88` : "rgba(255,255,255,0.12)",
-          boxShadow: active ? `0 40px 120px -40px ${universe.accent}` : undefined,
-        }}
-        animate={
-          reduced
-            ? undefined
-            : { rotateZ: [0, index % 2 === 0 ? 0.9 : -0.9, 0], y: [0, index % 2 === 0 ? -7 : 7, 0] }
-        }
-        transition={{
-          duration: 6.2 + index * 0.7,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: index * 0.4,
-        }}
-      >
-        <div className="relative h-full w-full overflow-hidden rounded-[1.3rem]">
-          <img
-            src={universe.image}
-            alt={`Prévia da demonstração ${universe.name}`}
-            loading={index === 0 ? "eager" : "lazy"}
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/25 to-transparent" />
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 mix-blend-screen transition-opacity duration-700"
-            style={{
-              opacity: active ? 0.5 : 0.16,
-              background: `radial-gradient(circle at 30% 100%, ${universe.accent}55, transparent 62%)`,
-            }}
-          />
-          <div className="absolute inset-x-0 bottom-0 p-4 text-left">
-            <p
-              className="text-[9px] font-bold uppercase tracking-[0.24em]"
-              style={{ color: universe.accent }}
-            >
-              {universe.number} · {universe.label}
-            </p>
-            <p className="mt-1 font-display text-xl font-semibold text-white sm:text-2xl">
-              {universe.name}
-            </p>
-            <p className="mt-1 text-[11px] leading-4 text-white/60">{universe.tagline}</p>
-          </div>
-        </div>
-      </motion.div>
-    </motion.button>
-  );
-}
-
-function MobileUniverseCard({
-  universe,
-  index,
-  active,
-  offset,
-  tier,
-  onSelect,
-}: {
-  universe: Universe;
-  index: number;
-  active: boolean;
-  offset: number;
-  tier: "off" | "low" | "high";
-  onSelect: (el: HTMLElement | null) => void;
-}) {
-  const depth = tier === "off";
-  const clamped = Math.max(-1, Math.min(1, offset));
-  const scale = depth ? (active ? 1 : 0.95) : Math.max(0.8, 1 - Math.abs(clamped) * 0.34);
-  const rotateY = depth ? 0 : clamped * -22;
-  const translateZ = depth ? 0 : -Math.abs(clamped) * 90;
-  const opacity = Math.max(0.42, 1 - Math.abs(clamped) * 0.85);
-
-  return (
-    <Link
-      ref={onSelect}
-      to="/demo/$storeSlug"
-      params={{ storeSlug: universe.slug }}
-      aria-current={active ? "true" : undefined}
-      aria-label={`${universe.name} — ${universe.label}`}
-      className="relative aspect-[3/4] w-[70vw] max-w-[19rem] shrink-0 snap-center overflow-hidden rounded-[1.75rem] border bg-black/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vb-gold"
-      style={{
-        transform: depth
-          ? undefined
-          : `perspective(1000px) rotateY(${rotateY}deg) translateZ(${translateZ}px) scale(${scale})`,
-        opacity,
-        borderColor: active ? `${universe.accent}66` : "rgba(255,255,255,0.1)",
-        boxShadow: active ? `0 26px 76px -34px ${universe.accent}` : undefined,
-        transformStyle: "preserve-3d",
-      }}
-      onClick={(event) => {
-        if (!active) event.preventDefault();
-      }}
-    >
-      <img
-        src={universe.image}
-        alt={`Prévia da demonstração ${universe.name}`}
-        loading={index === 0 ? "eager" : "lazy"}
-        className="h-full w-full object-cover"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 mix-blend-screen transition-opacity duration-500"
-        style={{
-          opacity: active ? 0.4 : 0.14,
-          background: `radial-gradient(circle at 30% 100%, ${universe.accent}44, transparent 62%)`,
-        }}
-      />
-      <div className="absolute inset-x-0 bottom-0 p-4 text-left">
-        <p className="text-[9px] font-bold uppercase tracking-[0.24em]" style={{ color: universe.accent }}>
-          {universe.number} · {universe.label}
-        </p>
-        <p className="mt-1 font-display text-xl font-semibold text-white">{universe.name}</p>
-      </div>
-    </Link>
-  );
-}
-
-function MobileUniverseCarousel({
-  activeIndex,
-  onActiveChange,
-  tier,
-}: {
-  activeIndex: number;
-  onActiveChange: (index: number) => void;
-  tier: "off" | "low" | "high";
-}) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<(HTMLElement | null)[]>([]);
-  const [offsets, setOffsets] = useState<number[]>(() => UNIVERSES.map(() => 0));
-
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    let frame = 0;
-    const measure = () => {
-      const rect = track.getBoundingClientRect();
-      const center = rect.left + rect.width / 2;
-      const next = cardsRef.current.map((card) => {
-        if (!card) return 0;
-        const cardRect = card.getBoundingClientRect();
-        const cardCenter = cardRect.left + cardRect.width / 2;
-        return (cardCenter - center) / rect.width;
-      });
-      setOffsets(next);
-      let nearest = 0;
-      next.forEach((value, i) => {
-        if (Math.abs(value) < Math.abs(next[nearest])) nearest = i;
-      });
-      onActiveChange(nearest);
-    };
-    measure();
-    const onScroll = () => {
-      window.cancelAnimationFrame(frame);
-      frame = window.requestAnimationFrame(measure);
-    };
-    track.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      track.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      window.cancelAnimationFrame(frame);
-    };
-  }, [onActiveChange]);
-
-  const scrollTo = useCallback((index: number) => {
-    const card = cardsRef.current[index];
-    card?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-  }, []);
-
-  return (
-    <div className="lg:hidden">
-      <div
-        ref={trackRef}
-        className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-[15vw] pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        style={{ scrollBehavior: "smooth" }}
-        role="group"
-        aria-label="Showroom dos universos. Deslize para trocar."
-      >
-        {UNIVERSES.map((universe, index) => (
-          <MobileUniverseCard
-            key={universe.slug}
-            universe={universe}
-            index={index}
-            active={index === activeIndex}
-            offset={offsets[index] ?? 0}
-            tier={tier}
-            onSelect={(el) => {
-              cardsRef.current[index] = el;
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="mt-5 flex items-center justify-center gap-2">
-        {UNIVERSES.map((universe, index) => (
-          <button
-            key={universe.slug}
-            type="button"
-            onClick={() => scrollTo(index)}
-            aria-label={`Ir para ${universe.name}`}
-            aria-current={index === activeIndex ? "true" : undefined}
-            className="grid h-8 w-8 place-items-center"
-          >
-            <span
-              className="block h-2 rounded-full transition-all duration-300"
-              style={{
-                width: index === activeIndex ? "1.5rem" : "0.5rem",
-                background: index === activeIndex ? universe.accent : "rgba(255,255,255,0.22)",
-              }}
-            />
-          </button>
-        ))}
-      </div>
-    </div>
-  );
+function relativeIndex(index: number, activeIndex: number) {
+  let value = index - activeIndex;
+  const half = UNIVERSES.length / 2;
+  if (value > half) value -= UNIVERSES.length;
+  if (value < -half) value += UNIVERSES.length;
+  return value;
 }
 
 export function UniverseShowroomHero({
@@ -289,104 +27,94 @@ export function UniverseShowroomHero({
 }: UniverseShowroomHeroProps) {
   const { capabilities } = useCinematicMotion();
   const { tier } = useAdaptiveQuality();
-  const reduced =
-    capabilities.hydrated &&
-    (capabilities.reducedMotion || capabilities.coarsePointer || capabilities.quality === "economy");
-  const rotation = useMotionValue(0);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const [radius, setRadius] = useState(300);
+  const motionDisabled = capabilities.hydrated && capabilities.reducedMotion;
   const [activeIndex, setActiveIndex] = useState(0);
-  const [dragging, setDragging] = useState(false);
-  const [explored, setExplored] = useState(false);
-  const idleRef = useRef(0);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [offsets, setOffsets] = useState<number[]>(() => UNIVERSES.map(() => 0));
+  const trackRef = useRef<HTMLDivElement>(null);
+  const cardsRef = useRef<(HTMLAnchorElement | null)[]>([]);
+  const idleUntilRef = useRef(0);
   const active = UNIVERSES[activeIndex];
 
   useEffect(() => {
-    const element = stageRef.current;
-    if (!element) return;
-    const measure = () => {
-      const width = element.clientWidth;
-      setRadius(Math.min(Math.max(width * 0.44, 170), 420));
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(element);
-    return () => observer.disconnect();
+    const query = window.matchMedia("(min-width: 1024px)");
+    const update = () => setIsDesktop(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
   }, []);
-
-  useEffect(() => {
-    const unsubscribe = rotation.on("change", (value) => {
-      const next = normalizeIndex(value);
-      setActiveIndex((current) => (current === next ? current : next));
-    });
-    return unsubscribe;
-  }, [rotation]);
 
   useEffect(() => {
     onActiveChange?.(active);
   }, [active, onActiveChange]);
 
-  // Movimento ambiental: a constelação continua girando sem scroll e sem mouse.
   useEffect(() => {
-    if (reduced || !capabilities.hydrated) return;
-    let frame = 0;
-    let last = performance.now();
-    const loop = (now: number) => {
-      const delta = Math.min(now - last, 64);
-      last = now;
-      if (!dragging && !document.hidden && idleRef.current < now) {
-        rotation.set(rotation.get() - (delta / 1000) * 5.2);
-      }
-      frame = window.requestAnimationFrame(loop);
-    };
-    frame = window.requestAnimationFrame(loop);
-    return () => window.cancelAnimationFrame(frame);
-  }, [capabilities.hydrated, dragging, reduced, rotation]);
+    if (!isDesktop || motionDisabled || tier === "off") return;
+    const interval = window.setInterval(() => {
+      if (document.hidden || performance.now() < idleUntilRef.current) return;
+      setActiveIndex((current) => (current + 1) % UNIVERSES.length);
+    }, 5200);
+    return () => window.clearInterval(interval);
+  }, [isDesktop, motionDisabled, tier]);
 
-  const goTo = useCallback(
-    (index: number) => {
-      const current = rotation.get();
-      const target = -index * STEP;
-      const wrapped = target + Math.round((current - target) / 360) * 360;
-      idleRef.current = performance.now() + 4200;
-      setExplored(true);
-      animate(rotation, wrapped, { type: "spring", stiffness: 90, damping: 18, mass: 0.9 });
-    },
-    [rotation],
-  );
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || isDesktop) return;
+
+    let frame = 0;
+    const measure = () => {
+      const trackRect = track.getBoundingClientRect();
+      const center = trackRect.left + trackRect.width / 2;
+      const next = cardsRef.current.map((card) => {
+        if (!card) return 0;
+        const rect = card.getBoundingClientRect();
+        return (rect.left + rect.width / 2 - center) / Math.max(trackRect.width, 1);
+      });
+
+      setOffsets((current) =>
+        current.every((value, index) => Math.abs(value - (next[index] ?? 0)) < 0.008)
+          ? current
+          : next,
+      );
+
+      let nearest = 0;
+      next.forEach((value, index) => {
+        if (Math.abs(value) < Math.abs(next[nearest] ?? Number.POSITIVE_INFINITY)) nearest = index;
+      });
+      setActiveIndex((current) => (current === nearest ? current : nearest));
+    };
+
+    const schedule = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(measure);
+    };
+
+    measure();
+    track.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      track.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      window.cancelAnimationFrame(frame);
+    };
+  }, [isDesktop]);
+
+  const centerCard = useCallback((index: number) => {
+    idleUntilRef.current = performance.now() + 5200;
+    setActiveIndex(index);
+    cardsRef.current[index]?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
+  }, []);
 
   const step = useCallback(
-    (direction: number) => goTo((activeIndex + direction + UNIVERSES.length) % UNIVERSES.length),
-    [activeIndex, goTo],
+    (direction: number) => {
+      centerCard((activeIndex + direction + UNIVERSES.length) % UNIVERSES.length);
+    },
+    [activeIndex, centerCard],
   );
-
-  const dragState = useRef({ id: -1, x: 0, moved: 0 });
-
-  const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (reduced) return;
-    dragState.current = { id: event.pointerId, x: event.clientX, moved: 0 };
-    setDragging(true);
-    setExplored(true);
-  };
-
-  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (dragState.current.id !== event.pointerId) return;
-    const dx = event.clientX - dragState.current.x;
-    dragState.current.x = event.clientX;
-    dragState.current.moved += Math.abs(dx);
-    rotation.set(rotation.get() + dx * 0.32);
-  };
-
-  const endDrag = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (dragState.current.id !== event.pointerId) return;
-    dragState.current.id = -1;
-    setDragging(false);
-    idleRef.current = performance.now() + 3600;
-    if (dragState.current.moved > 14) goTo(normalizeIndex(rotation.get()));
-  };
-
-  const glowShift = useTransform(rotation, (r) => Math.sin((r * Math.PI) / 180) * 14);
-  const glow = useMotionTemplate`radial-gradient(circle at calc(50% + ${glowShift}%) 46%, ${active.accent}25, transparent 58%)`;
 
   return (
     <section
@@ -399,20 +127,31 @@ export function UniverseShowroomHero({
       <motion.div
         aria-hidden="true"
         className="absolute inset-0"
-        style={reduced ? undefined : { backgroundImage: glow }}
+        animate={
+          motionDisabled
+            ? undefined
+            : {
+                backgroundImage: [
+                  `radial-gradient(circle at 42% 42%, ${active.accent}18, transparent 58%)`,
+                  `radial-gradient(circle at 58% 48%, ${active.accent}28, transparent 62%)`,
+                  `radial-gradient(circle at 42% 42%, ${active.accent}18, transparent 58%)`,
+                ],
+              }
+        }
+        transition={{ duration: 7, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
       />
 
-      <div className="relative mx-auto grid min-h-[calc(100svh-4rem)] max-w-[90rem] gap-10 px-5 py-14 sm:px-8 sm:py-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:px-12">
+      <div className="relative mx-auto grid min-h-[calc(100svh-4rem)] max-w-[90rem] gap-12 px-5 py-14 sm:px-8 sm:py-16 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:px-12">
         <div className="relative z-20 max-w-3xl">
           <div className="flex flex-wrap items-center gap-3">
             <span className="vb-kicker">Showroom de quatro universos</span>
             <span className="h-px w-10 bg-vb-gold/60" aria-hidden="true" />
             <span className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-              Explore antes de entrar
+              Deslize, explore e entre
             </span>
           </div>
 
-          <h1 className="mt-6 font-display text-[clamp(2.9rem,6vw,6.4rem)] font-semibold leading-[0.88] tracking-[-0.06em] text-vb-ivory">
+          <h1 className="mt-6 max-w-[12ch] font-display text-[clamp(2.75rem,12vw,6.4rem)] font-semibold leading-[0.88] tracking-[-0.06em] text-vb-ivory">
             Sites que o cliente sente
             <span className="block" style={{ color: active.accent }}>
               antes de entender.
@@ -420,39 +159,62 @@ export function UniverseShowroomHero({
           </h1>
 
           <p className="mt-6 max-w-xl text-base leading-8 text-white/64">
-            Gire a constelação, escolha um universo e veja o que ele já sabe fazer: vitrine,
-            catálogo, pedido, agenda, painel e atendimento no WhatsApp.
+            Quatro identidades, quatro formas de vender e operar. A experiência muda com a marca —
+            não é o mesmo template trocando de cor.
           </p>
 
           <AnimatePresence mode="wait">
             <motion.div
               key={active.slug}
-              initial={reduced ? false : { opacity: 0, y: 14 }}
+              initial={motionDisabled ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={reduced ? undefined : { opacity: 0, y: -10 }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              exit={motionDisabled ? undefined : { opacity: 0, y: -10 }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               className="mt-8 rounded-[1.5rem] border border-white/12 bg-black/35 p-5 backdrop-blur-xl sm:p-6"
             >
-              <div className="flex items-center justify-between gap-4">
-                <div>
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
                   <p
                     className="text-[10px] font-bold uppercase tracking-[0.24em]"
                     style={{ color: active.accent }}
                   >
-                    Universo ativo {active.number}
+                    Universo {active.number}
                   </p>
-                  <p className="mt-1 font-display text-2xl font-semibold text-white">
+                  <p className="mt-1 truncate font-display text-2xl font-semibold text-white">
                     {active.name}
                   </p>
                 </div>
-                <span className="hidden text-right text-[11px] leading-4 text-white/45 sm:block">
+                <span className="hidden max-w-32 text-right text-[11px] leading-4 text-white/45 sm:block">
                   {active.material}
                 </span>
               </div>
 
               <p className="mt-4 text-sm leading-6 text-white/70">{active.solution}</p>
 
-              <ul className="mt-5 grid gap-2 sm:grid-cols-2">
+              <details className="mt-5 sm:hidden">
+                <summary className="min-h-11 cursor-pointer border-y border-white/10 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white/70">
+                  Ver recursos
+                </summary>
+                <ul className="mt-3 grid gap-2">
+                  {active.capabilities.map((capability) => (
+                    <li
+                      key={capability.kind}
+                      className="flex gap-3 rounded-2xl border border-white/8 bg-white/[0.03] px-3 py-3"
+                    >
+                      <capability.icon
+                        className="mt-0.5 h-4 w-4 shrink-0"
+                        style={{ color: active.accent }}
+                        aria-hidden="true"
+                      />
+                      <span className="text-xs font-bold uppercase tracking-[0.12em] text-white/76">
+                        {capability.label}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+
+              <ul className="mt-5 hidden gap-2 sm:grid sm:grid-cols-2">
                 {active.capabilities.map((capability, index) => {
                   const content = (
                     <>
@@ -474,9 +236,9 @@ export function UniverseShowroomHero({
                   return (
                     <motion.li
                       key={capability.kind}
-                      initial={reduced ? false : { opacity: 0, y: 10 }}
+                      initial={motionDisabled ? false : { opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.26, delay: 0.05 + index * 0.05 }}
+                      transition={{ duration: 0.26, delay: 0.04 + index * 0.05 }}
                     >
                       {capability.path === undefined ? (
                         <span className="flex min-h-14 gap-3 rounded-2xl border border-white/8 bg-white/[0.03] px-3 py-2.5">
@@ -526,146 +288,179 @@ export function UniverseShowroomHero({
           </details>
         </div>
 
-        <div className="relative z-10">
-          <div className="lg:hidden">
-            <MobileUniverseCarousel
-              activeIndex={activeIndex}
-              onActiveChange={(index) => {
-                setActiveIndex(index);
-                idleRef.current = performance.now() + 4200;
-                setExplored(true);
-              }}
-              tier={tier}
-            />
-          </div>
-
+        <div className="relative z-10 min-w-0">
           <div
-            ref={stageRef}
+            ref={trackRef}
             role="group"
-            tabIndex={0}
-            aria-label="Showroom tridimensional dos universos. Use as setas para trocar."
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={endDrag}
-            onPointerCancel={endDrag}
-            onKeyDown={(event) => {
-              if (event.key === "ArrowRight") {
-                event.preventDefault();
-                step(1);
-              }
-              if (event.key === "ArrowLeft") {
-                event.preventDefault();
-                step(-1);
-              }
+            aria-label="Showroom tridimensional dos universos"
+            onPointerMove={(event) => {
+              if (!isDesktop || event.pointerType !== "mouse") return;
+              const rect = event.currentTarget.getBoundingClientRect();
+              event.currentTarget.style.setProperty(
+                "--showroom-x",
+                `${((event.clientX - rect.left) / rect.width) * 100}%`,
+              );
+              event.currentTarget.style.setProperty(
+                "--showroom-y",
+                `${((event.clientY - rect.top) / rect.height) * 100}%`,
+              );
             }}
-            className="relative hidden h-[38rem] w-full select-none rounded-[2rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vb-gold lg:block"
+            className="relative flex snap-x snap-mandatory gap-4 overflow-x-auto px-[15vw] pb-3 [perspective:1000px] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:block lg:h-[38rem] lg:overflow-visible lg:px-0 lg:pb-0 lg:[perspective:1200px]"
             style={{
-              perspective: reduced ? undefined : "1200px",
-              touchAction: "pan-y",
-              cursor: dragging ? "grabbing" : "grab",
+              background:
+                "radial-gradient(circle at var(--showroom-x,50%) var(--showroom-y,45%), color-mix(in srgb, var(--vb-universe) 20%, transparent), transparent 52%)",
             }}
           >
             <div
               aria-hidden="true"
-              className="absolute inset-[14%] rounded-full border border-white/10"
-              style={{ boxShadow: `0 0 112px -40px ${active.accent}` }}
+              className="pointer-events-none absolute inset-[12%] hidden rounded-full border border-white/10 lg:block"
+              style={{ boxShadow: `0 0 112px -42px ${active.accent}` }}
             />
             <motion.div
               aria-hidden="true"
-              className="absolute inset-[22%] rounded-full border border-dashed border-white/15"
-              animate={reduced ? undefined : { rotate: 360 }}
-              transition={{ duration: 46, repeat: Infinity, ease: "linear" }}
+              className="pointer-events-none absolute inset-[20%] hidden rounded-full border border-dashed border-white/15 lg:block"
+              animate={motionDisabled || tier === "off" ? undefined : { rotate: 360 }}
+              transition={{ duration: tier === "high" ? 42 : 58, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
             />
 
-            {reduced ? (
-              <div className="grid h-full grid-cols-2 gap-3 p-2">
-                {UNIVERSES.map((universe) => (
-                  <Link
-                    key={universe.slug}
-                    to="/demo/$storeSlug"
-                    params={{ storeSlug: universe.slug }}
-                    className="relative overflow-hidden rounded-2xl border border-white/12"
-                  >
-                    <img
-                      src={universe.image}
-                      alt={`Prévia da demonstração ${universe.name}`}
-                      loading="lazy"
-                      className="h-full w-full object-cover"
-                    />
-                    <span className="absolute inset-x-0 bottom-0 bg-black/70 p-3 font-display text-lg text-white">
-                      {universe.name}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div
-                className="absolute inset-0"
-                style={{ transformStyle: "preserve-3d" }}
-                aria-hidden={false}
-              >
-                {UNIVERSES.map((universe, index) => (
-                  <UniversePanel
-                    key={universe.slug}
-                    universe={universe}
-                    index={index}
-                    rotation={rotation}
-                    radius={radius}
-                    active={index === activeIndex}
-                    reduced={reduced}
-                    onSelect={() => goTo(index)}
+            {UNIVERSES.map((universe, index) => {
+              const isActive = index === activeIndex;
+              const delta = relativeIndex(index, activeIndex);
+              const mobileOffset = Math.max(-1, Math.min(1, offsets[index] ?? delta));
+              const mobileScale = Math.max(0.82, 1 - Math.abs(mobileOffset) * 0.24);
+              const desktopScale = Math.max(0.58, 1 - Math.abs(delta) * 0.18);
+              const transform = isDesktop
+                ? `translate3d(calc(-50% + ${delta * 178}px), -50%, ${-Math.abs(delta) * 150}px) rotateY(${delta * -30}deg) scale(${desktopScale})`
+                : `perspective(900px) rotateY(${mobileOffset * -18}deg) translateZ(${-Math.abs(mobileOffset) * 60}px) scale(${mobileScale})`;
+
+              return (
+                <Link
+                  key={universe.slug}
+                  ref={(element) => {
+                    cardsRef.current[index] = element;
+                  }}
+                  to="/demo/$storeSlug"
+                  params={{ storeSlug: universe.slug }}
+                  aria-current={isActive ? "true" : undefined}
+                  aria-label={`${universe.name} — ${universe.label}`}
+                  data-showroom-card
+                  data-active={isActive ? "true" : "false"}
+                  onClick={(event) => {
+                    if (isActive) return;
+                    event.preventDefault();
+                    centerCard(index);
+                  }}
+                  onFocus={() => centerCard(index)}
+                  className="group relative aspect-[3/4] w-[70vw] max-w-[19rem] shrink-0 snap-center overflow-hidden rounded-[1.75rem] border bg-black/55 transition-[transform,opacity,border-color,box-shadow] duration-700 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vb-gold lg:absolute lg:left-1/2 lg:top-1/2 lg:h-[62%] lg:w-[50%] lg:max-w-[22rem]"
+                  style={{
+                    transform,
+                    transformStyle: "preserve-3d",
+                    opacity: isActive ? 1 : isDesktop ? Math.max(0.2, 0.72 - Math.abs(delta) * 0.2) : 0.62,
+                    zIndex: 20 - Math.abs(delta),
+                    borderColor: isActive ? `${universe.accent}76` : "rgba(255,255,255,0.11)",
+                    boxShadow: isActive ? `0 30px 86px -38px ${universe.accent}` : undefined,
+                  }}
+                >
+                  <motion.img
+                    src={universe.image}
+                    alt={`Prévia da demonstração ${universe.name}`}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    className="h-full w-full object-cover"
+                    animate={
+                      motionDisabled || tier === "off"
+                        ? undefined
+                        : { scale: [1, 1.025, 1], y: [0, index % 2 === 0 ? -4 : 4, 0] }
+                    }
+                    transition={{
+                      duration: 6.2 + index * 0.55,
+                      repeat: Number.POSITIVE_INFINITY,
+                      ease: "easeInOut",
+                      delay: index * 0.35,
+                    }}
                   />
-                ))}
-              </div>
-            )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/24 to-transparent" />
+                  <motion.span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 mix-blend-screen"
+                    animate={
+                      motionDisabled || tier === "off"
+                        ? { opacity: isActive ? 0.28 : 0.1 }
+                        : { opacity: isActive ? [0.2, 0.42, 0.2] : [0.08, 0.17, 0.08] }
+                    }
+                    transition={{
+                      duration: 3.8 + index * 0.4,
+                      repeat: Number.POSITIVE_INFINITY,
+                      delay: index * 0.32,
+                    }}
+                    style={{
+                      background: `radial-gradient(circle at 32% 100%, ${universe.accent}66, transparent 62%)`,
+                    }}
+                  />
+                  <div className="absolute inset-x-0 bottom-0 p-4 text-left">
+                    <p
+                      className="text-[9px] font-bold uppercase tracking-[0.24em]"
+                      style={{ color: universe.accent }}
+                    >
+                      {universe.number} · {universe.label}
+                    </p>
+                    <p className="mt-1 font-display text-xl font-semibold text-white sm:text-2xl">
+                      {universe.name}
+                    </p>
+                    <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-white/60">
+                      {universe.tagline}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
 
-          <div className="mt-5 hidden flex-wrap items-center justify-between gap-4 lg:flex">
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => step(-1)}
-                aria-label="Universo anterior"
-                className="vb-button-glass grid h-11 w-11 place-items-center rounded-full"
-              >
-                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                onClick={() => step(1)}
-                aria-label="Próximo universo"
-                className="vb-button-glass grid h-11 w-11 place-items-center rounded-full"
-              >
-                <ChevronRight className="h-4 w-4" aria-hidden="true" />
-              </button>
-              <div className="ml-2 flex items-center gap-2">
-                {UNIVERSES.map((universe, index) => (
-                  <button
-                    key={universe.slug}
-                    type="button"
-                    onClick={() => goTo(index)}
-                    aria-label={`Ir para ${universe.name}`}
-                    aria-current={index === activeIndex ? "true" : undefined}
-                    className="h-9 w-9 rounded-full"
-                  >
-                    <span
-                      className="mx-auto block h-2.5 rounded-full transition-all duration-300"
-                      style={{
-                        width: index === activeIndex ? "1.6rem" : "0.625rem",
-                        background:
-                          index === activeIndex ? universe.accent : "rgba(255,255,255,0.22)",
-                      }}
-                    />
-                  </button>
-                ))}
-              </div>
+          <div className="mt-5 flex items-center justify-center gap-2 lg:justify-between">
+            <button
+              type="button"
+              onClick={() => step(-1)}
+              aria-label="Universo anterior"
+              className="vb-button-glass hidden h-11 w-11 place-items-center rounded-full lg:grid"
+            >
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+            </button>
+
+            <div className="flex items-center gap-1">
+              {UNIVERSES.map((universe, index) => (
+                <button
+                  key={universe.slug}
+                  type="button"
+                  onClick={() => centerCard(index)}
+                  aria-label={`Ir para ${universe.name}`}
+                  aria-current={index === activeIndex ? "true" : undefined}
+                  className="grid h-10 w-10 place-items-center rounded-full"
+                >
+                  <span
+                    className="block h-2 rounded-full transition-all duration-300"
+                    style={{
+                      width: index === activeIndex ? "1.55rem" : "0.5rem",
+                      background:
+                        index === activeIndex ? universe.accent : "rgba(255,255,255,0.22)",
+                    }}
+                  />
+                </button>
+              ))}
             </div>
 
-            <p className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-white/45">
-              <Hand className="h-4 w-4" style={{ color: active.accent }} aria-hidden="true" />
-              {explored ? active.gesture : "Arraste, toque ou use as setas"}
-            </p>
+            <button
+              type="button"
+              onClick={() => step(1)}
+              aria-label="Próximo universo"
+              className="vb-button-glass hidden h-11 w-11 place-items-center rounded-full lg:grid"
+            >
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
+            </button>
           </div>
+
+          <p className="mt-3 text-center text-[10px] font-bold uppercase tracking-[0.18em] text-white/42">
+            <span className="lg:hidden">Deslize. Toque uma vez para focar e novamente para entrar.</span>
+            <span className="hidden lg:inline">A cena gira sozinha. Use as setas ou escolha um universo.</span>
+          </p>
         </div>
       </div>
     </section>

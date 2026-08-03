@@ -61,54 +61,26 @@ const TONES: Record<StoreConfig["niche"], Tone> = {
   },
 };
 
-const ABOUT: Record<StoreConfig["niche"], { kicker: string; title: string; body: string[] }> = {
-  fashion: {
-    kicker: "Quem somos",
-    title: "Alfaiataria de autor, feita para durar",
-    body: [
-      "A Maison Belle nasceu de um ateliê pequeno e obstinado: poucas peças por coleção, tecidos escolhidos a dedo e caimento ajustado no corpo real.",
-      "Atendemos por agendamento na loja e também online, com curadoria pessoal por WhatsApp para acertar tamanho e combinação antes da compra.",
-    ],
-  },
-  barber: {
-    kicker: "Sobre a casa",
-    title: "Barbearia clássica com método próprio",
-    body: [
-      "A Barber Noir é um espaço de ritual: cadeira reclinável, toalha quente, navalha e tempo suficiente para fazer bem feito.",
-      "Trabalhamos com horário marcado para que ninguém espere, e indicamos em cada atendimento como manter o corte em casa.",
-    ],
-  },
-  restaurant: {
-    kicker: "Nossa história",
-    title: "Fogo alto, brasa constante, receita da casa",
-    body: [
-      "A Brasa Urbana começou numa churrasqueira de quintal e virou cozinha de bairro: carnes maturadas na casa, pães assados no dia e molhos feitos na hora.",
-      "Trabalhamos com retirada, entrega no bairro e pedidos pelo WhatsApp, sempre com a mesma brasa acesa do início ao fim do serviço.",
-    ],
-  },
-  electronics: {
-    kicker: "Sobre a NovaCore",
-    title: "Especialistas em configuração, não só em venda",
-    body: [
-      "A NovaCore Electronics monta, testa e documenta cada setup antes de entregar: nada sai da bancada sem checklist de estabilidade.",
-      "Nosso time ajuda a escolher o equipamento pelo uso real — trabalho, estúdio ou jogo — e acompanha a instalação depois da entrega.",
-    ],
-  },
+const KICKERS: Record<StoreConfig["niche"], string> = {
+  fashion: "Quem somos",
+  barber: "Sobre a casa",
+  restaurant: "Nossa identidade",
+  electronics: "Sobre a NovaCore",
 };
 
 interface LinkDef {
   label: string;
   desc: string;
   icon: typeof Truck;
-  to?: string;
-  href?: string;
+  to: string;
 }
 
 export function StoreInstitutional({ store }: { store: StoreConfig }) {
   const tone = TONES[store.niche];
-  const about = ABOUT[store.niche];
   const { ref, inView } = useInView<HTMLDivElement>({ amount: 0.15, once: true });
   const faq = store.faq.slice(0, 3);
+  const aboutTitle = store.messages.aboutTitle;
+  const aboutBody = store.messages.aboutBody;
 
   const links: LinkDef[] = [
     {
@@ -119,17 +91,22 @@ export function StoreInstitutional({ store }: { store: StoreConfig }) {
     },
     {
       label: "Entrega e frete",
-      desc: "Retirada, bairro e envio",
+      desc: "Retirada, entrega e envio",
       icon: Truck,
       to: "/demo/$storeSlug/entrega",
     },
     {
       label: "Privacidade",
-      desc: "Como tratamos seus dados",
+      desc: "Como os dados são tratados",
       icon: ShieldCheck,
       to: "/demo/$storeSlug/privacidade",
     },
-    { label: "Termos de uso", desc: "Condições da loja", icon: FileText, to: "/demo/$storeSlug/termos" },
+    {
+      label: "Termos de uso",
+      desc: "Condições da vitrine",
+      icon: FileText,
+      to: "/demo/$storeSlug/termos",
+    },
     {
       label: "Perguntas frequentes",
       desc: "Dúvidas rápidas",
@@ -152,42 +129,25 @@ export function StoreInstitutional({ store }: { store: StoreConfig }) {
     >
       <div className="mx-auto max-w-6xl">
         <p className={`text-[10px] font-semibold uppercase tracking-[0.32em] ${tone.kicker}`}>
-          {about.kicker}
+          {KICKERS[store.niche]}
         </p>
         <h2
           id={`institucional-${store.slug}`}
           className={`${tone.title} mt-4 max-w-[22ch] text-[clamp(1.75rem,7vw,3.1rem)] font-semibold leading-[1.05] tracking-tight`}
         >
-          {about.title}
+          {aboutTitle}
         </h2>
         <div className={`mt-6 grid max-w-3xl gap-4 text-[0.95rem] leading-7 ${tone.body}`}>
-          {about.body.map((p) => (
-            <p key={p.slice(0, 24)}>{p}</p>
-          ))}
+          <p>{aboutBody}</p>
+          <p className="text-xs leading-6 opacity-75">
+            Conteúdo institucional demonstrativo. História, prazos, políticas e condições devem ser
+            ajustados aos dados reais de cada cliente antes da publicação.
+          </p>
         </div>
 
         <ul className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {links.map((item, index) => {
             const Icon = item.icon;
-            const inner = (
-              <>
-                <span
-                  className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                  style={{
-                    background: `radial-gradient(120% 80% at 0% 0%, ${tone.edge}, transparent 60%)`,
-                    opacity: 0.14,
-                  }}
-                  aria-hidden
-                />
-                <span className={`relative grid h-9 w-9 shrink-0 place-items-center rounded-full border border-current/20 ${tone.accent}`}>
-                  <Icon className="h-4 w-4" />
-                </span>
-                <span className="relative min-w-0">
-                  <span className="block truncate text-sm font-semibold">{item.label}</span>
-                  <span className={`block truncate text-xs ${tone.body}`}>{item.desc}</span>
-                </span>
-              </>
-            );
             return (
               <motion.li
                 key={item.label}
@@ -195,24 +155,34 @@ export function StoreInstitutional({ store }: { store: StoreConfig }) {
                 animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
                 transition={{ duration: 0.5, delay: sequenceDelay(index) }}
               >
-                {item.to ? (
-                  <Link
-                    to={item.to}
-                    params={{ storeSlug: store.slug }}
-                    className={`group relative flex min-h-16 items-center gap-3 overflow-hidden rounded-2xl border p-4 ${tone.card} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current`}
+                <Link
+                  to={item.to}
+                  params={{ storeSlug: store.slug }}
+                  className={`group relative flex min-h-16 items-center gap-3 overflow-hidden rounded-2xl border p-4 ${tone.card} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current`}
+                >
+                  <motion.span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0"
+                    animate={{ opacity: inView ? [0.04, 0.13, 0.04] : 0.03 }}
+                    transition={{
+                      duration: 3.2,
+                      repeat: inView ? Number.POSITIVE_INFINITY : 0,
+                      delay: sequenceDelay(index, 0.18),
+                    }}
+                    style={{
+                      background: `radial-gradient(120% 80% at 0% 0%, ${tone.edge}, transparent 60%)`,
+                    }}
+                  />
+                  <span
+                    className={`relative grid h-9 w-9 shrink-0 place-items-center rounded-full border border-current/20 ${tone.accent}`}
                   >
-                    {inner}
-                  </Link>
-                ) : (
-                  <a
-                    href={item.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={`group relative flex min-h-16 items-center gap-3 overflow-hidden rounded-2xl border p-4 ${tone.card}`}
-                  >
-                    {inner}
-                  </a>
-                )}
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <span className="relative min-w-0">
+                    <span className="block truncate text-sm font-semibold">{item.label}</span>
+                    <span className={`block truncate text-xs ${tone.body}`}>{item.desc}</span>
+                  </span>
+                </Link>
               </motion.li>
             );
           })}
@@ -220,16 +190,16 @@ export function StoreInstitutional({ store }: { store: StoreConfig }) {
 
         {faq.length > 0 && (
           <div className="mt-12 grid gap-4 sm:grid-cols-3">
-            {faq.map((f, i) => (
+            {faq.map((item, index) => (
               <motion.div
-                key={f.q}
+                key={item.q}
                 initial={{ opacity: 0, y: 12 }}
                 animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-                transition={{ duration: 0.5, delay: 0.3 + sequenceDelay(i) }}
+                transition={{ duration: 0.5, delay: 0.3 + sequenceDelay(index) }}
                 className={`rounded-2xl border p-4 ${tone.card}`}
               >
-                <p className="text-sm font-semibold leading-snug">{f.q}</p>
-                <p className={`mt-2 text-xs leading-6 ${tone.body}`}>{f.a}</p>
+                <p className="text-sm font-semibold leading-snug">{item.q}</p>
+                <p className={`mt-2 text-xs leading-6 ${tone.body}`}>{item.a}</p>
               </motion.div>
             ))}
           </div>

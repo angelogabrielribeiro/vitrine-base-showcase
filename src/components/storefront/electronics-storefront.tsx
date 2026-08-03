@@ -368,6 +368,45 @@ function SignalRail() {
   );
 }
 
+function BorderTraceFrame({
+  index = 0,
+  intensity = 0.5,
+}: {
+  index?: number;
+  intensity?: number;
+}) {
+  const reduceMotion = useReducedMotion();
+  const opacity = Math.max(0.12, Math.min(0.55, intensity));
+
+  return (
+    <motion.span
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 z-30 border border-cyan-200/60"
+      style={{ opacity }}
+      animate={
+        reduceMotion
+          ? undefined
+          : {
+              clipPath: [
+                "inset(0 100% 99% 0)",
+                "inset(0 0 99% 0)",
+                "inset(0 0 0 99%)",
+                "inset(99% 0 0 0)",
+                "inset(0 99% 0 0)",
+                "inset(0 100% 99% 0)",
+              ],
+            }
+      }
+      transition={{
+        duration: 5.8 + (index % 3) * 0.45,
+        delay: (index % 4) * 0.15,
+        repeat: reduceMotion ? 0 : Number.POSITIVE_INFINITY,
+        ease: "linear",
+      }}
+    />
+  );
+}
+
 function CategoryCommandDeck({ store }: { store: StoreConfig }) {
   const reduceMotion = useReducedMotion();
   const [active, setActive] = useState(0);
