@@ -1,4 +1,4 @@
-# Final focused regression for automatic mobile interactions in Barber Noir.
+# Final user-triggered regression for automatic mobile interactions in Barber Noir.
 name: Validate Barber mobile cards
 
 on:
