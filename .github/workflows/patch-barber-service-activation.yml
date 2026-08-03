@@ -30,86 +30,90 @@ jobs:
           path = Path("src/components/storefront/barber-storefront.tsx")
           text = path.read_text(encoding="utf-8")
 
-          old_state = '''  const active = items[activeIdx];
-          return (
-            <section className="mx-auto max-w-7xl px-6 py-20 sm:py-16">'''
-          new_state = '''  const active = items[activeIdx];
-          const sectionRef = useRef<HTMLElement>(null);
+          anchor = "  const active = items[activeIdx];\n"
+          if anchor not in text:
+            raise SystemExit("ServicesEditorial active line not found")
 
-          useEffect(() => {
-            if (!isMobile) return;
+          controller = '''  const active = items[activeIdx];
+  const sectionRef = useRef<HTMLElement>(null);
 
-            let frame = 0;
-            const updateActiveService = () => {
-              window.cancelAnimationFrame(frame);
-              frame = window.requestAnimationFrame(() => {
-                const rows = sectionRef.current?.querySelectorAll<HTMLElement>(
-                  "[data-service-index]",
-                );
-                if (!rows?.length) return;
+  useEffect(() => {
+    if (!isMobile) return;
 
-                const viewportCenter = window.innerHeight / 2;
-                let nearestIndex = 0;
-                let nearestDistance = Number.POSITIVE_INFINITY;
+    let frame = 0;
+    const updateActiveService = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        const rows = sectionRef.current?.querySelectorAll<HTMLElement>(
+          "[data-service-index]",
+        );
+        if (!rows?.length) return;
 
-                rows.forEach((row) => {
-                  const rect = row.getBoundingClientRect();
-                  const distance = Math.abs(rect.top + rect.height / 2 - viewportCenter);
-                  if (distance >= nearestDistance) return;
-                  nearestDistance = distance;
-                  nearestIndex = Number(row.dataset.serviceIndex ?? 0);
-                });
+        const viewportCenter = window.innerHeight / 2;
+        let nearestIndex = 0;
+        let nearestDistance = Number.POSITIVE_INFINITY;
 
-                setActiveIdx(nearestIndex);
-              });
-            };
+        rows.forEach((row) => {
+          const rect = row.getBoundingClientRect();
+          const distance = Math.abs(rect.top + rect.height / 2 - viewportCenter);
+          if (distance >= nearestDistance) return;
+          nearestDistance = distance;
+          nearestIndex = Number(row.dataset.serviceIndex ?? 0);
+        });
 
-            updateActiveService();
-            window.addEventListener("scroll", updateActiveService, { passive: true });
-            window.addEventListener("resize", updateActiveService);
-            return () => {
-              window.cancelAnimationFrame(frame);
-              window.removeEventListener("scroll", updateActiveService);
-              window.removeEventListener("resize", updateActiveService);
-            };
-          }, [isMobile]);
+        setActiveIdx(nearestIndex);
+      });
+    };
 
-          return (
-            <section ref={sectionRef} className="mx-auto max-w-7xl px-6 py-20 sm:py-16">'''
-          if old_state not in text:
-            raise SystemExit("ServicesEditorial state block not found")
-          text = text.replace(old_state, new_state, 1)
+    updateActiveService();
+    window.addEventListener("scroll", updateActiveService, { passive: true });
+    window.addEventListener("resize", updateActiveService);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", updateActiveService);
+      window.removeEventListener("resize", updateActiveService);
+    };
+  }, [isMobile]);
+'''
+          text = text.replace(anchor, controller, 1)
 
-          old_observer = '''  const reduce = useReducedMotion();
-          const [hovered, setHovered] = useState(false);
-          const { ref, inView } = useInView<HTMLLIElement>({ amount: 0.6 });
-          const image = service.image;
+          section = '<section className="mx-auto max-w-7xl px-6 py-20 sm:py-16">'
+          if section not in text:
+            raise SystemExit("ServicesEditorial section not found")
+          text = text.replace(
+            section,
+            '<section ref={sectionRef} className="mx-auto max-w-7xl px-6 py-20 sm:py-16">',
+            1,
+          )
 
-          // Mobile: acende sozinho ao entrar na viewport, em sequência com o scroll.
-          // Desktop: reage a hover/foco, sem cursor simulado.
-          const active = autoActivate ? inView : hovered;
+          observer = '  const { ref, inView } = useInView<HTMLLIElement>({ amount: 0.6 });\n'
+          if observer not in text:
+            raise SystemExit("ServiceRow observer line not found")
+          text = text.replace(observer, "", 1)
 
-          useEffect(() => {
-            if (autoActivate && inView) onActivate?.();
-          }, [autoActivate, inView, onActivate]);
+          old_active = '''  // Mobile: acende sozinho ao entrar na viewport, em sequência com o scroll.
+  // Desktop: reage a hover/foco, sem cursor simulado.
+  const active = autoActivate ? inView : hovered;
 
-          return (
-            <li
-              ref={ref}'''
-          new_observer = '''  const reduce = useReducedMotion();
-          const [hovered, setHovered] = useState(false);
-          const image = service.image;
+  useEffect(() => {
+    if (autoActivate && inView) onActivate?.();
+  }, [autoActivate, inView, onActivate]);
+'''
+          new_active = '''  // Mobile: a linha mais próxima do centro da viewport acende automaticamente.
+  // Desktop: reage a hover/foco, sem cursor simulado.
+  const active = autoActivate ? Boolean(isActive) : hovered;
+'''
+          if old_active not in text:
+            raise SystemExit("ServiceRow activation block not found")
+          text = text.replace(old_active, new_active, 1)
 
-          // Mobile: a linha mais próxima do centro da viewport acende automaticamente.
-          // Desktop: reage a hover/foco, sem cursor simulado.
-          const active = autoActivate ? Boolean(isActive) : hovered;
-
-          return (
-            <li
-              data-service-index={index}'''
-          if old_observer not in text:
-            raise SystemExit("ServiceRow observer block not found")
-          text = text.replace(old_observer, new_observer, 1)
+          old_li = '''    <li
+      ref={ref}'''
+          new_li = '''    <li
+      data-service-index={index}'''
+          if old_li not in text:
+            raise SystemExit("ServiceRow list element not found")
+          text = text.replace(old_li, new_li, 1)
 
           path.write_text(text, encoding="utf-8")
           PY
