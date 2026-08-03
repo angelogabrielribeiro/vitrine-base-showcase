@@ -1,0 +1,67 @@
+name: Final production acceptance
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: final-production-acceptance-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.0-noble
+      options: --user 1001
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+
+      - name: Install dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npm install --no-save --no-audit --no-fund playwright@1.62.0
+
+      - name: Validate script and build
+        run: |
+          node --check scripts/validate-final-production.mjs
+          npm run build
+
+      - name: Start preview server
+        run: |
+          mkdir -p artifacts/final-production-2
+          npm run dev -- --host 0.0.0.0 --port 4173 > artifacts/final-production-2/server.log 2>&1 &
+          echo $! > /tmp/final-production-server.pid
+
+          for attempt in $(seq 1 90); do
+            if curl --fail --silent http://127.0.0.1:4173 > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+
+          cat artifacts/final-production-2/server.log
+          exit 1
+
+      - name: Run final acceptance suite
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: node scripts/validate-final-production.mjs
+
+      - name: Upload acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-production-acceptance-${{ github.run_id }}
+          path: artifacts/final-production-2
+          if-no-files-found: error
+          retention-days: 14
