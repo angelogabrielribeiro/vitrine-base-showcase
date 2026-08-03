@@ -36,7 +36,7 @@ jobs:
           content = path.read_text()
           start = content.index("test, count = re.subn(")
           end = content.index("test_path.write_text(test)", start)
-          exact = '''block_start = test.index(
+          exact = r'''block_start = test.index(
               '  if (scenario.mobile) {',
               test.index('const targetBox = await target.boundingBox();'),
           )
