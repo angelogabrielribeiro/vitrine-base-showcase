@@ -224,7 +224,7 @@
     text-shadow: 0 0 22px rgb(245 158 11 / 24%);
   }
 
-  /* Ritual e atmosfera: o próprio IntersectionObserver acende o card visível. */
+  /* Ritual e atmosfera: o IntersectionObserver reforça o card visível. */
   .store-theme-barbearia main [data-lit="true"] {
     border-color: rgb(252 211 77 / 46%) !important;
     box-shadow:
@@ -236,7 +236,25 @@
     color: rgb(254 243 199);
   }
 
-  .store-theme-barbearia main figure[data-lit="true"]::after {
+  /* Atmosfera: todos os quadros respiram e recebem varredura automaticamente.
+     O data-lit apenas aumenta a intensidade do quadro central. */
+  .store-theme-barbearia main figure[class*="snap-center"] {
+    animation: barber-atmosphere-ambient 7.2s ease-in-out infinite;
+  }
+
+  .store-theme-barbearia main figure[class*="snap-center"]:nth-child(2n) {
+    animation-delay: -2.4s;
+  }
+
+  .store-theme-barbearia main figure[class*="snap-center"]:nth-child(3n) {
+    animation-delay: -4.8s;
+  }
+
+  .store-theme-barbearia main figure[class*="snap-center"] img {
+    animation: barber-atmosphere-image 7.2s ease-in-out infinite;
+  }
+
+  .store-theme-barbearia main figure[class*="snap-center"]::after {
     position: absolute;
     inset: -55% -120%;
     z-index: 2;
@@ -304,6 +322,32 @@
   }
 }
 
+@keyframes barber-atmosphere-ambient {
+  0%,
+  100% {
+    border-color: rgb(252 211 77 / 16%);
+    box-shadow: 0 12px 34px -30px rgb(245 158 11 / 36%);
+  }
+  46%,
+  58% {
+    border-color: rgb(252 211 77 / 42%);
+    box-shadow:
+      0 22px 52px -30px rgb(245 158 11 / 76%),
+      inset 0 0 0 1px rgb(252 211 77 / 7%);
+  }
+}
+
+@keyframes barber-atmosphere-image {
+  0%,
+  100% {
+    filter: grayscale(0.82) brightness(0.92);
+  }
+  46%,
+  58% {
+    filter: grayscale(0.12) brightness(1.05) saturate(1.06);
+  }
+}
+
 @keyframes barber-mobile-scan {
   0%,
   18% {
@@ -332,7 +376,9 @@
   .store-theme-moda main article,
   .store-theme-barbearia main article,
   [data-ambient-card],
-  .store-theme-barbearia main figure[data-lit="true"]::after,
+  .store-theme-barbearia main figure[class*="snap-center"],
+  .store-theme-barbearia main figure[class*="snap-center"] img,
+  .store-theme-barbearia main figure[class*="snap-center"]::after,
   .store-theme-barbearia main ul[class*="divide-y"] > li > a::before {
     animation: none !important;
   }
