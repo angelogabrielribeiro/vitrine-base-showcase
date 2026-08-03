@@ -1,0 +1,137 @@
+name: Patch Barber service activation v2
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/patch-barber-service-activation-v2.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.event.pull_request.head.ref == 'fix/barber-mobile-cards-stage'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Patch deterministic mobile service activation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("src/components/storefront/barber-storefront.tsx")
+          text = path.read_text(encoding="utf-8")
+
+          anchor = "  const active = items[activeIdx];\n"
+          if anchor not in text:
+            raise SystemExit("ServicesEditorial active line not found")
+
+          controller = '''  const active = items[activeIdx];
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!isMobile) return;
+
+    let frame = 0;
+    const updateActiveService = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        const rows = sectionRef.current?.querySelectorAll<HTMLElement>(
+          "[data-service-index]",
+        );
+        if (!rows?.length) return;
+
+        const viewportCenter = window.innerHeight / 2;
+        let nearestIndex = 0;
+        let nearestDistance = Number.POSITIVE_INFINITY;
+
+        rows.forEach((row) => {
+          const rect = row.getBoundingClientRect();
+          const distance = Math.abs(rect.top + rect.height / 2 - viewportCenter);
+          if (distance >= nearestDistance) return;
+          nearestDistance = distance;
+          nearestIndex = Number(row.dataset.serviceIndex ?? 0);
+        });
+
+        setActiveIdx(nearestIndex);
+      });
+    };
+
+    updateActiveService();
+    window.addEventListener("scroll", updateActiveService, { passive: true });
+    window.addEventListener("resize", updateActiveService);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", updateActiveService);
+      window.removeEventListener("resize", updateActiveService);
+    };
+  }, [isMobile]);
+'''
+          text = text.replace(anchor, controller, 1)
+
+          section = '<section className="mx-auto max-w-7xl px-6 py-20 sm:py-16">'
+          if section not in text:
+            raise SystemExit("ServicesEditorial section not found")
+          text = text.replace(
+            section,
+            '<section ref={sectionRef} className="mx-auto max-w-7xl px-6 py-20 sm:py-16">',
+            1,
+          )
+
+          observer = '  const { ref, inView } = useInView<HTMLLIElement>({ amount: 0.6 });\n'
+          if observer not in text:
+            raise SystemExit("ServiceRow observer line not found")
+          text = text.replace(observer, "", 1)
+
+          old_active = '''  // Mobile: acende sozinho ao entrar na viewport, em sequência com o scroll.
+  // Desktop: reage a hover/foco, sem cursor simulado.
+  const active = autoActivate ? inView : hovered;
+
+  useEffect(() => {
+    if (autoActivate && inView) onActivate?.();
+  }, [autoActivate, inView, onActivate]);
+'''
+          new_active = '''  // Mobile: a linha mais próxima do centro da viewport acende automaticamente.
+  // Desktop: reage a hover/foco, sem cursor simulado.
+  const active = autoActivate ? Boolean(isActive) : hovered;
+'''
+          if old_active not in text:
+            raise SystemExit("ServiceRow activation block not found")
+          text = text.replace(old_active, new_active, 1)
+
+          old_li = '''    <li
+      ref={ref}'''
+          new_li = '''    <li
+      data-service-index={index}'''
+          if old_li not in text:
+            raise SystemExit("ServiceRow list element not found")
+          text = text.replace(old_li, new_li, 1)
+
+          path.write_text(text, encoding="utf-8")
+          PY
+
+      - name: Format and validate
+        run: |
+          npm install --no-audit --no-fund
+          npx prettier --write src/components/storefront/barber-storefront.tsx
+          npx eslint src/components/storefront/barber-storefront.tsx
+          npm run build
+
+      - name: Commit patch and remove temporary workflows
+        run: |
+          git rm \
+            .github/workflows/patch-barber-service-activation.yml \
+            .github/workflows/patch-barber-service-activation-v2.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/storefront/barber-storefront.tsx
+          git commit -m "Make Barber service activation follow viewport center"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
