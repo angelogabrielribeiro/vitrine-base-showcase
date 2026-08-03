@@ -105,7 +105,8 @@ try {
       const ritualSection = page
         .getByRole("heading", { name: "Três atos, uma cadeira" })
         .locator("xpath=ancestor::section[1]");
-      const ritualCard = ritualSection.locator("[data-lit]").first();
+      const ritualRail = ritualSection.locator('[class*="snap-x"][class*="overflow-x-auto"]');
+      const ritualCard = ritualRail.locator(":scope > div").first();
       await centerInViewport(ritualCard);
       const ritualState = await ritualCard.evaluate((element) => ({
         lit: element.getAttribute("data-lit"),
@@ -113,7 +114,6 @@ try {
       }));
       assert(ritualState.lit === "true", `${label}: card do ritual não acendeu no scroll`);
       assert(ritualState.shadow !== "none", `${label}: card do ritual sem glow automático`);
-      const ritualRail = ritualSection.locator('[class*="snap-x"][class*="overflow-x-auto"]');
       const ritualRailState = await ritualRail.evaluate((element) => ({
         scrollWidth: element.scrollWidth,
         clientWidth: element.clientWidth,
