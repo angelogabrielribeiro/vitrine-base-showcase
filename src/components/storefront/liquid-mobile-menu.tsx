@@ -22,25 +22,22 @@ import { useMobileMenuState } from "@/components/storefront/mobile-menu-state";
  * Se `hide` for true, o botão fica oculto (usar na etapa final do checkout).
  */
 export function LiquidMobileMenu({ store, hide = false }: { store: StoreConfig; hide?: boolean }) {
-  const [open, setOpen] = useState(false);
   const panelId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
   const firstItemRef = useRef<HTMLAnchorElement>(null);
   const { count } = useCart(store.slug);
   const hydrated = useHydrated();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { setMenuOpen } = useMobileMenuState();
+  // Estado único e compartilhado: abrir/fechar já esconde/restaura o FAB do WhatsApp
+  // na mesma chamada, sem depender de efeito posterior.
+  const { menuOpen: open, setMenuOpen: setOpen } = useMobileMenuState();
 
-  // Sincroniza estado global (o FAB do WhatsApp desaparece com o menu aberto).
-  useEffect(() => {
-    setMenuOpen(open);
-  }, [open, setMenuOpen]);
-  useEffect(() => () => setMenuOpen(false), [setMenuOpen]);
+  useEffect(() => () => setOpen(false), [setOpen]);
 
   // Fecha ao navegar
   useEffect(() => {
     setOpen(false);
-  }, [pathname]);
+  }, [pathname, setOpen]);
 
   // Escape + clique fora
   useEffect(() => {
@@ -55,7 +52,7 @@ export function LiquidMobileMenu({ store, hide = false }: { store: StoreConfig; 
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("mousedown", onDown);
     };
-  }, [open]);
+  }, [open, setOpen]);
 
   useEffect(() => {
     if (open) firstItemRef.current?.focus();
