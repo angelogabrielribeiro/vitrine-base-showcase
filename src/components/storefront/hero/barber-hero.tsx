@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "@tanstack/react-router";
 import { CalendarDays, MapPin } from "lucide-react";
 import type { NicheHeroProps } from "./niche-hero";
@@ -31,6 +31,69 @@ export function BarberHero({ store }: NicheHeroProps) {
   const reduce = useReducedMotion();
   const { isMobile } = useAdaptiveQuality();
   const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!isMobile) return;
+
+    let frame = 0;
+    let observedList: Element | null = null;
+    const activeStateObserver = new MutationObserver(() => scheduleUpdate());
+
+    const scheduleUpdate = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        const list = document.querySelector(
+          '.store-theme-barbearia main ul[class*="divide-y"]',
+        );
+        const rows = list
+          ? Array.from(list.querySelectorAll<HTMLElement>(":scope > li"))
+          : [];
+        if (!rows.length) return;
+
+        if (list !== observedList) {
+          activeStateObserver.disconnect();
+          activeStateObserver.observe(list, {
+            subtree: true,
+            attributes: true,
+            attributeFilter: ["data-active"],
+          });
+          observedList = list;
+        }
+
+        const viewportCenter = window.innerHeight / 2;
+        let nearestIndex = 0;
+        let nearestDistance = Number.POSITIVE_INFINITY;
+
+        rows.forEach((row, index) => {
+          const rect = row.getBoundingClientRect();
+          const distance = Math.abs(rect.top + rect.height / 2 - viewportCenter);
+          if (distance >= nearestDistance) return;
+          nearestDistance = distance;
+          nearestIndex = index;
+        });
+
+        rows.forEach((row, index) => {
+          const shouldBeActive = index === nearestIndex;
+          if (shouldBeActive && row.getAttribute("data-active") !== "true") {
+            row.setAttribute("data-active", "true");
+          } else if (!shouldBeActive && row.hasAttribute("data-active")) {
+            row.removeAttribute("data-active");
+          }
+        });
+      });
+    };
+
+    scheduleUpdate();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      activeStateObserver.disconnect();
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+    };
+  }, [isMobile]);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
