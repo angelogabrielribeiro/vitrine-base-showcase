@@ -136,23 +136,38 @@ try {
       await centerInViewport(atmosphereCard);
       const atmosphereState = await atmosphereCard.evaluate((element) => {
         const image = element.querySelector("img");
-        const pseudo = getComputedStyle(element, "::after");
+        const cardStyle = getComputedStyle(element);
+        const imageStyle = image ? getComputedStyle(image) : null;
+        const scanStyle = getComputedStyle(element, "::after");
         return {
           lit: element.getAttribute("data-lit"),
-          shadow: getComputedStyle(element).boxShadow,
-          filter: image ? getComputedStyle(image).filter : "",
-          scan: pseudo.animationName,
+          shadow: cardStyle.boxShadow,
+          ambientAnimation: cardStyle.animationName,
+          ambientPlayState: cardStyle.animationPlayState,
+          imageAnimation: imageStyle?.animationName ?? "none",
+          imagePlayState: imageStyle?.animationPlayState ?? "paused",
+          scan: scanStyle.animationName,
+          scanPlayState: scanStyle.animationPlayState,
         };
       });
-      assert(atmosphereState.lit === "true", `${label}: quadro de atmosfera não acendeu no scroll`);
-      assert(atmosphereState.shadow !== "none", `${label}: atmosfera sem glow automático`);
       assert(
-        atmosphereState.scan === "barber-mobile-scan",
-        `${label}: varredura dourada não está ativa`,
+        atmosphereState.ambientAnimation === "barber-atmosphere-ambient",
+        `${label}: quadro de atmosfera sem respiração dourada`,
       );
       assert(
-        !/grayscale\(1\)/.test(atmosphereState.filter),
-        `${label}: atmosfera continua totalmente cinza`,
+        atmosphereState.ambientPlayState === "running",
+        `${label}: glow da atmosfera depende de toque`,
+      );
+      assert(atmosphereState.shadow !== "none", `${label}: atmosfera sem profundidade`);
+      assert(
+        atmosphereState.imageAnimation === "barber-atmosphere-image" &&
+          atmosphereState.imagePlayState === "running",
+        `${label}: imagem da atmosfera permanece estática`,
+      );
+      assert(
+        atmosphereState.scan === "barber-mobile-scan" &&
+          atmosphereState.scanPlayState === "running",
+        `${label}: varredura dourada não está ativa`,
       );
 
       const groomingSection = page
