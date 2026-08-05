@@ -51,8 +51,8 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
         if (!element) return;
 
         const rect = element.getBoundingClientRect();
-        const entersBeforeCenter = rect.top < window.innerHeight * 0.88;
-        const remainsOnScreen = rect.bottom > window.innerHeight * 0.12;
+        const entersBeforeCenter = rect.top < window.innerHeight * 0.94;
+        const remainsOnScreen = rect.bottom > window.innerHeight * 0.08;
         setInView(entersBeforeCenter && remainsOnScreen);
       });
     };
@@ -68,7 +68,7 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
     };
   }, []);
 
-  const chapterTransition = { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const };
+  const chapterTransition = { duration: 0.76, ease: [0.22, 1, 0.36, 1] as const };
 
   return (
     <section
@@ -82,7 +82,7 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
             className="h-full w-px origin-top bg-[#c99a55] shadow-[0_0_20px_rgba(201,154,85,.52)]"
             initial={false}
             animate={{ scaleY: reduceMotion || inView ? 1 : 0 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
           />
         </div>
 
@@ -124,7 +124,7 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
                 ? { opacity: 1, x: 0, y: 0 }
                 : { opacity: 0, x: index % 2 === 0 ? -20 : 20, y: 14 }
             }
-            transition={{ ...chapterTransition, delay: reduceMotion ? 0 : 0.05 }}
+            transition={{ ...chapterTransition, delay: reduceMotion ? 0 : 0.06 }}
             className={`max-w-2xl ${index % 2 === 0 ? "lg:order-1" : "lg:order-2"}`}
           >
             <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-[0.34em] text-[#d8ad72]">
@@ -219,10 +219,10 @@ function AtelierConsole({ store, products }: { store: StoreConfig; products: Pro
           </div>
         </div>
 
-        <div className="mt-12 grid min-h-[36rem] gap-10 sm:mt-16 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
+        <div className="mt-12 grid min-h-0 gap-10 sm:mt-16 lg:min-h-[36rem] lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
           <div
             data-testid="fashion-atelier-rail"
-            className="relative h-[32rem]"
+            className="relative h-auto lg:h-[32rem]"
             style={{ perspective: "1200px" }}
           >
             {selection.map((product, index) => {
@@ -231,6 +231,7 @@ function AtelierConsole({ store, products }: { store: StoreConfig; products: Pro
               return (
                 <motion.div
                   layout
+                  data-testid="fashion-atelier-card"
                   key={`${category}-${product.id}`}
                   initial={{ opacity: 0, y: 45, rotateY: offset * -12 }}
                   animate={{

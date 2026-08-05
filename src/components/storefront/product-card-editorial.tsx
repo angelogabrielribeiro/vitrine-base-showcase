@@ -143,7 +143,7 @@ export function EditorialProductCard({
         .ep-card .ep-cta { transform: translateY(10px); transition: opacity 500ms ease, transform 500ms cubic-bezier(0.22,1,0.36,1); }
         .ep-card .ep-meta { transition: transform 500ms cubic-bezier(0.22,1,0.36,1); }
         .ep-card .ep-img-primary { transform: scale(1); }
-        .ep-card-frame { transition: box-shadow 420ms ease; }
+        .ep-card-frame { transition: filter 260ms ease, box-shadow 420ms ease; }
         .ep-card[data-in-view="true"] .ep-card-frame { animation: ep-glow-pulse 3.4s ease-in-out var(--ep-seq-delay, 0s) infinite; }
         @media (hover: hover) {
           .ep-card:hover .ep-img-primary, .ep-card:focus-visible .ep-img-primary { transform: scale(1.02); }
@@ -152,9 +152,9 @@ export function EditorialProductCard({
           .ep-card:hover .ep-cta, .ep-card:focus-visible .ep-cta { opacity: 1; transform: translateY(0); }
           .ep-card:hover .ep-meta, .ep-card:focus-visible .ep-meta { transform: translateY(-4px); }
           .ep-card:hover .ep-card-frame, .ep-card:focus-visible .ep-card-frame {
-            animation-play-state: paused;
-            box-shadow: 0 18px 42px -26px rgba(139,49,80,0.34), 0 0 0 1px rgba(201,154,85,0.16);
+            filter: brightness(1.015) drop-shadow(0 12px 22px rgba(91,24,48,0.18));
           }
+          .ep-card:not(:hover):not(:focus-visible) .ep-card-frame { filter: none; }
           .ep-card:not(:hover):not(:focus-visible) .ep-reveal { clip-path: inset(100% 0 0 0); }
           .ep-card:not(:hover):not(:focus-visible) .ep-grad { opacity: 0; }
           .ep-card:not(:hover):not(:focus-visible) .ep-cta { opacity: 0; transform: translateY(10px); }

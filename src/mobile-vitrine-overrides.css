@@ -36,7 +36,12 @@
     max-width: 36ch !important;
   }
 
-  /* A arara é um trilho horizontal contido, com gesto nos dois eixos e próxima peça aparente. */
+  /* A arara vira um trilho horizontal contido: card principal inteiro,
+     pequena prévia do próximo e sem transferir overscroll para o documento. */
+  .store-theme-moda {
+    overflow-x: clip;
+  }
+
   [data-testid="fashion-atelier"] [class*="mt-12"][class*="min-h"] {
     min-height: 0 !important;
     gap: 2rem !important;
@@ -44,33 +49,43 @@
 
   [data-testid="fashion-atelier-rail"] {
     display: flex !important;
+    box-sizing: border-box;
     width: 100% !important;
     height: auto !important;
     gap: 1rem;
     overflow-x: auto !important;
-    overscroll-behavior-inline: contain;
+    overflow-y: hidden !important;
+    overscroll-behavior-x: contain;
+    overscroll-behavior-y: auto;
     scroll-snap-type: x mandatory;
-    scroll-padding-inline: 0.25rem;
+    scroll-padding-inline: 0.5rem 2.75rem;
     scrollbar-width: none;
     touch-action: pan-x pan-y;
+    -webkit-overflow-scrolling: touch;
     perspective: none !important;
-    padding: 0.5rem max(1rem, 12vw) 1rem 0.25rem;
+    padding: 0.5rem 2.75rem 1rem 0.5rem;
   }
 
   [data-testid="fashion-atelier-rail"]::-webkit-scrollbar {
     display: none;
   }
 
-  [data-testid="fashion-atelier-rail"] > div {
+  [data-testid="fashion-atelier-card"] {
     position: relative !important;
     inset: auto !important;
-    width: min(76vw, 18.5rem) !important;
+    width: calc(100% - 2.75rem) !important;
+    min-width: 0 !important;
+    max-width: 22rem;
     height: auto !important;
     aspect-ratio: 4 / 5;
-    flex: 0 0 auto;
+    flex: 0 0 calc(100% - 2.75rem);
     scroll-snap-align: start;
+    scroll-snap-stop: always;
     opacity: 1 !important;
     transform: none !important;
+    translate: none !important;
+    rotate: none !important;
+    scale: none !important;
   }
 
   [data-testid="fashion-atelier-rail"] img {
