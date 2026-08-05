@@ -288,10 +288,7 @@ async function inspectDesktopCardAndCursor(page, scenario) {
   const cards = selection.locator(".ep-card");
   await cards.first().scrollIntoViewIfNeeded();
   await page.waitForTimeout(800);
-  assert(
-    (await cards.count()) >= 4,
-    `${scenario.name}: cards insuficientes para validar glow`,
-  );
+  assert((await cards.count()) >= 4, `${scenario.name}: cards insuficientes para validar glow`);
 
   const ambientStates = await cards.evaluateAll((nodes) =>
     nodes.map((node) => {
@@ -316,9 +313,7 @@ async function inspectDesktopCardAndCursor(page, scenario) {
 
   const card = cards.first();
   const ambient = card.locator(".ep-ambient-glow");
-  const beforeTime = await ambient.evaluate(
-    (node) => node.getAnimations()[0]?.currentTime ?? 0,
-  );
+  const beforeTime = await ambient.evaluate((node) => node.getAnimations()[0]?.currentTime ?? 0);
 
   await card.hover();
   await page.waitForTimeout(220);
@@ -357,10 +352,7 @@ async function inspectDesktopCardAndCursor(page, scenario) {
     after.frameShadow === "none",
     `${scenario.name}: frame ficou congelado após o hover (${after.frameShadow})`,
   );
-  assert(
-    after.ambientPlayState === "running",
-    `${scenario.name}: glow parou após o hover`,
-  );
+  assert(after.ambientPlayState === "running", `${scenario.name}: glow parou após o hover`);
   assert(
     after.ambientTime > Number(beforeTime),
     `${scenario.name}: glow não avançou durante/depois do hover`,
