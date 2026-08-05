@@ -1,11 +1,75 @@
 /* Acabamento comercial exclusivo da NovaCore.
-   Mantém o showroom em gravidade zero e os diagnósticos sem alterações. */
+   O showroom em gravidade zero e os diagnósticos interativos são preservados. */
 .store-theme-eletronicos {
   overflow-x: clip;
 }
 
-/* "Escolha uma constelação" deixa de repetir o planetário do showroom.
-   A mesma interação de categorias passa a ocupar um módulo técnico compacto. */
+/* --------------------------------------------------------------------------
+   Catálogo desktop: remove o percurso vazio e leva o traço azul aos cards.
+   -------------------------------------------------------------------------- */
+@media (min-width: 1024px) {
+  .store-theme-eletronicos
+    [data-testid="catalog-expansion-hero"][class*="min-h-[185svh]"] {
+    min-height: 138svh !important;
+  }
+}
+
+.store-theme-eletronicos .premium-product-card[data-niche="electronics"] .premium-product-frame {
+  animation-play-state: running;
+}
+
+.store-theme-eletronicos
+  .premium-product-card[data-niche="electronics"]
+  .premium-product-frame::after {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  content: "";
+  pointer-events: none;
+  border: 1px solid rgb(103 232 249 / 72%);
+  opacity: 0.72;
+  clip-path: inset(0 100% 99% 0);
+  animation: novacore-catalog-border 5.9s linear infinite;
+}
+
+.store-theme-eletronicos
+  .premium-product-card[data-niche="electronics"]:nth-of-type(2n)
+  .premium-product-frame::after {
+  animation-delay: -1.9s;
+}
+
+.store-theme-eletronicos
+  .premium-product-card[data-niche="electronics"]:nth-of-type(3n)
+  .premium-product-frame::after {
+  animation-delay: -3.8s;
+}
+
+@keyframes novacore-catalog-border {
+  0% {
+    clip-path: inset(0 100% 99% 0);
+    filter: drop-shadow(0 0 2px rgb(103 232 249 / 45%));
+  }
+  20% {
+    clip-path: inset(0 0 99% 0);
+  }
+  40% {
+    clip-path: inset(0 0 0 99%);
+  }
+  60% {
+    clip-path: inset(99% 0 0 0);
+  }
+  80% {
+    clip-path: inset(0 99% 0 0);
+  }
+  100% {
+    clip-path: inset(0 100% 99% 0);
+    filter: drop-shadow(0 0 10px rgb(103 232 249 / 78%));
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Escolha uma constelação: um módulo técnico, não outro planetário.
+   -------------------------------------------------------------------------- */
 .store-theme-eletronicos
   section:has(h2[class*="max-w-[16ch]"][class*="uppercase"]):has(a[href*="/categoria/"])
   [class*="perspective:1700px"] {
@@ -20,7 +84,14 @@
   box-shadow:
     inset 0 0 0 1px rgb(255 255 255 / 3%),
     0 34px 90px -54px rgb(34 211 238 / 34%);
-  clip-path: polygon(0 0, calc(100% - 2.25rem) 0, 100% 2.25rem, 100% 100%, 2.25rem 100%, 0 calc(100% - 2.25rem));
+  clip-path: polygon(
+    0 0,
+    calc(100% - 2.25rem) 0,
+    100% 2.25rem,
+    100% 100%,
+    2.25rem 100%,
+    0 calc(100% - 2.25rem)
+  );
 }
 
 .store-theme-eletronicos
@@ -57,6 +128,7 @@
   [class*="perspective:1700px"]
   > [class*="transform-style:preserve-3d"] {
   inset: 0 !important;
+  opacity: 1 !important;
   transform: none !important;
 }
 
@@ -78,7 +150,10 @@
   [class*="perspective:1700px"]
   > [class*="transform-style:preserve-3d"]
   > :nth-child(3) {
+  display: grid !important;
   inset: 17% 15% !important;
+  opacity: 1 !important;
+  visibility: visible !important;
   overflow: hidden;
   border-radius: 1.2rem !important;
   border-color: rgb(103 232 249 / 42%) !important;
@@ -92,7 +167,14 @@
     inset 0 0 0 1px rgb(255 255 255 / 4%) !important;
   transform: none !important;
   animation: novacore-module-breathe 5.6s ease-in-out infinite !important;
-  clip-path: polygon(0 0, calc(100% - 1.5rem) 0, 100% 1.5rem, 100% 100%, 1.5rem 100%, 0 calc(100% - 1.5rem));
+  clip-path: polygon(
+    0 0,
+    calc(100% - 1.5rem) 0,
+    100% 1.5rem,
+    100% 100%,
+    1.5rem 100%,
+    0 calc(100% - 1.5rem)
+  );
 }
 
 .store-theme-eletronicos
@@ -126,8 +208,11 @@
   }
 }
 
-@media (max-width: 767px) {
-  /* Primeiro viewport mais compacto, sem retirar o produto principal. */
+/* --------------------------------------------------------------------------
+   Mobile.
+   -------------------------------------------------------------------------- */
+@media (max-width: 767px), (any-pointer: coarse) and (max-device-width: 900px) {
+  /* Hero completo, mas sem uma altura artificial. */
   .store-theme-eletronicos section[class*="min-h-[760px]"] {
     min-height: 43rem !important;
   }
@@ -146,28 +231,192 @@
     min-height: 22rem !important;
   }
 
-  /* Circuit story permanece completo, mas não cria um intervalo escuro exagerado. */
+  /* Abra o sistema vira uma sequência horizontal de módulos técnicos.
+     Assim ele não repete a grade comercial de Hardware que responde. */
   .store-theme-eletronicos [data-testid="electronics-circuit-story"] {
-    padding-block: 4rem !important;
+    padding-block: 4.25rem !important;
   }
 
   .store-theme-eletronicos [data-testid="electronics-circuit-story"] > div[class*="max-w-3xl"] {
     width: 100%;
+    max-width: none;
   }
 
-  /* Módulo de categorias cabe integralmente entre 360 e 430 px. */
+  .store-theme-eletronicos [data-testid="electronics-circuit-story"] h2 {
+    max-width: 10ch;
+    font-size: clamp(2.45rem, 11.2vw, 3.35rem) !important;
+    line-height: 0.86 !important;
+    letter-spacing: -0.055em !important;
+  }
+
+  .store-theme-eletronicos
+    [data-testid="electronics-circuit-story"]
+    > div[class*="max-w-3xl"]
+    > div[class*="mt-10"][class*="grid"] {
+    display: flex !important;
+    gap: 1rem !important;
+    width: calc(100vw - 1.25rem);
+    margin-right: -1.25rem;
+    padding-right: 2.75rem;
+    padding-bottom: 0.8rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 0;
+    scrollbar-width: none;
+    touch-action: pan-x pan-y;
+  }
+
+  .store-theme-eletronicos
+    [data-testid="electronics-circuit-story"]
+    > div[class*="max-w-3xl"]
+    > div[class*="mt-10"][class*="grid"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  .store-theme-eletronicos [data-testid="electronics-circuit-story"] article {
+    position: relative;
+    flex: 0 0 calc(100% - 2.5rem);
+    min-width: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    border-color: rgb(103 232 249 / 28%) !important;
+    background:
+      linear-gradient(145deg, rgb(103 232 249 / 7%), transparent 38%),
+      rgb(5 9 24 / 94%) !important;
+    box-shadow:
+      0 24px 70px -40px rgb(34 211 238 / 48%),
+      inset 0 0 0 1px rgb(255 255 255 / 3%);
+    clip-path: polygon(
+      0 0,
+      calc(100% - 1.25rem) 0,
+      100% 1.25rem,
+      100% 100%,
+      1.25rem 100%,
+      0 calc(100% - 1.25rem)
+    );
+  }
+
+  .store-theme-eletronicos [data-testid="electronics-circuit-story"] article::before {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 8;
+    content: "DECONSTRUCTION MODULE";
+    color: rgb(165 243 252 / 54%);
+    font-size: 0.38rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+  }
+
+  .store-theme-eletronicos [data-testid="electronics-circuit-story"] article::after {
+    position: absolute;
+    inset-block: 0;
+    left: -12%;
+    z-index: 7;
+    width: 1px;
+    content: "";
+    pointer-events: none;
+    background: rgb(103 232 249 / 78%);
+    box-shadow: 0 0 18px rgb(103 232 249 / 78%);
+    animation: novacore-mobile-module-scan 4.2s linear infinite;
+  }
+
+  .store-theme-eletronicos [data-testid="electronics-circuit-story"] article > div:first-child {
+    aspect-ratio: 16 / 11 !important;
+  }
+
+  .store-theme-eletronicos [data-testid="electronics-circuit-story"] article > div:last-child {
+    padding: 1.15rem !important;
+  }
+
+  @keyframes novacore-mobile-module-scan {
+    from {
+      transform: translateX(0);
+      opacity: 0;
+    }
+    14% {
+      opacity: 1;
+    }
+    86% {
+      opacity: 0.82;
+    }
+    to {
+      transform: translateX(calc(100vw - 1rem));
+      opacity: 0;
+    }
+  }
+
+  /* Módulo de categorias integralmente visível entre 360 e 430 px. */
   .store-theme-eletronicos
     section:has(h2[class*="max-w-[16ch]"][class*="uppercase"]):has(a[href*="/categoria/"])
     > div[class*="max-w-[96rem]"] {
-    gap: 2.5rem !important;
+    display: block !important;
     padding-block: 4rem !important;
+  }
+
+  .store-theme-eletronicos
+    section:has(h2[class*="max-w-[16ch]"][class*="uppercase"]):has(a[href*="/categoria/"])
+    h2 {
+    max-width: 10ch !important;
+    font-size: clamp(2.35rem, 11vw, 3.35rem) !important;
+    line-height: 0.88 !important;
+    letter-spacing: -0.045em !important;
+    overflow-wrap: normal !important;
+  }
+
+  .store-theme-eletronicos
+    section:has(h2[class*="max-w-[16ch]"][class*="uppercase"]):has(a[href*="/categoria/"])
+    [class*="snap-x"][class*="overflow-x-auto"] {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem !important;
+    width: 100%;
+    overflow: visible !important;
+    padding-bottom: 0 !important;
+    touch-action: auto;
+  }
+
+  .store-theme-eletronicos
+    section:has(h2[class*="max-w-[16ch]"][class*="uppercase"]):has(a[href*="/categoria/"])
+    [class*="snap-x"][class*="overflow-x-auto"]
+    > button {
+    width: 100%;
+    min-width: 0;
+    padding-inline: 0.75rem !important;
+    gap: 0.55rem !important;
+  }
+
+  .store-theme-eletronicos
+    section:has(h2[class*="max-w-[16ch]"][class*="uppercase"]):has(a[href*="/categoria/"])
+    [class*="snap-x"][class*="overflow-x-auto"]
+    > button
+    span:nth-child(2) {
+    overflow-wrap: anywhere;
+    letter-spacing: 0.13em !important;
+  }
+
+  .store-theme-eletronicos
+    section:has(h2[class*="max-w-[16ch]"][class*="uppercase"]):has(a[href*="/categoria/"])
+    > div[class*="max-w-[96rem]"]
+    > div:last-child {
+    margin-top: 2.25rem;
+    overflow: visible;
   }
 
   .store-theme-eletronicos
     section:has(h2[class*="max-w-[16ch]"][class*="uppercase"]):has(a[href*="/categoria/"])
     [class*="perspective:1700px"] {
-    min-height: 15.5rem !important;
-    clip-path: polygon(0 0, calc(100% - 1.4rem) 0, 100% 1.4rem, 100% 100%, 1.4rem 100%, 0 calc(100% - 1.4rem));
+    min-height: 15rem !important;
+    clip-path: polygon(
+      0 0,
+      calc(100% - 1.4rem) 0,
+      100% 1.4rem,
+      100% 100%,
+      1.4rem 100%,
+      0 calc(100% - 1.4rem)
+    );
   }
 
   .store-theme-eletronicos
@@ -183,35 +432,130 @@
     [class*="perspective:1700px"]::after {
     right: 0.85rem;
     bottom: 0.75rem;
-    max-width: 68%;
+    max-width: 70%;
     overflow: hidden;
-    font-size: 0.38rem;
+    font-size: 0.36rem;
     text-align: right;
     white-space: nowrap;
   }
 
   .store-theme-eletronicos
     section:has(h2[class*="max-w-[16ch]"][class*="uppercase"]):has(a[href*="/categoria/"])
-    h2 {
-    max-width: 11ch !important;
-    font-size: clamp(2.25rem, 11vw, 3.45rem) !important;
-    line-height: 0.9 !important;
-    overflow-wrap: normal !important;
+    [class*="perspective:1700px"]
+    + div {
+    position: relative !important;
+    margin-top: 0.9rem;
+  }
+
+  /* Nada entra sem provar: painel em fluxo e métricas que respeitam a célula. */
+  .store-theme-eletronicos section:has(.lucide-flask-conical) > div[class*="max-w-[96rem]"] {
+    gap: 2.25rem !important;
+    padding-block: 4.5rem !important;
+  }
+
+  .store-theme-eletronicos section:has(.lucide-flask-conical) h2 {
+    max-width: 9ch;
+    font-size: clamp(2.65rem, 12vw, 3.75rem) !important;
+    line-height: 0.84 !important;
+  }
+
+  .store-theme-eletronicos section:has(.lucide-flask-conical) [class*="min-h-[560px]"] {
+    min-height: 0 !important;
+    perspective: none !important;
   }
 
   .store-theme-eletronicos
-    section:has(h2[class*="max-w-[16ch]"][class*="uppercase"]):has(a[href*="/categoria/"])
-    [class*="snap-x"][class*="overflow-x-auto"] {
-    scroll-padding-inline: 0;
-    overscroll-behavior-x: contain;
-    touch-action: pan-x pan-y;
-    scrollbar-width: none;
+    section:has(.lucide-flask-conical)
+    [class*="min-h-[560px]"]
+    > [class*="transform-style:preserve-3d"] {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   .store-theme-eletronicos
-    section:has(h2[class*="max-w-[16ch]"][class*="uppercase"]):has(a[href*="/categoria/"])
-    [class*="snap-x"][class*="overflow-x-auto"]::-webkit-scrollbar {
-    display: none;
+    section:has(.lucide-flask-conical)
+    [class*="min-h-[560px]"]
+    > [class*="transform-style:preserve-3d"]
+    > :first-child {
+    display: none !important;
+  }
+
+  .store-theme-eletronicos
+    section:has(.lucide-flask-conical)
+    [class*="min-h-[560px]"]
+    > [class*="transform-style:preserve-3d"]
+    > :last-child {
+    position: relative !important;
+    inset: auto !important;
+    overflow: hidden !important;
+    padding: 1rem !important;
+    transform: none !important;
+  }
+
+  .store-theme-eletronicos section:has(.lucide-flask-conical) h3 {
+    max-width: 10ch;
+    font-size: clamp(1.8rem, 8.5vw, 2.45rem) !important;
+    line-height: 0.9;
+    overflow-wrap: anywhere;
+  }
+
+  .store-theme-eletronicos
+    section:has(.lucide-flask-conical)
+    [class*="grid-cols-3"][class*="gap-px"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    width: 100%;
+  }
+
+  .store-theme-eletronicos
+    section:has(.lucide-flask-conical)
+    [class*="grid-cols-3"][class*="gap-px"]
+    > div {
+    min-width: 0;
+    padding: 0.7rem 0.45rem !important;
+  }
+
+  .store-theme-eletronicos
+    section:has(.lucide-flask-conical)
+    [class*="grid-cols-3"][class*="gap-px"]
+    span {
+    display: block;
+    font-size: 0.39rem !important;
+    letter-spacing: 0.1em !important;
+    white-space: normal;
+  }
+
+  .store-theme-eletronicos
+    section:has(.lucide-flask-conical)
+    [class*="grid-cols-3"][class*="gap-px"]
+    strong {
+    display: block;
+    max-width: 100%;
+    font-size: clamp(0.7rem, 3.1vw, 0.86rem) !important;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .store-theme-eletronicos section:has(.lucide-flask-conical) strong[class*="text-5xl"] {
+    font-size: clamp(2.7rem, 14vw, 4rem) !important;
+    line-height: 0.9;
+  }
+
+  .store-theme-eletronicos section:has(.lucide-flask-conical) [class*="h-44"] {
+    height: 9rem !important;
+    margin-top: 1.5rem !important;
+    padding: 0.75rem !important;
+  }
+
+  /* Hardware segue como catálogo; cards mais compactos que os módulos acima. */
+  .store-theme-eletronicos article[class*="min-h-[480px]"] {
+    min-height: 26rem !important;
+  }
+
+  .store-theme-eletronicos article[class*="min-h-[480px]"] > a[class*="min-h-[480px]"] {
+    min-height: 26rem !important;
   }
 }
 
@@ -220,7 +564,11 @@
     section:has(h2[class*="max-w-[16ch]"][class*="uppercase"]):has(a[href*="/categoria/"])
     [class*="perspective:1700px"]
     > [class*="transform-style:preserve-3d"]
-    > :nth-child(3) {
+    > :nth-child(3),
+  .store-theme-eletronicos
+    .premium-product-card[data-niche="electronics"]
+    .premium-product-frame::after,
+  .store-theme-eletronicos [data-testid="electronics-circuit-story"] article::after {
     animation: none !important;
   }
 }
