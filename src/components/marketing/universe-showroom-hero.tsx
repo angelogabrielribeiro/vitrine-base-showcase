@@ -27,10 +27,11 @@ export function UniverseShowroomHero({
 }: UniverseShowroomHeroProps) {
   const { capabilities } = useCinematicMotion();
   const { tier } = useAdaptiveQuality();
-  const motionDisabled = capabilities.hydrated && capabilities.reducedMotion;
+  const lightweightMobile = capabilities.hydrated && capabilities.coarsePointer;
+  const motionDisabled =
+    capabilities.hydrated && (capabilities.reducedMotion || lightweightMobile);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isDesktop, setIsDesktop] = useState(false);
-  const [offsets, setOffsets] = useState<number[]>(() => UNIVERSES.map(() => 0));
   const trackRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLAnchorElement | null)[]>([]);
   const idleUntilRef = useRef(0);
@@ -65,21 +66,15 @@ export function UniverseShowroomHero({
     const measure = () => {
       const trackRect = track.getBoundingClientRect();
       const center = trackRect.left + trackRect.width / 2;
-      const next = cardsRef.current.map((card) => {
-        if (!card) return 0;
+      const distances = cardsRef.current.map((card) => {
+        if (!card) return Number.POSITIVE_INFINITY;
         const rect = card.getBoundingClientRect();
-        return (rect.left + rect.width / 2 - center) / Math.max(trackRect.width, 1);
+        return Math.abs(rect.left + rect.width / 2 - center);
       });
 
-      setOffsets((current) =>
-        current.every((value, index) => Math.abs(value - (next[index] ?? 0)) < 0.008)
-          ? current
-          : next,
-      );
-
       let nearest = 0;
-      next.forEach((value, index) => {
-        if (Math.abs(value) < Math.abs(next[nearest] ?? Number.POSITIVE_INFINITY)) nearest = index;
+      distances.forEach((distance, index) => {
+        if (distance < (distances[nearest] ?? Number.POSITIVE_INFINITY)) nearest = index;
       });
       setActiveIndex((current) => (current === nearest ? current : nearest));
     };
@@ -99,15 +94,18 @@ export function UniverseShowroomHero({
     };
   }, [isDesktop]);
 
-  const centerCard = useCallback((index: number) => {
-    idleUntilRef.current = performance.now() + 5200;
-    setActiveIndex(index);
-    cardsRef.current[index]?.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
-      inline: "center",
-    });
-  }, []);
+  const centerCard = useCallback(
+    (index: number) => {
+      idleUntilRef.current = performance.now() + 5200;
+      setActiveIndex(index);
+      cardsRef.current[index]?.scrollIntoView({
+        behavior: lightweightMobile ? "auto" : "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+    },
+    [lightweightMobile],
+  );
 
   const step = useCallback(
     (direction: number) => {
@@ -320,18 +318,20 @@ export function UniverseShowroomHero({
               aria-hidden="true"
               className="pointer-events-none absolute inset-[20%] hidden rounded-full border border-dashed border-white/15 lg:block"
               animate={motionDisabled || tier === "off" ? undefined : { rotate: 360 }}
-              transition={{ duration: tier === "high" ? 42 : 58, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+              transition={{
+                duration: tier === "high" ? 42 : 58,
+                repeat: Number.POSITIVE_INFINITY,
+                ease: "linear",
+              }}
             />
 
             {UNIVERSES.map((universe, index) => {
               const isActive = index === activeIndex;
               const delta = relativeIndex(index, activeIndex);
-              const mobileOffset = Math.max(-1, Math.min(1, offsets[index] ?? delta));
-              const mobileScale = Math.max(0.82, 1 - Math.abs(mobileOffset) * 0.24);
               const desktopScale = Math.max(0.58, 1 - Math.abs(delta) * 0.18);
               const transform = isDesktop
                 ? `translate3d(calc(-50% + ${delta * 178}px), -50%, ${-Math.abs(delta) * 150}px) rotateY(${delta * -30}deg) scale(${desktopScale})`
-                : `perspective(900px) rotateY(${mobileOffset * -18}deg) translateZ(${-Math.abs(mobileOffset) * 60}px) scale(${mobileScale})`;
+                : "none";
 
               return (
                 <Link
@@ -354,11 +354,11 @@ export function UniverseShowroomHero({
                   className="group relative aspect-[3/4] w-[70vw] max-w-[19rem] shrink-0 snap-center overflow-hidden rounded-[1.75rem] border bg-black/55 transition-[transform,opacity,border-color,box-shadow] duration-700 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vb-gold lg:absolute lg:left-1/2 lg:top-1/2 lg:h-[62%] lg:w-[50%] lg:max-w-[22rem]"
                   style={{
                     transform,
-                    transformStyle: "preserve-3d",
-                    opacity: isActive ? 1 : isDesktop ? Math.max(0.2, 0.72 - Math.abs(delta) * 0.2) : 0.62,
+                    transformStyle: isDesktop ? "preserve-3d" : "flat",
+                    opacity: isActive ? 1 : isDesktop ? Math.max(0.2, 0.72 - Math.abs(delta) * 0.2) : 0.72,
                     zIndex: 20 - Math.abs(delta),
                     borderColor: isActive ? `${universe.accent}76` : "rgba(255,255,255,0.11)",
-                    boxShadow: isActive ? `0 30px 86px -38px ${universe.accent}` : undefined,
+                    boxShadow: isActive && isDesktop ? `0 30px 86px -38px ${universe.accent}` : undefined,
                   }}
                 >
                   <motion.img
@@ -384,7 +384,7 @@ export function UniverseShowroomHero({
                     className="pointer-events-none absolute inset-0 mix-blend-screen"
                     animate={
                       motionDisabled || tier === "off"
-                        ? { opacity: isActive ? 0.28 : 0.1 }
+                        ? { opacity: isActive ? 0.22 : 0.08 }
                         : { opacity: isActive ? [0.2, 0.42, 0.2] : [0.08, 0.17, 0.08] }
                     }
                     transition={{
@@ -459,7 +459,9 @@ export function UniverseShowroomHero({
 
           <p className="mt-3 text-center text-[10px] font-bold uppercase tracking-[0.18em] text-white/42">
             <span className="lg:hidden">Deslize. Toque uma vez para focar e novamente para entrar.</span>
-            <span className="hidden lg:inline">A cena gira sozinha. Use as setas ou escolha um universo.</span>
+            <span className="hidden lg:inline">
+              A cena gira sozinha. Use as setas ou escolha um universo.
+            </span>
           </p>
         </div>
       </div>
