@@ -14,8 +14,9 @@ const NovaCoreCanvas = lazy(() => import("@/components/storefront/novacore-core-
 
 /**
  * Núcleo 3D da NovaCore. Qualidade adaptativa via useAdaptiveQuality:
- * no mobile o WebGL continua ativo (tier "low"), apenas com geometria,
- * partículas e DPR reduzidos. Pausa fora da viewport com useInView e
+ * o hero mantém WebGL de baixa complexidade no celular, enquanto instâncias
+ * compactas secundárias usam o fallback técnico para evitar cenas repetidas,
+ * travamentos e competição por GPU. Pausa fora da viewport com useInView e
  * a cena pesada é carregada via lazy import.
  */
 export function NovaCoreSpatialCore({
@@ -27,7 +28,7 @@ export function NovaCoreSpatialCore({
   const adaptive = useAdaptiveQuality();
   const { ref, inView } = useInView<HTMLDivElement>({ amount: 0, rootMargin: "35% 0px" });
 
-  const canRender3D = adaptive.tier !== "off";
+  const canRender3D = adaptive.tier !== "off" && (!adaptive.isMobile || !compact);
   const isCompact = compact || adaptive.isMobile;
   const particles = useMemo(() => {
     const base = adaptive.tier === "low" ? 16 : isCompact ? 32 : 48;
