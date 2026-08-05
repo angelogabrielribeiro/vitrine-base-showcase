@@ -1,0 +1,115 @@
+/* Ajustes finais de performance mobile da vitrine principal e acabamento dos cards NovaCore. */
+
+/* NovaCore: remove o pulso branco/clareamento do frame e preserva somente o traço azul. */
+.store-theme-eletronicos
+  .premium-product-card[data-niche="electronics"]
+  .premium-product-frame {
+  animation: none !important;
+  filter: none !important;
+  box-shadow:
+    0 18px 46px rgb(0 0 0 / 34%),
+    inset 0 0 0 1px rgb(103 232 249 / 8%) !important;
+}
+
+.store-theme-eletronicos
+  .premium-product-card[data-niche="electronics"]
+  .product-attention-glow,
+.store-theme-eletronicos
+  .premium-product-card[data-niche="electronics"]
+  .premium-product-frame
+  > div[aria-hidden="true"][class*="transition-opacity"][class*="duration-700"],
+.store-theme-eletronicos
+  .premium-product-card[data-niche="electronics"]
+  .premium-product-frame
+  > span[class*="inset-x-0"][class*="via-cyan-200"] {
+  display: none !important;
+  animation: none !important;
+}
+
+.store-theme-eletronicos
+  .premium-product-card[data-niche="electronics"]
+  .premium-product-frame::after {
+  border-width: 2px !important;
+  border-color: rgb(103 232 249 / 98%) !important;
+  opacity: 1 !important;
+  animation-duration: 4.7s !important;
+  filter:
+    drop-shadow(0 0 5px rgb(103 232 249 / 88%))
+    drop-shadow(0 0 15px rgb(34 211 238 / 72%)) !important;
+}
+
+/* A vitrine principal mobile perde os efeitos contínuos mais caros, mas mantém swipe e foco. */
+@media (max-width: 1023px), (any-pointer: coarse) and (max-device-width: 900px) {
+  header[class*="backdrop-blur-2xl"] {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background-color: rgb(7 8 18 / 96%) !important;
+  }
+
+  .vb-hero-shell > div[aria-hidden="true"]:nth-of-type(3) {
+    display: none !important;
+  }
+
+  .vb-hero-shell .vb-noise,
+  .vb-hero-shell .vb-hero-grid {
+    opacity: 0.1 !important;
+  }
+
+  .vb-hero-shell [class*="backdrop-blur"] {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .vb-hero-shell [role="group"][aria-label*="Showroom"] {
+    perspective: none !important;
+    background: none !important;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    touch-action: pan-x pan-y;
+    -webkit-overflow-scrolling: touch;
+    contain: layout paint;
+  }
+
+  .vb-hero-shell [data-showroom-card] {
+    transform: none !important;
+    transform-style: flat !important;
+    opacity: 0.72 !important;
+    box-shadow: none !important;
+    transition:
+      opacity 220ms ease,
+      border-color 220ms ease !important;
+    will-change: auto !important;
+    contain: layout paint;
+    backface-visibility: hidden;
+  }
+
+  .vb-hero-shell [data-showroom-card][data-active="true"] {
+    opacity: 1 !important;
+    border-color: var(--vb-universe) !important;
+    box-shadow: 0 18px 48px -34px var(--vb-universe) !important;
+  }
+
+  .vb-hero-shell [data-showroom-card] img {
+    transform: none !important;
+    animation: none !important;
+    will-change: auto !important;
+  }
+
+  .vb-hero-shell [data-showroom-card] > span[aria-hidden="true"] {
+    display: none !important;
+  }
+
+  .vb-hero-shell [data-showroom-card] * {
+    will-change: auto !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .store-theme-eletronicos
+    .premium-product-card[data-niche="electronics"]
+    .premium-product-frame::after {
+    animation: none !important;
+    clip-path: inset(0) !important;
+    opacity: 0.58 !important;
+  }
+}
