@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import mobileVitrineCss from "../mobile-vitrine-overrides.css?url";
 import novaCoreClientPolishCss from "../novacore-client-polish.css?url";
+import mobileShowroomPerformanceCss from "../mobile-showroom-performance.css?url";
 import { CinematicMotionProvider } from "../components/motion/cinematic-motion-system";
 import { NotFoundPage } from "../components/system/not-found-page";
 import { StoreThemeBootstrapScript } from "../components/storefront/store-theme";
@@ -95,6 +96,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: novaCoreClientPolishCss,
+      },
+      {
+        rel: "stylesheet",
+        href: mobileShowroomPerformanceCss,
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
