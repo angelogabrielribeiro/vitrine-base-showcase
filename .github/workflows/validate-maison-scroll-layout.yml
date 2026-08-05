@@ -41,6 +41,8 @@ jobs:
       - name: Check and build
         run: |
           mkdir -p artifacts/maison-scroll-layout
+          npx prettier --write scripts/validate-maison-scroll-layout.mjs
+          cp scripts/validate-maison-scroll-layout.mjs artifacts/maison-scroll-layout/formatted-validate-maison-scroll-layout.mjs
           npx prettier --check \
             src/components/storefront/fashion-storefront.tsx \
             src/components/storefront/product-card-editorial.tsx \
