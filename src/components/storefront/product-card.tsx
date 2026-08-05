@@ -328,6 +328,9 @@ export function ProductCard({ product, storeSlug }: { product: Product; storeSlu
         .premium-product-card:focus-visible .premium-product-frame {
           animation-play-state: running;
         }
+        .premium-product-card[data-niche="fashion"] .premium-product-frame {
+          animation-play-state: running;
+        }
         .premium-product-card[data-niche="fashion"] { color: #f7eee8; }
         .premium-product-card[data-niche="electronics"] { color: #cffafe; }
         @keyframes premium-frame-breathe {
