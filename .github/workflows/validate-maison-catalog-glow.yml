@@ -1,0 +1,72 @@
+name: Validate Maison catalog glow
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "src/components/storefront/product-card.tsx"
+      - "scripts/validate-maison-catalog-glow.mjs"
+      - ".github/workflows/validate-maison-catalog-glow.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maison-catalog-glow-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.0-noble
+      options: --user 1001
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+
+      - name: Install dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npm install --no-save --no-audit --no-fund playwright@1.62.0
+
+      - name: Check and build
+        run: |
+          mkdir -p artifacts/maison-catalog-glow
+          npx prettier --check \
+            src/components/storefront/product-card.tsx \
+            scripts/validate-maison-catalog-glow.mjs \
+            .github/workflows/validate-maison-catalog-glow.yml
+          npx eslint src/components/storefront/product-card.tsx
+          node --check scripts/validate-maison-catalog-glow.mjs
+          npm run build
+
+      - name: Start preview server
+        run: |
+          npm run dev -- --host 0.0.0.0 --port 4173 > artifacts/maison-catalog-glow/server.log 2>&1 &
+          for attempt in $(seq 1 90); do
+            if curl --fail --silent http://127.0.0.1:4173 > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat artifacts/maison-catalog-glow/server.log
+          exit 1
+
+      - name: Validate hover exit
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: node scripts/validate-maison-catalog-glow.mjs
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maison-catalog-glow-${{ github.run_id }}
+          path: artifacts/maison-catalog-glow
+          if-no-files-found: warn
+          retention-days: 14
