@@ -176,12 +176,16 @@ export function CatalogExpansionHero({
   }
 
   const reduced = Boolean(prefersReduced);
+  const desktopScrollHeight =
+    store.niche === "fashion" ? "min-h-[150svh]" : "min-h-[185svh]";
 
   return (
     <section
       ref={ref}
       data-testid="catalog-expansion-hero"
-      className={`relative border-b border-white/12 text-white ${reduced ? "min-h-[calc(100svh-4rem)]" : "min-h-[185svh]"}`}
+      className={`relative border-b border-white/12 text-white ${
+        reduced ? "min-h-[calc(100svh-4rem)]" : desktopScrollHeight
+      }`}
       style={{ background: BACKGROUNDS[store.niche] }}
     >
       <div
