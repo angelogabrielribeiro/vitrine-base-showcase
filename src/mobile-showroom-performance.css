@@ -1,5 +1,11 @@
 /* Ajustes finais de performance mobile da vitrine principal e acabamento dos cards NovaCore. */
 
+@property --novacore-trace-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
 /* NovaCore: remove o pulso branco/clareamento do frame e preserva somente o traço azul. */
 .store-theme-eletronicos
   .premium-product-card[data-niche="electronics"]
@@ -36,6 +42,61 @@
   filter:
     drop-shadow(0 0 5px rgb(103 232 249 / 88%))
     drop-shadow(0 0 15px rgb(34 211 238 / 72%)) !important;
+}
+
+/* Desktop: o traço percorre uma moldura externa, portanto continua visível mesmo
+   quando a fotografia do produto tem fundo branco. */
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .store-theme-eletronicos
+    .premium-product-card[data-niche="electronics"] {
+    isolation: isolate;
+  }
+
+  .store-theme-eletronicos
+    .premium-product-card[data-niche="electronics"]
+    .premium-product-frame::after {
+    display: none !important;
+  }
+
+  .store-theme-eletronicos
+    .premium-product-card[data-niche="electronics"]::before {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    z-index: 30;
+    width: calc(100% + 8px);
+    aspect-ratio: 4 / 5;
+    padding: 2px;
+    content: "";
+    pointer-events: none;
+    background: conic-gradient(
+      from var(--novacore-trace-angle),
+      transparent 0deg 282deg,
+      rgb(34 211 238 / 10%) 298deg,
+      rgb(103 232 249 / 82%) 320deg,
+      rgb(103 232 249) 340deg,
+      rgb(34 211 238 / 88%) 350deg,
+      transparent 360deg
+    );
+    filter:
+      drop-shadow(0 0 5px rgb(103 232 249 / 92%))
+      drop-shadow(0 0 14px rgb(34 211 238 / 82%));
+    animation: novacore-external-trace 4.7s linear infinite;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+}
+
+@keyframes novacore-external-trace {
+  to {
+    --novacore-trace-angle: 360deg;
+  }
 }
 
 /* A vitrine principal mobile perde os efeitos contínuos mais caros, mas mantém swipe e foco. */
@@ -111,5 +172,12 @@
     animation: none !important;
     clip-path: inset(0) !important;
     opacity: 0.58 !important;
+  }
+
+  .store-theme-eletronicos
+    .premium-product-card[data-niche="electronics"]::before {
+    --novacore-trace-angle: 326deg;
+    animation: none !important;
+    opacity: 0.72;
   }
 }
