@@ -11,7 +11,9 @@ function assert(condition, message) {
 
 async function animationState(frame) {
   return frame.evaluate((element) => {
-    const animation = element.getAnimations().find((item) => item.animationName === "premium-frame-breathe");
+    const animation = element
+      .getAnimations()
+      .find((item) => item.animationName === "premium-frame-breathe");
     return {
       animationName: getComputedStyle(element).animationName,
       playState: animation?.playState ?? getComputedStyle(element).animationPlayState,
@@ -66,12 +68,18 @@ try {
     beforeHover.animationName.includes("premium-frame-breathe"),
     `Maison não usa premium-frame-breathe: ${beforeHover.animationName}`,
   );
-  assert(beforeHover.playState === "running", `Glow Maison inicia ${beforeHover.playState}`);
+  assert(
+    beforeHover.playState === "running",
+    `Glow Maison inicia ${beforeHover.playState}`,
+  );
 
   await card.hover();
   await page.waitForTimeout(450);
   const duringHover = await animationState(frame);
-  assert(duringHover.playState === "running", `Glow Maison parou no hover: ${duringHover.playState}`);
+  assert(
+    duringHover.playState === "running",
+    `Glow Maison parou no hover: ${duringHover.playState}`,
+  );
   assert(
     duringHover.currentTime > beforeHover.currentTime,
     `Glow Maison não avançou durante hover: ${beforeHover.currentTime} -> ${duringHover.currentTime}`,
@@ -82,7 +90,10 @@ try {
   const afterExit = await animationState(frame);
   const stillHovered = await card.evaluate((element) => element.matches(":hover"));
   assert(!stillHovered, "Cursor ainda é considerado sobre o card");
-  assert(afterExit.playState === "running", `Glow Maison congelou após saída: ${afterExit.playState}`);
+  assert(
+    afterExit.playState === "running",
+    `Glow Maison congelou após saída: ${afterExit.playState}`,
+  );
   assert(
     afterExit.currentTime > duringHover.currentTime,
     `Glow Maison congelou no frame ${duringHover.currentTime}: terminou em ${afterExit.currentTime}`,
@@ -90,7 +101,10 @@ try {
 
   await page.waitForTimeout(650);
   const later = await animationState(frame);
-  assert(later.playState === "running", `Glow Maison parou depois da saída: ${later.playState}`);
+  assert(
+    later.playState === "running",
+    `Glow Maison parou depois da saída: ${later.playState}`,
+  );
   assert(
     later.currentTime > afterExit.currentTime,
     `Glow Maison deixou de pulsar depois da saída: ${afterExit.currentTime} -> ${later.currentTime}`,
