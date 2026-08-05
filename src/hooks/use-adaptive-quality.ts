@@ -26,9 +26,25 @@ function detectWebgl() {
   }
 }
 
+function detectHandheld() {
+  if (typeof window === "undefined") return false;
+
+  const narrowViewport = window.matchMedia("(max-width: 767px)").matches;
+  const coarsePointer = window.matchMedia("(any-pointer: coarse)").matches;
+  const touchDevice = navigator.maxTouchPoints > 1;
+  const shortScreenEdge = Math.min(window.screen.width, window.screen.height);
+  const compactTouchScreen = touchDevice && shortScreenEdge <= 900;
+  const userAgentMobile = Boolean(
+    (navigator as Navigator & { userAgentData?: { mobile?: boolean } }).userAgentData?.mobile,
+  );
+
+  return narrowViewport || userAgentMobile || (coarsePointer && compactTouchScreen);
+}
+
 /**
  * Qualidade adaptativa das cenas 3D/WebGL.
- * No mobile o 3D CONTINUA ativo, apenas com DPR e geometria reduzidos.
+ * Celulares continuam no tier reduzido mesmo quando o navegador solicita a
+ * versão desktop, evitando múltiplos canvases pesados e falhas de renderização.
  */
 export function useAdaptiveQuality(): AdaptiveQuality {
   const [state, setState] = useState<AdaptiveQuality>({
@@ -42,20 +58,27 @@ export function useAdaptiveQuality(): AdaptiveQuality {
   useEffect(() => {
     const compute = () => {
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const isMobile = window.matchMedia("(max-width: 767px)").matches;
+      const isMobile = detectHandheld();
       const webgl = detectWebgl();
       const tier: QualityTier = !webgl || reduceMotion ? "off" : isMobile ? "low" : "high";
-      const dpr = tier === "high" ? Math.min(window.devicePixelRatio || 1, 2) : 1.4;
+      const dpr = tier === "high" ? Math.min(window.devicePixelRatio || 1, 1.8) : 1.2;
       setState({ tier, dpr, isMobile, reduceMotion, webgl });
     };
+
     compute();
-    const mq = window.matchMedia("(max-width: 767px)");
-    const rm = window.matchMedia("(prefers-reduced-motion: reduce)");
-    mq.addEventListener("change", compute);
-    rm.addEventListener("change", compute);
+    const viewport = window.matchMedia("(max-width: 767px)");
+    const pointer = window.matchMedia("(any-pointer: coarse)");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    viewport.addEventListener("change", compute);
+    pointer.addEventListener("change", compute);
+    reducedMotion.addEventListener("change", compute);
+    window.addEventListener("resize", compute, { passive: true });
+
     return () => {
-      mq.removeEventListener("change", compute);
-      rm.removeEventListener("change", compute);
+      viewport.removeEventListener("change", compute);
+      pointer.removeEventListener("change", compute);
+      reducedMotion.removeEventListener("change", compute);
+      window.removeEventListener("resize", compute);
     };
   }, []);
 
