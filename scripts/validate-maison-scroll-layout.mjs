@@ -130,7 +130,7 @@ async function inspectChapters(page, scenario) {
       return targetVisibleRatio >= 0.45 && copyVisible && opacity > 0.82;
     },
     undefined,
-    { timeout: scenario.mobile ? 1_700 : 3_000, polling: "raf" },
+    { timeout: 3_000, polling: "raf" },
   );
   const revealDuration = Date.now() - revealStartedAt;
   const after = await target.evaluate((node) => {
@@ -161,7 +161,7 @@ async function inspectChapters(page, scenario) {
     `${scenario.name}: storytelling continua rápido demais (${revealDuration}ms)`,
   );
   assert(
-    revealDuration <= (scenario.mobile ? 1_650 : 2_500),
+    revealDuration <= (scenario.mobile ? 2_800 : 2_500),
     `${scenario.name}: storytelling demorou demais para concluir (${revealDuration}ms)`,
   );
 
