@@ -68,10 +68,7 @@ try {
     beforeHover.animationName.includes("premium-frame-breathe"),
     `Maison não usa premium-frame-breathe: ${beforeHover.animationName}`,
   );
-  assert(
-    beforeHover.playState === "running",
-    `Glow Maison inicia ${beforeHover.playState}`,
-  );
+  assert(beforeHover.playState === "running", `Glow Maison inicia ${beforeHover.playState}`);
 
   await card.hover();
   await page.waitForTimeout(450);
@@ -101,10 +98,7 @@ try {
 
   await page.waitForTimeout(650);
   const later = await animationState(frame);
-  assert(
-    later.playState === "running",
-    `Glow Maison parou depois da saída: ${later.playState}`,
-  );
+  assert(later.playState === "running", `Glow Maison parou depois da saída: ${later.playState}`);
   assert(
     later.currentTime > afterExit.currentTime,
     `Glow Maison deixou de pulsar depois da saída: ${afterExit.currentTime} -> ${later.currentTime}`,
