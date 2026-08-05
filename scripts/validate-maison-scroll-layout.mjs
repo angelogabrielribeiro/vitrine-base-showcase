@@ -196,12 +196,18 @@ async function readAtelierState(rail) {
 }
 
 function assertAtelierFraming(state, scenario, phase) {
-  assert(state.scrollWidth > state.clientWidth, `${scenario.name}/${phase}: arara deixou de ser navegável`);
+  assert(
+    state.scrollWidth > state.clientWidth,
+    `${scenario.name}/${phase}: arara deixou de ser navegável`,
+  );
   assert(
     state.left >= -2 && state.right <= scenario.width + 2,
     `${scenario.name}/${phase}: trilho da arara extrapola a tela`,
   );
-  assert(state.scrollLeft <= 2, `${scenario.name}/${phase}: trilho inicia deslocado (${state.scrollLeft}px)`);
+  assert(
+    state.scrollLeft <= 2,
+    `${scenario.name}/${phase}: trilho inicia deslocado (${state.scrollLeft}px)`,
+  );
   assert(
     state.firstLeft >= state.left - 2 && state.firstRight <= state.right + 2,
     `${scenario.name}/${phase}: primeiro card está cortado (${state.firstLeft}–${state.firstRight}; trilho ${state.left}–${state.right})`,
@@ -218,7 +224,10 @@ function assertAtelierFraming(state, scenario, phase) {
     state.touchAction.includes("pan-x") && state.touchAction.includes("pan-y"),
     `${scenario.name}/${phase}: gesto da arara bloqueia um eixo`,
   );
-  assert(state.objectFit === "contain", `${scenario.name}/${phase}: imagem continua cortada na arara`);
+  assert(
+    state.objectFit === "contain",
+    `${scenario.name}/${phase}: imagem continua cortada na arara`,
+  );
 }
 
 async function inspectAtelierMobile(page, scenario) {
@@ -239,7 +248,10 @@ async function inspectAtelierMobile(page, scenario) {
   );
 
   const categories = page.getByTestId("fashion-category");
-  assert((await categories.count()) > 1, `${scenario.name}: categorias insuficientes para testar reset`);
+  assert(
+    (await categories.count()) > 1,
+    `${scenario.name}: categorias insuficientes para testar reset`,
+  );
   await categories.nth(1).click();
   await page.waitForTimeout(500);
 
@@ -276,7 +288,10 @@ async function inspectDesktopCardAndCursor(page, scenario) {
   const cards = selection.locator(".ep-card");
   await cards.first().scrollIntoViewIfNeeded();
   await page.waitForTimeout(800);
-  assert((await cards.count()) >= 4, `${scenario.name}: cards insuficientes para validar glow`);
+  assert(
+    (await cards.count()) >= 4,
+    `${scenario.name}: cards insuficientes para validar glow`,
+  );
 
   const ambientStates = await cards.evaluateAll((nodes) =>
     nodes.map((node) => {
@@ -301,7 +316,9 @@ async function inspectDesktopCardAndCursor(page, scenario) {
 
   const card = cards.first();
   const ambient = card.locator(".ep-ambient-glow");
-  const beforeTime = await ambient.evaluate((node) => node.getAnimations()[0]?.currentTime ?? 0);
+  const beforeTime = await ambient.evaluate(
+    (node) => node.getAnimations()[0]?.currentTime ?? 0,
+  );
 
   await card.hover();
   await page.waitForTimeout(220);
@@ -340,7 +357,10 @@ async function inspectDesktopCardAndCursor(page, scenario) {
     after.frameShadow === "none",
     `${scenario.name}: frame ficou congelado após o hover (${after.frameShadow})`,
   );
-  assert(after.ambientPlayState === "running", `${scenario.name}: glow parou após o hover`);
+  assert(
+    after.ambientPlayState === "running",
+    `${scenario.name}: glow parou após o hover`,
+  );
   assert(
     after.ambientTime > Number(beforeTime),
     `${scenario.name}: glow não avançou durante/depois do hover`,
