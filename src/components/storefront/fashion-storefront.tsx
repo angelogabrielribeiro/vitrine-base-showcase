@@ -8,6 +8,7 @@ import type { HeroSpotlight } from "@/components/storefront/hero/niche-hero";
 import { EditorialProductCard } from "@/components/storefront/product-card-editorial";
 import { StoreInstitutional } from "@/components/storefront/store-institutional";
 import { useInView, sequenceDelay } from "@/hooks/use-in-view";
+import { useAdaptiveQuality } from "@/hooks/use-adaptive-quality";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -51,7 +52,7 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
         if (!element) return;
 
         const rect = element.getBoundingClientRect();
-        const entersBeforeCenter = rect.top < window.innerHeight * 0.94;
+        const entersBeforeCenter = rect.top < window.innerHeight * 0.9;
         const remainsOnScreen = rect.bottom > window.innerHeight * 0.08;
         setInView(entersBeforeCenter && remainsOnScreen);
       });
@@ -68,7 +69,7 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
     };
   }, []);
 
-  const chapterTransition = { duration: 0.76, ease: [0.22, 1, 0.36, 1] as const };
+  const chapterTransition = { duration: 1.18, ease: [0.25, 0.1, 0.25, 1] as const };
 
   return (
     <section
@@ -82,7 +83,7 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
             className="h-full w-px origin-top bg-[#c99a55] shadow-[0_0_20px_rgba(201,154,85,.52)]"
             initial={false}
             animate={{ scaleY: reduceMotion || inView ? 1 : 0 }}
-            transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 1.1, ease: [0.25, 0.1, 0.25, 1] }}
           />
         </div>
 
@@ -122,9 +123,9 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
             animate={
               reduceMotion || inView
                 ? { opacity: 1, x: 0, y: 0 }
-                : { opacity: 0, x: index % 2 === 0 ? -20 : 20, y: 14 }
+                : { opacity: 0, x: index % 2 === 0 ? -28 : 28, y: 16 }
             }
-            transition={{ ...chapterTransition, delay: reduceMotion ? 0 : 0.06 }}
+            transition={{ ...chapterTransition, delay: reduceMotion ? 0 : 0.08 }}
             className={`max-w-2xl ${index % 2 === 0 ? "lg:order-1" : "lg:order-2"}`}
           >
             <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-[0.34em] text-[#d8ad72]">
@@ -165,11 +166,25 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
 
 function AtelierConsole({ store, products }: { store: StoreConfig; products: Product[] }) {
   const [category, setCategory] = useState(store.categories[0]?.slug ?? "");
+  const railRef = useRef<HTMLDivElement>(null);
+  const { isMobile } = useAdaptiveQuality();
   const selectedCategory = store.categories.find((item) => item.slug === category);
   const selection = useMemo(() => {
     const matching = products.filter((product) => product.category === category);
     return (matching.length ? matching : products).slice(0, 4);
   }, [category, products]);
+
+  useEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+
+    rail.scrollLeft = 0;
+    const frame = window.requestAnimationFrame(() => {
+      rail.scrollLeft = 0;
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [category]);
 
   return (
     <section
@@ -221,16 +236,58 @@ function AtelierConsole({ store, products }: { store: StoreConfig; products: Pro
 
         <div className="mt-12 grid min-h-0 gap-10 sm:mt-16 lg:min-h-[36rem] lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
           <div
+            key={category}
+            ref={railRef}
             data-testid="fashion-atelier-rail"
-            className="relative h-auto lg:h-[32rem]"
-            style={{ perspective: "1200px" }}
+            className={
+              isMobile
+                ? "relative flex h-auto w-full gap-4 overflow-x-auto overflow-y-hidden pb-4 pl-2 pr-11"
+                : "relative h-[32rem]"
+            }
+            style={
+              isMobile
+                ? {
+                    overscrollBehaviorX: "contain",
+                    scrollSnapType: "x mandatory",
+                    scrollPaddingInline: "0.5rem 2.75rem",
+                    touchAction: "pan-x pan-y",
+                  }
+                : { perspective: "1200px" }
+            }
           >
             {selection.map((product, index) => {
               const center = (selection.length - 1) / 2;
               const offset = index - center;
+
+              if (isMobile) {
+                return (
+                  <div
+                    data-testid="fashion-atelier-card"
+                    key={`${category}-${product.id}`}
+                    className="relative aspect-[4/5] shrink-0 snap-start overflow-hidden border border-white/18 bg-[#6b2941] shadow-[0_28px_70px_rgba(25,5,15,.45)]"
+                    style={{
+                      width: "calc(100% - 2.75rem)",
+                      maxWidth: "22rem",
+                      flexBasis: "calc(100% - 2.75rem)",
+                      scrollSnapStop: "always",
+                    }}
+                  >
+                    <img
+                      src={product.images[0]}
+                      alt={product.name}
+                      loading="lazy"
+                      className="h-full w-full bg-[#3d1828] object-contain p-1.5"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#25131d]/72 via-transparent to-transparent" />
+                    <p className="absolute inset-x-4 bottom-4 font-display text-xl leading-tight">
+                      {product.name}
+                    </p>
+                  </div>
+                );
+              }
+
               return (
                 <motion.div
-                  layout
                   data-testid="fashion-atelier-card"
                   key={`${category}-${product.id}`}
                   initial={{ opacity: 0, y: 45, rotateY: offset * -12 }}
