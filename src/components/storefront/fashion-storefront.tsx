@@ -52,8 +52,8 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
         if (!element) return;
 
         const rect = element.getBoundingClientRect();
-        const entersBeforeCenter = rect.top < window.innerHeight * 0.98;
-        const remainsOnScreen = rect.bottom > window.innerHeight * 0.04;
+        const entersBeforeCenter = rect.top < window.innerHeight * 0.9;
+        const remainsOnScreen = rect.bottom > window.innerHeight * 0.08;
         setInView(entersBeforeCenter && remainsOnScreen);
       });
     };
@@ -69,7 +69,7 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
     };
   }, []);
 
-  const chapterTransition = { duration: 1.08, ease: [0.22, 1, 0.36, 1] as const };
+  const chapterTransition = { duration: 1.18, ease: [0.25, 0.1, 0.25, 1] as const };
 
   return (
     <section
@@ -83,7 +83,7 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
             className="h-full w-px origin-top bg-[#c99a55] shadow-[0_0_20px_rgba(201,154,85,.52)]"
             initial={false}
             animate={{ scaleY: reduceMotion || inView ? 1 : 0 }}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 1.1, ease: [0.25, 0.1, 0.25, 1] }}
           />
         </div>
 
@@ -123,7 +123,7 @@ function FashionChapter({ chapter, index }: { chapter: Chapter; index: number })
             animate={
               reduceMotion || inView
                 ? { opacity: 1, x: 0, y: 0 }
-                : { opacity: 0, x: index % 2 === 0 ? -20 : 20, y: 14 }
+                : { opacity: 0, x: index % 2 === 0 ? -28 : 28, y: 16 }
             }
             transition={{ ...chapterTransition, delay: reduceMotion ? 0 : 0.08 }}
             className={`max-w-2xl ${index % 2 === 0 ? "lg:order-1" : "lg:order-2"}`}
