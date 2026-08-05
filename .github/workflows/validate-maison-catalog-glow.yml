@@ -37,6 +37,8 @@ jobs:
       - name: Check and build
         run: |
           mkdir -p artifacts/maison-catalog-glow
+          npx prettier --write scripts/validate-maison-catalog-glow.mjs
+          cp scripts/validate-maison-catalog-glow.mjs artifacts/maison-catalog-glow/formatted-validate-maison-catalog-glow.mjs
           npx prettier --check \
             src/components/storefront/product-card.tsx \
             scripts/validate-maison-catalog-glow.mjs \
