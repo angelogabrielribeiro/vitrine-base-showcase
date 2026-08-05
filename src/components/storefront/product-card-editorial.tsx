@@ -96,6 +96,8 @@ export function EditorialProductCard({
           </span>
         )}
 
+        <span aria-hidden className="ep-ambient-glow pointer-events-none absolute inset-0 z-[5]" />
+
         <span
           aria-hidden
           className="ep-cta pointer-events-none absolute inset-x-0 bottom-4 z-10 flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.4em] text-white opacity-0"
@@ -143,8 +145,13 @@ export function EditorialProductCard({
         .ep-card .ep-cta { transform: translateY(10px); transition: opacity 500ms ease, transform 500ms cubic-bezier(0.22,1,0.36,1); }
         .ep-card .ep-meta { transition: transform 500ms cubic-bezier(0.22,1,0.36,1); }
         .ep-card .ep-img-primary { transform: scale(1); }
-        .ep-card-frame { transition: filter 260ms ease, box-shadow 420ms ease; }
-        .ep-card[data-in-view="true"] .ep-card-frame { animation: ep-glow-pulse 3.4s ease-in-out var(--ep-seq-delay, 0s) infinite; }
+        .ep-card-frame { transition: box-shadow 320ms ease; }
+        .ep-card .ep-ambient-glow {
+          opacity: 0.08;
+          background: linear-gradient(118deg, transparent 20%, rgba(139,49,80,0.14) 43%, rgba(201,154,85,0.14) 52%, rgba(212,154,167,0.12) 60%, transparent 80%);
+          box-shadow: inset 0 0 0 1px rgba(201,154,85,0.1);
+          animation: ep-ambient-pulse 4.8s ease-in-out var(--ep-seq-delay, 0s) infinite;
+        }
         @media (hover: hover) {
           .ep-card:hover .ep-img-primary, .ep-card:focus-visible .ep-img-primary { transform: scale(1.02); }
           .ep-card:hover .ep-reveal, .ep-card:focus-visible .ep-reveal { clip-path: inset(0 0 0 0); }
@@ -152,25 +159,27 @@ export function EditorialProductCard({
           .ep-card:hover .ep-cta, .ep-card:focus-visible .ep-cta { opacity: 1; transform: translateY(0); }
           .ep-card:hover .ep-meta, .ep-card:focus-visible .ep-meta { transform: translateY(-4px); }
           .ep-card:hover .ep-card-frame, .ep-card:focus-visible .ep-card-frame {
-            filter: brightness(1.015) drop-shadow(0 12px 22px rgba(91,24,48,0.18));
+            box-shadow: 0 18px 42px -28px rgba(91,24,48,0.42), 0 0 0 1px rgba(201,154,85,0.16);
           }
-          .ep-card:not(:hover):not(:focus-visible) .ep-card-frame { filter: none; }
+          .ep-card:not(:hover):not(:focus-visible) .ep-card-frame { box-shadow: none; }
           .ep-card:not(:hover):not(:focus-visible) .ep-reveal { clip-path: inset(100% 0 0 0); }
           .ep-card:not(:hover):not(:focus-visible) .ep-grad { opacity: 0; }
           .ep-card:not(:hover):not(:focus-visible) .ep-cta { opacity: 0; transform: translateY(10px); }
-        }
-        /* Sequência automática ao entrar na viewport (mobile/touch): sweep de luz vinho/rosé/cobre + glow pulsante, sem branco. */
-        .ep-card[data-mobile-active="true"] .ep-card-frame {
-          animation-duration: 3.4s;
         }
         .ep-card[data-mobile-active="true"] .ep-img-primary { transform: scale(1.015); }
         .ep-card[data-mobile-active="true"] .ep-reveal { clip-path: inset(0 0 0 0); }
         .ep-card[data-mobile-active="true"] .ep-grad { opacity: 1; }
         .ep-card[data-mobile-active="true"] .ep-cta { opacity: 1; transform: translateY(0); }
         .ep-card[data-mobile-active="true"] .ep-meta { transform: translateY(-4px); }
-        @keyframes ep-glow-pulse {
-          0%, 100% { box-shadow: 0 8px 22px -22px rgba(139,49,80,0.12); }
-          50% { box-shadow: 0 14px 32px -20px rgba(139,49,80,0.24), 0 0 6px rgba(201,154,85,0.12); }
+        @keyframes ep-ambient-pulse {
+          0%, 100% {
+            opacity: 0.08;
+            box-shadow: inset 0 0 0 1px rgba(201,154,85,0.1), 0 0 0 rgba(139,49,80,0);
+          }
+          45%, 60% {
+            opacity: 0.46;
+            box-shadow: inset 0 0 0 1px rgba(201,154,85,0.34), 0 0 28px rgba(139,49,80,0.2);
+          }
         }
         .ep-line { position: absolute; background: linear-gradient(90deg, rgba(139,49,80,0.7), rgba(201,154,85,0.75), rgba(212,154,167,0.7)); transition: transform 550ms cubic-bezier(0.22,1,0.36,1); }
         .ep-line-t { top: 8px; left: 8px; right: 8px; height: 1.5px; transform: scaleX(0); transform-origin: left; }
@@ -200,7 +209,7 @@ export function EditorialProductCard({
         @media (prefers-reduced-motion: reduce) {
           .ep-card .ep-img-primary, .ep-card .ep-reveal, .ep-card .ep-grad, .ep-card .ep-cta, .ep-card .ep-meta { transition: none !important; transform: none !important; }
           .ep-card .ep-line { display: none; }
-          .ep-card[data-mobile-active="true"] .ep-card-frame, .ep-card[data-in-view="true"] .ep-card-frame { animation: none; }
+          .ep-card .ep-ambient-glow { animation: none; opacity: 0.12; }
         }
       `}</style>
     </Link>
