@@ -1,17 +1,23 @@
-/* Refinamento exclusivo da Brasa Urbana: ritmo mais contínuo, melhor contraste e menos vazio. */
+/* Refinamento exclusivo da Brasa Urbana: ritmo contínuo, glow de brasa e menos vazio. */
+
+@property --brasa-card-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
 
 .store-theme-restaurante {
   --brasa-copy: rgb(255 247 237 / 76%);
   --brasa-copy-soft: rgb(255 247 237 / 64%);
 }
 
-/* A categoria entra logo após a câmara de desejo, sem um corredor vazio. */
+/* A categoria entra logo após a Câmara de desejo, sem corredor escuro. */
 .store-theme-restaurante
   [data-testid="restaurant-fire-deck"]
   + div
   + section {
-  padding-top: 4.5rem !important;
-  padding-bottom: 4.5rem !important;
+  padding-top: 2.75rem !important;
+  padding-bottom: 4.25rem !important;
 }
 
 .store-theme-restaurante #mais-pedidos {
@@ -19,7 +25,6 @@
   padding-bottom: 4.75rem !important;
 }
 
-/* Assinatura da casa, processo e depoimentos permanecem respirados, mas conectados. */
 .store-theme-restaurante #mais-pedidos + section {
   padding-top: 4.75rem !important;
   padding-bottom: 5.25rem !important;
@@ -34,7 +39,7 @@
   padding-bottom: 4.75rem !important;
 }
 
-/* Cópias que estavam apagadas ganham legibilidade sem perder a atmosfera escura. */
+/* Cópias secundárias legíveis sem perder a atmosfera escura. */
 .store-theme-restaurante main [class*="text-orange-50/55"],
 .store-theme-restaurante main [class*="text-orange-50/60"],
 .store-theme-restaurante main [class*="text-orange-50/65"] {
@@ -51,6 +56,144 @@
   color: rgb(255 247 237 / 52%) !important;
 }
 
+/* Catálogo Brasa: substitui o frame branco por uma respiração laranja automática. */
+.store-theme-restaurante
+  .premium-product-card[data-niche="restaurant"]
+  .premium-product-frame {
+  animation: brasa-catalog-breathe 3.35s ease-in-out infinite !important;
+  animation-play-state: running !important;
+}
+
+.store-theme-restaurante
+  .premium-product-card[data-niche="restaurant"]
+  .product-attention-glow {
+  filter: blur(3rem) brightness(0.62) saturate(1.12) !important;
+}
+
+@keyframes brasa-catalog-breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 18px 44px rgb(0 0 0 / 34%),
+      0 0 0 1px rgb(251 146 60 / 12%);
+    filter: brightness(0.98) saturate(1);
+  }
+  48% {
+    box-shadow:
+      0 26px 62px rgb(0 0 0 / 42%),
+      0 0 22px rgb(249 115 22 / 48%),
+      inset 0 0 14px rgb(253 186 116 / 9%);
+    filter: brightness(1.025) saturate(1.035);
+  }
+  58% {
+    box-shadow:
+      0 22px 54px rgb(0 0 0 / 39%),
+      0 0 9px rgb(251 146 60 / 32%),
+      inset 0 0 7px rgb(253 186 116 / 6%);
+    filter: brightness(1.01) saturate(1.02);
+  }
+}
+
+/* Mais pedidos: borda de brasa, varredura de luz e fotografia respirando automaticamente. */
+.store-theme-restaurante #mais-pedidos a[href*="/produto/"] {
+  position: relative;
+  isolation: isolate;
+  box-shadow: 0 20px 54px -40px rgb(249 115 22 / 72%);
+  transition:
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 420ms ease,
+    border-color 420ms ease !important;
+}
+
+.store-theme-restaurante #mais-pedidos a[href*="/produto/"]::before {
+  position: absolute;
+  inset: 0;
+  z-index: 24;
+  padding: 1px;
+  content: "";
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--brasa-card-angle),
+    transparent 0deg 272deg,
+    rgb(234 88 12 / 8%) 292deg,
+    rgb(251 146 60 / 78%) 320deg,
+    rgb(254 215 170 / 96%) 339deg,
+    rgb(249 115 22 / 72%) 352deg,
+    transparent 360deg
+  );
+  filter: drop-shadow(0 0 7px rgb(249 115 22 / 48%));
+  animation: brasa-card-orbit 4.8s linear infinite;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.store-theme-restaurante #mais-pedidos a[href*="/produto/"]::after {
+  position: absolute;
+  inset: -25% auto -25% -48%;
+  z-index: 18;
+  width: 34%;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgb(255 237 213 / 18%), transparent);
+  filter: blur(12px);
+  transform: skewX(-14deg);
+  animation: brasa-card-sweep 4.6s ease-in-out infinite;
+}
+
+.store-theme-restaurante #mais-pedidos a[href*="/produto/"] img {
+  animation: brasa-card-image-breathe 6.2s ease-in-out infinite !important;
+  transform-origin: 50% 54%;
+}
+
+.store-theme-restaurante #mais-pedidos a[href*="/produto/"]:hover,
+.store-theme-restaurante #mais-pedidos a[href*="/produto/"]:focus-visible {
+  transform: translateY(-5px);
+  border-color: rgb(251 146 60 / 44%) !important;
+  box-shadow:
+    0 26px 68px -38px rgb(249 115 22 / 82%),
+    0 0 28px -14px rgb(251 146 60 / 48%);
+}
+
+@keyframes brasa-card-orbit {
+  to {
+    --brasa-card-angle: 360deg;
+  }
+}
+
+@keyframes brasa-card-sweep {
+  0%,
+  24% {
+    translate: 0 0;
+    opacity: 0;
+  }
+  42% {
+    opacity: 0.75;
+  }
+  68%,
+  100% {
+    translate: 470% 0;
+    opacity: 0;
+  }
+}
+
+@keyframes brasa-card-image-breathe {
+  0%,
+  100% {
+    scale: 1;
+    filter: saturate(1) contrast(1);
+  }
+  50% {
+    scale: 1.035;
+    filter: saturate(1.07) contrast(1.025);
+  }
+}
+
 /* O produto em destaque do catálogo termina antes, eliminando o vazio antes da grade. */
 @media (min-width: 1024px) {
   .store-theme-restaurante [data-testid="catalog-expansion-hero"] {
@@ -62,18 +205,18 @@
     + div
     + section,
   .store-theme-restaurante #mais-pedidos {
-    padding-top: 5.5rem !important;
-    padding-bottom: 5.5rem !important;
+    padding-top: 3.25rem !important;
+    padding-bottom: 5rem !important;
   }
 
   .store-theme-restaurante #mais-pedidos + section {
-    padding-top: 5.75rem !important;
-    padding-bottom: 6rem !important;
+    padding-top: 5.25rem !important;
+    padding-bottom: 5.5rem !important;
   }
 
   .store-theme-restaurante #mais-pedidos + section + section + section {
-    padding-top: 5.5rem !important;
-    padding-bottom: 5.5rem !important;
+    padding-top: 5rem !important;
+    padding-bottom: 5rem !important;
   }
 }
 
@@ -82,7 +225,7 @@
     [data-testid="restaurant-fire-deck"]
     + div
     + section {
-    padding-top: 3.75rem !important;
+    padding-top: 3rem !important;
     padding-bottom: 3.75rem !important;
   }
 
@@ -103,5 +246,55 @@
   .store-theme-restaurante #mais-pedidos + section + section + section {
     padding-top: 4rem !important;
     padding-bottom: 4rem !important;
+  }
+
+  .store-theme-restaurante
+    .premium-product-card[data-niche="restaurant"]
+    .premium-product-frame {
+    animation-name: brasa-catalog-breathe-mobile !important;
+  }
+
+  .store-theme-restaurante
+    .premium-product-card[data-niche="restaurant"]
+    .product-attention-glow {
+    filter: blur(3.2rem) brightness(0.48) saturate(1.05) !important;
+  }
+
+  .store-theme-restaurante #mais-pedidos a[href*="/produto/"]::before {
+    opacity: 0.72;
+    filter: drop-shadow(0 0 5px rgb(249 115 22 / 38%));
+    animation-duration: 5.4s;
+  }
+
+  .store-theme-restaurante #mais-pedidos a[href*="/produto/"]::after {
+    opacity: 0.56;
+  }
+}
+
+@keyframes brasa-catalog-breathe-mobile {
+  0%,
+  100% {
+    box-shadow:
+      0 14px 34px rgb(0 0 0 / 28%),
+      0 0 0 1px rgb(251 146 60 / 10%);
+    filter: brightness(0.99);
+  }
+  50% {
+    box-shadow:
+      0 18px 44px rgb(0 0 0 / 34%),
+      0 0 13px rgb(249 115 22 / 32%),
+      inset 0 0 8px rgb(253 186 116 / 6%);
+    filter: brightness(1.012);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .store-theme-restaurante
+    .premium-product-card[data-niche="restaurant"]
+    .premium-product-frame,
+  .store-theme-restaurante #mais-pedidos a[href*="/produto/"]::before,
+  .store-theme-restaurante #mais-pedidos a[href*="/produto/"]::after,
+  .store-theme-restaurante #mais-pedidos a[href*="/produto/"] img {
+    animation: none !important;
   }
 }
