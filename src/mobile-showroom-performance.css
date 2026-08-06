@@ -1,3 +1,5 @@
+@import "./brasa-urbana-refinement.css";
+
 /* Ajustes finais de performance mobile da vitrine principal e acabamento dos cards NovaCore. */
 
 @property --novacore-trace-angle {
