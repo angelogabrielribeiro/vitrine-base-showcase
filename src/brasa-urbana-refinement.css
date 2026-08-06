@@ -1,0 +1,107 @@
+/* Refinamento exclusivo da Brasa Urbana: ritmo mais contínuo, melhor contraste e menos vazio. */
+
+.store-theme-restaurante {
+  --brasa-copy: rgb(255 247 237 / 76%);
+  --brasa-copy-soft: rgb(255 247 237 / 64%);
+}
+
+/* A categoria entra logo após a câmara de desejo, sem um corredor vazio. */
+.store-theme-restaurante
+  [data-testid="restaurant-fire-deck"]
+  + div
+  + section {
+  padding-top: 4.5rem !important;
+  padding-bottom: 4.5rem !important;
+}
+
+.store-theme-restaurante #mais-pedidos {
+  padding-top: 4.75rem !important;
+  padding-bottom: 4.75rem !important;
+}
+
+/* Assinatura da casa, processo e depoimentos permanecem respirados, mas conectados. */
+.store-theme-restaurante #mais-pedidos + section {
+  padding-top: 4.75rem !important;
+  padding-bottom: 5.25rem !important;
+}
+
+.store-theme-restaurante #mais-pedidos + section + section > div {
+  min-height: 36rem !important;
+}
+
+.store-theme-restaurante #mais-pedidos + section + section + section {
+  padding-top: 4.75rem !important;
+  padding-bottom: 4.75rem !important;
+}
+
+/* Cópias que estavam apagadas ganham legibilidade sem perder a atmosfera escura. */
+.store-theme-restaurante main [class*="text-orange-50/55"],
+.store-theme-restaurante main [class*="text-orange-50/60"],
+.store-theme-restaurante main [class*="text-orange-50/65"] {
+  color: var(--brasa-copy-soft) !important;
+}
+
+.store-theme-restaurante main [class*="text-orange-50/70"],
+.store-theme-restaurante main [class*="text-orange-50/72"],
+.store-theme-restaurante main [class*="text-white/45"] {
+  color: var(--brasa-copy) !important;
+}
+
+.store-theme-restaurante main [class*="text-white/35"] {
+  color: rgb(255 247 237 / 52%) !important;
+}
+
+/* O produto em destaque do catálogo termina antes, eliminando o vazio antes da grade. */
+@media (min-width: 1024px) {
+  .store-theme-restaurante [data-testid="catalog-expansion-hero"] {
+    min-height: 148svh !important;
+  }
+
+  .store-theme-restaurante
+    [data-testid="restaurant-fire-deck"]
+    + div
+    + section,
+  .store-theme-restaurante #mais-pedidos {
+    padding-top: 5.5rem !important;
+    padding-bottom: 5.5rem !important;
+  }
+
+  .store-theme-restaurante #mais-pedidos + section {
+    padding-top: 5.75rem !important;
+    padding-bottom: 6rem !important;
+  }
+
+  .store-theme-restaurante #mais-pedidos + section + section + section {
+    padding-top: 5.5rem !important;
+    padding-bottom: 5.5rem !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .store-theme-restaurante
+    [data-testid="restaurant-fire-deck"]
+    + div
+    + section {
+    padding-top: 3.75rem !important;
+    padding-bottom: 3.75rem !important;
+  }
+
+  .store-theme-restaurante #mais-pedidos {
+    padding-top: 4rem !important;
+    padding-bottom: 4rem !important;
+  }
+
+  .store-theme-restaurante #mais-pedidos + section {
+    padding-top: 4rem !important;
+    padding-bottom: 4.5rem !important;
+  }
+
+  .store-theme-restaurante #mais-pedidos + section + section > div {
+    min-height: 0 !important;
+  }
+
+  .store-theme-restaurante #mais-pedidos + section + section + section {
+    padding-top: 4rem !important;
+    padding-bottom: 4rem !important;
+  }
+}
