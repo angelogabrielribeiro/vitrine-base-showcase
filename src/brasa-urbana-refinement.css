@@ -298,3 +298,23 @@
     animation: none !important;
   }
 }
+
+/* Mobile: encurta a passagem entre a assinatura e o preparo, sem alterar desktop. */
+@media (max-width: 767px) {
+  .store-theme-restaurante #mais-pedidos + section {
+    padding-bottom: 1.5rem !important;
+  }
+
+  .store-theme-restaurante #mais-pedidos + section + section > div > div:first-child {
+    min-height: 21rem !important;
+  }
+
+  .store-theme-restaurante #mais-pedidos + section + section > div > div:first-child img {
+    object-position: 43% 52% !important;
+  }
+
+  .store-theme-restaurante #mais-pedidos + section + section > div > div:nth-child(2) {
+    padding-top: 3rem !important;
+    padding-bottom: 3.5rem !important;
+  }
+}
