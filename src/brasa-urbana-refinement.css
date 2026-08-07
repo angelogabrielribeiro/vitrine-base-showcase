@@ -318,3 +318,155 @@
     padding-bottom: 3.5rem !important;
   }
 }
+
+/* Teste de direção editorial: entradas laterais curtas, acionadas pela própria viewport. */
+@supports (animation-timeline: view()) {
+  .store-theme-restaurante
+    [data-testid="restaurant-fire-deck"]
+    + div
+    + section
+    h2,
+  .store-theme-restaurante #mais-pedidos + section h2,
+  .store-theme-restaurante #mais-pedidos + section + section h2 {
+    animation-duration: 1s;
+    animation-fill-mode: both;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    animation-timeline: view();
+    animation-range: entry 8% cover 30%;
+    will-change: transform, opacity;
+  }
+
+  .store-theme-restaurante
+    [data-testid="restaurant-fire-deck"]
+    + div
+    + section
+    h2,
+  .store-theme-restaurante #mais-pedidos + section + section h2 {
+    animation-name: brasa-title-from-left;
+  }
+
+  .store-theme-restaurante #mais-pedidos + section h2 {
+    animation-name: brasa-title-from-right;
+  }
+
+  .store-theme-restaurante
+    [data-testid="restaurant-fire-deck"]
+    + div
+    + section
+    span:has(+ h2),
+  .store-theme-restaurante #mais-pedidos + section span:has(+ h2),
+  .store-theme-restaurante #mais-pedidos + section + section span:has(+ h2) {
+    animation-duration: 1s;
+    animation-fill-mode: both;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    animation-timeline: view();
+    animation-range: entry 2% cover 20%;
+    will-change: transform, opacity;
+  }
+
+  .store-theme-restaurante
+    [data-testid="restaurant-fire-deck"]
+    + div
+    + section
+    span:has(+ h2),
+  .store-theme-restaurante #mais-pedidos + section + section span:has(+ h2) {
+    animation-name: brasa-kicker-from-left;
+  }
+
+  .store-theme-restaurante #mais-pedidos + section span:has(+ h2) {
+    animation-name: brasa-kicker-from-right;
+  }
+}
+
+@keyframes brasa-title-from-left {
+  from {
+    transform: translate3d(-42px, 0, 0);
+    opacity: 0.08;
+  }
+  65% {
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes brasa-title-from-right {
+  from {
+    transform: translate3d(42px, 0, 0);
+    opacity: 0.08;
+  }
+  65% {
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes brasa-kicker-from-left {
+  from {
+    transform: translate3d(-22px, 0, 0);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes brasa-kicker-from-right {
+  from {
+    transform: translate3d(22px, 0, 0);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 767px) {
+  @keyframes brasa-title-from-left {
+    from {
+      transform: translate3d(-28px, 0, 0);
+      opacity: 0.08;
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes brasa-title-from-right {
+    from {
+      transform: translate3d(28px, 0, 0);
+      opacity: 0.08;
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+      opacity: 1;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .store-theme-restaurante
+    [data-testid="restaurant-fire-deck"]
+    + div
+    + section
+    h2,
+  .store-theme-restaurante #mais-pedidos + section h2,
+  .store-theme-restaurante #mais-pedidos + section + section h2,
+  .store-theme-restaurante
+    [data-testid="restaurant-fire-deck"]
+    + div
+    + section
+    span:has(+ h2),
+  .store-theme-restaurante #mais-pedidos + section span:has(+ h2),
+  .store-theme-restaurante #mais-pedidos + section + section span:has(+ h2) {
+    animation: none !important;
+  }
+}
