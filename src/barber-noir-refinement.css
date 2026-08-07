@@ -23,7 +23,7 @@
   }
 }
 
-/* Mobile: o carrossel dos atos ocupa a tela de forma limpa, sem card espremido/cortado. */
+/* Mobile: carrosséis inteiros, fotos menores e ritmo vertical mais contínuo. */
 @media (max-width: 767px) {
   .store-theme-barbearia
     [data-testid="niche-scroll-odyssey"]
@@ -33,7 +33,16 @@
     scroll-snap-align: center;
   }
 
+  /* Ritual: cada ato cabe na largura útil, sem parecer cortado nas laterais. */
+  .store-theme-barbearia div[class*="min-w-[82vw]"] {
+    min-width: calc(100vw - 3rem) !important;
+    max-width: 22rem;
+  }
+
   /* Seções que usavam 80px no telefone ficam mais contínuas. */
+  .store-theme-barbearia
+    [data-testid="niche-scroll-odyssey"]
+    ~ section[class*="py-20"],
   .store-theme-barbearia
     [data-testid="niche-scroll-odyssey"]
     ~ section
