@@ -319,7 +319,7 @@
   }
 }
 
-/* Teste de direção editorial: entradas laterais curtas, acionadas pela própria viewport. */
+/* Direção editorial v2: entrada lateral mais perceptível e distribuída em mais scroll. */
 @supports (animation-timeline: view()) {
   .store-theme-restaurante
     [data-testid="restaurant-fire-deck"]
@@ -330,9 +330,9 @@
   .store-theme-restaurante #mais-pedidos + section + section h2 {
     animation-duration: 1s;
     animation-fill-mode: both;
-    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
     animation-timeline: view();
-    animation-range: entry 8% cover 30%;
+    animation-range: entry 0% cover 58%;
     will-change: transform, opacity;
   }
 
@@ -358,9 +358,9 @@
   .store-theme-restaurante #mais-pedidos + section + section span:has(+ h2) {
     animation-duration: 1s;
     animation-fill-mode: both;
-    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
     animation-timeline: view();
-    animation-range: entry 2% cover 20%;
+    animation-range: entry 0% cover 36%;
     will-change: transform, opacity;
   }
 
@@ -380,11 +380,11 @@
 
 @keyframes brasa-title-from-left {
   from {
-    transform: translate3d(-42px, 0, 0);
-    opacity: 0.08;
+    transform: translate3d(-84px, 0, 0);
+    opacity: 0;
   }
-  65% {
-    opacity: 1;
+  72% {
+    opacity: 0.94;
   }
   to {
     transform: translate3d(0, 0, 0);
@@ -394,11 +394,11 @@
 
 @keyframes brasa-title-from-right {
   from {
-    transform: translate3d(42px, 0, 0);
-    opacity: 0.08;
+    transform: translate3d(84px, 0, 0);
+    opacity: 0;
   }
-  65% {
-    opacity: 1;
+  72% {
+    opacity: 0.94;
   }
   to {
     transform: translate3d(0, 0, 0);
@@ -408,7 +408,7 @@
 
 @keyframes brasa-kicker-from-left {
   from {
-    transform: translate3d(-22px, 0, 0);
+    transform: translate3d(-36px, 0, 0);
     opacity: 0;
   }
   to {
@@ -419,7 +419,7 @@
 
 @keyframes brasa-kicker-from-right {
   from {
-    transform: translate3d(22px, 0, 0);
+    transform: translate3d(36px, 0, 0);
     opacity: 0;
   }
   to {
@@ -431,8 +431,8 @@
 @media (max-width: 767px) {
   @keyframes brasa-title-from-left {
     from {
-      transform: translate3d(-28px, 0, 0);
-      opacity: 0.08;
+      transform: translate3d(-52px, 0, 0);
+      opacity: 0;
     }
     to {
       transform: translate3d(0, 0, 0);
@@ -442,8 +442,8 @@
 
   @keyframes brasa-title-from-right {
     from {
-      transform: translate3d(28px, 0, 0);
-      opacity: 0.08;
+      transform: translate3d(52px, 0, 0);
+      opacity: 0;
     }
     to {
       transform: translate3d(0, 0, 0);
