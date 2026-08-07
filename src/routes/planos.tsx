@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PricingPageV2 } from "@/components/pricing/pricing-page-v2";
+import { PricingPageV3 } from "@/components/pricing/pricing-page-v3";
 
 export const Route = createFileRoute("/planos")({
   head: () => ({
@@ -18,5 +18,5 @@ export const Route = createFileRoute("/planos")({
       },
     ],
   }),
-  component: PricingPageV2,
+  component: PricingPageV3,
 });
