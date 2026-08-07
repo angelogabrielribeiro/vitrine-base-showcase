@@ -1,0 +1,32 @@
+/* Barber Noir — correção pontual dos cards de serviço no agendamento mobile. */
+@media (max-width: 639px) {
+  .store-theme-barbearia
+    main
+    ol[class*="grid-cols-3"]
+    + div
+    button[class*="items-start"] {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .store-theme-barbearia
+    main
+    ol[class*="grid-cols-3"]
+    + div
+    button[class*="items-start"]
+    > div[class*="min-w-0"] {
+    min-width: 0;
+  }
+
+  .store-theme-barbearia
+    main
+    ol[class*="grid-cols-3"]
+    + div
+    button[class*="items-start"]
+    > div[class*="min-w-0"]
+    > div[class*="justify-between"]
+    > div:last-child {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}
