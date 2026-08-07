@@ -1,32 +1,71 @@
 /* Barber Noir — correção pontual dos cards de serviço no agendamento mobile. */
 @media (max-width: 639px) {
+  .store-theme-barbearia ol[class*="grid-cols-3"] + div {
+    min-width: 0;
+  }
+
   .store-theme-barbearia
-    main
     ol[class*="grid-cols-3"]
     + div
     button[class*="items-start"] {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .store-theme-barbearia
+    ol[class*="grid-cols-3"]
+    + div
+    button[class*="items-start"]
+    > div[class*="min-w-0"] {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  /* Nome usa todo o espaço flexível; preço recebe uma coluna própria e nunca sai do card. */
+  .store-theme-barbearia
+    ol[class*="grid-cols-3"]
+    + div
+    button[class*="items-start"]
+    > div[class*="min-w-0"]
+    > div[class*="justify-between"] {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) max-content;
+    align-items: start;
+    column-gap: 0.5rem;
     width: 100%;
     min-width: 0;
   }
 
   .store-theme-barbearia
-    main
     ol[class*="grid-cols-3"]
     + div
     button[class*="items-start"]
-    > div[class*="min-w-0"] {
+    > div[class*="min-w-0"]
+    > div[class*="justify-between"]
+    > div:first-child {
     min-width: 0;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    line-height: 1.2;
   }
 
   .store-theme-barbearia
-    main
     ol[class*="grid-cols-3"]
     + div
     button[class*="items-start"]
     > div[class*="min-w-0"]
     > div[class*="justify-between"]
     > div:last-child {
-    flex-shrink: 0;
+    min-width: max-content;
+    max-width: none;
+    flex: none;
+    justify-self: end;
     white-space: nowrap;
   }
 }
