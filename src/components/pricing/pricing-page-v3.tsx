@@ -52,7 +52,7 @@ const CREATION_PLANS: Plan[] = [
       "Direção visual adaptada ao negócio",
       "Site responsivo para celular e computador",
       "Domínio .com.br por 1 ano incluído",
-      "Configuração e publicação do projeto",
+      "Configuração, publicação e infraestrutura inicial do projeto",
       "WhatsApp e chamadas para ação integradas",
       "Catálogo ou painel básico quando fizer parte do escopo",
       "SEO técnico essencial e indexação básica",
@@ -160,7 +160,7 @@ const EXTERNAL_COSTS = [
   "Taxas do gateway ou meio de pagamento escolhido",
   "E-mail profissional pago, quando contratado",
   "APIs, serviços de mensagens e licenças pagas escolhidas pelo cliente",
-  "Hospedagem, banco de dados ou consumo acima de faixas gratuitas quando o projeto exigir",
+  "Hospedagem, banco de dados ou consumo que exceda a infraestrutura inicial prevista em proposta",
   "Domínios especiais ou extensões cujo valor supere o .com.br incluído",
 ];
 
@@ -293,7 +293,7 @@ export function PricingPageV3() {
             <Link to="/" className="inline-flex items-center gap-2 text-xs text-white/48 hover:text-white/80"><ArrowLeft className="h-4 w-4" />Voltar às demonstrações</Link>
             <p className="mt-12 text-xs font-bold uppercase tracking-[0.28em] text-cyan-200">Projeto completo · preço claro · sem mensalidade obrigatória</p>
             <h1 className="mx-auto mt-6 max-w-5xl font-display text-5xl font-light leading-[0.95] tracking-[-0.055em] sm:text-7xl lg:text-[6rem]">Você paga pela construção. Depois escolhe como quer ser acompanhado.</h1>
-            <p className="mx-auto mt-7 max-w-2xl text-base leading-8 text-white/60 sm:text-lg">Domínio .com.br do primeiro ano, configuração e publicação entram no projeto. A manutenção mensal é uma escolha, não uma condição para receber o site.</p>
+            <p className="mx-auto mt-7 max-w-2xl text-base leading-8 text-white/60 sm:text-lg">Domínio .com.br do primeiro ano, configuração, publicação e infraestrutura inicial entram no projeto. A manutenção mensal é uma escolha, não uma condição para receber o site.</p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <a href="#criacao" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-100">Comparar projetos<ArrowRight className="h-4 w-4" /></a>
               <ProposalButton label="Conversar sobre meu projeto" />
@@ -303,7 +303,7 @@ export function PricingPageV3() {
 
         <section id="criacao" className="scroll-mt-24 px-4 py-24">
           <div className="mx-auto max-w-6xl">
-            <Reveal><div className="mx-auto max-w-3xl text-center"><p className="text-xs font-bold uppercase tracking-[0.26em] text-cyan-200">Criação</p><h2 className="mt-4 font-display text-4xl font-light tracking-[-0.04em] sm:text-6xl">A diferença está na complexidade, não em entregar um site pela metade.</h2><p className="mt-5 text-sm leading-7 text-white/55 sm:text-base">Todos os níveis incluem direção visual, responsividade, publicação e o primeiro ano de domínio .com.br. O escopo define profundidade, volume e integrações.</p></div></Reveal>
+            <Reveal><div className="mx-auto max-w-3xl text-center"><p className="text-xs font-bold uppercase tracking-[0.26em] text-cyan-200">Criação</p><h2 className="mt-4 font-display text-4xl font-light tracking-[-0.04em] sm:text-6xl">A diferença está na complexidade, não em entregar um site pela metade.</h2><p className="mt-5 text-sm leading-7 text-white/55 sm:text-base">Todos os níveis incluem direção visual, responsividade, publicação, infraestrutura inicial e o primeiro ano de domínio .com.br. O escopo define profundidade, volume e integrações.</p></div></Reveal>
             <div className="mt-14 grid gap-6 lg:grid-cols-3">{CREATION_PLANS.map((plan, index) => <CreationCard key={plan.name} plan={plan} index={index} />)}</div>
           </div>
         </section>
@@ -313,7 +313,7 @@ export function PricingPageV3() {
             {[
               { icon: Globe2, title: "Domínio incluído", text: "Um .com.br disponível por 1 ano entra em qualquer plano de criação." },
               { icon: ShieldCheck, title: "Sem venda casada", text: "Manutenção recorrente não é obrigatória para manter a propriedade do projeto." },
-              { icon: CircleDollarSign, title: "Extra só quando é extra", text: "Serviços pagos de terceiros são informados antes e contratados apenas quando necessários." },
+              { icon: CircleDollarSign, title: "Extra só quando é extra", text: "Publicação e infraestrutura inicial previstas no escopo entram no projeto. Fornecedor pago ou consumo adicional é informado antes." },
             ].map((item, index) => <Reveal key={item.title} delay={index * 0.07}><div className="h-full rounded-2xl border border-white/10 bg-white/[0.035] p-6"><item.icon className="h-5 w-5 text-amber-300" /><h3 className="mt-5 font-display text-2xl">{item.title}</h3><p className="mt-3 text-sm leading-6 text-white/52">{item.text}</p></div></Reveal>)}
           </div>
         </section>
@@ -332,7 +332,7 @@ export function PricingPageV3() {
 
         <section id="extras" className="scroll-mt-24 border-y border-white/10 bg-[#071018] px-4 py-24">
           <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.82fr_1.18fr]">
-            <Reveal><p className="text-xs font-bold uppercase tracking-[0.26em] text-cyan-200">O que pode ficar fora do valor</p><h2 className="mt-4 font-display text-4xl font-light tracking-[-0.04em] sm:text-5xl">Só custo externo que realmente depende da escolha ou do consumo do cliente.</h2><p className="mt-5 text-sm leading-7 text-white/55">A Vitrine Base inclui o trabalho de configurar e integrar o que estiver no escopo. Quando um fornecedor cobra licença, tarifa ou consumo recorrente, isso é informado antes da aprovação e, sempre que possível, fica na conta do próprio cliente.</p></Reveal>
+            <Reveal><p className="text-xs font-bold uppercase tracking-[0.26em] text-cyan-200">O que pode ficar fora do valor</p><h2 className="mt-4 font-display text-4xl font-light tracking-[-0.04em] sm:text-5xl">Só custo externo que realmente depende da escolha ou do consumo do cliente.</h2><p className="mt-5 text-sm leading-7 text-white/55">A Vitrine Base inclui configuração, publicação e a infraestrutura inicial prevista no escopo. Quando um fornecedor cobra licença, tarifa, hospedagem especial ou quando o consumo ultrapassa o previsto, isso é informado antes da aprovação e, sempre que possível, fica na conta do próprio cliente.</p></Reveal>
             <Reveal delay={0.08}><div className="rounded-3xl border border-white/10 bg-white/[0.035] p-6 sm:p-8"><ul className="space-y-4 text-sm leading-7 text-white/68">{EXTERNAL_COSTS.map((item) => <li key={item} className="flex gap-3"><Sparkles className="mt-1 h-4 w-4 shrink-0 text-cyan-200" />{item}</li>)}</ul><div className="mt-7 rounded-2xl border border-amber-300/20 bg-amber-300/[0.055] p-5 text-sm leading-6 text-amber-50/78"><strong className="block text-amber-200">Domínio comum não entra nessa lista.</strong>O primeiro ano de um domínio .com.br disponível já está incluído no preço de criação. Extensões premium ou nomes com custo especial têm somente a diferença informada ao cliente.</div></div></Reveal>
           </div>
         </section>
