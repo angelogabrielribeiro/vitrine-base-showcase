@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PricingPage } from "@/components/pricing/pricing-page";
+import { PricingPageV2 } from "@/components/pricing/pricing-page-v2";
 
 export const Route = createFileRoute("/planos")({
   head: () => ({
@@ -8,15 +8,15 @@ export const Route = createFileRoute("/planos")({
       {
         name: "description",
         content:
-          "Compare os planos de criação e manutenção da Vitrine Base. Sites profissionais para negócios locais, com escopo transparente e proposta personalizada.",
+          "Compare os projetos da Vitrine Base: criação a partir de R$ 1.190, domínio .com.br do primeiro ano incluído e manutenção recorrente opcional.",
       },
       { property: "og:title", content: "Planos e investimento | Vitrine Base" },
       {
         property: "og:description",
         content:
-          "Criação a partir de R$ 1.190 e manutenção com regras claras. Solicite uma proposta personalizada para o seu negócio.",
+          "Site completo, domínio .com.br por 1 ano incluído e liberdade para escolher manutenção mensal ou suporte sob demanda.",
       },
     ],
   }),
-  component: PricingPage,
+  component: PricingPageV2,
 });
