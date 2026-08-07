@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PricingPageV3 } from "@/components/pricing/pricing-page-v3";
+import { PricingPageV4 } from "@/components/pricing/pricing-page-v4";
 
 export const Route = createFileRoute("/planos")({
   head: () => ({
@@ -8,7 +8,7 @@ export const Route = createFileRoute("/planos")({
       {
         name: "description",
         content:
-          "Compare os projetos da Vitrine Base: criação a partir de R$ 1.190, domínio .com.br do primeiro ano incluído e infraestrutura mensal somente quando o projeto usa sistema, banco, login ou painel.",
+          "Compare os projetos da Vitrine Base: criação a partir de R$ 1.190, domínio .com.br do primeiro ano incluído e infraestrutura mensal a partir de R$ 249 somente quando o projeto usa sistema, banco, login ou painel.",
       },
       { property: "og:title", content: "Planos e investimento | Vitrine Base" },
       {
@@ -18,5 +18,5 @@ export const Route = createFileRoute("/planos")({
       },
     ],
   }),
-  component: PricingPageV3,
+  component: PricingPageV4,
 });
