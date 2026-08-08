@@ -42,6 +42,8 @@ const CREATION: CardData[] = [
       "Celular + computador",
       "Domínio .com.br por 1 ano",
       "Publicação e configuração inicial",
+      "Google Analytics 4 + Google Search Console",
+      "Medição de visitas, origem do tráfego e cliques principais",
       "WhatsApp, formulários e catálogo conforme o escopo",
       "SEO técnico essencial",
       "Até 2 rodadas de ajustes",
@@ -57,6 +59,7 @@ const CREATION: CardData[] = [
       "Mais páginas, seções e produtos",
       "Animações e experiência mais elaboradas",
       "Carrinho e checkout externo conforme o escopo",
+      "Eventos de conversão principais conforme o projeto",
       "Estrutura orientada para conversão",
       "Integrações essenciais previstas em proposta",
       "Até 3 rodadas de ajustes",
@@ -73,6 +76,7 @@ const CREATION: CardData[] = [
       "Painel administrativo quando necessário",
       "Contas, histórico e perfis de acesso",
       "Múltiplos profissionais ou unidades",
+      "Mensuração avançada e integrações de conversão previstas em escopo",
       "Automações e integrações adicionais",
       "Componentes e interações exclusivas",
     ],
@@ -88,6 +92,7 @@ const RECURRING: CardData[] = [
       "Sem mensalidade técnica",
       "Hospedagem estática adequada ao escopo",
       "Não depende de banco gratuito sujeito a pausa",
+      "Google Analytics e Search Console continuam disponíveis",
       "Venda por WhatsApp ou checkout externo",
       "Após o 1º ano, cliente renova apenas o domínio",
       "Alterações futuras: R$ 150/h",
@@ -103,6 +108,7 @@ const RECURRING: CardData[] = [
       "Backups e retenção de produção",
       "Políticas de acesso e segredos protegidos",
       "Monitoramento básico da infraestrutura",
+      "Medição de tráfego e conversões continua ativa",
       "Renovação anual do .com.br enquanto ativo",
     ],
   },
@@ -114,6 +120,7 @@ const RECURRING: CardData[] = [
     features: [
       "Tudo do plano Operação",
       "1 hora mensal para pequenos ajustes e conteúdo",
+      "Leitura mensal simples de tráfego e conversões",
       "Prioridade sobre demandas avulsas",
       "Correções de defeitos da implementação não consomem a hora",
       "Relato simples do que foi alterado",
@@ -127,7 +134,7 @@ const RECURRING: CardData[] = [
       "Tudo do Operação + Suporte",
       "2 horas mensais para ajustes e evolução",
       "Prioridade maior na fila",
-      "Revisão mensal de pontos técnicos e comerciais",
+      "Revisão mensal de pontos técnicos, comerciais e de conversão",
       "Horas excedentes somente com aprovação prévia",
     ],
   },
@@ -215,7 +222,7 @@ export function PricingPageV4() {
               <div className="mx-auto max-w-3xl text-center">
                 <p className="text-xs font-bold uppercase tracking-[0.26em] text-cyan-200">Criação</p>
                 <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.04em] sm:text-6xl">Todos são profissionais, responsivos e animados.</h2>
-                <p className="mt-5 text-sm leading-7 text-white/55">O que muda é a profundidade visual e a complexidade da operação.</p>
+                <p className="mt-5 text-sm leading-7 text-white/55">O que muda é a profundidade visual e a complexidade da operação. Google Analytics 4 e Search Console já entram na base para medir visitas, origem do tráfego e ações importantes.</p>
               </div>
             </Reveal>
             <div className="mt-14 grid gap-6 lg:grid-cols-3">
@@ -229,7 +236,7 @@ export function PricingPageV4() {
             {[
               { icon: Globe2, title: "Domínio incluído", text: "Um .com.br disponível por 1 ano entra em qualquer plano de criação." },
               { icon: Database, title: "Banco só quando precisa", text: "Pedidos, contas, agenda e painel usam backend de produção. Site vitrine não." },
-              { icon: CircleDollarSign, title: "Sem surpresa", text: "Você sabe antes de fechar se o seu projeto terá ou não custo mensal de infraestrutura." },
+              { icon: CircleDollarSign, title: "Mensuração incluída", text: "Google Analytics 4 e Search Console ajudam a acompanhar visitantes, origem do tráfego, buscas e ações importantes sem aumentar o preço de criação." },
             ].map((item) => (
               <div key={item.title} className="rounded-2xl border border-white/10 bg-white/[0.035] p-6">
                 <item.icon className="h-5 w-5 text-amber-300" />
@@ -246,7 +253,7 @@ export function PricingPageV4() {
               <div className="max-w-4xl">
                 <p className="text-xs font-bold uppercase tracking-[0.26em] text-amber-200">Depois da publicação</p>
                 <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.04em] sm:text-6xl">Sem sistema: R$ 0. Com sistema: infraestrutura a partir de R$ 249/mês.</h2>
-                <p className="mt-5 max-w-3xl text-sm leading-7 text-white/55">Os planos maiores somam suporte e horas de evolução. A infraestrutura base continua a mesma.</p>
+                <p className="mt-5 max-w-3xl text-sm leading-7 text-white/55">Os planos maiores somam suporte, leitura de desempenho e horas de evolução. A infraestrutura base continua a mesma.</p>
               </div>
             </Reveal>
             <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
