@@ -1,0 +1,309 @@
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Sparkles, useGLTF } from "@react-three/drei";
+import type { MotionValue } from "framer-motion";
+import { Suspense, useMemo, useRef } from "react";
+import * as THREE from "three";
+
+const MODEL_URLS = {
+  top: "https://v3b.fal.media/files/b/0aa5b85d/efnjRD9rC8BihXV6bStxA_UQfgLRXxntmc6O2QDUbEu_model.glb",
+  greens:
+    "https://v3b.fal.media/files/b/0aa5b85e/NToyFVwlbXRjPpIdiGIsb_37sy1SV6ig5NQ_OfpyDtL_model.glb",
+  cheese:
+    "https://v3b.fal.media/files/b/0aa5b84d/4IIW1F4pvFyfQH9a6UHhy_g3ywL0dct7bNLs-ZHx5PC_model.glb",
+  patty:
+    "https://v3b.fal.media/files/b/0aa5b860/PzhQOaqe6U41y2nCYKPxj_Pxf2r6yu1nIX2qHpCvt4__model.glb",
+  bottom:
+    "https://v3b.fal.media/files/b/0aa5b861/v8r81xb0cuD0d1qA0jZZn_usLS-Zo4GERmI1pCn7vwh_model.glb",
+} as const;
+
+type BrasaBurgerCanvasProps = {
+  progress: MotionValue<number>;
+  compact: boolean;
+  reduced: boolean;
+  dpr: number;
+  antialias: boolean;
+};
+
+type BurgerLayerConfig = {
+  url: string;
+  baseY: number;
+  explodeY: number;
+  width: number;
+  driftX: number;
+  rotateZ: number;
+  rotateY: number;
+};
+
+const LAYERS: BurgerLayerConfig[] = [
+  {
+    url: MODEL_URLS.bottom,
+    baseY: -1.02,
+    explodeY: -1.48,
+    width: 2.85,
+    driftX: -0.08,
+    rotateZ: -0.035,
+    rotateY: -0.06,
+  },
+  {
+    url: MODEL_URLS.patty,
+    baseY: -0.5,
+    explodeY: -0.72,
+    width: 2.82,
+    driftX: 0.1,
+    rotateZ: 0.04,
+    rotateY: 0.08,
+  },
+  {
+    url: MODEL_URLS.cheese,
+    baseY: -0.08,
+    explodeY: 0.02,
+    width: 3.02,
+    driftX: -0.14,
+    rotateZ: -0.08,
+    rotateY: -0.1,
+  },
+  {
+    url: MODEL_URLS.greens,
+    baseY: 0.38,
+    explodeY: 0.84,
+    width: 3.02,
+    driftX: 0.16,
+    rotateZ: 0.06,
+    rotateY: 0.12,
+  },
+  {
+    url: MODEL_URLS.top,
+    baseY: 0.98,
+    explodeY: 1.7,
+    width: 2.9,
+    driftX: -0.06,
+    rotateZ: -0.04,
+    rotateY: -0.08,
+  },
+];
+
+export default function BrasaBurgerCanvas({
+  progress,
+  compact,
+  reduced,
+  dpr,
+  antialias,
+}: BrasaBurgerCanvasProps) {
+  return (
+    <Canvas
+      dpr={dpr}
+      camera={{ position: [0, 0.15, compact ? 7.6 : 7.1], fov: compact ? 48 : 42 }}
+      gl={{ antialias, alpha: true, powerPreference: "high-performance" }}
+      className="absolute inset-0"
+      shadows={!compact}
+    >
+      <BurgerScene progress={progress} compact={compact} reduced={reduced} />
+    </Canvas>
+  );
+}
+
+function BurgerScene({
+  progress,
+  compact,
+  reduced,
+}: {
+  progress: MotionValue<number>;
+  compact: boolean;
+  reduced: boolean;
+}) {
+  const rigRef = useRef<THREE.Group>(null);
+
+  useFrame((state, delta) => {
+    const rig = rigRef.current;
+    if (!rig) return;
+
+    const value = reduced ? 0.52 : progress.get();
+    const open = THREE.MathUtils.smoothstep(value, 0.12, 0.72);
+    const pointerX = compact ? 0 : state.pointer.x;
+    const pointerY = compact ? 0 : state.pointer.y;
+
+    rig.rotation.y = THREE.MathUtils.damp(
+      rig.rotation.y,
+      pointerX * 0.18 + open * 0.18,
+      4.2,
+      delta,
+    );
+    rig.rotation.x = THREE.MathUtils.damp(rig.rotation.x, -pointerY * 0.08, 4.2, delta);
+    rig.position.x = THREE.MathUtils.damp(
+      rig.position.x,
+      compact ? 0 : 1.05 + pointerX * 0.12,
+      3.6,
+      delta,
+    );
+    rig.position.y = THREE.MathUtils.damp(
+      rig.position.y,
+      compact ? -0.25 : -0.02 - pointerY * 0.08,
+      3.6,
+      delta,
+    );
+    rig.scale.setScalar(THREE.MathUtils.damp(rig.scale.x, compact ? 0.82 : 1, 4, delta));
+  });
+
+  return (
+    <>
+      <fog attach="fog" args={["#120d0a", 7.5, 14]} />
+      <ambientLight intensity={1.15} />
+      <hemisphereLight args={["#ffb36b", "#2b0d05", 1.2]} />
+      <directionalLight
+        position={[3.5, 5.5, 5]}
+        intensity={3.7}
+        color="#ffd0a1"
+        castShadow={!compact}
+      />
+      <pointLight position={[-3.4, 1.5, 3]} intensity={34} distance={9} color="#ff4d18" />
+      <pointLight position={[2.8, -2.2, 1]} intensity={26} distance={8} color="#ff9a3d" />
+
+      <group ref={rigRef}>
+        <Suspense fallback={<FallbackBurger progress={progress} reduced={reduced} />}>
+          {LAYERS.map((layer, index) => (
+            <BurgerLayer
+              key={layer.url}
+              config={layer}
+              index={index}
+              progress={progress}
+              reduced={reduced}
+            />
+          ))}
+        </Suspense>
+      </group>
+
+      <Sparkles
+        count={compact ? 24 : 52}
+        scale={compact ? [5, 6, 2] : [8, 7, 3]}
+        size={compact ? 1.4 : 1.8}
+        speed={0.22}
+        opacity={0.5}
+        color="#ff7a2f"
+      />
+
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -3.2, -0.3]} receiveShadow>
+        <circleGeometry args={[compact ? 3.4 : 4.4, 64]} />
+        <meshStandardMaterial color="#160b06" roughness={0.92} metalness={0.04} transparent opacity={0.72} />
+      </mesh>
+    </>
+  );
+}
+
+function BurgerLayer({
+  config,
+  index,
+  progress,
+  reduced,
+}: {
+  config: BurgerLayerConfig;
+  index: number;
+  progress: MotionValue<number>;
+  reduced: boolean;
+}) {
+  const ref = useRef<THREE.Group>(null);
+
+  useFrame((state, delta) => {
+    const group = ref.current;
+    if (!group) return;
+
+    const value = reduced ? 0.52 : progress.get();
+    const open = THREE.MathUtils.smoothstep(value, 0.12, 0.72);
+    const breathing = reduced ? 0 : Math.sin(state.clock.elapsedTime * 0.75 + index * 0.7) * 0.018;
+    const targetY = config.baseY + config.explodeY * open + breathing;
+
+    group.position.y = THREE.MathUtils.damp(group.position.y, targetY, 5.2, delta);
+    group.position.x = THREE.MathUtils.damp(group.position.x, config.driftX * open, 5.2, delta);
+    group.rotation.z = THREE.MathUtils.damp(group.rotation.z, config.rotateZ * open, 5, delta);
+    group.rotation.y = THREE.MathUtils.damp(group.rotation.y, config.rotateY * open, 5, delta);
+  });
+
+  return (
+    <group ref={ref} position={[0, config.baseY, 0]}>
+      <NormalizedModel url={config.url} targetWidth={config.width} />
+    </group>
+  );
+}
+
+function NormalizedModel({ url, targetWidth }: { url: string; targetWidth: number }) {
+  const { scene } = useGLTF(url);
+  const normalized = useMemo(() => {
+    const object = scene.clone(true);
+    object.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+
+    const box = new THREE.Box3().setFromObject(object);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    const horizontal = Math.max(size.x, size.z, 0.001);
+    const scale = targetWidth / horizontal;
+    object.position.set(-center.x, -center.y, -center.z);
+
+    return { object, scale };
+  }, [scene, targetWidth]);
+
+  return <primitive object={normalized.object} scale={normalized.scale} />;
+}
+
+function FallbackBurger({
+  progress,
+  reduced,
+}: {
+  progress: MotionValue<number>;
+  reduced: boolean;
+}) {
+  const root = useRef<THREE.Group>(null);
+  const layerRefs = useRef<Array<THREE.Group | null>>([]);
+  const assembledY = [-1.02, -0.5, -0.08, 0.38, 0.98];
+  const explodedY = [-1.5, -0.72, 0.02, 0.84, 1.7];
+
+  useFrame((_state, delta) => {
+    const open = THREE.MathUtils.smoothstep(reduced ? 0.52 : progress.get(), 0.12, 0.72);
+    layerRefs.current.forEach((layer, index) => {
+      if (!layer) return;
+      const target = assembledY[index] + explodedY[index] * open;
+      layer.position.y = THREE.MathUtils.damp(layer.position.y, target, 5, delta);
+    });
+    if (root.current) root.current.rotation.y += delta * 0.06;
+  });
+
+  return (
+    <group ref={root}>
+      <group ref={(node) => { layerRefs.current[0] = node; }} position={[0, assembledY[0], 0]}>
+        <mesh scale={[1.5, 0.3, 1.5]}>
+          <sphereGeometry args={[1, 48, 24, 0, Math.PI * 2, Math.PI * 0.42, Math.PI * 0.58]} />
+          <meshStandardMaterial color="#d9863f" roughness={0.62} />
+        </mesh>
+      </group>
+      <group ref={(node) => { layerRefs.current[1] = node; }} position={[0, assembledY[1], 0]}>
+        <mesh scale={[1.45, 0.3, 1.45]}>
+          <cylinderGeometry args={[1, 1.05, 0.42, 48]} />
+          <meshStandardMaterial color="#4b1f10" roughness={0.9} />
+        </mesh>
+      </group>
+      <group ref={(node) => { layerRefs.current[2] = node; }} position={[0, assembledY[2], 0]} rotation={[0, Math.PI / 4, 0]}>
+        <mesh scale={[1.72, 0.08, 1.72]}>
+          <boxGeometry args={[1, 1, 1]} />
+          <meshStandardMaterial color="#f7a21b" roughness={0.52} />
+        </mesh>
+      </group>
+      <group ref={(node) => { layerRefs.current[3] = node; }} position={[0, assembledY[3], 0]}>
+        <mesh scale={[1.52, 0.14, 1.52]}>
+          <torusGeometry args={[0.72, 0.32, 18, 64]} />
+          <meshStandardMaterial color="#4d8d3f" roughness={0.82} />
+        </mesh>
+      </group>
+      <group ref={(node) => { layerRefs.current[4] = node; }} position={[0, assembledY[4], 0]}>
+        <mesh scale={[1.55, 0.7, 1.55]}>
+          <sphereGeometry args={[1, 64, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
+          <meshStandardMaterial color="#d98a46" roughness={0.58} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+Object.values(MODEL_URLS).forEach((url) => useGLTF.preload(url));
