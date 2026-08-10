@@ -331,7 +331,49 @@ function BurgerAssembly(props: SceneProps) {
   useFrame((state, delta) => {
     const group = burgerRef.current;
     if (!group) return;
-    const p = props.reduceMotion ? 0 : ￭ǲڮ݆͹ܠlayer.open[1], e) - py * pointerStrength * 0.55 + floatY;
+    const p = props.reduceMotion ? 0 : props.progress.get();
+    const px = props.reduceMotion ? 0 : props.pointerX.get();
+    const py = props.reduceMotion ? 0 : props.pointerY.get();
+    const openEase = THREE.MathUtils.smootherstep(p, 0.06, 1);
+    const targetScale = (compact ? 0.67 : 0.93) * THREE.MathUtils.lerp(1, 0.86, openEase);
+    const cinematicSpin = THREE.MathUtils.smootherstep(p, 0.18, 0.91);
+    const breathe = props.reduceMotion ? 0 : Math.sin(state.clock.elapsedTime * 0.75) * 0.015 * openEase;
+
+    group.position.y = THREE.MathUtils.damp(group.position.y, -0.1 - openEase * 0.1 + breathe, 4.6, delta);
+    group.rotation.y = THREE.MathUtils.damp(group.rotation.y, -0.1 + cinematicSpin * 0.66 + px * 0.21, 4.6, delta);
+    group.rotation.x = THREE.MathUtils.damp(group.rotation.x, -0.02 + cinematicSpin * 0.075 - py * 0.075, 4.8, delta);
+    group.rotation.z = THREE.MathUtils.damp(group.rotation.z, Math.sin(cinematicSpin * Math.PI) * 0.075 + px * 0.03, 4.6, delta);
+    const scale = THREE.MathUtils.damp(group.scale.x, targetScale, 4.5, delta);
+    group.scale.setScalar(scale);
+  });
+
+  return (
+    <group>
+      <DepthRings progress={props.progress} reduceMotion={props.reduceMotion} />
+      <group ref={burgerRef}>
+        {BURGER_LAYERS.map((layer) => <IngredientLayer key={layer.key} layer={layer} {...props} />)}
+      </group>
+    </group>
+  );
+}
+
+function IngredientLayer({ layer, progress, pointerX, pointerY, reduceMotion }: SceneProps & { layer: Layer3D }) {
+  const groupRef = useRef<THREE.Group>(null);
+  useFrame((state, delta) => {
+    const group = groupRef.current;
+    if (!group) return;
+    const p = reduceMotion ? 0 : progress.get();
+    const raw = THREE.MathUtils.clamp((p - layer.delay) / Math.max(0.001, 0.93 - layer.delay), 0, 1);
+    const e = THREE.MathUtils.smootherstep(raw, 0, 1);
+    const px = reduceMotion ? 0 : pointerX.get();
+    const py = reduceMotion ? 0 : pointerY.get();
+    const pointerStrength = e * layer.parallax;
+    const floatPhase = state.clock.elapsedTime * (1.02 + layer.delay) + layer.delay * 18;
+    const floatY = reduceMotion ? 0 : Math.sin(floatPhase) * 0.045 * e;
+    const floatR = reduceMotion ? 0 : Math.cos(floatPhase * 0.88) * 0.022 * e;
+
+    const x = THREE.MathUtils.lerp(layer.closed[0], layer.open[0], e) + px * pointerStrength;
+    const y = THREE.MathUtils.lerp(layer.closed[1], layer.open[1], e) - py * pointerStrength * 0.55 + floatY;
     const z = THREE.MathUtils.lerp(layer.closed[2], layer.open[2], e) + Math.abs(px) * pointerStrength * 0.3;
     group.position.x = THREE.MathUtils.damp(group.position.x, x, 5.2, delta);
     group.position.y = THREE.MathUtils.damp(group.position.y, y, 5.2, delta);
