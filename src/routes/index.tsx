@@ -21,7 +21,6 @@ import { OfferConfigurator } from "@/components/marketing/offer-configurator";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 import { STORES } from "@/config/stores";
 import { DEMO_NOTICE } from "@/lib/demo-mode";
-import { whatsappUrl } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -46,12 +45,8 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const PROPOSAL_URL = whatsappUrl(
-  "5511987201816",
-  "Olá! Vi a Vitrine Base da SAV Digital e quero entender como seria um site para o meu negócio.",
-);
 const SAV_INSTAGRAM_URL = "https://www.instagram.com/savdigital.br/";
-const SAV_EMAIL = "comercial.savdigital@gmail.com";
+const PROPOSAL_URL = SAV_INSTAGRAM_URL;
 
 const NICHE_ICON: Record<string, typeof ShoppingBag> = {
   fashion: ShoppingBag,
@@ -228,8 +223,8 @@ function Index() {
             rel="noreferrer"
             className="vb-button-primary inline-flex min-h-11 items-center gap-2 px-4 py-2 text-xs"
           >
-            <span className="hidden sm:inline">Falar com a SAV</span>
-            <span className="sm:hidden">Falar agora</span>
+            <span className="hidden sm:inline">Falar no Instagram</span>
+            <span className="sm:hidden">Instagram</span>
             <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
           </a>
         </div>
@@ -537,7 +532,7 @@ function Index() {
                 rel="noreferrer"
                 className="vb-button-primary group inline-flex min-h-14 items-center justify-center gap-3 px-7 py-4"
               >
-                Conversar sobre meu projeto
+                Falar com a SAV no Instagram
                 <MessageCircle className="h-4 w-4 transition-transform group-hover:rotate-6" />
               </a>
               <Link
@@ -553,7 +548,7 @@ function Index() {
       </main>
 
       <footer className="border-t border-white/10 bg-vb-deep px-5 py-8 text-xs text-white/38 sm:px-8 lg:px-12">
-        <div className="mx-auto grid max-w-[90rem] gap-5 sm:grid-cols-[1fr_auto] sm:items-end lg:grid-cols-[1fr_auto_1fr]">
+        <div className="mx-auto flex max-w-[90rem] flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="flex items-center gap-3">
               <span className="grid h-8 w-8 place-items-center rounded-lg border border-[#5b7fff]/40 bg-[#315cff]/10 font-display text-[9px] font-black text-[#8aa6ff]">
@@ -571,23 +566,17 @@ function Index() {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-x-5 gap-y-2 text-[11px] sm:justify-end lg:justify-center">
+          <div className="flex flex-col gap-2 text-[11px] sm:items-end">
             <a
               href={SAV_INSTAGRAM_URL}
               target="_blank"
               rel="noreferrer"
-              className="transition hover:text-[#8aa6ff]"
+              className="font-semibold text-[#8aa6ff] transition hover:text-[#b8c6ff]"
             >
-              @savdigital.br
+              Falar com a SAV · @savdigital.br
             </a>
-            <a href={`mailto:${SAV_EMAIL}`} className="transition hover:text-[#8aa6ff]">
-              {SAV_EMAIL}
-            </a>
+            <span>Demonstrações locais · Nenhum pagamento real é processado</span>
           </div>
-
-          <span className="sm:col-span-2 sm:text-right lg:col-span-1">
-            Demonstrações locais · Nenhum pagamento real é processado
-          </span>
         </div>
       </footer>
     </div>
