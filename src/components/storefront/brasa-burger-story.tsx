@@ -30,6 +30,14 @@ type Layer3D = {
   roughness: number;
 };
 
+const NATURAL_TINTS: Record<Layer3D["key"], string> = {
+  bottom: "#d79a58",
+  patty: "#70442d",
+  cheese: "#f2a31a",
+  greens: "#5aa641",
+  top: "#df9f59",
+};
+
 const BURGER_LAYERS: Layer3D[] = [
   {
     key: "bottom",
@@ -321,7 +329,7 @@ function BurgerCanvas(props: SceneProps) {
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         onCreated={({ gl }) => {
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = 1.06;
+          gl.toneMappingExposure = 1.18;
           gl.outputColorSpace = THREE.SRGBColorSpace;
         }}
       >
@@ -330,7 +338,7 @@ function BurgerCanvas(props: SceneProps) {
           <BurgerAssembly {...props} />
           <ContactShadows
             position={[0, -3.8, 0]}
-            opacity={0.48}
+            opacity={0.46}
             scale={9.5}
             blur={2.8}
             far={8}
@@ -457,32 +465,21 @@ function IngredientLayer({
 
   return (
     <group ref={groupRef} position={layer.closed}>
-      <NormalizedIngredient layer={layer} progress={progress} reduceMotion={reduceMotion} />
+      <NormalizedIngredient layer={layer} />
     </group>
   );
 }
 
-function NormalizedIngredient({
-  layer,
-  progress,
-  reduceMotion,
-}: {
-  layer: Layer3D;
-  progress: MotionValue<number>;
-  reduceMotion: boolean;
-}) {
+function NormalizedIngredient({ layer }: { layer: Layer3D }) {
   const materials = useLoader(MTLLoader, layer.mtl);
   materials.preload();
   const loaded = useLoader(OBJLoader, layer.obj, (loader) => {
     loader.setMaterials(materials);
   });
-  const gl = useThree((state) => state.gl);
-  const materialRefs = useRef<THREE.MeshStandardMaterial[]>([]);
 
   const object = useMemo(() => {
     const clone = loaded.clone(true);
-    const maxAnisotropy = gl.capabilities.getMaxAnisotropy();
-    const collected: THREE.MeshStandardMaterial[] = [];
+    const naturalColor = new THREE.Color(NATURAL_TINTS[layer.key]);
 
     clone.traverse((child) => {
       if (!(child instanceof THREE.Mesh)) return;
@@ -493,9 +490,9 @@ function NormalizedIngredient({
       const sourceMaterials = Array.isArray(child.material) ? child.material : [child.material];
       const upgraded = sourceMaterials.map((source) => {
         const sourceMaterial = source as THREE.MeshPhongMaterial;
-        const material = new THREE.MeshStandardMaterial({
-          color: sourceMaterial.color ? sourceMaterial.color.clone() : new THREE.Color("white"),
-          map: sourceMaterial.map ?? null,
+        return new THREE.MeshStandardMaterial({
+          color: naturalColor.clone(),
+          map: null,
           transparent: sourceMaterial.transparent,
           opacity: sourceMaterial.opacity,
           alphaTest: sourceMaterial.alphaTest,
@@ -503,18 +500,6 @@ function NormalizedIngredient({
           metalness: 0,
           roughness: layer.roughness,
         });
-
-        material.emissive.set("#000000");
-        material.emissiveIntensity = 0;
-
-        if (material.map) {
-          material.map.colorSpace = THREE.SRGBColorSpace;
-          material.map.anisotropy = maxAnisotropy;
-          material.map.needsUpdate = true;
-        }
-
-        collected.push(material);
-        return material;
       });
 
       child.material = Array.isArray(child.material) ? upgraded : upgraded[0];
@@ -527,24 +512,8 @@ function NormalizedIngredient({
     const longest = Math.max(size.x, size.y, size.z, 0.001);
     clone.scale.setScalar(layer.targetSize / longest);
 
-    materialRefs.current = collected;
     return clone;
-  }, [gl, layer.roughness, layer.targetSize, loaded]);
-
-  useFrame((_, delta) => {
-    const p = reduceMotion ? 1 : progress.get();
-    const finish = THREE.MathUtils.smootherstep(p, 0.68, 1);
-
-    materialRefs.current.forEach((material) => {
-      material.emissiveIntensity = 0;
-      material.roughness = THREE.MathUtils.damp(
-        material.roughness,
-        THREE.MathUtils.lerp(layer.roughness, Math.max(0.36, layer.roughness - 0.045), finish),
-        5,
-        delta,
-      );
-    });
-  });
+  }, [layer.key, layer.roughness, layer.targetSize, loaded]);
 
   return <primitive object={object} />;
 }
@@ -556,46 +525,36 @@ function NaturalLighting({ progress, pointerX, pointerY, reduceMotion }: ScenePr
   const emberRef = useRef<THREE.PointLight>(null);
   const keyRef = useRef<THREE.PointLight>(null);
   const gl = useThree((state) => state.gl);
-  const neutralDirectional = useMemo(() => new THREE.Color("#fff2e4"), []);
-  const warmDirectional = useMemo(() => new THREE.Color("#ffe1b8"), []);
-  const neutralKey = useMemo(() => new THREE.Color("#fff0de"), []);
-  const warmKey = useMemo(() => new THREE.Color("#ffd9ad"), []);
+  const neutralDirectional = useMemo(() => new THREE.Color("#fff8f0"), []);
+  const warmDirectional = useMemo(() => new THREE.Color("#ffe8c8"), []);
+  const neutralKey = useMemo(() => new THREE.Color("#fffaf4"), []);
+  const warmKey = useMemo(() => new THREE.Color("#ffe4c2"), []);
 
   useFrame((_, delta) => {
     const p = reduceMotion ? 1 : progress.get();
-    const finish = THREE.MathUtils.smootherstep(p, 0.62, 1);
+    const finish = THREE.MathUtils.smootherstep(p, 0.72, 1);
     const px = reduceMotion ? 0 : pointerX.get();
     const py = reduceMotion ? 0 : pointerY.get();
 
     if (ambientRef.current) {
-      ambientRef.current.intensity = THREE.MathUtils.damp(
-        ambientRef.current.intensity,
-        THREE.MathUtils.lerp(0.72, 0.82, finish),
-        4.2,
-        delta,
-      );
+      ambientRef.current.intensity = THREE.MathUtils.damp(ambientRef.current.intensity, 1.05, 4.2, delta);
     }
     if (hemisphereRef.current) {
-      hemisphereRef.current.intensity = THREE.MathUtils.damp(
-        hemisphereRef.current.intensity,
-        THREE.MathUtils.lerp(1.35, 1.5, finish),
-        4.2,
-        delta,
-      );
+      hemisphereRef.current.intensity = THREE.MathUtils.damp(hemisphereRef.current.intensity, 1.55, 4.2, delta);
     }
     if (directionalRef.current) {
       directionalRef.current.intensity = THREE.MathUtils.damp(
         directionalRef.current.intensity,
-        THREE.MathUtils.lerp(4.1, 4.7, finish),
+        THREE.MathUtils.lerp(5, 5.55, finish),
         4.2,
         delta,
       );
-      directionalRef.current.color.copy(neutralDirectional).lerp(warmDirectional, finish * 0.45);
+      directionalRef.current.color.copy(neutralDirectional).lerp(warmDirectional, finish * 0.22);
     }
     if (emberRef.current) {
       emberRef.current.intensity = THREE.MathUtils.damp(
         emberRef.current.intensity,
-        THREE.MathUtils.lerp(4.5, 7.5, finish),
+        THREE.MathUtils.lerp(2.4, 3.8, finish),
         4.2,
         delta,
       );
@@ -603,18 +562,18 @@ function NaturalLighting({ progress, pointerX, pointerY, reduceMotion }: ScenePr
     if (keyRef.current) {
       keyRef.current.intensity = THREE.MathUtils.damp(
         keyRef.current.intensity,
-        THREE.MathUtils.lerp(11.5, 14.5, finish),
+        THREE.MathUtils.lerp(13, 15, finish),
         4.2,
         delta,
       );
-      keyRef.current.color.copy(neutralKey).lerp(warmKey, finish * 0.35);
+      keyRef.current.color.copy(neutralKey).lerp(warmKey, finish * 0.18);
       keyRef.current.position.x = THREE.MathUtils.damp(keyRef.current.position.x, 2.7 + px * 2.4, 5, delta);
       keyRef.current.position.y = THREE.MathUtils.damp(keyRef.current.position.y, 2.8 - py * 1.6, 5, delta);
     }
 
     gl.toneMappingExposure = THREE.MathUtils.damp(
       gl.toneMappingExposure,
-      THREE.MathUtils.lerp(1.06, 1.14, finish),
+      THREE.MathUtils.lerp(1.18, 1.22, finish),
       3.8,
       delta,
     );
@@ -622,20 +581,20 @@ function NaturalLighting({ progress, pointerX, pointerY, reduceMotion }: ScenePr
 
   return (
     <>
-      <ambientLight ref={ambientRef} intensity={0.72} />
-      <hemisphereLight ref={hemisphereRef} args={["#fff4e8", "#1b0b06", 1.35]} />
+      <ambientLight ref={ambientRef} intensity={1.05} />
+      <hemisphereLight ref={hemisphereRef} args={["#ffffff", "#3a1d12", 1.55]} />
       <directionalLight
         ref={directionalRef}
         castShadow
-        color="#fff2e4"
-        intensity={4.1}
+        color="#fff8f0"
+        intensity={5}
         position={[4.5, 6.4, 5.2]}
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
         shadow-bias={-0.0002}
       />
-      <pointLight ref={emberRef} color="#f15a24" intensity={4.5} distance={12} position={[-3.2, 0.6, 3.4]} />
-      <pointLight ref={keyRef} color="#fff0de" intensity={11.5} distance={11} position={[2.7, 2.8, 3.8]} />
+      <pointLight ref={emberRef} color="#f15a24" intensity={2.4} distance={12} position={[-3.2, 0.6, 3.4]} />
+      <pointLight ref={keyRef} color="#fffaf4" intensity={13} distance={11} position={[2.7, 2.8, 3.8]} />
     </>
   );
 }
