@@ -4,17 +4,17 @@ import { PricingPageV4 } from "@/components/pricing/pricing-page-v4";
 export const Route = createFileRoute("/planos")({
   head: () => ({
     meta: [
-      { title: "Planos e investimento | Vitrine Base" },
+      { title: "Planos e investimento | SAV Digital · Vitrine Base" },
       {
         name: "description",
         content:
-          "Compare os projetos da Vitrine Base: criação a partir de R$ 1.190, domínio .com.br do primeiro ano incluído e infraestrutura mensal a partir de R$ 249 somente quando o projeto usa sistema, banco, login ou painel.",
+          "Compare os projetos da SAV Digital na Vitrine Base: criação a partir de R$ 1.190, domínio .com.br do primeiro ano incluído e infraestrutura mensal a partir de R$ 249 somente quando o projeto usa sistema, banco, login ou painel.",
       },
-      { property: "og:title", content: "Planos e investimento | Vitrine Base" },
+      { property: "og:title", content: "Planos e investimento | SAV Digital · Vitrine Base" },
       {
         property: "og:description",
         content:
-          "Site vitrine pode operar sem mensalidade técnica. Projetos com pedidos persistidos, agenda, login ou painel usam infraestrutura operacional de produção.",
+          "Sites, mensuração e operação sob medida pela SAV Digital. Site vitrine pode operar sem mensalidade técnica; projetos com sistema usam infraestrutura de produção.",
       },
     ],
   }),
