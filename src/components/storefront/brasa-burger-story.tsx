@@ -169,24 +169,24 @@ const BURGER_LAYERS: Layer3D[] = [
 
 const PHASES = [
   {
-    kicker: "01 Â· Fechado",
-    title: "Primeiro vocÃª vÃª a mordida.",
+    kicker: "01 · Fechado",
+    title: "Primeiro você vê a mordida.",
     body: "O burger entra montado: brioche, alface, tomate, cheddar, blend e base comprimidos como um lanche de verdade.",
   },
   {
-    kicker: "02 Â· PressÃ£o",
-    title: "A estrutura comeÃ§a a ceder.",
-    body: "Depois da tensÃ£o inicial, cada ingrediente solta em seu prÃ³prio plano sem perder a leitura de comida real.",
+    kicker: "02 · Pressão",
+    title: "A estrutura começa a ceder.",
+    body: "Depois da tensão inicial, cada ingrediente solta em seu próprio plano sem perder a leitura de comida real.",
   },
   {
-    kicker: "03 Â· ExplosÃ£o 3D",
+    kicker: "03 · Explosão 3D",
     title: "Agora a Brasa sai do plano.",
-    body: "As seis peÃ§as abrem em X, Y e Z com rotaÃ§Ã£o, profundidade e cÃ¢mera recuando para manter tudo em quadro.",
+    body: "As seis peças abrem em X, Y e Z com rotação, profundidade e câmera recuando para manter tudo em quadro.",
   },
   {
-    kicker: "04 Â· Assinatura",
+    kicker: "04 · Assinatura",
     title: "Tudo aberto. Tudo em profundidade.",
-    body: "O final segura a composiÃ§Ã£o com luz de food photography e cores naturais, sem dourar ou plastificar os ingredientes.",
+    body: "O final segura a composição com luz de food photography e cores naturais, sem dourar ou plastificar os ingredientes.",
   },
 ] as const;
 
@@ -276,7 +276,7 @@ export function BrasaBurgerStory() {
           </div>
           <div className="self-end pb-8 text-right lg:self-center lg:pb-0">
             <div className="ml-auto hidden w-fit items-center gap-2 text-[9px] font-bold uppercase tracking-[0.22em] text-orange-100/40 sm:inline-flex">
-              <MousePointer2 className="h-3.5 w-3.5 text-orange-400" /> Mouse move a luz e a cÃ¢mera Â· scroll explode em 3D
+              <MousePointer2 className="h-3.5 w-3.5 text-orange-400" /> Mouse move a luz e a câmera · scroll explode em 3D
             </div>
           </div>
         </div>
@@ -284,7 +284,7 @@ export function BrasaBurgerStory() {
         <div className="absolute inset-x-5 bottom-3 z-20 flex items-center gap-3 sm:inset-x-8 sm:bottom-4 lg:inset-x-12">
           <span className="inline-flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.2em] text-orange-200/55 sm:text-[9px]"><Flame className="h-3.5 w-3.5 fill-orange-500 text-orange-500" /> Brasa em profundidade</span>
           <div className="h-px flex-1 overflow-hidden bg-white/10"><motion.div className="h-full origin-left bg-gradient-to-r from-[#f15a24] to-[#ffb25b]" style={{ scaleX: burgerProgress }} /></div>
-          <span className="hidden items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-white/34 sm:inline-flex"><Sparkles className="h-3 w-3 text-orange-400" /> seis peÃ§as Â· luz fÃ­sica</span>
+          <span className="hidden items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-white/34 sm:inline-flex"><Sparkles className="h-3 w-3 text-orange-400" /> seis peças · luz física</span>
         </div>
       </div>
     </section>
@@ -320,7 +320,7 @@ function BurgerCanvas(props: SceneProps) {
 function SceneLoadIndicator() {
   const { active, progress } = useProgress();
   if (!active) return null;
-  return <div className="pointer-events-none absolute bottom-7 right-4 z-20 border border-orange-300/15 bg-black/45 px-3 py-2 text-[8px] font-black uppercase tracking-[0.22em] text-orange-200/65 backdrop-blur sm:right-7">Construindo volume Â· {Math.round(progress)}%</div>;
+  return <div className="pointer-events-none absolute bottom-7 right-4 z-20 border border-orange-300/15 bg-black/45 px-3 py-2 text-[8px] font-black uppercase tracking-[0.22em] text-orange-200/65 backdrop-blur sm:right-7">Construindo volume · {Math.round(progress)}%</div>;
 }
 
 function BurgerAssembly(props: SceneProps) {
@@ -331,49 +331,7 @@ function BurgerAssembly(props: SceneProps) {
   useFrame((state, delta) => {
     const group = burgerRef.current;
     if (!group) return;
-    const p = props.reduceMotion ? 0 : props.progress.get();
-    const px = props.reduceMotion ? 0 : props.pointerX.get();
-    const py = props.reduceMotion ? 0 : props.pointerY.get();
-    const openEase = THREE.MathUtils.smootherstep(p, 0.06, 1);
-    const targetScale = (compact ? 0.67 : 0.93) * THREE.MathUtils.lerp(1, 0.86, openEase);
-    const cinematicSpin = THREE.MathUtils.smootherstep(p, 0.18, 0.91);
-    const breathe = props.reduceMotion ? 0 : Math.sin(state.clock.elapsedTime * 0.75) * 0.015 * openEase;
-
-    group.position.y = THREE.MathUtils.damp(group.position.y, -0.1 - openEase * 0.1 + breathe, 4.6, delta);
-    group.rotation.y = THREE.MathUtils.damp(group.rotation.y, -0.1 + cinematicSpin * 0.66 + px * 0.21, 4.6, delta);
-    group.rotation.x = THREE.MathUtils.damp(group.rotation.x, -0.02 + cinematicSpin * 0.075 - py * 0.075, 4.8, delta);
-    group.rotation.z = THREE.MathUtils.damp(group.rotation.z, Math.sin(cinematicSpin * Math.PI) * 0.075 + px * 0.03, 4.6, delta);
-    const scale = THREE.MathUtils.damp(group.scale.x, targetScale, 4.5, delta);
-    group.scale.setScalar(scale);
-  });
-
-  return (
-    <group>
-      <DepthRings progress={props.progress} reduceMotion={props.reduceMotion} />
-      <group ref={burgerRef}>
-        {BURGER_LAYERS.map((layer) => <IngredientLayer key={layer.key} layer={layer} {...props} />)}
-      </group>
-    </group>
-  );
-}
-
-function IngredientLayer({ layer, progress, pointerX, pointerY, reduceMotion }: SceneProps & { layer: Layer3D }) {
-  const groupRef = useRef<THREE.Group>(null);
-  useFrame((state, delta) => {
-    const group = groupRef.current;
-    if (!group) return;
-    const p = reduceMotion ? 0 : progress.get();
-    const raw = THREE.MathUtils.clamp((p - layer.delay) / Math.max(0.001, 0.93 - layer.delay), 0, 1);
-    const e = THREE.MathUtils.smootherstep(raw, 0, 1);
-    const px = reduceMotion ? 0 : pointerX.get();
-    const py = reduceMotion ? 0 : pointerY.get();
-    const pointerStrength = e * layer.parallax;
-    const floatPhase = state.clock.elapsedTime * (1.02 + layer.delay) + layer.delay * 18;
-    const floatY = reduceMotion ? 0 : Math.sin(floatPhase) * 0.045 * e;
-    const floatR = reduceMotion ? 0 : Math.cos(floatPhase * 0.88) * 0.022 * e;
-
-    const x = THREE.MathUtils.lerp(layer.closed[0], layer.open[0], e) + px * pointerStrength;
-    const y = THREE.MathUtils.lerp(layer.closed[1], layer.open[1], e) - py * pointerStrength * 0.55 + floatY;
+    const p = props.reduceMotion ? 0 : ￭ǲڮ݆͹ܠlayer.open[1], e) - py * pointerStrength * 0.55 + floatY;
     const z = THREE.MathUtils.lerp(layer.closed[2], layer.open[2], e) + Math.abs(px) * pointerStrength * 0.3;
     group.position.x = THREE.MathUtils.damp(group.position.x, x, 5.2, delta);
     group.position.y = THREE.MathUtils.damp(group.position.y, y, 5.2, delta);
@@ -684,4 +642,3 @@ function DepthRings({ progress, reduceMotion }: { progress: MotionValue<number>;
     </group>
   );
 }
-
