@@ -26,20 +26,20 @@ import { whatsappUrl } from "@/lib/whatsapp";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Vitrine Base — Experiências digitais para negócios locais" },
+      { title: "SAV Digital — Vitrine Base | Experiências digitais" },
       {
         name: "description",
         content:
-          "Sites e sistemas sob medida com identidade, movimento e ferramentas reais para negócios locais venderem e operarem melhor.",
+          "Vitrine Base, o showcase da SAV Digital: experiências de sites e sistemas com identidade, movimento e estrutura comercial para negócios locais.",
       },
       {
         property: "og:title",
-        content: "Vitrine Base — Sites que o cliente sente antes de entender",
+        content: "SAV Digital apresenta Vitrine Base — Sites que o cliente sente antes de entender",
       },
       {
         property: "og:description",
         content:
-          "Atravesse quatro experiências digitais e veja como design, catálogo, pedidos, agenda e painel podem trabalhar juntos.",
+          "Explore quatro experiências demonstrativas criadas pela SAV Digital e veja como design, catálogo, pedidos, agenda e painel podem trabalhar juntos.",
       },
     ],
   }),
@@ -48,8 +48,10 @@ export const Route = createFileRoute("/")({
 
 const PROPOSAL_URL = whatsappUrl(
   "5511987201816",
-  "Olá, Angelo! Vi a Vitrine Base e quero entender como seria um site para o meu negócio.",
+  "Olá! Vi a Vitrine Base da SAV Digital e quero entender como seria um site para o meu negócio.",
 );
+const SAV_INSTAGRAM_URL = "https://www.instagram.com/savdigital.br/";
+const SAV_EMAIL = "comercial.savdigital@gmail.com";
 
 const NICHE_ICON: Record<string, typeof ShoppingBag> = {
   fashion: ShoppingBag,
@@ -183,13 +185,22 @@ function Index() {
         <div className="mx-auto flex min-h-16 max-w-[90rem] items-center justify-between gap-4 px-5 sm:px-8 lg:px-12">
           <a
             href="#inicio"
-            className="group inline-flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vb-cyan"
+            aria-label="SAV Digital — Vitrine Base"
+            className="group inline-flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5b7fff]"
           >
-            <span className="relative grid h-8 w-8 place-items-center overflow-hidden rounded-full border border-vb-gold/40">
-              <span className="absolute h-2.5 w-2.5 rounded-full bg-vb-gold transition-transform duration-500 group-hover:scale-[2.8]" />
+            <span className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl border border-[#5b7fff]/45 bg-[#315cff]/10 shadow-[0_0_26px_rgba(49,92,255,.08)] transition duration-500 group-hover:border-[#7b9aff]/75 group-hover:shadow-[0_0_30px_rgba(49,92,255,.28)]">
+              <span className="absolute inset-0 bg-[radial-gradient(circle_at_35%_25%,rgba(111,145,255,.24),transparent_62%)]" />
+              <span className="relative font-display text-[10px] font-black tracking-[-0.04em] text-[#8aa6ff]">
+                SAV
+              </span>
             </span>
-            <span className="font-display text-sm font-semibold tracking-[0.16em] text-vb-ivory">
-              VITRINE BASE
+            <span className="flex min-w-0 flex-col leading-none">
+              <span className="font-display text-[12px] font-bold tracking-[0.14em] text-white">
+                SAV DIGITAL
+              </span>
+              <span className="mt-1 text-[8px] font-semibold uppercase tracking-[0.19em] text-white/38">
+                Vitrine Base · Showcase
+              </span>
             </span>
           </a>
 
@@ -217,7 +228,7 @@ function Index() {
             rel="noreferrer"
             className="vb-button-primary inline-flex min-h-11 items-center gap-2 px-4 py-2 text-xs"
           >
-            <span className="hidden sm:inline">Começar um projeto</span>
+            <span className="hidden sm:inline">Falar com a SAV</span>
             <span className="sm:hidden">Falar agora</span>
             <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
           </a>
@@ -259,14 +270,15 @@ function Index() {
           <div className="relative mx-auto max-w-[90rem] px-5 py-24 sm:px-8 sm:py-32 lg:px-12">
             <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
               <div>
-                <p className="vb-kicker">Projetos demonstrativos</p>
+                <p className="vb-kicker">Vitrine de projetos SAV Digital</p>
                 <h2 className="mt-5 font-display text-5xl font-semibold leading-[0.9] tracking-[-0.06em] text-vb-ivory sm:text-7xl">
                   Cada negócio merece seu próprio mundo.
                 </h2>
               </div>
               <p className="max-w-2xl text-base leading-8 text-white/58 lg:justify-self-end lg:text-lg">
-                A estrutura técnica pode ser reaproveitada com responsabilidade. O que o cliente vê,
-                sente e usa é construído a partir da identidade e da operação de cada marca.
+                A Vitrine Base reúne experiências demonstrativas criadas pela SAV Digital. A
+                estrutura técnica pode ser reaproveitada com responsabilidade; o que o cliente vê,
+                sente e usa nasce da identidade e da operação de cada marca.
               </p>
             </div>
 
@@ -409,7 +421,7 @@ function Index() {
                 </article>
                 <article className="rounded-[2rem] bg-vb-deep p-7 text-vb-ivory shadow-2xl shadow-black/20 sm:p-9">
                   <p className="text-xs font-bold uppercase tracking-[0.2em] text-vb-gold">
-                    Vitrine Base
+                    Vitrine Base · SAV Digital
                   </p>
                   <ul className="mt-7 space-y-5 text-base leading-7 text-white/72">
                     {[
@@ -509,14 +521,14 @@ function Index() {
           <div aria-hidden="true" className="vb-pointer-aura absolute inset-0" />
           <div aria-hidden="true" className="vb-noise absolute inset-0 opacity-30" />
           <div className="relative mx-auto flex min-h-[70svh] max-w-[90rem] flex-col items-center justify-center px-5 py-24 text-center sm:px-8 lg:px-12">
-            <p className="vb-kicker">Seu negócio não precisa parecer pequeno</p>
+            <p className="vb-kicker">SAV Digital · Sites · Anúncios · Vendas</p>
             <h2 className="mt-6 max-w-6xl font-display text-5xl font-semibold leading-[0.88] tracking-[-0.065em] text-vb-ivory sm:text-7xl lg:text-[7rem]">
               Vamos construir uma presença que seja difícil de esquecer.
             </h2>
             <p className="mt-7 max-w-2xl text-base leading-8 text-white/58">
-              Conte o que você vende, como atende e qual é o principal problema da operação. A
-              partir disso, definimos o projeto certo — sem funcionalidades inventadas e sem
-              promessa vazia.
+              Conte o que você vende, como atende e qual é o principal problema da operação. A SAV
+              Digital parte disso para definir o projeto certo — sem funcionalidades inventadas e
+              sem promessa vazia.
             </p>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <a
@@ -541,11 +553,41 @@ function Index() {
       </main>
 
       <footer className="border-t border-white/10 bg-vb-deep px-5 py-8 text-xs text-white/38 sm:px-8 lg:px-12">
-        <div className="mx-auto flex max-w-[90rem] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <span className="font-display font-semibold tracking-[0.14em] text-white/65">
-            VITRINE BASE
+        <div className="mx-auto grid max-w-[90rem] gap-5 sm:grid-cols-[1fr_auto] sm:items-end lg:grid-cols-[1fr_auto_1fr]">
+          <div>
+            <div className="flex items-center gap-3">
+              <span className="grid h-8 w-8 place-items-center rounded-lg border border-[#5b7fff]/40 bg-[#315cff]/10 font-display text-[9px] font-black text-[#8aa6ff]">
+                SAV
+              </span>
+              <div>
+                <p className="font-display font-semibold tracking-[0.14em] text-white/75">SAV DIGITAL</p>
+                <p className="mt-1 text-[9px] uppercase tracking-[0.18em] text-white/30">
+                  Vitrine Base · Showcase
+                </p>
+              </div>
+            </div>
+            <p className="mt-3 text-[10px] uppercase tracking-[0.16em] text-[#7898ff]/75">
+              Sites que atraem. Anúncios que vendem.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-x-5 gap-y-2 text-[11px] sm:justify-end lg:justify-center">
+            <a
+              href={SAV_INSTAGRAM_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="transition hover:text-[#8aa6ff]"
+            >
+              @savdigital.br
+            </a>
+            <a href={`mailto:${SAV_EMAIL}`} className="transition hover:text-[#8aa6ff]">
+              {SAV_EMAIL}
+            </a>
+          </div>
+
+          <span className="sm:col-span-2 sm:text-right lg:col-span-1">
+            Demonstrações locais · Nenhum pagamento real é processado
           </span>
-          <span>Demonstrações locais · Nenhum pagamento real é processado</span>
         </div>
       </footer>
     </div>
