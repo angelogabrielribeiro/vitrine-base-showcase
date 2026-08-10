@@ -113,6 +113,8 @@ export function BrasaBurgerStory() {
   const sceneRotateX = useTransform(pointerY, [-1, 1], reduceMotion ? [0, 0] : [2.4, -2.4]);
   const sceneX = useTransform(pointerX, [-1, 1], reduceMotion ? [0, 0] : [-8, 8]);
   const sceneY = useTransform(pointerY, [-1, 1], reduceMotion ? [0, 0] : [-5, 5]);
+  const shadowScale = useTransform(burgerProgress, [0, 1], [0.7, 1.08]);
+  const shadowOpacity = useTransform(burgerProgress, [0, 1], [0.56, 0.34]);
 
   useMotionValueEvent(scrollYProgress, "change", (value) => {
     const next = phaseFromProgress(value);
@@ -159,19 +161,13 @@ export function BrasaBurgerStory() {
               <motion.div
                 aria-hidden="true"
                 className="absolute left-1/2 top-[73%] h-16 w-[62%] -translate-x-1/2 rounded-[50%] bg-black/65 blur-2xl"
-                style={{
-                  scaleX: useTransform(burgerProgress, [0, 1], [0.7, 1.08]),
-                  opacity: useTransform(burgerProgress, [0, 1], [0.56, 0.34]),
-                }}
+                style={{ scaleX: shadowScale, opacity: shadowOpacity }}
               />
               {BURGER_LAYERS.map((layer) => (
                 <PhotoBurgerLayer
                   key={layer.key}
                   layer={layer}
                   progress={burgerProgress}
-                  pointerX={pointerX}
-                  pointerY={pointerY}
-                  reduced={reduceMotion}
                 />
               ))}
             </div>
@@ -270,22 +266,14 @@ type Layer = (typeof BURGER_LAYERS)[number];
 function PhotoBurgerLayer({
   layer,
   progress,
-  pointerX,
-  pointerY,
-  reduced,
 }: {
   layer: Layer;
   progress: MotionValue<number>;
-  pointerX: MotionValue<number>;
-  pointerY: MotionValue<number>;
-  reduced: boolean;
 }) {
   const y = useTransform(progress, [0, 1], [layer.closedY, layer.openY]);
   const x = useTransform(progress, [0, 1], [0, layer.openX]);
   const rotate = useTransform(progress, [0, 1], [0, layer.openRotate]);
   const z = useTransform(progress, [0, 1], [0, layer.depth]);
-  const pointerShiftX = useTransform(pointerX, [-1, 1], reduced ? [0, 0] : [-2.4, 2.4]);
-  const pointerShiftY = useTransform(pointerY, [-1, 1], reduced ? [0, 0] : [-1.6, 1.6]);
   const opacity = useTransform(progress, [0, 0.05, 1], [0.98, 1, 1]);
 
   return (
@@ -301,8 +289,6 @@ function PhotoBurgerLayer({
         x,
         z,
         rotate,
-        translateX: pointerShiftX,
-        translateY: pointerShiftY,
         opacity,
         zIndex: layer.zIndex,
         transformStyle: "preserve-3d",
