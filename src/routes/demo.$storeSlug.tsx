@@ -66,9 +66,12 @@ function StoreLayout() {
 
   // Esconde o menu flutuante no formulário final do checkout para não cobrir o botão.
   const hideFloatingMenu = pathname.endsWith(`/demo/${storeSlug}/checkout`);
+  const storefrontOverflow =
+    store.slug === "restaurante" ? " overflow-x-clip" : " overflow-x-hidden";
+
   return (
     <MobileMenuProvider>
-      <div className={themeScopeClass(store.slug) + " min-h-screen overflow-x-hidden"}>
+      <div className={themeScopeClass(store.slug) + " min-h-screen" + storefrontOverflow}>
         <StoreThemeStyle store={store} />
         <StoreCursorShader niche={store.niche} />
         <DemoBanner />
