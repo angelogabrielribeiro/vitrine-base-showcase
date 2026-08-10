@@ -8,10 +8,12 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import { ContactShadows, useProgress } from "@react-three/drei";
 import { Flame, Layers3, MousePointer2, Sparkles } from "lucide-react";
 import * as THREE from "three";
+import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 
 type IngredientKey = "bottom" | "patty" | "cheese" | "tomato" | "lettuce" | "top";
@@ -19,7 +21,10 @@ type IngredientKey = "bottom" | "patty" | "cheese" | "tomato" | "lettuce" | "top
 type Layer3D = {
   key: IngredientKey;
   label: string;
+  obj?: string;
+  mtl?: string;
   targetSize: number;
+  modelScale?: [number, number, number];
   closed: [number, number, number];
   open: [number, number, number];
   openRotation: [number, number, number];
@@ -108,7 +113,10 @@ const BURGER_LAYERS: Layer3D[] = [
   {
     key: "bottom",
     label: "Base",
+    obj: "https://v3b.fal.media/files/b/0aa5bc39/ZnnAAKl2M4BL8b39EWROu_279c9e64555dd1af68bcce588f6fe692.obj",
+    mtl: "https://v3b.fal.media/files/b/0aa5bc39/k__sqzPd1N06zYxVOWro-_material.mtl",
     targetSize: 2.72,
+    modelScale: [1.05, 0.58, 1.05],
     closed: [0, -0.6, 0],
     open: [-0.72, -2.55, -0.9],
     openRotation: [-0.2, -0.5, -0.12],
@@ -118,7 +126,10 @@ const BURGER_LAYERS: Layer3D[] = [
   {
     key: "patty",
     label: "Blend",
+    obj: "https://v3b.fal.media/files/b/0aa5bc38/zAoPvOz9YZ_gnm4K9vOMC_90293462e8dddfad0e739bd4d0a393c4.obj",
+    mtl: "https://v3b.fal.media/files/b/0aa5bc38/eklM6XDuNtK0jEPuiU_yG_material.mtl",
     targetSize: 2.72,
+    modelScale: [1.04, 0.76, 1.04],
     closed: [0, -0.3, 0.03],
     open: [0.72, -1.55, 0.3],
     openRotation: [0.18, 0.44, 0.13],
@@ -148,7 +159,10 @@ const BURGER_LAYERS: Layer3D[] = [
   {
     key: "lettuce",
     label: "Alface",
+    obj: "https://v3b.fal.media/files/b/0aa5bc3d/EaQLxWhMpBjDc9CzbSLH5_6e4dd5c97af8801cec67afc39a46cdcc.obj",
+    mtl: "https://v3b.fal.media/files/b/0aa5bc3d/s6hp4ZxEBLbble1_R13sP_material.mtl",
     targetSize: 2.76,
+    modelScale: [1.03, 0.72, 1.03],
     closed: [0, 0.17, 0.08],
     open: [-0.78, 1.63, 0.98],
     openRotation: [-0.16, -0.62, -0.21],
@@ -158,7 +172,10 @@ const BURGER_LAYERS: Layer3D[] = [
   {
     key: "top",
     label: "Brioche",
+    obj: "https://v3b.fal.media/files/b/0aa5bc36/KlHmBTmSTFE3WuAXiHI6M_6ceaade6ad374f949d1a1d44b8439ddc.obj",
+    mtl: "https://v3b.fal.media/files/b/0aa5bc36/-WPBmwpxYDxM-QPhmnxLt_material.mtl",
     targetSize: 2.92,
+    modelScale: [1, 1, 1],
     closed: [0, 0.52, 0.03],
     open: [0.58, 2.62, 0.72],
     openRotation: [-0.26, -0.78, -0.2],
@@ -387,106 +404,81 @@ function IngredientLayer({ layer, progress, pointerX, pointerY, reduceMotion }: 
     <group ref={groupRef} position={layer.closed}>
       {layer.key === "cheese" && <CheeseIngredient />}
       {layer.key === "tomato" && <TomatoIngredient />}
-      {layer.key === "lettuce" && <LettuceIngredient />}
-      {layer.key === "bottom" && <BunIngredient variant="bottom" />}
-      {layer.key === "patty" && <PattyIngredient />}
-      {layer.key === "top" && <BunIngredient variant="top" />}
+      {(layer.key === "bottom" || layer.key === "patty" || layer.key === "lettuce" || layer.key === "top") && (
+        <DetailedModelIngredient layer={layer} />
+      )}
     </group>
   );
 }
 
-function makeBunGeometry(variant: "bottom" | "top") {
-  const geometry = new THREE.SphereGeometry(1, 96, 56);
-  const position = geometry.attributes.position as THREE.BufferAttribute;
-  for (let i = 0; i < position.count; i += 1) {
-    const x = position.getX(i);
-    const y = position.getY(i);
-    const z = position.getZ(i);
-    const radial = Math.sqrt(x * x + z * z);
-    const irregular = Math.sin(x * 7.1 + z * 4.3) * 0.018 + Math.sin(z * 8.6) * 0.011;
-    if (variant === "top") {
-      const shapedY = y < -0.2 ? -0.24 + (y + 0.2) * 0.18 : y;
-      position.set(x * (1 + irregular), shapedY, z * (1 + irregular));
-    } else {
-      const flattenedY = y > 0.16
-        ? 0.16 + (y - 0.16) * 0.08
-        : y * 0.62 - Math.pow(radial, 2.4) * 0.045;
-      position.set(x * (1 + irregular), flattenedY, z * (1 + irregular));
-    }
-  }
-  position.needsUpdate = true;
-  geometry.computeVertexNormals();
-  return geometry;
-}
+function DetailedModelIngredient({ layer }: { layer: Layer3D }) {
+  const modelLayer = layer as Layer3D & {
+    key: "bottom" | "patty" | "lettuce" | "top";
+    obj: string;
+    mtl: string;
+  };
+  const gl = useThree((state) => state.gl);
+  const materials = useLoader(MTLLoader, modelLayer.mtl);
+  materials.preload();
+  const loaded = useLoader(OBJLoader, modelLayer.obj, (loader) => loader.setMaterials(materials));
+  const fallback = useMemo(() => makeFoodMaps(modelLayer.key), [modelLayer.key]);
 
-function BunIngredient({ variant }: { variant: "bottom" | "top" }) {
-  const key = variant === "top" ? "top" : "bottom";
-  const geometry = useMemo(() => makeBunGeometry(variant), [variant]);
-  const food = useMemo(() => makeFoodMaps(key), [key]);
-  const seeds = useMemo(() => Array.from({ length: 24 }, (_, index) => {
-    const ring = index < 8 ? 0.32 : index < 18 ? 0.58 : 0.78;
-    const slot = index < 8 ? index : index < 18 ? index - 8 : index - 18;
-    const count = index < 8 ? 8 : index < 18 ? 10 : 6;
-    const angle = slot / count * Math.PI * 2 + ring * 0.9;
-    const x = Math.cos(angle) * ring * 1.28;
-    const z = Math.sin(angle) * ring * 1.05;
-    const dome = Math.sqrt(Math.max(0, 1 - Math.pow(x / 1.45, 2) - Math.pow(z / 1.2, 2)));
-    return { x, z, y: dome * 0.72 + 0.06, angle };
-  }), []);
-  const scale: [number, number, number] = variant === "top" ? [1.45, 0.82, 1.2] : [1.42, 0.52, 1.18];
+  const object = useMemo(() => {
+    const clone = loaded.clone(true);
+    const maxAnisotropy = Math.min(16, gl.capabilities.getMaxAnisotropy());
+
+    clone.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return;
+      child.castShadow = true;
+      child.receiveShadow = true;
+
+      const sourceMaterials = Array.isArray(child.material) ? child.material : [child.material];
+      const upgraded = sourceMaterials.map((source) => {
+        const sourceMaterial = source as THREE.MeshPhongMaterial;
+        const detailMap = fallback.map;
+        const bumpMap = fallback.bumpMap;
+        const normalMap = sourceMaterial.normalMap ?? null;
+
+        for (const texture of [detailMap, bumpMap, fallback.roughnessMap, normalMap]) {
+          if (!texture) continue;
+          texture.anisotropy = maxAnisotropy;
+          texture.needsUpdate = true;
+        }
+        detailMap.colorSpace = THREE.SRGBColorSpace;
+
+        const material = new THREE.MeshPhysicalMaterial({
+          color: "#ffffff",
+          map: detailMap,
+          bumpMap,
+          bumpScale: sourceMaterial.bumpScale || fallback.profile.bump,
+          normalMap,
+          roughnessMap: fallback.roughnessMap,
+          transparent: sourceMaterial.transparent,
+          opacity: sourceMaterial.opacity,
+          alphaTest: sourceMaterial.alphaTest,
+          side: THREE.FrontSide,
+          metalness: 0,
+          roughness: fallback.profile.roughness,
+          clearcoat: modelLayer.key === "patty" ? 0 : 0.025,
+          clearcoatRoughness: 0.78,
+        });
+        return material;
+      });
+      child.material = Array.isArray(child.material) ? upgraded : upgraded[0];
+    });
+
+    const box = new THREE.Box3().setFromObject(clone);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    clone.position.sub(center);
+    const longest = Math.max(size.x, size.y, size.z, 0.001);
+    clone.scale.setScalar(modelLayer.targetSize / longest);
+    return clone;
+  }, [fallback, gl, loaded, modelLayer.key, modelLayer.targetSize]);
 
   return (
-    <group>
-      <mesh geometry={geometry} scale={scale} castShadow receiveShadow>
-        <meshPhysicalMaterial color="#fff0d8" map={food.map} bumpMap={food.bumpMap} bumpScale={food.profile.bump} roughnessMap={food.roughnessMap} roughness={food.profile.roughness} metalness={0} clearcoat={0.025} clearcoatRoughness={0.76} />
-      </mesh>
-      {variant === "top" && seeds.map((seed, index) => (
-        <mesh key={index} position={[seed.x, seed.y, seed.z]} rotation={[0.12, -seed.angle, 0.2]} scale={[0.09, 0.025, 0.035]} castShadow>
-          <sphereGeometry args={[1, 12, 8]} />
-          <meshStandardMaterial color="#f4d7a5" roughness={0.82} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-function makePattyGeometry() {
-  const geometry = new THREE.CylinderGeometry(1.32, 1.35, 0.48, 96, 12);
-  const position = geometry.attributes.position as THREE.BufferAttribute;
-  for (let i = 0; i < position.count; i += 1) {
-    const x = position.getX(i);
-    const y = position.getY(i);
-    const z = position.getZ(i);
-    const angle = Math.atan2(z, x);
-    const edge = Math.sqrt(x * x + z * z);
-    const irregular = Math.sin(angle * 7 + y * 18) * 0.035 + Math.sin(angle * 13 - y * 9) * 0.018;
-    const surface = Math.sin(x * 8.2 + z * 5.3) * 0.014 + Math.sin(z * 11.1) * 0.01;
-    if (edge > 1) {
-      const scale = (edge + irregular) / edge;
-      position.set(x * scale, y + surface, z * scale);
-    } else {
-      position.setY(i, y + surface);
-    }
-  }
-  position.needsUpdate = true;
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-function PattyIngredient() {
-  const geometry = useMemo(makePattyGeometry, []);
-  const food = useMemo(() => makeFoodMaps("patty"), []);
-  return (
-    <group scale={[1.03, 1, 0.95]}>
-      <mesh geometry={geometry} castShadow receiveShadow>
-        <meshStandardMaterial color="#fff4ea" map={food.map} bumpMap={food.bumpMap} bumpScale={food.profile.bump} roughnessMap={food.roughnessMap} roughness={food.profile.roughness} metalness={0} emissive="#180806" emissiveIntensity={0.12} />
-      </mesh>
-      {[-0.52, -0.18, 0.21, 0.58].map((z, index) => (
-        <mesh key={z} position={[0, 0.249, z]} rotation={[-Math.PI / 2, 0, index % 2 ? 0.08 : -0.06]} scale={[1.05, 0.018, 0.018]}>
-          <boxGeometry args={[1.7, 1, 1]} />
-          <meshStandardMaterial color="#1a0c08" roughness={0.95} />
-        </mesh>
-      ))}
+    <group scale={modelLayer.modelScale ?? [1, 1, 1]}>
+      <primitive object={object} />
     </group>
   );
 }
@@ -545,56 +537,6 @@ function TomatoIngredient() {
           <meshPhysicalMaterial color="#f5c987" roughness={0.56} transmission={0.03} />
         </mesh>
       ))}
-    </group>
-  );
-}
-
-function makeLettuceGeometry() {
-  const rings = 9;
-  const segments = 96;
-  const positions: number[] = [];
-  const uvs: number[] = [];
-  const indices: number[] = [];
-  for (let ring = 0; ring <= rings; ring += 1) {
-    const t = ring / rings;
-    for (let segment = 0; segment <= segments; segment += 1) {
-      const a = segment / segments * Math.PI * 2;
-      const edgeWave = Math.sin(a * 9) * 0.095 + Math.sin(a * 17 + 0.8) * 0.04;
-      const radius = t * (1.22 + edgeWave * Math.pow(t, 2.2));
-      const x = Math.cos(a) * radius * 1.12;
-      const z = Math.sin(a) * radius;
-      const y = Math.sin(a * 5 + t * 7) * 0.038 * t + Math.sin(a * 13) * 0.035 * Math.pow(t, 3);
-      positions.push(x, y, z);
-      uvs.push(0.5 + x / 3, 0.5 + z / 2.7);
-    }
-  }
-  for (let ring = 0; ring < rings; ring += 1) {
-    for (let segment = 0; segment < segments; segment += 1) {
-      const a = ring * (segments + 1) + segment;
-      const b = a + segments + 1;
-      indices.push(a, b, a + 1, b, b + 1, a + 1);
-    }
-  }
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
-  geometry.setIndex(indices);
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-function LettuceIngredient() {
-  const geometry = useMemo(makeLettuceGeometry, []);
-  const food = useMemo(() => makeFoodMaps("lettuce"), []);
-  return (
-    <group>
-      <mesh geometry={geometry} castShadow receiveShadow>
-        <meshPhysicalMaterial color="#eef9bf" map={food.map} bumpMap={food.bumpMap} bumpScale={food.profile.bump} roughnessMap={food.roughnessMap} roughness={food.profile.roughness} metalness={0} emissive="#102508" emissiveIntensity={0.1} side={THREE.DoubleSide} />
-      </mesh>
-      <mesh position={[0, 0.035, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[0.45, 0.018, 8, 64]} />
-        <meshStandardMaterial color="#b8d875" roughness={0.75} />
-      </mesh>
     </group>
   );
 }
