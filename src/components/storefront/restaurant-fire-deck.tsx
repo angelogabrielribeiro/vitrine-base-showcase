@@ -13,6 +13,7 @@ import type { Product, StoreConfig } from "@/types/commerce";
 import { brl } from "@/lib/format";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 import { useInView, sequenceDelay } from "@/hooks/use-in-view";
+import { BrasaBurgerStory } from "@/components/storefront/brasa-burger-story";
 
 export function RestaurantFireDeck({
   store,
@@ -49,178 +50,184 @@ export function RestaurantFireDeck({
 
   if (reduced || isCompact) {
     return (
-      <section
-        data-testid="restaurant-fire-deck"
-        className="relative isolate overflow-hidden border-y border-orange-300/15 bg-[#140804] px-5 py-14 text-white sm:px-8 sm:py-16"
-      >
-        <div className="pointer-events-none absolute inset-x-0 top-24 -z-0 h-32 opacity-85 sm:top-20 sm:h-40">
-          <FireRibbon reduced={reduced} compact />
-        </div>
-        <div className="relative z-10 mx-auto max-w-3xl">
-          <p className="text-[10px] font-bold uppercase tracking-[0.34em] text-orange-300">
-            Fogo sob comando
-          </p>
-          <h2 className="mt-4 max-w-[16ch] font-display text-[clamp(2.6rem,10vw,3.5rem)] uppercase leading-[0.88]">
-            Três desejos. Nenhum espaço morto.
-          </h2>
-          <p className="mt-4 max-w-xl text-sm leading-6 text-orange-50/70">
-            Role, toque e escolha. Cada desejo entra em cena com calor próprio.
-          </p>
-
-          <div className="mt-28 space-y-5 sm:mt-32">
-            {items.map((product, index) => (
-              <FireScene
-                key={product.id}
-                product={product}
-                storeSlug={store.slug}
-                index={index}
-                reduced={reduced}
-              />
-            ))}
+      <>
+        <section
+          data-testid="restaurant-fire-deck"
+          className="relative isolate overflow-hidden border-y border-orange-300/15 bg-[#140804] px-5 py-14 text-white sm:px-8 sm:py-16"
+        >
+          <div className="pointer-events-none absolute inset-x-0 top-24 -z-0 h-32 opacity-85 sm:top-20 sm:h-40">
+            <FireRibbon reduced={reduced} compact />
           </div>
-        </div>
-      </section>
+          <div className="relative z-10 mx-auto max-w-3xl">
+            <p className="text-[10px] font-bold uppercase tracking-[0.34em] text-orange-300">
+              Fogo sob comando
+            </p>
+            <h2 className="mt-4 max-w-[16ch] font-display text-[clamp(2.6rem,10vw,3.5rem)] uppercase leading-[0.88]">
+              Três desejos. Nenhum espaço morto.
+            </h2>
+            <p className="mt-4 max-w-xl text-sm leading-6 text-orange-50/70">
+              Role, toque e escolha. Cada desejo entra em cena com calor próprio.
+            </p>
+
+            <div className="mt-28 space-y-5 sm:mt-32">
+              {items.map((product, index) => (
+                <FireScene
+                  key={product.id}
+                  product={product}
+                  storeSlug={store.slug}
+                  index={index}
+                  reduced={reduced}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+        <BrasaBurgerStory />
+      </>
     );
   }
 
   const current = items[active] ?? items[0];
 
   return (
-    <section
-      ref={sectionRef}
-      data-testid="restaurant-fire-deck"
-      className="relative h-[132svh] border-y border-orange-300/15 bg-[#120603] text-white"
-    >
-      <div className="sticky top-16 h-[calc(100svh-4rem)] overflow-hidden">
-        <motion.div
-          aria-hidden="true"
-          className="absolute inset-0"
-          style={{
-            opacity: heat,
-            backgroundImage:
-              "radial-gradient(circle at 66% 60%, rgba(255,91,31,.58), transparent 29%), radial-gradient(circle at 28% 86%, rgba(255,184,55,.25), transparent 27%)",
-          }}
-        />
-        <div className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(rgba(255,255,255,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.06)_1px,transparent_1px)] [background-size:58px_58px]" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-56 opacity-90">
-          <FireRibbon reduced={reduced} />
-        </div>
-
-        <div className="relative mx-auto grid h-full max-w-[94rem] items-center gap-8 px-6 lg:grid-cols-[.72fr_1.28fr] lg:px-12">
-          <div className="relative z-30">
-            <p className="text-[10px] font-bold uppercase tracking-[0.38em] text-orange-300">
-              <Flame className="mr-2 inline h-4 w-4" /> Câmara de desejo · 0{active + 1}
-            </p>
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={current.id}
-                initial={{ opacity: 0, x: -24, filter: "blur(7px)" }}
-                animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, x: 16, filter: "blur(5px)" }}
-                transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <h2 className="mt-4 max-w-[15ch] font-display text-[clamp(2.6rem,5.2vw,5.5rem)] uppercase leading-[0.86] tracking-[-0.03em]">
-                  {current.name}
-                </h2>
-                <p className="mt-5 max-w-lg text-base leading-7 text-orange-50/78">
-                  {current.description}
-                </p>
-                <div className="mt-5 flex flex-wrap items-center gap-5">
-                  <strong className="text-3xl text-orange-200">
-                    {brl(current.salePrice ?? current.price)}
-                  </strong>
-                  <span className="inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.26em] text-orange-200/70">
-                    <Gauge className="h-4 w-4" /> calor {38 + active * 19}%
-                  </span>
-                </div>
-                <Link
-                  to="/demo/$storeSlug/produto/$productSlug"
-                  params={{ storeSlug: store.slug, productSlug: current.slug }}
-                  className="mt-6 inline-flex min-h-13 items-center gap-3 border border-orange-300/35 bg-orange-500 px-6 text-[10px] font-bold uppercase tracking-[0.24em] text-[#160703] transition hover:bg-orange-300"
-                >
-                  Abrir pedido <ArrowRight className="h-4 w-4" />
-                </Link>
-              </motion.div>
-            </AnimatePresence>
-
-            <div className="mt-7 flex items-center gap-3">
-              {items.map((product, index) => {
-                const targetProgress = items.length === 3 ? [0.05, 0.25, 0.52][index] : index * 0.34;
-                return (
-                  <button
-                    key={product.id}
-                    type="button"
-                    onClick={() => {
-                      const top = sectionRef.current?.offsetTop ?? 0;
-                      const travel = Math.max(
-                        0,
-                        (sectionRef.current?.offsetHeight ?? 0) - window.innerHeight,
-                      );
-                      window.scrollTo({
-                        top: top + travel * targetProgress,
-                        behavior: "smooth",
-                      });
-                    }}
-                    aria-label={`Mostrar ${product.name}`}
-                    aria-pressed={index === active}
-                    className={`h-1.5 transition-all duration-300 ${index === active ? "w-16 bg-orange-300" : "w-7 bg-white/20"}`}
-                  />
-                );
-              })}
-              <span className="ml-2 inline-flex items-center gap-2 text-[8px] uppercase tracking-[0.24em] text-white/42">
-                <Hand className="h-3.5 w-3.5" /> role para atiçar
-              </span>
-            </div>
+    <>
+      <section
+        ref={sectionRef}
+        data-testid="restaurant-fire-deck"
+        className="relative h-[132svh] border-y border-orange-300/15 bg-[#120603] text-white"
+      >
+        <div className="sticky top-16 h-[calc(100svh-4rem)] overflow-hidden">
+          <motion.div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              opacity: heat,
+              backgroundImage:
+                "radial-gradient(circle at 66% 60%, rgba(255,91,31,.58), transparent 29%), radial-gradient(circle at 28% 86%, rgba(255,184,55,.25), transparent 27%)",
+            }}
+          />
+          <div className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(rgba(255,255,255,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.06)_1px,transparent_1px)] [background-size:58px_58px]" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-56 opacity-90">
+            <FireRibbon reduced={reduced} />
           </div>
 
-          <motion.div
-            className="relative z-10 h-[62vh] min-h-[29rem] max-h-[43rem]"
-            style={{ scale: stageScale }}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.article
-                key={current.id}
-                initial={{ opacity: 0, x: 72, scale: 0.95, rotateY: -5, filter: "blur(8px)" }}
-                animate={{ opacity: 1, x: 0, scale: 1, rotateY: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, x: -54, scale: 0.97, rotateY: 4, filter: "blur(6px)" }}
-                transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-                className="absolute inset-[7%_17%] overflow-hidden border border-orange-200/25 bg-black shadow-[0_42px_110px_rgba(0,0,0,.68)]"
-                style={{ transformStyle: "preserve-3d" }}
-              >
-                <motion.img
-                  src={current.images[0]}
-                  alt={current.name}
-                  className="h-full w-full object-cover"
-                  initial={{ scale: 1.04 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#120603] via-transparent to-orange-200/[0.05]" />
+          <div className="relative mx-auto grid h-full max-w-[94rem] items-center gap-8 px-6 lg:grid-cols-[.72fr_1.28fr] lg:px-12">
+            <div className="relative z-30">
+              <p className="text-[10px] font-bold uppercase tracking-[0.38em] text-orange-300">
+                <Flame className="mr-2 inline h-4 w-4" /> Câmara de desejo · 0{active + 1}
+              </p>
+              <AnimatePresence mode="wait" initial={false}>
                 <motion.div
-                  aria-hidden
-                  className="absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-orange-200/20 to-transparent blur-xl"
-                  animate={{ x: ["0%", "420%"] }}
-                  transition={{ duration: 2.6, repeat: Number.POSITIVE_INFINITY, repeatDelay: 0.8, ease: "easeInOut" }}
-                />
-                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6">
-                  <div>
-                    <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-orange-300">
-                      Brasa 0{active + 1}
-                    </p>
-                    <p className="mt-2 max-w-[14ch] font-display text-3xl uppercase leading-none">
-                      {current.name}
-                    </p>
+                  key={current.id}
+                  initial={{ opacity: 0, x: -24, filter: "blur(7px)" }}
+                  animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, x: 16, filter: "blur(5px)" }}
+                  transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <h2 className="mt-4 max-w-[15ch] font-display text-[clamp(2.6rem,5.2vw,5.5rem)] uppercase leading-[0.86] tracking-[-0.03em]">
+                    {current.name}
+                  </h2>
+                  <p className="mt-5 max-w-lg text-base leading-7 text-orange-50/78">
+                    {current.description}
+                  </p>
+                  <div className="mt-5 flex flex-wrap items-center gap-5">
+                    <strong className="text-3xl text-orange-200">
+                      {brl(current.salePrice ?? current.price)}
+                    </strong>
+                    <span className="inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.26em] text-orange-200/70">
+                      <Gauge className="h-4 w-4" /> calor {38 + active * 19}%
+                    </span>
                   </div>
-                  <strong className="text-lg text-orange-100">
-                    {brl(current.salePrice ?? current.price)}
-                  </strong>
-                </div>
-              </motion.article>
-            </AnimatePresence>
-          </motion.div>
+                  <Link
+                    to="/demo/$storeSlug/produto/$productSlug"
+                    params={{ storeSlug: store.slug, productSlug: current.slug }}
+                    className="mt-6 inline-flex min-h-13 items-center gap-3 border border-orange-300/35 bg-orange-500 px-6 text-[10px] font-bold uppercase tracking-[0.24em] text-[#160703] transition hover:bg-orange-300"
+                  >
+                    Abrir pedido <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </motion.div>
+              </AnimatePresence>
+
+              <div className="mt-7 flex items-center gap-3">
+                {items.map((product, index) => {
+                  const targetProgress = items.length === 3 ? [0.05, 0.25, 0.52][index] : index * 0.34;
+                  return (
+                    <button
+                      key={product.id}
+                      type="button"
+                      onClick={() => {
+                        const top = sectionRef.current?.offsetTop ?? 0;
+                        const travel = Math.max(
+                          0,
+                          (sectionRef.current?.offsetHeight ?? 0) - window.innerHeight,
+                        );
+                        window.scrollTo({
+                          top: top + travel * targetProgress,
+                          behavior: "smooth",
+                        });
+                      }}
+                      aria-label={`Mostrar ${product.name}`}
+                      aria-pressed={index === active}
+                      className={`h-1.5 transition-all duration-300 ${index === active ? "w-16 bg-orange-300" : "w-7 bg-white/20"}`}
+                    />
+                  );
+                })}
+                <span className="ml-2 inline-flex items-center gap-2 text-[8px] uppercase tracking-[0.24em] text-white/42">
+                  <Hand className="h-3.5 w-3.5" /> role para atiçar
+                </span>
+              </div>
+            </div>
+
+            <motion.div
+              className="relative z-10 h-[62vh] min-h-[29rem] max-h-[43rem]"
+              style={{ scale: stageScale }}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.article
+                  key={current.id}
+                  initial={{ opacity: 0, x: 72, scale: 0.95, rotateY: -5, filter: "blur(8px)" }}
+                  animate={{ opacity: 1, x: 0, scale: 1, rotateY: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, x: -54, scale: 0.97, rotateY: 4, filter: "blur(6px)" }}
+                  transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute inset-[7%_17%] overflow-hidden border border-orange-200/25 bg-black shadow-[0_42px_110px_rgba(0,0,0,.68)]"
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+                  <motion.img
+                    src={current.images[0]}
+                    alt={current.name}
+                    className="h-full w-full object-cover"
+                    initial={{ scale: 1.04 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#120603] via-transparent to-orange-200/[0.05]" />
+                  <motion.div
+                    aria-hidden
+                    className="absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-orange-200/20 to-transparent blur-xl"
+                    animate={{ x: ["0%", "420%"] }}
+                    transition={{ duration: 2.6, repeat: Number.POSITIVE_INFINITY, repeatDelay: 0.8, ease: "easeInOut" }}
+                  />
+                  <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6">
+                    <div>
+                      <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-orange-300">
+                        Brasa 0{active + 1}
+                      </p>
+                      <p className="mt-2 max-w-[14ch] font-display text-3xl uppercase leading-none">
+                        {current.name}
+                      </p>
+                    </div>
+                    <strong className="text-lg text-orange-100">
+                      {brl(current.salePrice ?? current.price)}
+                    </strong>
+                  </div>
+                </motion.article>
+              </AnimatePresence>
+            </motion.div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+      <BrasaBurgerStory />
+    </>
   );
 }
 
