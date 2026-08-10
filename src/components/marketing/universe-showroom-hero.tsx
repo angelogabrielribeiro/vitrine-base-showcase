@@ -118,10 +118,40 @@ export function UniverseShowroomHero({
     <section
       id="inicio"
       className="vb-hero-shell relative isolate scroll-mt-20 overflow-hidden border-b border-white/10"
-      style={{ ["--vb-universe" as string]: active.accent }}
+      onPointerMove={(event) => {
+        if (event.pointerType !== "mouse") return;
+        const rect = event.currentTarget.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width;
+        const y = (event.clientY - rect.top) / rect.height;
+        event.currentTarget.style.setProperty("--sav-x", `${x * 100}%`);
+        event.currentTarget.style.setProperty("--sav-y", `${y * 100}%`);
+        event.currentTarget.style.setProperty("--sav-tilt-x", `${(x - 0.5) * 10}deg`);
+        event.currentTarget.style.setProperty("--sav-tilt-y", `${(0.5 - y) * 8}deg`);
+      }}
+      onPointerLeave={(event) => {
+        event.currentTarget.style.setProperty("--sav-x", "22%");
+        event.currentTarget.style.setProperty("--sav-y", "24%");
+        event.currentTarget.style.setProperty("--sav-tilt-x", "0deg");
+        event.currentTarget.style.setProperty("--sav-tilt-y", "0deg");
+      }}
+      style={{
+        ["--vb-universe" as string]: active.accent,
+        ["--sav-x" as string]: "22%",
+        ["--sav-y" as string]: "24%",
+        ["--sav-tilt-x" as string]: "0deg",
+        ["--sav-tilt-y" as string]: "0deg",
+      }}
     >
       <div aria-hidden="true" className="vb-noise absolute inset-0 opacity-30" />
       <div aria-hidden="true" className="vb-hero-grid absolute inset-0" />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 transition-[background] duration-300"
+        style={{
+          background:
+            "radial-gradient(circle at var(--sav-x) var(--sav-y), rgba(82,119,255,.2), transparent 22%)",
+        }}
+      />
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -left-[8vw] top-[6%] h-[28rem] w-[28rem] rounded-full bg-[#315cff]/16 blur-[120px] sm:h-[36rem] sm:w-[36rem]"
@@ -129,10 +159,34 @@ export function UniverseShowroomHero({
       <motion.div
         aria-hidden="true"
         className="pointer-events-none absolute -left-[0.04em] top-[7%] select-none font-display text-[clamp(7rem,23vw,22rem)] font-black leading-none tracking-[-0.09em] text-[#5277ff]/[0.035]"
-        animate={motionDisabled ? undefined : { x: [0, 18, 0], opacity: [0.7, 1, 0.7] }}
-        transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+        animate={
+          motionDisabled
+            ? undefined
+            : { x: [0, 18, -8, 0], y: [0, -8, 6, 0], opacity: [0.65, 1, 0.78, 0.65] }
+        }
+        transition={{ duration: 12, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
       >
         SAV
+      </motion.div>
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-[8%] top-[16%] hidden h-64 w-64 rounded-full border border-[#6284ff]/10 lg:block"
+        animate={motionDisabled ? undefined : { rotate: 360, scale: [0.96, 1.04, 0.96] }}
+        transition={{
+          rotate: { duration: 26, repeat: Number.POSITIVE_INFINITY, ease: "linear" },
+          scale: { duration: 5, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" },
+        }}
+      >
+        {[0, 1, 2].map((index) => (
+          <span
+            key={index}
+            className="absolute h-2 w-2 rounded-full bg-[#7898ff] shadow-[0_0_18px_rgba(120,152,255,.8)]"
+            style={{
+              left: `${50 + Math.cos((index * Math.PI * 2) / 3) * 49}%`,
+              top: `${50 + Math.sin((index * Math.PI * 2) / 3) * 49}%`,
+            }}
+          />
+        ))}
       </motion.div>
       <motion.div
         aria-hidden="true"
@@ -157,18 +211,42 @@ export function UniverseShowroomHero({
             initial={motionDisabled ? false : { opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
-            className="mb-7 flex max-w-2xl items-center gap-4 rounded-[1.4rem] border border-[#6d8aff]/25 bg-[#315cff]/[0.07] p-3.5 pr-5 shadow-[0_20px_70px_-36px_rgba(49,92,255,.75)] backdrop-blur-xl sm:w-fit"
+            className="mb-7"
           >
-            <span className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl border border-[#7898ff]/45 bg-[#315cff]/15 shadow-[inset_0_0_30px_rgba(82,119,255,.12)]">
-              <span className="absolute inset-0 bg-[radial-gradient(circle_at_35%_20%,rgba(151,173,255,.28),transparent_58%)]" />
-              <span className="relative font-display text-sm font-black tracking-[-0.06em] text-[#a7b9ff]">SAV</span>
-            </span>
-            <span className="min-w-0">
-              <span className="block font-display text-sm font-bold tracking-[0.2em] text-white">SAV DIGITAL</span>
-              <span className="mt-1.5 block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#92a9ff]">
-                Sites que atraem. Anúncios que vendem.
+            <div
+              className="group relative flex max-w-2xl items-center gap-4 overflow-hidden rounded-[1.4rem] border border-[#6d8aff]/25 bg-[#315cff]/[0.07] p-3.5 pr-5 shadow-[0_20px_70px_-36px_rgba(49,92,255,.75)] backdrop-blur-xl transition-transform duration-200 ease-out sm:w-fit"
+              style={{
+                transform:
+                  "perspective(900px) rotateX(var(--sav-tilt-y)) rotateY(var(--sav-tilt-x)) translateZ(0)",
+              }}
+            >
+              <motion.span
+                aria-hidden="true"
+                className="pointer-events-none absolute -left-1/3 top-0 h-full w-1/3 skew-x-[-18deg] bg-gradient-to-r from-transparent via-[#9eb3ff]/15 to-transparent"
+                animate={motionDisabled ? undefined : { x: ["0%", "430%"] }}
+                transition={{ duration: 3.8, repeat: Number.POSITIVE_INFINITY, repeatDelay: 1.7 }}
+              />
+              <span className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl border border-[#7898ff]/45 bg-[#315cff]/15 shadow-[inset_0_0_30px_rgba(82,119,255,.12)]">
+                <motion.span
+                  aria-hidden="true"
+                  className="absolute inset-1 rounded-xl border border-dashed border-[#8ca5ff]/25"
+                  animate={motionDisabled ? undefined : { rotate: 360 }}
+                  transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                />
+                <span className="absolute inset-0 bg-[radial-gradient(circle_at_35%_20%,rgba(151,173,255,.28),transparent_58%)]" />
+                <span className="relative font-display text-sm font-black tracking-[-0.06em] text-[#a7b9ff]">
+                  SAV
+                </span>
               </span>
-            </span>
+              <span className="min-w-0">
+                <span className="block font-display text-sm font-bold tracking-[0.2em] text-white">
+                  SAV DIGITAL
+                </span>
+                <span className="mt-1.5 block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#92a9ff]">
+                  Sites que atraem. Anúncios que vendem.
+                </span>
+              </span>
+            </div>
           </motion.div>
 
           <div className="mb-6 grid max-w-xl grid-cols-3 gap-2">
@@ -182,10 +260,33 @@ export function UniverseShowroomHero({
                 initial={motionDisabled ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.42, delay: 0.12 + index * 0.07 }}
-                className="flex items-center gap-2 rounded-xl border border-white/8 bg-black/20 px-3 py-2.5"
+                whileHover={
+                  motionDisabled
+                    ? undefined
+                    : {
+                        y: -6,
+                        scale: 1.035,
+                        borderColor: "rgba(118,148,255,.52)",
+                        boxShadow: "0 16px 42px -24px rgba(82,119,255,.9)",
+                      }
+                }
+                whileTap={motionDisabled ? undefined : { scale: 0.98 }}
+                className="flex items-center gap-2 rounded-xl border border-white/8 bg-black/20 px-3 py-2.5 backdrop-blur-sm"
               >
-                <span className="font-display text-base font-black text-[#7694ff]">{letter}</span>
-                <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-white/48">{label}</span>
+                <motion.span
+                  className="font-display text-base font-black text-[#7694ff]"
+                  animate={
+                    motionDisabled
+                      ? undefined
+                      : { textShadow: ["0 0 0 rgba(118,148,255,0)", "0 0 16px rgba(118,148,255,.85)", "0 0 0 rgba(118,148,255,0)"] }
+                  }
+                  transition={{ duration: 3.2, repeat: Number.POSITIVE_INFINITY, delay: index * 0.4 }}
+                >
+                  {letter}
+                </motion.span>
+                <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-white/48">
+                  {label}
+                </span>
               </motion.div>
             ))}
           </div>
@@ -319,7 +420,7 @@ export function UniverseShowroomHero({
                   rel="noreferrer"
                   className="vb-button-secondary inline-flex min-h-12 items-center justify-center gap-2 px-5 py-3 text-sm"
                 >
-                  Criar com a SAV
+                  Falar com a SAV no Instagram
                   <MessageCircle className="h-4 w-4" aria-hidden="true" />
                 </a>
               </div>
