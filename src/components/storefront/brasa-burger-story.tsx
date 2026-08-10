@@ -17,11 +17,13 @@ const BURGER_LAYERS = [
     label: "Base",
     src: "https://v3b.fal.media/files/b/0aa5b9a0/Qx-bWKmP021LefLh3ViAl_8CMLkq2hB5tQTy1ZLgy2R.png",
     closedY: 116,
-    openY: 290,
-    openX: -22,
-    openRotate: -4.2,
-    openScale: 0.98,
-    depth: -46,
+    openY: 255,
+    openX: -34,
+    openRotate: -7.5,
+    openScale: 0.96,
+    depth: -54,
+    parallaxX: 8,
+    parallaxY: 5,
     zIndex: 10,
   },
   {
@@ -29,23 +31,27 @@ const BURGER_LAYERS = [
     label: "Blend",
     src: "https://v3b.fal.media/files/b/0aa5b99f/ZH1l075aBM_oDvwREea9e_ip9W6DFnkPUm4Mz-Tref_.png",
     closedY: 62,
-    openY: 132,
-    openX: 20,
-    openRotate: 4.1,
-    openScale: 1.035,
-    depth: 14,
+    openY: 112,
+    openX: 34,
+    openRotate: 6.5,
+    openScale: 1.03,
+    depth: 10,
+    parallaxX: 7,
+    parallaxY: 5,
     zIndex: 20,
   },
   {
     key: "cheese",
     label: "Cheddar",
-    src: "https://v3b.fal.media/files/b/0aa5ba89/GAaxqyUxFNBy81Wpz7bJV_result.png",
+    src: "https://v3b.fal.media/files/b/0aa5baef/UiSDYUW--EtWWZi10ZON2_result.png",
     closedY: 18,
-    openY: -8,
-    openX: -26,
-    openRotate: -5.4,
-    openScale: 1.055,
+    openY: -12,
+    openX: -40,
+    openRotate: -8.5,
+    openScale: 1.08,
     depth: 34,
+    parallaxX: 10,
+    parallaxY: 7,
     zIndex: 30,
   },
   {
@@ -53,11 +59,13 @@ const BURGER_LAYERS = [
     label: "Frescor",
     src: "https://v3b.fal.media/files/b/0aa5b98c/GSNF9d8Qh5gUBTDYTLuUh_vchTMr2kmHJT4Q0AIWKCO.png",
     closedY: -30,
-    openY: -148,
-    openX: 28,
-    openRotate: 5.2,
-    openScale: 1.035,
-    depth: 48,
+    openY: -120,
+    openX: 36,
+    openRotate: 7.5,
+    openScale: 1.04,
+    depth: 54,
+    parallaxX: 12,
+    parallaxY: 8,
     zIndex: 40,
   },
   {
@@ -65,11 +73,13 @@ const BURGER_LAYERS = [
     label: "Brioche",
     src: "https://v3b.fal.media/files/b/0aa5b98b/9hR0QNSNdsz6KArQieq___UOVKK7esieHIXgT7A2rsP.png",
     closedY: -104,
-    openY: -300,
-    openX: -20,
-    openRotate: -5.6,
-    openScale: 1.06,
-    depth: 68,
+    openY: -255,
+    openX: -30,
+    openRotate: -7.5,
+    openScale: 1.07,
+    depth: 78,
+    parallaxX: 15,
+    parallaxY: 10,
     zIndex: 50,
   },
 ] as const;
@@ -88,7 +98,7 @@ const PHASES = [
   {
     kicker: "03 · Explosão",
     title: "Agora a Brasa se desmonta de verdade.",
-    body: "Brioche, frescor, cheddar, blend e base se afastam com força. A leitura continua vertical, mas deixa de parecer uma microanimação.",
+    body: "Brioche, frescor, cheddar, blend e base se afastam com força. A câmera recua enquanto a montagem abre para manter o exploded view inteiro no quadro.",
   },
   {
     kicker: "04 · Assinatura",
@@ -116,19 +126,23 @@ export function BrasaBurgerStory() {
 
   const burgerProgress = useTransform(
     scrollYProgress,
-    [0, 0.12, 0.25, 0.65, 0.86, 1],
-    [0, 0, 0.08, 0.8, 1, 1],
+    [0, 0.1, 0.22, 0.58, 0.82, 1],
+    [0, 0, 0.08, 0.72, 1, 1],
     { clamp: true },
   );
-  const sceneRotateY = useTransform(pointerX, [-1, 1], reduceMotion ? [0, 0] : [-5.5, 5.5]);
-  const sceneRotateX = useTransform(pointerY, [-1, 1], reduceMotion ? [0, 0] : [3, -3]);
-  const sceneX = useTransform(pointerX, [-1, 1], reduceMotion ? [0, 0] : [-10, 10]);
-  const sceneY = useTransform(pointerY, [-1, 1], reduceMotion ? [0, 0] : [-7, 7]);
-  const sceneScale = useTransform(burgerProgress, [0, 0.35, 1], [0.98, 1.01, 1.035]);
-  const glowScale = useTransform(burgerProgress, [0, 0.5, 1], [0.82, 1.04, 1.22]);
-  const glowOpacity = useTransform(burgerProgress, [0, 0.45, 1], [0.2, 0.4, 0.62]);
-  const shadowScale = useTransform(burgerProgress, [0, 0.45, 1], [0.7, 0.94, 1.3]);
-  const shadowOpacity = useTransform(burgerProgress, [0, 0.55, 1], [0.56, 0.43, 0.26]);
+  const sceneRotateY = useTransform(pointerX, [-1, 1], reduceMotion ? [0, 0] : [-7, 7]);
+  const sceneRotateX = useTransform(pointerY, [-1, 1], reduceMotion ? [0, 0] : [4, -4]);
+  const sceneX = useTransform(pointerX, [-1, 1], reduceMotion ? [0, 0] : [-14, 14]);
+  const sceneY = useTransform(pointerY, [-1, 1], reduceMotion ? [0, 0] : [-9, 9]);
+  const sceneScale = useTransform(
+    burgerProgress,
+    [0, 0.22, 0.52, 0.82, 1],
+    [0.98, 1, 0.94, 0.82, 0.78],
+  );
+  const glowScale = useTransform(burgerProgress, [0, 0.5, 1], [0.82, 1.08, 1.28]);
+  const glowOpacity = useTransform(burgerProgress, [0, 0.45, 1], [0.2, 0.44, 0.68]);
+  const shadowScale = useTransform(burgerProgress, [0, 0.45, 1], [0.7, 0.98, 1.32]);
+  const shadowOpacity = useTransform(burgerProgress, [0, 0.55, 1], [0.56, 0.4, 0.24]);
 
   useMotionValueEvent(scrollYProgress, "change", (value) => {
     const next = phaseFromProgress(value);
@@ -158,7 +172,7 @@ export function BrasaBurgerStory() {
           style={{ scaleX: burgerProgress }}
         />
 
-        <div className="absolute inset-x-0 bottom-7 top-[28%] sm:top-[25%] lg:inset-y-0 lg:left-[37%] lg:right-[2%]">
+        <div className="absolute inset-x-0 bottom-7 top-[27%] sm:top-[23%] lg:inset-y-0 lg:left-[37%] lg:right-[2%]">
           <motion.div
             aria-hidden="true"
             className="absolute inset-[8%] rounded-[50%] bg-[radial-gradient(circle,rgba(244,102,33,.34)_0%,rgba(244,102,33,.14)_38%,transparent_72%)] blur-3xl"
@@ -167,7 +181,7 @@ export function BrasaBurgerStory() {
           <motion.div
             className="absolute inset-0 flex items-center justify-center"
             style={{
-              perspective: 1400,
+              perspective: 1500,
               rotateX: sceneRotateX,
               rotateY: sceneRotateY,
               x: sceneX,
@@ -183,7 +197,14 @@ export function BrasaBurgerStory() {
                 style={{ scaleX: shadowScale, opacity: shadowOpacity }}
               />
               {BURGER_LAYERS.map((layer) => (
-                <PhotoBurgerLayer key={layer.key} layer={layer} progress={burgerProgress} />
+                <PhotoBurgerLayer
+                  key={layer.key}
+                  layer={layer}
+                  progress={burgerProgress}
+                  pointerX={pointerX}
+                  pointerY={pointerY}
+                  reduceMotion={reduceMotion}
+                />
               ))}
             </div>
           </motion.div>
@@ -278,33 +299,47 @@ export function BrasaBurgerStory() {
 
 type Layer = (typeof BURGER_LAYERS)[number];
 
-function PhotoBurgerLayer({ layer, progress }: { layer: Layer; progress: MotionValue<number> }) {
+type PhotoBurgerLayerProps = {
+  layer: Layer;
+  progress: MotionValue<number>;
+  pointerX: MotionValue<number>;
+  pointerY: MotionValue<number>;
+  reduceMotion: boolean;
+};
+
+function PhotoBurgerLayer({
+  layer,
+  progress,
+  pointerX,
+  pointerY,
+  reduceMotion,
+}: PhotoBurgerLayerProps) {
   const travelY = layer.openY - layer.closedY;
   const y = useTransform(
     progress,
-    [0, 0.12, 0.38, 0.72, 1],
+    [0, 0.08, 0.3, 0.62, 1],
     [
       layer.closedY,
-      layer.closedY + travelY * 0.04,
-      layer.closedY + travelY * 0.28,
-      layer.closedY + travelY * 0.82,
+      layer.closedY + travelY * 0.02,
+      layer.closedY + travelY * 0.22,
+      layer.closedY + travelY * 0.74,
       layer.openY,
     ],
   );
   const x = useTransform(
     progress,
-    [0, 0.12, 0.38, 0.72, 1],
-    [0, layer.openX * 0.05, layer.openX * 0.3, layer.openX * 0.78, layer.openX],
+    [0, 0.08, 0.3, 0.62, 1],
+    [0, layer.openX * 0.03, layer.openX * 0.24, layer.openX * 0.72, layer.openX],
   );
   const rotate = useTransform(
     progress,
-    [0, 0.12, 0.38, 0.72, 1],
-    [0, layer.openRotate * 0.05, layer.openRotate * 0.28, layer.openRotate * 0.8, layer.openRotate],
+    [0, 0.08, 0.3, 0.62, 1],
+    [0, layer.openRotate * 0.03, layer.openRotate * 0.22, layer.openRotate * 0.72, layer.openRotate],
   );
   const z = useTransform(
     progress,
-    [0, 0.12, 0.38, 0.72, 1],
-    [0, layer.depth * 0.04, layer.depth * 0.26, layer.depth * 0.78, layer.depth],
+    [0, 0.08, 0.3, 0.62, 1],
+    [0, layer.depth * 0.03, layer.depth * 0.24, layer.depth * 0.74, layer.depth],
   );
   const scale = useTransform(
     progress,
@@ -312,15 +347,31 @@ function PhotoBurgerLayer({ layer, progress }: { layer: Layer; progress: MotionV
     [1, 1, 1 + (layer.openScale - 1) * 0.45, layer.openScale],
   );
   const opacity = useTransform(progress, [0, 0.04, 1], [0.98, 1, 1]);
+  const pointerLayerX = useTransform(
+    pointerX,
+    [-1, 1],
+    reduceMotion ? [0, 0] : [-layer.parallaxX, layer.parallaxX],
+  );
+  const pointerLayerY = useTransform(
+    pointerY,
+    [-1, 1],
+    reduceMotion ? [0, 0] : [layer.parallaxY, -layer.parallaxY],
+  );
+  const pointerRotateY = useTransform(
+    pointerX,
+    [-1, 1],
+    reduceMotion ? [0, 0] : [-layer.parallaxX * 0.18, layer.parallaxX * 0.18],
+  );
+  const pointerRotateX = useTransform(
+    pointerY,
+    [-1, 1],
+    reduceMotion ? [0, 0] : [layer.parallaxY * 0.14, -layer.parallaxY * 0.14],
+  );
 
   return (
-    <motion.img
-      src={layer.src}
-      alt=""
+    <motion.div
       aria-hidden="true"
-      draggable={false}
-      decoding="async"
-      className="pointer-events-none absolute left-1/2 top-1/2 h-auto w-[95%] -ml-[47.5%] -mt-[47.5%] select-none object-contain [filter:drop-shadow(0_22px_28px_rgba(0,0,0,.32))]"
+      className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[95%] -ml-[47.5%] -mt-[47.5%] select-none"
       style={{
         y,
         x,
@@ -332,6 +383,22 @@ function PhotoBurgerLayer({ layer, progress }: { layer: Layer; progress: MotionV
         transformStyle: "preserve-3d",
         willChange: "transform",
       }}
-    />
+    >
+      <motion.img
+        src={layer.src}
+        alt=""
+        draggable={false}
+        decoding="async"
+        className="h-full w-full object-contain [filter:drop-shadow(0_22px_28px_rgba(0,0,0,.32))]"
+        style={{
+          x: pointerLayerX,
+          y: pointerLayerY,
+          rotateX: pointerRotateX,
+          rotateY: pointerRotateY,
+          transformStyle: "preserve-3d",
+          willChange: "transform",
+        }}
+      />
+    </motion.div>
   );
 }
