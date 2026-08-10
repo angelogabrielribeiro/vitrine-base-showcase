@@ -38,10 +38,10 @@ const BURGER_LAYERS: Layer3D[] = [
     mtl: "https://v3b.fal.media/files/b/0aa5bc39/k__sqzPd1N06zYxVOWro-_material.mtl",
     targetSize: 2.72,
     closed: [0, -1.34, 0],
-    open: [-0.5, -3.0, -0.62],
-    openRotation: [-0.18, -0.2, -0.08],
+    open: [-0.72, -3.05, -1.05],
+    openRotation: [-0.24, -0.48, -0.14],
     delay: 0.03,
-    parallax: 0.11,
+    parallax: 0.14,
     roughness: 0.62,
   },
   {
@@ -51,10 +51,10 @@ const BURGER_LAYERS: Layer3D[] = [
     mtl: "https://v3b.fal.media/files/b/0aa5bc38/eklM6XDuNtK0jEPuiU_yG_material.mtl",
     targetSize: 2.72,
     closed: [0, -0.55, 0.04],
-    open: [0.42, -1.08, 0.28],
-    openRotation: [0.14, 0.24, 0.08],
+    open: [0.58, -1.18, 0.42],
+    openRotation: [0.2, 0.42, 0.14],
     delay: 0.13,
-    parallax: 0.14,
+    parallax: 0.17,
     roughness: 0.76,
   },
   {
@@ -64,10 +64,10 @@ const BURGER_LAYERS: Layer3D[] = [
     mtl: "https://v3b.fal.media/files/b/0aa5bc37/hi3d6OHV_y6SX3Y_p9-NU_material.mtl",
     targetSize: 2.88,
     closed: [0, 0.02, 0.1],
-    open: [-0.62, 0.18, 0.96],
-    openRotation: [-0.2, -0.2, -0.24],
-    delay: 0.18,
-    parallax: 0.18,
+    open: [-0.82, 0.12, 1.25],
+    openRotation: [-0.28, -0.52, -0.34],
+    delay: 0.19,
+    parallax: 0.22,
     roughness: 0.48,
   },
   {
@@ -77,10 +77,10 @@ const BURGER_LAYERS: Layer3D[] = [
     mtl: "https://v3b.fal.media/files/b/0aa5bc3d/s6hp4ZxEBLbble1_R13sP_material.mtl",
     targetSize: 2.8,
     closed: [0, 0.58, 0.12],
-    open: [0.62, 1.78, 0.7],
-    openRotation: [0.12, 0.3, 0.18],
-    delay: 0.09,
-    parallax: 0.22,
+    open: [0.9, 1.72, 0.95],
+    openRotation: [0.18, 0.58, 0.28],
+    delay: 0.08,
+    parallax: 0.26,
     roughness: 0.68,
   },
   {
@@ -90,41 +90,41 @@ const BURGER_LAYERS: Layer3D[] = [
     mtl: "https://v3b.fal.media/files/b/0aa5bc36/-WPBmwpxYDxM-QPhmnxLt_material.mtl",
     targetSize: 2.92,
     closed: [0, 1.45, 0.08],
-    open: [-0.42, 3.48, 1.08],
-    openRotation: [-0.24, -0.24, -0.14],
+    open: [-0.7, 2.92, 1.5],
+    openRotation: [-0.3, -0.82, -0.24],
     delay: 0.01,
-    parallax: 0.26,
+    parallax: 0.32,
     roughness: 0.58,
   },
 ];
 
 const PHASES = [
   {
-    kicker: "01 · Fechado",
-    title: "Primeiro você vê a mordida.",
-    body: "O burger entra montado como um único objeto. Luz, sombra e câmera já tratam cada ingrediente como volume real.",
+    kicker: "01 · Brasa baixa",
+    title: "Primeiro, a silhueta.",
+    body: "O burger entra quase no escuro. A estrutura existe, mas a luz ainda segura o sabor antes da abertura.",
   },
   {
-    kicker: "02 · Pressão",
-    title: "A estrutura começa a ceder.",
-    body: "O brioche abre primeiro, a base responde e as camadas ganham profundidade antes da explosão principal.",
+    kicker: "02 · Ignição",
+    title: "A mordida começa a acender.",
+    body: "Enquanto as peças cedem, a luz ganha temperatura, revela os materiais e empurra cada camada para fora do eixo.",
   },
   {
     kicker: "03 · Explosão 3D",
     title: "Agora a Brasa sai do plano.",
-    body: "As cinco peças se separam nos eixos X, Y e Z. A câmera recua, a luz reage ao mouse e o volume permanece inteiro no quadro.",
+    body: "Brioche, frescor, cheddar, blend e base abrem em X, Y e Z com rotação maior, profundidade e câmera recuando junto.",
   },
   {
-    kicker: "04 · Assinatura",
-    title: "Tudo aberto. Tudo em profundidade.",
-    body: "O exploded view segura a composição final com espaço, sombra e perspectiva suficientes para ler cada ingrediente como objeto.",
+    kicker: "04 · Brasa aberta",
+    title: "Tudo aceso. Tudo em profundidade.",
+    body: "A composição segura o exploded view iluminado por mais tempo, com cada ingrediente legível e inteiro dentro do quadro.",
   },
 ] as const;
 
 function phaseFromProgress(value: number) {
-  if (value < 0.08) return 0;
-  if (value < 0.42) return 1;
-  if (value < 0.84) return 2;
+  if (value < 0.12) return 0;
+  if (value < 0.46) return 1;
+  if (value < 0.86) return 2;
   return 3;
 }
 
@@ -141,10 +141,12 @@ export function BrasaBurgerStory() {
 
   const burgerProgress = useTransform(
     scrollYProgress,
-    [0, 0.08, 0.18, 0.56, 0.84, 1],
-    [0, 0, 0.12, 0.78, 1, 1],
+    [0, 0.11, 0.26, 0.64, 0.9, 1],
+    [0, 0, 0.08, 0.62, 1, 1],
     { clamp: true },
   );
+  const glowOpacity = useTransform(burgerProgress, [0, 0.35, 0.72, 1], [0.08, 0.16, 0.32, 0.48]);
+  const glowScale = useTransform(burgerProgress, [0, 0.55, 1], [0.78, 0.98, 1.18]);
 
   useEffect(() => {
     const target = sectionRef.current;
@@ -177,16 +179,21 @@ export function BrasaBurgerStory() {
     <section
       ref={sectionRef}
       aria-labelledby="brasa-burger-story-title"
-      className="relative h-[320svh] border-y border-orange-200/10 bg-[#0d0806] sm:h-[310svh] lg:h-[300svh]"
+      className="relative h-[355svh] border-y border-orange-200/10 bg-[#0d0806] sm:h-[345svh] lg:h-[335svh]"
     >
       <div className="sticky top-16 h-[calc(100svh-4rem)] overflow-hidden">
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-[radial-gradient(circle_at_73%_47%,rgba(241,90,36,.24),transparent_29%),radial-gradient(circle_at_48%_91%,rgba(255,155,65,.1),transparent_35%),linear-gradient(140deg,#090605_0%,#180c07_48%,#0b0705_100%)]"
+          className="absolute inset-0 bg-[radial-gradient(circle_at_73%_47%,rgba(241,90,36,.16),transparent_30%),radial-gradient(circle_at_48%_91%,rgba(255,155,65,.07),transparent_36%),linear-gradient(140deg,#070504_0%,#130a06_48%,#090605_100%)]"
         />
         <div
           aria-hidden="true"
           className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.025)_1px,transparent_1px)] [background-size:54px_54px]"
+        />
+        <motion.div
+          aria-hidden="true"
+          className="absolute inset-[4%] rounded-[50%] bg-[radial-gradient(circle,rgba(244,102,33,.35)_0%,rgba(244,102,33,.14)_40%,transparent_72%)] blur-3xl"
+          style={{ opacity: glowOpacity, scale: glowScale }}
         />
         <motion.div
           aria-hidden="true"
@@ -195,10 +202,6 @@ export function BrasaBurgerStory() {
         />
 
         <div className="absolute inset-x-0 bottom-8 top-[29%] sm:top-[24%] lg:inset-y-0 lg:left-[37%] lg:right-[1%]">
-          <div
-            aria-hidden="true"
-            className="absolute inset-[5%] rounded-[50%] bg-[radial-gradient(circle,rgba(244,102,33,.28)_0%,rgba(244,102,33,.12)_39%,transparent_70%)] blur-3xl"
-          />
           {mountScene ? (
             <BurgerCanvas
               progress={burgerProgress}
@@ -234,7 +237,7 @@ export function BrasaBurgerStory() {
                 initial={reduceMotion ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={reduceMotion ? undefined : { opacity: 0, y: -9 }}
-                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
                 className="mt-4 max-w-lg sm:mt-6"
               >
                 <p className="text-[9px] font-black uppercase tracking-[0.28em] text-orange-400 sm:text-[10px]">
@@ -275,7 +278,7 @@ export function BrasaBurgerStory() {
           <div className="self-end pb-8 text-right lg:self-center lg:pb-0">
             <div className="ml-auto hidden w-fit items-center gap-2 text-[9px] font-bold uppercase tracking-[0.22em] text-orange-100/40 sm:inline-flex">
               <MousePointer2 className="h-3.5 w-3.5 text-orange-400" />
-              Mouse move a luz e a câmera · scroll explode em 3D
+              Mouse move a luz e a câmera · scroll acende e explode em 3D
             </div>
           </div>
         </div>
@@ -314,34 +317,22 @@ function BurgerCanvas(props: SceneProps) {
       <Canvas
         dpr={[1, 1.65]}
         shadows
-        camera={{ position: [0, 0.15, 7.8], fov: 34, near: 0.1, far: 80 }}
+        camera={{ position: [0, -0.05, 8.15], fov: 34, near: 0.1, far: 80 }}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         onCreated={({ gl }) => {
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = 1.16;
+          gl.toneMappingExposure = 0.72;
           gl.outputColorSpace = THREE.SRGBColorSpace;
         }}
       >
-        <ambientLight intensity={0.55} />
-        <hemisphereLight args={["#ffd2a8", "#190804", 1.35]} />
-        <directionalLight
-          castShadow
-          color="#ffd3aa"
-          intensity={4.2}
-          position={[4.5, 6.4, 5.2]}
-          shadow-mapSize-width={1024}
-          shadow-mapSize-height={1024}
-          shadow-bias={-0.0002}
-        />
-        <pointLight color="#f15a24" intensity={22} distance={11} position={[-3.2, 0.6, 3.4]} />
-        <ReactiveKeyLight pointerX={props.pointerX} pointerY={props.pointerY} />
+        <AnimatedLighting {...props} />
         <Suspense fallback={null}>
           <BurgerAssembly {...props} />
           <ContactShadows
-            position={[0, -3.75, 0]}
-            opacity={0.5}
-            scale={9}
-            blur={2.7}
+            position={[0, -3.8, 0]}
+            opacity={0.52}
+            scale={9.5}
+            blur={2.8}
             far={8}
             resolution={512}
             color="#080302"
@@ -369,7 +360,7 @@ function BurgerAssembly(props: SceneProps) {
   const viewportWidth = useThree((state) => state.size.width);
   const compact = viewportWidth < 720;
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     const group = groupRef.current;
     if (!group) return;
 
@@ -377,12 +368,30 @@ function BurgerAssembly(props: SceneProps) {
     const px = props.reduceMotion ? 0 : props.pointerX.get();
     const py = props.reduceMotion ? 0 : props.pointerY.get();
     const openEase = THREE.MathUtils.smootherstep(p, 0.08, 1);
-    const targetScale = (compact ? 0.72 : 0.96) * THREE.MathUtils.lerp(1, 0.92, openEase);
+    const targetScale = (compact ? 0.7 : 0.94) * THREE.MathUtils.lerp(1, 0.86, openEase);
+    const cinematicSpin = THREE.MathUtils.smootherstep(p, 0.2, 0.92);
+    const breathe = props.reduceMotion ? 0 : Math.sin(state.clock.elapsedTime * 0.75) * 0.018 * openEase;
 
-    group.rotation.y = THREE.MathUtils.damp(group.rotation.y, -0.08 + px * 0.19, 5, delta);
-    group.rotation.x = THREE.MathUtils.damp(group.rotation.x, py * -0.075, 5, delta);
-    group.rotation.z = THREE.MathUtils.damp(group.rotation.z, px * 0.025, 5, delta);
-    const scale = THREE.MathUtils.damp(group.scale.x, targetScale, 5, delta);
+    group.position.y = THREE.MathUtils.damp(group.position.y, -0.22 - openEase * 0.12 + breathe, 4.5, delta);
+    group.rotation.y = THREE.MathUtils.damp(
+      group.rotation.y,
+      -0.12 + cinematicSpin * 0.68 + px * 0.24,
+      4.6,
+      delta,
+    );
+    group.rotation.x = THREE.MathUtils.damp(
+      group.rotation.x,
+      -0.025 + cinematicSpin * 0.08 - py * 0.09,
+      4.8,
+      delta,
+    );
+    group.rotation.z = THREE.MathUtils.damp(
+      group.rotation.z,
+      Math.sin(cinematicSpin * Math.PI) * 0.08 + px * 0.035,
+      4.6,
+      delta,
+    );
+    const scale = THREE.MathUtils.damp(group.scale.x, targetScale, 4.5, delta);
     group.scale.setScalar(scale);
   });
 
@@ -405,7 +414,7 @@ function IngredientLayer({
 }: SceneProps & { layer: Layer3D }) {
   const groupRef = useRef<THREE.Group>(null);
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     const group = groupRef.current;
     if (!group) return;
 
@@ -414,28 +423,54 @@ function IngredientLayer({
     const e = THREE.MathUtils.smootherstep(raw, 0, 1);
     const px = reduceMotion ? 0 : pointerX.get();
     const py = reduceMotion ? 0 : pointerY.get();
-    const pointerStrength = (0.22 + e * 0.78) * layer.parallax;
+    const pointerStrength = (0.2 + e * 0.8) * layer.parallax;
+    const floatPhase = state.clock.elapsedTime * (1.05 + layer.delay) + layer.delay * 18;
+    const floatY = reduceMotion ? 0 : Math.sin(floatPhase) * 0.055 * e;
+    const floatR = reduceMotion ? 0 : Math.cos(floatPhase * 0.88) * 0.028 * e;
 
     const x = THREE.MathUtils.lerp(layer.closed[0], layer.open[0], e) + px * pointerStrength;
-    const y = THREE.MathUtils.lerp(layer.closed[1], layer.open[1], e) - py * pointerStrength * 0.62;
-    const z = THREE.MathUtils.lerp(layer.closed[2], layer.open[2], e) + Math.abs(px) * pointerStrength * 0.28;
+    const y = THREE.MathUtils.lerp(layer.closed[1], layer.open[1], e) - py * pointerStrength * 0.65 + floatY;
+    const z = THREE.MathUtils.lerp(layer.closed[2], layer.open[2], e) + Math.abs(px) * pointerStrength * 0.38;
 
-    group.position.x = THREE.MathUtils.damp(group.position.x, x, 6.2, delta);
-    group.position.y = THREE.MathUtils.damp(group.position.y, y, 6.2, delta);
-    group.position.z = THREE.MathUtils.damp(group.position.z, z, 6.2, delta);
-    group.rotation.x = THREE.MathUtils.damp(group.rotation.x, layer.openRotation[0] * e - py * 0.035, 6, delta);
-    group.rotation.y = THREE.MathUtils.damp(group.rotation.y, layer.openRotation[1] * e + px * 0.05, 6, delta);
-    group.rotation.z = THREE.MathUtils.damp(group.rotation.z, layer.openRotation[2] * e + px * 0.02, 6, delta);
+    group.position.x = THREE.MathUtils.damp(group.position.x, x, 5.2, delta);
+    group.position.y = THREE.MathUtils.damp(group.position.y, y, 5.2, delta);
+    group.position.z = THREE.MathUtils.damp(group.position.z, z, 5.2, delta);
+    group.rotation.x = THREE.MathUtils.damp(
+      group.rotation.x,
+      layer.openRotation[0] * e - py * 0.045 + floatR,
+      5,
+      delta,
+    );
+    group.rotation.y = THREE.MathUtils.damp(
+      group.rotation.y,
+      layer.openRotation[1] * e + px * 0.075 - floatR * 0.5,
+      5,
+      delta,
+    );
+    group.rotation.z = THREE.MathUtils.damp(
+      group.rotation.z,
+      layer.openRotation[2] * e + px * 0.03 + floatR,
+      5,
+      delta,
+    );
   });
 
   return (
     <group ref={groupRef} position={layer.closed}>
-      <NormalizedIngredient layer={layer} />
+      <NormalizedIngredient layer={layer} progress={progress} reduceMotion={reduceMotion} />
     </group>
   );
 }
 
-function NormalizedIngredient({ layer }: { layer: Layer3D }) {
+function NormalizedIngredient({
+  layer,
+  progress,
+  reduceMotion,
+}: {
+  layer: Layer3D;
+  progress: MotionValue<number>;
+  reduceMotion: boolean;
+}) {
   const materials = useLoader(MTLLoader, layer.mtl);
   materials.preload();
   const loaded = useLoader(OBJLoader, layer.obj, (loader) => {
@@ -467,6 +502,10 @@ function NormalizedIngredient({ layer }: { layer: Layer3D }) {
           roughness: layer.roughness,
         });
 
+        material.userData.baseColor = material.color.clone();
+        material.emissive = new THREE.Color("#3b1005");
+        material.emissiveIntensity = 0.01;
+
         if (material.map) {
           material.map.colorSpace = THREE.SRGBColorSpace;
           material.map.anisotropy = maxAnisotropy;
@@ -489,47 +528,132 @@ function NormalizedIngredient({ layer }: { layer: Layer3D }) {
     return clone;
   }, [gl, layer.roughness, layer.targetSize, loaded]);
 
+  useFrame(() => {
+    const p = reduceMotion ? 1 : progress.get();
+    const ignition = THREE.MathUtils.smootherstep(p, 0.04, 0.88);
+    const brightness = THREE.MathUtils.lerp(0.38, 1.08, ignition);
+    const emissive = THREE.MathUtils.lerp(0.005, 0.16, ignition);
+
+    object.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return;
+      const mats = Array.isArray(child.material) ? child.material : [child.material];
+      mats.forEach((mat) => {
+        if (!(mat instanceof THREE.MeshStandardMaterial)) return;
+        const baseColor = mat.userData.baseColor as THREE.Color | undefined;
+        if (baseColor) mat.color.copy(baseColor).multiplyScalar(brightness);
+        mat.emissiveIntensity = emissive;
+        mat.roughness = THREE.MathUtils.lerp(layer.roughness + 0.12, Math.max(0.32, layer.roughness - 0.05), ignition);
+      });
+    });
+  });
+
   return <primitive object={object} />;
+}
+
+function AnimatedLighting({ progress, pointerX, pointerY, reduceMotion }: SceneProps) {
+  const ambientRef = useRef<THREE.AmbientLight>(null);
+  const hemisphereRef = useRef<THREE.HemisphereLight>(null);
+  const directionalRef = useRef<THREE.DirectionalLight>(null);
+  const emberRef = useRef<THREE.PointLight>(null);
+  const keyRef = useRef<THREE.PointLight>(null);
+  const gl = useThree((state) => state.gl);
+
+  useFrame((_, delta) => {
+    const p = reduceMotion ? 1 : progress.get();
+    const e = THREE.MathUtils.smootherstep(p, 0.04, 0.9);
+    const px = reduceMotion ? 0 : pointerX.get();
+    const py = reduceMotion ? 0 : pointerY.get();
+
+    if (ambientRef.current) {
+      ambientRef.current.intensity = THREE.MathUtils.damp(
+        ambientRef.current.intensity,
+        THREE.MathUtils.lerp(0.1, 0.72, e),
+        4.2,
+        delta,
+      );
+    }
+    if (hemisphereRef.current) {
+      hemisphereRef.current.intensity = THREE.MathUtils.damp(
+        hemisphereRef.current.intensity,
+        THREE.MathUtils.lerp(0.18, 1.65, e),
+        4.2,
+        delta,
+      );
+    }
+    if (directionalRef.current) {
+      directionalRef.current.intensity = THREE.MathUtils.damp(
+        directionalRef.current.intensity,
+        THREE.MathUtils.lerp(0.85, 5.4, e),
+        4.2,
+        delta,
+      );
+    }
+    if (emberRef.current) {
+      emberRef.current.intensity = THREE.MathUtils.damp(
+        emberRef.current.intensity,
+        THREE.MathUtils.lerp(2.5, 30, e),
+        4.2,
+        delta,
+      );
+    }
+    if (keyRef.current) {
+      keyRef.current.intensity = THREE.MathUtils.damp(
+        keyRef.current.intensity,
+        THREE.MathUtils.lerp(3, 24, e),
+        4.2,
+        delta,
+      );
+      keyRef.current.position.x = THREE.MathUtils.damp(keyRef.current.position.x, 2.7 + px * 2.4, 5, delta);
+      keyRef.current.position.y = THREE.MathUtils.damp(keyRef.current.position.y, 2.8 - py * 1.6, 5, delta);
+    }
+
+    gl.toneMappingExposure = THREE.MathUtils.damp(
+      gl.toneMappingExposure,
+      THREE.MathUtils.lerp(0.68, 1.32, e),
+      3.8,
+      delta,
+    );
+  });
+
+  return (
+    <>
+      <ambientLight ref={ambientRef} intensity={0.1} />
+      <hemisphereLight ref={hemisphereRef} args={["#ffd2a8", "#140603", 0.18]} />
+      <directionalLight
+        ref={directionalRef}
+        castShadow
+        color="#ffd3aa"
+        intensity={0.85}
+        position={[4.5, 6.4, 5.2]}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+        shadow-bias={-0.0002}
+      />
+      <pointLight ref={emberRef} color="#f15a24" intensity={2.5} distance={12} position={[-3.2, 0.6, 3.4]} />
+      <pointLight ref={keyRef} color="#ffb16a" intensity={3} distance={11} position={[2.7, 2.8, 3.8]} />
+    </>
+  );
 }
 
 function CameraRig({ progress, pointerX, pointerY, reduceMotion }: SceneProps) {
   const { camera } = useThree();
-  const lookTarget = useMemo(() => new THREE.Vector3(0, 0.12, 0), []);
+  const lookTarget = useMemo(() => new THREE.Vector3(0, -0.08, 0), []);
 
   useFrame((_, delta) => {
     const p = reduceMotion ? 0 : progress.get();
     const px = reduceMotion ? 0 : pointerX.get();
     const py = reduceMotion ? 0 : pointerY.get();
-    const e = THREE.MathUtils.smootherstep(p, 0.14, 1);
-    const targetZ = THREE.MathUtils.lerp(7.8, 10.65, e);
+    const e = THREE.MathUtils.smootherstep(p, 0.12, 1);
+    const orbit = Math.sin(e * Math.PI) * 0.48;
+    const targetZ = THREE.MathUtils.lerp(8.15, 12.25, e);
 
-    camera.position.x = THREE.MathUtils.damp(camera.position.x, px * 0.42, 4.2, delta);
-    camera.position.y = THREE.MathUtils.damp(camera.position.y, 0.12 - py * 0.24, 4.2, delta);
-    camera.position.z = THREE.MathUtils.damp(camera.position.z, targetZ, 4.2, delta);
+    camera.position.x = THREE.MathUtils.damp(camera.position.x, px * 0.48 + orbit, 3.8, delta);
+    camera.position.y = THREE.MathUtils.damp(camera.position.y, -0.02 - py * 0.26 - e * 0.08, 3.8, delta);
+    camera.position.z = THREE.MathUtils.damp(camera.position.z, targetZ, 3.8, delta);
     camera.lookAt(lookTarget);
   });
 
   return null;
-}
-
-function ReactiveKeyLight({
-  pointerX,
-  pointerY,
-}: {
-  pointerX: MotionValue<number>;
-  pointerY: MotionValue<number>;
-}) {
-  const lightRef = useRef<THREE.PointLight>(null);
-
-  useFrame((_, delta) => {
-    const light = lightRef.current;
-    if (!light) return;
-
-    light.position.x = THREE.MathUtils.damp(light.position.x, 2.7 + pointerX.get() * 2.1, 5, delta);
-    light.position.y = THREE.MathUtils.damp(light.position.y, 2.8 - pointerY.get() * 1.4, 5, delta);
-  });
-
-  return <pointLight ref={lightRef} color="#ffb16a" intensity={18} distance={10} position={[2.7, 2.8, 3.8]} />;
 }
 
 function DepthRings({
@@ -551,24 +675,24 @@ function DepthRings({
     const inner = innerRef.current;
 
     if (outer) {
-      outer.rotation.z = THREE.MathUtils.damp(outer.rotation.z, p * 0.65 + px * 0.12, 2.8, delta);
-      outer.rotation.y = THREE.MathUtils.damp(outer.rotation.y, px * 0.08, 2.8, delta);
+      outer.rotation.z = THREE.MathUtils.damp(outer.rotation.z, p * 1.1 + px * 0.18, 2.4, delta);
+      outer.rotation.y = THREE.MathUtils.damp(outer.rotation.y, px * 0.13 + p * 0.12, 2.4, delta);
     }
     if (inner) {
-      inner.rotation.z = THREE.MathUtils.damp(inner.rotation.z, -p * 0.9 - px * 0.16, 2.8, delta);
-      inner.rotation.x = THREE.MathUtils.damp(inner.rotation.x, 0.18 + p * 0.08, 2.8, delta);
+      inner.rotation.z = THREE.MathUtils.damp(inner.rotation.z, -p * 1.45 - px * 0.22, 2.4, delta);
+      inner.rotation.x = THREE.MathUtils.damp(inner.rotation.x, 0.18 + p * 0.16, 2.4, delta);
     }
   });
 
   return (
-    <group position={[0, 0.12, -2.35]}>
+    <group position={[0, -0.02, -2.55]}>
       <mesh ref={outerRef} scale={[1.08, 1.08, 1]}>
         <torusGeometry args={[3.45, 0.012, 8, 128]} />
-        <meshBasicMaterial color="#f15a24" transparent opacity={0.2} depthWrite={false} />
+        <meshBasicMaterial color="#f15a24" transparent opacity={0.22} depthWrite={false} />
       </mesh>
       <mesh ref={innerRef} rotation={[0.18, 0.08, 0]}>
         <torusGeometry args={[2.78, 0.009, 8, 128]} />
-        <meshBasicMaterial color="#ffb25b" transparent opacity={0.12} depthWrite={false} />
+        <meshBasicMaterial color="#ffb25b" transparent opacity={0.14} depthWrite={false} />
       </mesh>
     </group>
   );
