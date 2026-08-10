@@ -16,10 +16,10 @@ import {
 } from "lucide-react";
 import { whatsappUrl } from "@/lib/whatsapp";
 
-const INSTAGRAM_URL = "https://www.instagram.com/angelo.sem.acento/";
+const INSTAGRAM_URL = "https://www.instagram.com/savdigital.br/";
 const PROPOSAL_URL = whatsappUrl(
   "5511987201816",
-  "Olá, Angelo! Vi os planos da Vitrine Base e quero conversar sobre um projeto para o meu negócio.",
+  "Olá! Vi os planos da SAV Digital na Vitrine Base e quero conversar sobre um projeto para o meu negócio.",
 );
 
 type CardData = {
@@ -194,24 +194,38 @@ export function PricingPageV4() {
     <div className="min-h-screen overflow-x-clip bg-[#05070a] text-white">
       <header className="sticky top-0 z-40 border-b border-white/10 bg-[#05070a]/90 backdrop-blur-xl">
         <div className="mx-auto flex min-h-16 max-w-6xl items-center justify-between gap-4 px-4">
-          <Link to="/" className="font-semibold tracking-[0.2em] text-amber-300">VITRINE BASE</Link>
-          <a href={PROPOSAL_URL} target="_blank" rel="noreferrer" className="rounded-full border border-cyan-300/30 bg-cyan-300/10 px-4 py-2 text-xs font-semibold text-cyan-100">
-            Falar no WhatsApp
+          <Link to="/" aria-label="SAV Digital — voltar para a Vitrine Base" className="group flex items-center gap-3">
+            <span className="grid h-9 w-9 place-items-center rounded-xl border border-[#6e8cff]/45 bg-[#315cff]/10 font-display text-[10px] font-black text-[#96acff] shadow-[0_0_28px_rgba(49,92,255,.12)] transition group-hover:border-[#8aa4ff]/80 group-hover:shadow-[0_0_30px_rgba(49,92,255,.3)]">
+              SAV
+            </span>
+            <span className="leading-none">
+              <span className="block font-display text-xs font-bold tracking-[0.16em] text-white">SAV DIGITAL</span>
+              <span className="mt-1 block text-[8px] font-semibold uppercase tracking-[0.18em] text-white/36">Vitrine Base · Planos</span>
+            </span>
+          </Link>
+          <a href={PROPOSAL_URL} target="_blank" rel="noreferrer" className="rounded-full border border-[#6e8cff]/35 bg-[#315cff]/10 px-4 py-2 text-xs font-semibold text-[#c8d3ff] transition hover:border-[#8aa4ff]/65 hover:bg-[#315cff]/16">
+            Falar com a SAV
           </a>
         </div>
       </header>
 
       <main>
         <section className="relative overflow-hidden border-b border-white/10 px-4 py-24 sm:py-32">
-          <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(34,211,238,.14),transparent_35%),radial-gradient(circle_at_80%_75%,rgba(251,191,36,.1),transparent_32%)]" />
+          <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(49,92,255,.24),transparent_38%),radial-gradient(circle_at_82%_76%,rgba(34,211,238,.1),transparent_34%)]" />
+          <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-5 -translate-x-1/2 select-none font-display text-[clamp(8rem,28vw,22rem)] font-black leading-none tracking-[-0.1em] text-[#5073ff]/[0.035]">SAV</div>
           <div className="relative mx-auto max-w-5xl text-center">
-            <Link to="/" className="inline-flex items-center gap-2 text-xs text-white/48"><ArrowLeft className="h-4 w-4" />Voltar às demonstrações</Link>
-            <p className="mt-10 text-xs font-bold uppercase tracking-[0.26em] text-cyan-200">Preço claro · infraestrutura só quando precisa</p>
+            <Link to="/" className="inline-flex items-center gap-2 text-xs text-white/48"><ArrowLeft className="h-4 w-4" />Voltar à Vitrine Base</Link>
+            <div className="mx-auto mt-10 flex w-fit items-center gap-3 rounded-full border border-[#6e8cff]/25 bg-[#315cff]/[0.07] px-4 py-2.5 backdrop-blur-xl">
+              <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9db1ff]">SAV Digital</span>
+              <span className="h-1 w-1 rounded-full bg-[#7694ff]" />
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/42">Sites · Anúncios · Vendas</span>
+            </div>
+            <p className="mt-6 text-xs font-bold uppercase tracking-[0.26em] text-cyan-200">Preço claro · infraestrutura só quando precisa</p>
             <h1 className="mx-auto mt-6 max-w-4xl font-display text-5xl font-semibold leading-[0.95] tracking-[-0.055em] sm:text-7xl">
               Site vitrine pode ficar sem mensalidade. Sistema com dados usa infraestrutura de produção.
             </h1>
             <p className="mx-auto mt-7 max-w-3xl text-base leading-8 text-white/60">
-              Criação e infraestrutura são coisas diferentes. Você só paga backend recorrente quando o projeto realmente depende dele para funcionar.
+              A SAV Digital separa criação, operação e crescimento para você pagar somente pelo que o projeto realmente precisa.
             </p>
           </div>
         </section>
@@ -267,7 +281,7 @@ export function PricingPageV4() {
             <div className="mx-auto max-w-3xl text-center">
               <p className="text-xs font-bold uppercase tracking-[0.26em] text-cyan-200">Segurança</p>
               <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.04em] sm:text-6xl">Operação real não depende de free tier.</h2>
-              <p className="mt-5 text-sm leading-7 text-white/55">Quando houver dados privados, login ou painel, usamos backend de produção, políticas de acesso e segredos fora do navegador. Dados brutos de cartão não ficam armazenados pela Vitrine Base.</p>
+              <p className="mt-5 text-sm leading-7 text-white/55">Quando houver dados privados, login ou painel, usamos backend de produção, políticas de acesso e segredos fora do navegador. Dados brutos de cartão não ficam armazenados pela SAV Digital.</p>
             </div>
             <div className="mt-12 grid gap-5 md:grid-cols-3">
               {[
@@ -301,15 +315,17 @@ export function PricingPageV4() {
         </section>
 
         <section className="px-4 pb-24 text-center">
-          <div className="mx-auto max-w-4xl rounded-[2rem] border border-white/10 bg-white/[0.035] p-8 sm:p-12">
-            <Sparkles className="mx-auto h-5 w-5 text-amber-300" />
-            <h2 className="mt-5 font-display text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Primeiro entendemos o negócio. Depois escolhemos a estrutura certa.</h2>
+          <div className="mx-auto max-w-4xl rounded-[2rem] border border-[#6e8cff]/20 bg-[radial-gradient(circle_at_50%_0%,rgba(49,92,255,.12),transparent_48%),rgba(255,255,255,.035)] p-8 sm:p-12">
+            <Sparkles className="mx-auto h-5 w-5 text-[#91a8ff]" />
+            <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.24em] text-[#8fa7ff]">SAV Digital</p>
+            <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Primeiro entendemos o negócio. Depois escolhemos a estrutura certa.</h2>
+            <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-white/52">Sites, mensuração e operação podem trabalhar juntos. Gestão de anúncios é opcional e contratada separadamente quando fizer sentido para o negócio.</p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <a href={PROPOSAL_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-cyan-300 px-6 py-3 text-sm font-semibold text-slate-950">
-                Conversar pelo WhatsApp <MessageCircle className="h-4 w-4" />
+              <a href={PROPOSAL_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#6f8dff] px-6 py-3 text-sm font-semibold text-[#05070a] transition hover:bg-[#8aa4ff]">
+                Conversar com a SAV <MessageCircle className="h-4 w-4" />
               </a>
-              <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center gap-2 rounded-full border border-white/15 px-6 py-3 text-sm text-white/70">
-                Ver Instagram <Instagram className="h-4 w-4" />
+              <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center gap-2 rounded-full border border-white/15 px-6 py-3 text-sm text-white/70 transition hover:border-[#6e8cff]/45 hover:text-white">
+                @savdigital.br <Instagram className="h-4 w-4" />
               </a>
             </div>
           </div>
