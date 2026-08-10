@@ -5,15 +5,11 @@ import { Suspense, useMemo, useRef } from "react";
 import * as THREE from "three";
 
 const MODEL_URLS = {
-  top: "https://v3b.fal.media/files/b/0aa5b85d/efnjRD9rC8BihXV6bStxA_UQfgLRXxntmc6O2QDUbEu_model.glb",
-  greens:
-    "https://v3b.fal.media/files/b/0aa5b85e/NToyFVwlbXRjPpIdiGIsb_37sy1SV6ig5NQ_OfpyDtL_model.glb",
-  cheese:
-    "https://v3b.fal.media/files/b/0aa5b84d/4IIW1F4pvFyfQH9a6UHhy_g3ywL0dct7bNLs-ZHx5PC_model.glb",
-  patty:
-    "https://v3b.fal.media/files/b/0aa5b860/PzhQOaqe6U41y2nCYKPxj_Pxf2r6yu1nIX2qHpCvt4__model.glb",
-  bottom:
-    "https://v3b.fal.media/files/b/0aa5b861/v8r81xb0cuD0d1qA0jZZn_usLS-Zo4GERmI1pCn7vwh_model.glb",
+  top: "https://v3b.fal.media/files/b/0aa5b90a/_yTuGk25g3FLoLcqiHRJk_model.glb",
+  greens: "https://v3b.fal.media/files/b/0aa5b8ff/tEhNTxccJiIYtwTj4t_P7_model.glb",
+  cheese: "https://v3b.fal.media/files/b/0aa5b8fa/gwA3NVHUkkTxlwnuzj9GO_model.glb",
+  patty: "https://v3b.fal.media/files/b/0aa5b90f/vvgLpjJwze4nx3n6tSkga_model.glb",
+  bottom: "https://v3b.fal.media/files/b/0aa5b90d/yKHi4cdHni8FCv5Zmk4Tb_model.glb",
 } as const;
 
 type BrasaBurgerCanvasProps = {
