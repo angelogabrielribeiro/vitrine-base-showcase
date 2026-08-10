@@ -122,6 +122,18 @@ export function UniverseShowroomHero({
     >
       <div aria-hidden="true" className="vb-noise absolute inset-0 opacity-30" />
       <div aria-hidden="true" className="vb-hero-grid absolute inset-0" />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-[8vw] top-[6%] h-[28rem] w-[28rem] rounded-full bg-[#315cff]/16 blur-[120px] sm:h-[36rem] sm:w-[36rem]"
+      />
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-[0.04em] top-[7%] select-none font-display text-[clamp(7rem,23vw,22rem)] font-black leading-none tracking-[-0.09em] text-[#5277ff]/[0.035]"
+        animate={motionDisabled ? undefined : { x: [0, 18, 0], opacity: [0.7, 1, 0.7] }}
+        transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+      >
+        SAV
+      </motion.div>
       <motion.div
         aria-hidden="true"
         className="absolute inset-0"
@@ -141,9 +153,46 @@ export function UniverseShowroomHero({
 
       <div className="relative mx-auto grid min-h-[calc(100svh-4rem)] max-w-[90rem] gap-12 px-5 py-14 sm:px-8 sm:py-16 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:px-12">
         <div className="relative z-20 max-w-3xl">
+          <motion.div
+            initial={motionDisabled ? false : { opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
+            className="mb-7 flex max-w-2xl items-center gap-4 rounded-[1.4rem] border border-[#6d8aff]/25 bg-[#315cff]/[0.07] p-3.5 pr-5 shadow-[0_20px_70px_-36px_rgba(49,92,255,.75)] backdrop-blur-xl sm:w-fit"
+          >
+            <span className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl border border-[#7898ff]/45 bg-[#315cff]/15 shadow-[inset_0_0_30px_rgba(82,119,255,.12)]">
+              <span className="absolute inset-0 bg-[radial-gradient(circle_at_35%_20%,rgba(151,173,255,.28),transparent_58%)]" />
+              <span className="relative font-display text-sm font-black tracking-[-0.06em] text-[#a7b9ff]">SAV</span>
+            </span>
+            <span className="min-w-0">
+              <span className="block font-display text-sm font-bold tracking-[0.2em] text-white">SAV DIGITAL</span>
+              <span className="mt-1.5 block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#92a9ff]">
+                Sites que atraem. Anúncios que vendem.
+              </span>
+            </span>
+          </motion.div>
+
+          <div className="mb-6 grid max-w-xl grid-cols-3 gap-2">
+            {[
+              ["S", "Sites"],
+              ["A", "Anúncios"],
+              ["V", "Vendas"],
+            ].map(([letter, label], index) => (
+              <motion.div
+                key={letter}
+                initial={motionDisabled ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.42, delay: 0.12 + index * 0.07 }}
+                className="flex items-center gap-2 rounded-xl border border-white/8 bg-black/20 px-3 py-2.5"
+              >
+                <span className="font-display text-base font-black text-[#7694ff]">{letter}</span>
+                <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-white/48">{label}</span>
+              </motion.div>
+            ))}
+          </div>
+
           <div className="flex flex-wrap items-center gap-3">
-            <span className="vb-kicker">Showroom de quatro universos</span>
-            <span className="h-px w-10 bg-vb-gold/60" aria-hidden="true" />
+            <span className="vb-kicker">Vitrine Base · Showcase SAV Digital</span>
+            <span className="h-px w-10 bg-[#6587ff]/70" aria-hidden="true" />
             <span className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
               Deslize, explore e entre
             </span>
@@ -157,8 +206,8 @@ export function UniverseShowroomHero({
           </h1>
 
           <p className="mt-6 max-w-xl text-base leading-8 text-white/64">
-            Quatro identidades, quatro formas de vender e operar. A experiência muda com a marca —
-            não é o mesmo template trocando de cor.
+            Uma seleção de experiências desenvolvidas pela SAV Digital. Quatro identidades, quatro
+            formas de vender e operar — sem repetir o mesmo template trocando de cor.
           </p>
 
           <AnimatePresence mode="wait">
@@ -270,7 +319,7 @@ export function UniverseShowroomHero({
                   rel="noreferrer"
                   className="vb-button-secondary inline-flex min-h-12 items-center justify-center gap-2 px-5 py-3 text-sm"
                 >
-                  Quero algo assim
+                  Criar com a SAV
                   <MessageCircle className="h-4 w-4" aria-hidden="true" />
                 </a>
               </div>
