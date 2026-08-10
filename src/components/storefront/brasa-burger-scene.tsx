@@ -183,7 +183,13 @@ function BurgerScene({
 
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -3.2, -0.3]} receiveShadow>
         <circleGeometry args={[compact ? 3.4 : 4.4, 64]} />
-        <meshStandardMaterial color="#160b06" roughness={0.92} metalness={0.04} transparent opacity={0.72} />
+        <meshStandardMaterial
+          color="#160b06"
+          roughness={0.92}
+          metalness={0.04}
+          transparent
+          opacity={0.72}
+        />
       </mesh>
     </>
   );
@@ -208,7 +214,9 @@ function BurgerLayer({
 
     const value = reduced ? 0.52 : progress.get();
     const open = THREE.MathUtils.smoothstep(value, 0.12, 0.72);
-    const breathing = reduced ? 0 : Math.sin(state.clock.elapsedTime * 0.75 + index * 0.7) * 0.018;
+    const breathing = reduced
+      ? 0
+      : Math.sin(state.clock.elapsedTime * 0.75 + index * 0.7) * 0.018;
     const targetY = config.baseY + config.explodeY * open + breathing;
 
     group.position.y = THREE.MathUtils.damp(group.position.y, targetY, 5.2, delta);
@@ -272,31 +280,59 @@ function FallbackBurger({
 
   return (
     <group ref={root}>
-      <group ref={(node) => { layerRefs.current[0] = node; }} position={[0, assembledY[0], 0]}>
+      <group
+        ref={(node) => {
+          layerRefs.current[0] = node;
+        }}
+        position={[0, assembledY[0], 0]}
+      >
         <mesh scale={[1.5, 0.3, 1.5]}>
-          <sphereGeometry args={[1, 48, 24, 0, Math.PI * 2, Math.PI * 0.42, Math.PI * 0.58]} />
+          <sphereGeometry
+            args={[1, 48, 24, 0, Math.PI * 2, Math.PI * 0.42, Math.PI * 0.58]}
+          />
           <meshStandardMaterial color="#d9863f" roughness={0.62} />
         </mesh>
       </group>
-      <group ref={(node) => { layerRefs.current[1] = node; }} position={[0, assembledY[1], 0]}>
+      <group
+        ref={(node) => {
+          layerRefs.current[1] = node;
+        }}
+        position={[0, assembledY[1], 0]}
+      >
         <mesh scale={[1.45, 0.3, 1.45]}>
           <cylinderGeometry args={[1, 1.05, 0.42, 48]} />
           <meshStandardMaterial color="#4b1f10" roughness={0.9} />
         </mesh>
       </group>
-      <group ref={(node) => { layerRefs.current[2] = node; }} position={[0, assembledY[2], 0]} rotation={[0, Math.PI / 4, 0]}>
+      <group
+        ref={(node) => {
+          layerRefs.current[2] = node;
+        }}
+        position={[0, assembledY[2], 0]}
+        rotation={[0, Math.PI / 4, 0]}
+      >
         <mesh scale={[1.72, 0.08, 1.72]}>
           <boxGeometry args={[1, 1, 1]} />
           <meshStandardMaterial color="#f7a21b" roughness={0.52} />
         </mesh>
       </group>
-      <group ref={(node) => { layerRefs.current[3] = node; }} position={[0, assembledY[3], 0]}>
+      <group
+        ref={(node) => {
+          layerRefs.current[3] = node;
+        }}
+        position={[0, assembledY[3], 0]}
+      >
         <mesh scale={[1.52, 0.14, 1.52]}>
           <torusGeometry args={[0.72, 0.32, 18, 64]} />
           <meshStandardMaterial color="#4d8d3f" roughness={0.82} />
         </mesh>
       </group>
-      <group ref={(node) => { layerRefs.current[4] = node; }} position={[0, assembledY[4], 0]}>
+      <group
+        ref={(node) => {
+          layerRefs.current[4] = node;
+        }}
+        position={[0, assembledY[4], 0]}
+      >
         <mesh scale={[1.55, 0.7, 1.55]}>
           <sphereGeometry args={[1, 64, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
           <meshStandardMaterial color="#d98a46" roughness={0.58} />
@@ -305,5 +341,3 @@ function FallbackBurger({
     </group>
   );
 }
-
-Object.values(MODEL_URLS).forEach((url) => useGLTF.preload(url));
