@@ -90,7 +90,7 @@ const BURGER_LAYERS: Layer3D[] = [
     mtl: "https://v3b.fal.media/files/b/0aa5bc36/-WPBmwpxYDxM-QPhmnxLt_material.mtl",
     targetSize: 2.92,
     closed: [0, 1.45, 0.08],
-    open: [-0.7, 2.92, 1.5],
+    open: [-0.7, 2.82, 1.5],
     openRotation: [-0.3, -0.82, -0.24],
     delay: 0.01,
     parallax: 0.32,
@@ -100,24 +100,24 @@ const BURGER_LAYERS: Layer3D[] = [
 
 const PHASES = [
   {
-    kicker: "01 · Brasa baixa",
-    title: "Primeiro, a silhueta.",
-    body: "O burger entra quase no escuro. A estrutura existe, mas a luz ainda segura o sabor antes da abertura.",
+    kicker: "01 · Fechado",
+    title: "Primeiro você vê a mordida.",
+    body: "O burger entra inteiro e já mostra as cores reais de cada ingrediente, com luz de estúdio e volume 3D.",
   },
   {
-    kicker: "02 · Ignição",
-    title: "A mordida começa a acender.",
-    body: "Enquanto as peças cedem, a luz ganha temperatura, revela os materiais e empurra cada camada para fora do eixo.",
+    kicker: "02 · Pressão",
+    title: "A estrutura começa a ceder.",
+    body: "Brioche, frescor, cheddar, blend e base começam a abrir sem perder a leitura natural dos materiais.",
   },
   {
     kicker: "03 · Explosão 3D",
     title: "Agora a Brasa sai do plano.",
-    body: "Brioche, frescor, cheddar, blend e base abrem em X, Y e Z com rotação maior, profundidade e câmera recuando junto.",
+    body: "As cinco peças abrem em X, Y e Z com rotação, profundidade, câmera recuando e cores próprias preservadas.",
   },
   {
-    kicker: "04 · Brasa aberta",
-    title: "Tudo aceso. Tudo em profundidade.",
-    body: "A composição segura o exploded view iluminado por mais tempo, com cada ingrediente legível e inteiro dentro do quadro.",
+    kicker: "04 · Assinatura",
+    title: "Tudo aberto. Tudo em profundidade.",
+    body: "No final a luz fica só um pouco mais quente, como fotografia de comida, sem pintar o burger inteiro de dourado.",
   },
 ] as const;
 
@@ -145,8 +145,8 @@ export function BrasaBurgerStory() {
     [0, 0, 0.08, 0.62, 1, 1],
     { clamp: true },
   );
-  const glowOpacity = useTransform(burgerProgress, [0, 0.35, 0.72, 1], [0.08, 0.16, 0.32, 0.48]);
-  const glowScale = useTransform(burgerProgress, [0, 0.55, 1], [0.78, 0.98, 1.18]);
+  const glowOpacity = useTransform(burgerProgress, [0, 0.5, 1], [0.16, 0.22, 0.3]);
+  const glowScale = useTransform(burgerProgress, [0, 0.55, 1], [0.86, 1, 1.12]);
 
   useEffect(() => {
     const target = sectionRef.current;
@@ -184,7 +184,7 @@ export function BrasaBurgerStory() {
       <div className="sticky top-16 h-[calc(100svh-4rem)] overflow-hidden">
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-[radial-gradient(circle_at_73%_47%,rgba(241,90,36,.16),transparent_30%),radial-gradient(circle_at_48%_91%,rgba(255,155,65,.07),transparent_36%),linear-gradient(140deg,#070504_0%,#130a06_48%,#090605_100%)]"
+          className="absolute inset-0 bg-[radial-gradient(circle_at_73%_47%,rgba(241,90,36,.18),transparent_30%),radial-gradient(circle_at_48%_91%,rgba(255,155,65,.08),transparent_36%),linear-gradient(140deg,#090605_0%,#160b07_48%,#0b0705_100%)]"
         />
         <div
           aria-hidden="true"
@@ -192,7 +192,7 @@ export function BrasaBurgerStory() {
         />
         <motion.div
           aria-hidden="true"
-          className="absolute inset-[4%] rounded-[50%] bg-[radial-gradient(circle,rgba(244,102,33,.35)_0%,rgba(244,102,33,.14)_40%,transparent_72%)] blur-3xl"
+          className="absolute inset-[4%] rounded-[50%] bg-[radial-gradient(circle,rgba(244,102,33,.3)_0%,rgba(244,102,33,.1)_42%,transparent_72%)] blur-3xl"
           style={{ opacity: glowOpacity, scale: glowScale }}
         />
         <motion.div
@@ -278,7 +278,7 @@ export function BrasaBurgerStory() {
           <div className="self-end pb-8 text-right lg:self-center lg:pb-0">
             <div className="ml-auto hidden w-fit items-center gap-2 text-[9px] font-bold uppercase tracking-[0.22em] text-orange-100/40 sm:inline-flex">
               <MousePointer2 className="h-3.5 w-3.5 text-orange-400" />
-              Mouse move a luz e a câmera · scroll acende e explode em 3D
+              Mouse move a luz e a câmera · scroll explode em 3D
             </div>
           </div>
         </div>
@@ -321,16 +321,16 @@ function BurgerCanvas(props: SceneProps) {
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         onCreated={({ gl }) => {
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = 0.72;
+          gl.toneMappingExposure = 1.06;
           gl.outputColorSpace = THREE.SRGBColorSpace;
         }}
       >
-        <AnimatedLighting {...props} />
+        <NaturalLighting {...props} />
         <Suspense fallback={null}>
           <BurgerAssembly {...props} />
           <ContactShadows
             position={[0, -3.8, 0]}
-            opacity={0.52}
+            opacity={0.48}
             scale={9.5}
             blur={2.8}
             far={8}
@@ -477,10 +477,12 @@ function NormalizedIngredient({
     loader.setMaterials(materials);
   });
   const gl = useThree((state) => state.gl);
+  const materialRefs = useRef<THREE.MeshStandardMaterial[]>([]);
 
   const object = useMemo(() => {
     const clone = loaded.clone(true);
     const maxAnisotropy = gl.capabilities.getMaxAnisotropy();
+    const collected: THREE.MeshStandardMaterial[] = [];
 
     clone.traverse((child) => {
       if (!(child instanceof THREE.Mesh)) return;
@@ -492,7 +494,7 @@ function NormalizedIngredient({
       const upgraded = sourceMaterials.map((source) => {
         const sourceMaterial = source as THREE.MeshPhongMaterial;
         const material = new THREE.MeshStandardMaterial({
-          color: sourceMaterial.color ?? new THREE.Color("white"),
+          color: sourceMaterial.color ? sourceMaterial.color.clone() : new THREE.Color("white"),
           map: sourceMaterial.map ?? null,
           transparent: sourceMaterial.transparent,
           opacity: sourceMaterial.opacity,
@@ -502,9 +504,8 @@ function NormalizedIngredient({
           roughness: layer.roughness,
         });
 
-        material.userData.baseColor = material.color.clone();
-        material.emissive = new THREE.Color("#3b1005");
-        material.emissiveIntensity = 0.01;
+        material.emissive.set("#000000");
+        material.emissiveIntensity = 0;
 
         if (material.map) {
           material.map.colorSpace = THREE.SRGBColorSpace;
@@ -512,6 +513,7 @@ function NormalizedIngredient({
           material.map.needsUpdate = true;
         }
 
+        collected.push(material);
         return material;
       });
 
@@ -525,49 +527,50 @@ function NormalizedIngredient({
     const longest = Math.max(size.x, size.y, size.z, 0.001);
     clone.scale.setScalar(layer.targetSize / longest);
 
+    materialRefs.current = collected;
     return clone;
   }, [gl, layer.roughness, layer.targetSize, loaded]);
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     const p = reduceMotion ? 1 : progress.get();
-    const ignition = THREE.MathUtils.smootherstep(p, 0.04, 0.88);
-    const brightness = THREE.MathUtils.lerp(0.38, 1.08, ignition);
-    const emissive = THREE.MathUtils.lerp(0.005, 0.16, ignition);
+    const finish = THREE.MathUtils.smootherstep(p, 0.68, 1);
 
-    object.traverse((child) => {
-      if (!(child instanceof THREE.Mesh)) return;
-      const mats = Array.isArray(child.material) ? child.material : [child.material];
-      mats.forEach((mat) => {
-        if (!(mat instanceof THREE.MeshStandardMaterial)) return;
-        const baseColor = mat.userData.baseColor as THREE.Color | undefined;
-        if (baseColor) mat.color.copy(baseColor).multiplyScalar(brightness);
-        mat.emissiveIntensity = emissive;
-        mat.roughness = THREE.MathUtils.lerp(layer.roughness + 0.12, Math.max(0.32, layer.roughness - 0.05), ignition);
-      });
+    materialRefs.current.forEach((material) => {
+      material.emissiveIntensity = 0;
+      material.roughness = THREE.MathUtils.damp(
+        material.roughness,
+        THREE.MathUtils.lerp(layer.roughness, Math.max(0.36, layer.roughness - 0.045), finish),
+        5,
+        delta,
+      );
     });
   });
 
   return <primitive object={object} />;
 }
 
-function AnimatedLighting({ progress, pointerX, pointerY, reduceMotion }: SceneProps) {
+function NaturalLighting({ progress, pointerX, pointerY, reduceMotion }: SceneProps) {
   const ambientRef = useRef<THREE.AmbientLight>(null);
   const hemisphereRef = useRef<THREE.HemisphereLight>(null);
   const directionalRef = useRef<THREE.DirectionalLight>(null);
   const emberRef = useRef<THREE.PointLight>(null);
   const keyRef = useRef<THREE.PointLight>(null);
   const gl = useThree((state) => state.gl);
+  const neutralDirectional = useMemo(() => new THREE.Color("#fff2e4"), []);
+  const warmDirectional = useMemo(() => new THREE.Color("#ffe1b8"), []);
+  const neutralKey = useMemo(() => new THREE.Color("#fff0de"), []);
+  const warmKey = useMemo(() => new THREE.Color("#ffd9ad"), []);
 
   useFrame((_, delta) => {
     const p = reduceMotion ? 1 : progress.get();
-    const e = THREE.MathUtils.smootherstep(p, 0.04, 0.9);
+    const finish = THREE.MathUtils.smootherstep(p, 0.62, 1);
     const px = reduceMotion ? 0 : pointerX.get();
     const py = reduceMotion ? 0 : pointerY.get();
 
     if (ambientRef.current) {
       ambientRef.current.intensity = THREE.MathUtils.damp(
         ambientRef.current.intensity,
-        THREE.MathUtils.lerp(0.1, 0.72, e),
+        THREE.MathUtils.lerp(0.72, 0.82, finish),
         4.2,
         delta,
       );
@@ -575,7 +578,7 @@ function AnimatedLighting({ progress, pointerX, pointerY, reduceMotion }: SceneP
     if (hemisphereRef.current) {
       hemisphereRef.current.intensity = THREE.MathUtils.damp(
         hemisphereRef.current.intensity,
-        THREE.MathUtils.lerp(0.18, 1.65, e),
+        THREE.MathUtils.lerp(1.35, 1.5, finish),
         4.2,
         delta,
       );
@@ -583,15 +586,16 @@ function AnimatedLighting({ progress, pointerX, pointerY, reduceMotion }: SceneP
     if (directionalRef.current) {
       directionalRef.current.intensity = THREE.MathUtils.damp(
         directionalRef.current.intensity,
-        THREE.MathUtils.lerp(0.85, 5.4, e),
+        THREE.MathUtils.lerp(4.1, 4.7, finish),
         4.2,
         delta,
       );
+      directionalRef.current.color.copy(neutralDirectional).lerp(warmDirectional, finish * 0.45);
     }
     if (emberRef.current) {
       emberRef.current.intensity = THREE.MathUtils.damp(
         emberRef.current.intensity,
-        THREE.MathUtils.lerp(2.5, 30, e),
+        THREE.MathUtils.lerp(4.5, 7.5, finish),
         4.2,
         delta,
       );
@@ -599,17 +603,18 @@ function AnimatedLighting({ progress, pointerX, pointerY, reduceMotion }: SceneP
     if (keyRef.current) {
       keyRef.current.intensity = THREE.MathUtils.damp(
         keyRef.current.intensity,
-        THREE.MathUtils.lerp(3, 24, e),
+        THREE.MathUtils.lerp(11.5, 14.5, finish),
         4.2,
         delta,
       );
+      keyRef.current.color.copy(neutralKey).lerp(warmKey, finish * 0.35);
       keyRef.current.position.x = THREE.MathUtils.damp(keyRef.current.position.x, 2.7 + px * 2.4, 5, delta);
       keyRef.current.position.y = THREE.MathUtils.damp(keyRef.current.position.y, 2.8 - py * 1.6, 5, delta);
     }
 
     gl.toneMappingExposure = THREE.MathUtils.damp(
       gl.toneMappingExposure,
-      THREE.MathUtils.lerp(0.68, 1.32, e),
+      THREE.MathUtils.lerp(1.06, 1.14, finish),
       3.8,
       delta,
     );
@@ -617,20 +622,20 @@ function AnimatedLighting({ progress, pointerX, pointerY, reduceMotion }: SceneP
 
   return (
     <>
-      <ambientLight ref={ambientRef} intensity={0.1} />
-      <hemisphereLight ref={hemisphereRef} args={["#ffd2a8", "#140603", 0.18]} />
+      <ambientLight ref={ambientRef} intensity={0.72} />
+      <hemisphereLight ref={hemisphereRef} args={["#fff4e8", "#1b0b06", 1.35]} />
       <directionalLight
         ref={directionalRef}
         castShadow
-        color="#ffd3aa"
-        intensity={0.85}
+        color="#fff2e4"
+        intensity={4.1}
         position={[4.5, 6.4, 5.2]}
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
         shadow-bias={-0.0002}
       />
-      <pointLight ref={emberRef} color="#f15a24" intensity={2.5} distance={12} position={[-3.2, 0.6, 3.4]} />
-      <pointLight ref={keyRef} color="#ffb16a" intensity={3} distance={11} position={[2.7, 2.8, 3.8]} />
+      <pointLight ref={emberRef} color="#f15a24" intensity={4.5} distance={12} position={[-3.2, 0.6, 3.4]} />
+      <pointLight ref={keyRef} color="#fff0de" intensity={11.5} distance={11} position={[2.7, 2.8, 3.8]} />
     </>
   );
 }
