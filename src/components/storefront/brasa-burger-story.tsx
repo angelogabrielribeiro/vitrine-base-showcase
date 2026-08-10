@@ -127,7 +127,7 @@ export function BrasaBurgerStory() {
     <section
       ref={sectionRef}
       aria-labelledby="brasa-burger-story-title"
-      className="relative h-[158svh] border-y border-orange-200/10 bg-[#0d0806]"
+      className="relative h-[150svh] border-y border-orange-200/10 bg-[#0d0806]"
     >
       <div className="sticky top-16 h-[calc(100svh-4rem)] overflow-hidden">
         <div
@@ -164,11 +164,7 @@ export function BrasaBurgerStory() {
                 style={{ scaleX: shadowScale, opacity: shadowOpacity }}
               />
               {BURGER_LAYERS.map((layer) => (
-                <PhotoBurgerLayer
-                  key={layer.key}
-                  layer={layer}
-                  progress={burgerProgress}
-                />
+                <PhotoBurgerLayer key={layer.key} layer={layer} progress={burgerProgress} />
               ))}
             </div>
           </motion.div>
@@ -263,13 +259,7 @@ export function BrasaBurgerStory() {
 
 type Layer = (typeof BURGER_LAYERS)[number];
 
-function PhotoBurgerLayer({
-  layer,
-  progress,
-}: {
-  layer: Layer;
-  progress: MotionValue<number>;
-}) {
+function PhotoBurgerLayer({ layer, progress }: { layer: Layer; progress: MotionValue<number> }) {
   const y = useTransform(progress, [0, 1], [layer.closedY, layer.openY]);
   const x = useTransform(progress, [0, 1], [0, layer.openX]);
   const rotate = useTransform(progress, [0, 1], [0, layer.openRotate]);
@@ -283,7 +273,7 @@ function PhotoBurgerLayer({
       aria-hidden="true"
       draggable={false}
       decoding="async"
-      className="pointer-events-none absolute left-1/2 top-1/2 h-auto w-[95%] -translate-x-1/2 -translate-y-1/2 select-none object-contain [filter:drop-shadow(0_20px_24px_rgba(0,0,0,.28))]"
+      className="pointer-events-none absolute left-1/2 top-1/2 h-auto w-[95%] -ml-[47.5%] -mt-[47.5%] select-none object-contain [filter:drop-shadow(0_20px_24px_rgba(0,0,0,.28))]"
       style={{
         y,
         x,
