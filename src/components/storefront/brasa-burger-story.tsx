@@ -17,10 +17,11 @@ const BURGER_LAYERS = [
     label: "Base",
     src: "https://v3b.fal.media/files/b/0aa5b9a0/Qx-bWKmP021LefLh3ViAl_8CMLkq2hB5tQTy1ZLgy2R.png",
     closedY: 116,
-    openY: 176,
-    openX: -4,
-    openRotate: -1.2,
-    depth: -12,
+    openY: 290,
+    openX: -22,
+    openRotate: -4.2,
+    openScale: 0.98,
+    depth: -46,
     zIndex: 10,
   },
   {
@@ -28,21 +29,23 @@ const BURGER_LAYERS = [
     label: "Blend",
     src: "https://v3b.fal.media/files/b/0aa5b99f/ZH1l075aBM_oDvwREea9e_ip9W6DFnkPUm4Mz-Tref_.png",
     closedY: 62,
-    openY: 82,
-    openX: 6,
-    openRotate: 1.3,
-    depth: 4,
+    openY: 132,
+    openX: 20,
+    openRotate: 4.1,
+    openScale: 1.035,
+    depth: 14,
     zIndex: 20,
   },
   {
     key: "cheese",
     label: "Cheddar",
-    src: "https://v3b.fal.media/files/b/0aa5b98c/GfT34S2gzsk2zXgBofAr8_HFBKOHiKy9H93bfuW0TPK.png",
+    src: "https://v3b.fal.media/files/b/0aa5ba89/GAaxqyUxFNBy81Wpz7bJV_result.png",
     closedY: 18,
-    openY: 0,
-    openX: -8,
-    openRotate: -2.2,
-    depth: 18,
+    openY: -8,
+    openX: -26,
+    openRotate: -5.4,
+    openScale: 1.055,
+    depth: 34,
     zIndex: 30,
   },
   {
@@ -50,10 +53,11 @@ const BURGER_LAYERS = [
     label: "Frescor",
     src: "https://v3b.fal.media/files/b/0aa5b98c/GSNF9d8Qh5gUBTDYTLuUh_vchTMr2kmHJT4Q0AIWKCO.png",
     closedY: -30,
-    openY: -88,
-    openX: 7,
-    openRotate: 1.8,
-    depth: 30,
+    openY: -148,
+    openX: 28,
+    openRotate: 5.2,
+    openScale: 1.035,
+    depth: 48,
     zIndex: 40,
   },
   {
@@ -61,10 +65,11 @@ const BURGER_LAYERS = [
     label: "Brioche",
     src: "https://v3b.fal.media/files/b/0aa5b98b/9hR0QNSNdsz6KArQieq___UOVKK7esieHIXgT7A2rsP.png",
     closedY: -104,
-    openY: -190,
-    openX: -3,
-    openRotate: -1.1,
-    depth: 44,
+    openY: -300,
+    openX: -20,
+    openRotate: -5.6,
+    openScale: 1.06,
+    depth: 68,
     zIndex: 50,
   },
 ] as const;
@@ -73,29 +78,29 @@ const PHASES = [
   {
     kicker: "01 · Fechado",
     title: "Primeiro você vê a mordida.",
-    body: "O burger entra montado e ocupa a cena como uma peça de campanha, não como um modelo de jogo.",
+    body: "O burger entra montado, pesado e inteiro. O começo segura a tensão antes de abrir a estrutura.",
   },
   {
-    kicker: "02 · Estrutura",
-    title: "A montagem começa a respirar.",
-    body: "Cada camada ganha espaço sem perder o alinhamento: brioche, frescor, cheddar, blend e base.",
+    kicker: "02 · Pressão",
+    title: "As camadas começam a escapar.",
+    body: "O primeiro movimento ainda é controlado, mas cada ingrediente já ganha direção, profundidade e espaço próprio.",
   },
   {
-    kicker: "03 · Fogo",
-    title: "O centro da Brasa aparece.",
-    body: "O blend e o cheddar viram o foco enquanto o scroll abre a composição e mantém tudo dentro do enquadramento.",
+    kicker: "03 · Explosão",
+    title: "Agora a Brasa se desmonta de verdade.",
+    body: "Brioche, frescor, cheddar, blend e base se afastam com força. A leitura continua vertical, mas deixa de parecer uma microanimação.",
   },
   {
     kicker: "04 · Assinatura",
-    title: "Tudo aberto. Nada sobrando.",
-    body: "A animação termina inteira na tela e segura a visão final antes de entregar a próxima seção.",
+    title: "Tudo aberto. Tudo no quadro.",
+    body: "A composição segura o exploded view completo por alguns instantes e entrega a próxima seção sem um corredor vazio depois da cena.",
   },
 ] as const;
 
 function phaseFromProgress(value: number) {
-  if (value < 0.2) return 0;
-  if (value < 0.43) return 1;
-  if (value < 0.66) return 2;
+  if (value < 0.18) return 0;
+  if (value < 0.42) return 1;
+  if (value < 0.7) return 2;
   return 3;
 }
 
@@ -108,13 +113,22 @@ export function BrasaBurgerStory() {
     target: sectionRef,
     offset: ["start start", "end end"],
   });
-  const burgerProgress = useTransform(scrollYProgress, [0.02, 0.72], [0, 1], { clamp: true });
-  const sceneRotateY = useTransform(pointerX, [-1, 1], reduceMotion ? [0, 0] : [-4.5, 4.5]);
-  const sceneRotateX = useTransform(pointerY, [-1, 1], reduceMotion ? [0, 0] : [2.4, -2.4]);
-  const sceneX = useTransform(pointerX, [-1, 1], reduceMotion ? [0, 0] : [-8, 8]);
-  const sceneY = useTransform(pointerY, [-1, 1], reduceMotion ? [0, 0] : [-5, 5]);
-  const shadowScale = useTransform(burgerProgress, [0, 1], [0.7, 1.08]);
-  const shadowOpacity = useTransform(burgerProgress, [0, 1], [0.56, 0.34]);
+
+  const burgerProgress = useTransform(
+    scrollYProgress,
+    [0, 0.12, 0.25, 0.65, 0.86, 1],
+    [0, 0, 0.08, 0.8, 1, 1],
+    { clamp: true },
+  );
+  const sceneRotateY = useTransform(pointerX, [-1, 1], reduceMotion ? [0, 0] : [-5.5, 5.5]);
+  const sceneRotateX = useTransform(pointerY, [-1, 1], reduceMotion ? [0, 0] : [3, -3]);
+  const sceneX = useTransform(pointerX, [-1, 1], reduceMotion ? [0, 0] : [-10, 10]);
+  const sceneY = useTransform(pointerY, [-1, 1], reduceMotion ? [0, 0] : [-7, 7]);
+  const sceneScale = useTransform(burgerProgress, [0, 0.35, 1], [0.98, 1.01, 1.035]);
+  const glowScale = useTransform(burgerProgress, [0, 0.5, 1], [0.82, 1.04, 1.22]);
+  const glowOpacity = useTransform(burgerProgress, [0, 0.45, 1], [0.2, 0.4, 0.62]);
+  const shadowScale = useTransform(burgerProgress, [0, 0.45, 1], [0.7, 0.94, 1.3]);
+  const shadowOpacity = useTransform(burgerProgress, [0, 0.55, 1], [0.56, 0.43, 0.26]);
 
   useMotionValueEvent(scrollYProgress, "change", (value) => {
     const next = phaseFromProgress(value);
@@ -127,7 +141,7 @@ export function BrasaBurgerStory() {
     <section
       ref={sectionRef}
       aria-labelledby="brasa-burger-story-title"
-      className="relative h-[150svh] border-y border-orange-200/10 bg-[#0d0806]"
+      className="relative h-[310svh] border-y border-orange-200/10 bg-[#0d0806] sm:h-[300svh] lg:h-[285svh]"
     >
       <div className="sticky top-16 h-[calc(100svh-4rem)] overflow-hidden">
         <div
@@ -144,23 +158,28 @@ export function BrasaBurgerStory() {
           style={{ scaleX: burgerProgress }}
         />
 
-        <div className="absolute inset-x-0 bottom-8 top-[39%] sm:top-[33%] lg:inset-y-0 lg:left-[37%] lg:right-[2%]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_52%_54%,rgba(244,102,33,.18),transparent_42%)] blur-2xl" />
+        <div className="absolute inset-x-0 bottom-7 top-[28%] sm:top-[25%] lg:inset-y-0 lg:left-[37%] lg:right-[2%]">
+          <motion.div
+            aria-hidden="true"
+            className="absolute inset-[8%] rounded-[50%] bg-[radial-gradient(circle,rgba(244,102,33,.34)_0%,rgba(244,102,33,.14)_38%,transparent_72%)] blur-3xl"
+            style={{ scale: glowScale, opacity: glowOpacity }}
+          />
           <motion.div
             className="absolute inset-0 flex items-center justify-center"
             style={{
-              perspective: 1300,
+              perspective: 1400,
               rotateX: sceneRotateX,
               rotateY: sceneRotateY,
               x: sceneX,
               y: sceneY,
+              scale: sceneScale,
               transformStyle: "preserve-3d",
             }}
           >
-            <div className="relative h-[21rem] w-[21rem] origin-center scale-[0.72] sm:h-[25rem] sm:w-[25rem] sm:scale-[0.86] lg:h-[32rem] lg:w-[32rem] lg:scale-100">
+            <div className="relative h-[34rem] w-[22rem] origin-center scale-[0.68] sm:h-[38rem] sm:w-[28rem] sm:scale-[0.78] lg:h-[34rem] lg:w-[34rem] lg:scale-[0.94] xl:scale-100">
               <motion.div
                 aria-hidden="true"
-                className="absolute left-1/2 top-[73%] h-16 w-[62%] -translate-x-1/2 rounded-[50%] bg-black/65 blur-2xl"
+                className="absolute left-1/2 top-[76%] h-16 w-[64%] -translate-x-1/2 rounded-[50%] bg-black/65 blur-2xl"
                 style={{ scaleX: shadowScale, opacity: shadowOpacity }}
               />
               {BURGER_LAYERS.map((layer) => (
@@ -260,11 +279,39 @@ export function BrasaBurgerStory() {
 type Layer = (typeof BURGER_LAYERS)[number];
 
 function PhotoBurgerLayer({ layer, progress }: { layer: Layer; progress: MotionValue<number> }) {
-  const y = useTransform(progress, [0, 1], [layer.closedY, layer.openY]);
-  const x = useTransform(progress, [0, 1], [0, layer.openX]);
-  const rotate = useTransform(progress, [0, 1], [0, layer.openRotate]);
-  const z = useTransform(progress, [0, 1], [0, layer.depth]);
-  const opacity = useTransform(progress, [0, 0.05, 1], [0.98, 1, 1]);
+  const travelY = layer.openY - layer.closedY;
+  const y = useTransform(
+    progress,
+    [0, 0.12, 0.38, 0.72, 1],
+    [
+      layer.closedY,
+      layer.closedY + travelY * 0.04,
+      layer.closedY + travelY * 0.28,
+      layer.closedY + travelY * 0.82,
+      layer.openY,
+    ],
+  );
+  const x = useTransform(
+    progress,
+    [0, 0.12, 0.38, 0.72, 1],
+    [0, layer.openX * 0.05, layer.openX * 0.3, layer.openX * 0.78, layer.openX],
+  );
+  const rotate = useTransform(
+    progress,
+    [0, 0.12, 0.38, 0.72, 1],
+    [0, layer.openRotate * 0.05, layer.openRotate * 0.28, layer.openRotate * 0.8, layer.openRotate],
+  );
+  const z = useTransform(
+    progress,
+    [0, 0.12, 0.38, 0.72, 1],
+    [0, layer.depth * 0.04, layer.depth * 0.26, layer.depth * 0.78, layer.depth],
+  );
+  const scale = useTransform(
+    progress,
+    [0, 0.18, 0.55, 1],
+    [1, 1, 1 + (layer.openScale - 1) * 0.45, layer.openScale],
+  );
+  const opacity = useTransform(progress, [0, 0.04, 1], [0.98, 1, 1]);
 
   return (
     <motion.img
@@ -273,12 +320,13 @@ function PhotoBurgerLayer({ layer, progress }: { layer: Layer; progress: MotionV
       aria-hidden="true"
       draggable={false}
       decoding="async"
-      className="pointer-events-none absolute left-1/2 top-1/2 h-auto w-[95%] -ml-[47.5%] -mt-[47.5%] select-none object-contain [filter:drop-shadow(0_20px_24px_rgba(0,0,0,.28))]"
+      className="pointer-events-none absolute left-1/2 top-1/2 h-auto w-[95%] -ml-[47.5%] -mt-[47.5%] select-none object-contain [filter:drop-shadow(0_22px_28px_rgba(0,0,0,.32))]"
       style={{
         y,
         x,
         z,
         rotate,
+        scale,
         opacity,
         zIndex: layer.zIndex,
         transformStyle: "preserve-3d",
