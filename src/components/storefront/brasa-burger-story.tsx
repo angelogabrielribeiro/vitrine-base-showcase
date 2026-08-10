@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import {
   AnimatePresence,
   motion,
@@ -8,109 +8,123 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
+import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
+import { ContactShadows, useProgress } from "@react-three/drei";
 import { Flame, Layers3, MousePointer2, Sparkles } from "lucide-react";
+import * as THREE from "three";
+import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { useCinematicMotion } from "@/components/motion/cinematic-motion-system";
 
-const BURGER_LAYERS = [
+type Layer3D = {
+  key: "bottom" | "patty" | "cheese" | "greens" | "top";
+  label: string;
+  obj: string;
+  mtl: string;
+  targetSize: number;
+  closed: [number, number, number];
+  open: [number, number, number];
+  openRotation: [number, number, number];
+  delay: number;
+  parallax: number;
+  roughness: number;
+};
+
+const BURGER_LAYERS: Layer3D[] = [
   {
     key: "bottom",
     label: "Base",
-    src: "https://v3b.fal.media/files/b/0aa5b9a0/Qx-bWKmP021LefLh3ViAl_8CMLkq2hB5tQTy1ZLgy2R.png",
-    closedY: 116,
-    openY: 255,
-    openX: -34,
-    openRotate: -7.5,
-    openScale: 0.96,
-    depth: -54,
-    parallaxX: 8,
-    parallaxY: 5,
-    zIndex: 10,
+    obj: "https://v3b.fal.media/files/b/0aa5bc39/ZnnAAKl2M4BL8b39EWROu_279c9e64555dd1af68bcce588f6fe692.obj",
+    mtl: "https://v3b.fal.media/files/b/0aa5bc39/k__sqzPd1N06zYxVOWro-_material.mtl",
+    targetSize: 2.72,
+    closed: [0, -1.34, 0],
+    open: [-0.5, -3.0, -0.62],
+    openRotation: [-0.18, -0.2, -0.08],
+    delay: 0.03,
+    parallax: 0.11,
+    roughness: 0.62,
   },
   {
     key: "patty",
     label: "Blend",
-    src: "https://v3b.fal.media/files/b/0aa5b99f/ZH1l075aBM_oDvwREea9e_ip9W6DFnkPUm4Mz-Tref_.png",
-    closedY: 62,
-    openY: 112,
-    openX: 34,
-    openRotate: 6.5,
-    openScale: 1.03,
-    depth: 10,
-    parallaxX: 7,
-    parallaxY: 5,
-    zIndex: 20,
+    obj: "https://v3b.fal.media/files/b/0aa5bc38/zAoPvOz9YZ_gnm4K9vOMC_90293462e8dddfad0e739bd4d0a393c4.obj",
+    mtl: "https://v3b.fal.media/files/b/0aa5bc38/eklM6XDuNtK0jEPuiU_yG_material.mtl",
+    targetSize: 2.72,
+    closed: [0, -0.55, 0.04],
+    open: [0.42, -1.08, 0.28],
+    openRotation: [0.14, 0.24, 0.08],
+    delay: 0.13,
+    parallax: 0.14,
+    roughness: 0.76,
   },
   {
     key: "cheese",
     label: "Cheddar",
-    src: "https://v3b.fal.media/files/b/0aa5baef/UiSDYUW--EtWWZi10ZON2_result.png",
-    closedY: 18,
-    openY: -12,
-    openX: -40,
-    openRotate: -8.5,
-    openScale: 1.08,
-    depth: 34,
-    parallaxX: 10,
-    parallaxY: 7,
-    zIndex: 30,
+    obj: "https://v3b.fal.media/files/b/0aa5bc37/DyMA6T43lcZbuH3VoS80N_0c176574ef6d7ab558ceb54451d75dc4.obj",
+    mtl: "https://v3b.fal.media/files/b/0aa5bc37/hi3d6OHV_y6SX3Y_p9-NU_material.mtl",
+    targetSize: 2.88,
+    closed: [0, 0.02, 0.1],
+    open: [-0.62, 0.18, 0.96],
+    openRotation: [-0.2, -0.2, -0.24],
+    delay: 0.18,
+    parallax: 0.18,
+    roughness: 0.48,
   },
   {
     key: "greens",
     label: "Frescor",
-    src: "https://v3b.fal.media/files/b/0aa5b98c/GSNF9d8Qh5gUBTDYTLuUh_vchTMr2kmHJT4Q0AIWKCO.png",
-    closedY: -30,
-    openY: -120,
-    openX: 36,
-    openRotate: 7.5,
-    openScale: 1.04,
-    depth: 54,
-    parallaxX: 12,
-    parallaxY: 8,
-    zIndex: 40,
+    obj: "https://v3b.fal.media/files/b/0aa5bc3d/EaQLxWhMpBjDc9CzbSLH5_6e4dd5c97af8801cec67afc39a46cdcc.obj",
+    mtl: "https://v3b.fal.media/files/b/0aa5bc3d/s6hp4ZxEBLbble1_R13sP_material.mtl",
+    targetSize: 2.8,
+    closed: [0, 0.58, 0.12],
+    open: [0.62, 1.78, 0.7],
+    openRotation: [0.12, 0.3, 0.18],
+    delay: 0.09,
+    parallax: 0.22,
+    roughness: 0.68,
   },
   {
     key: "top",
     label: "Brioche",
-    src: "https://v3b.fal.media/files/b/0aa5b98b/9hR0QNSNdsz6KArQieq___UOVKK7esieHIXgT7A2rsP.png",
-    closedY: -104,
-    openY: -255,
-    openX: -30,
-    openRotate: -7.5,
-    openScale: 1.07,
-    depth: 78,
-    parallaxX: 15,
-    parallaxY: 10,
-    zIndex: 50,
+    obj: "https://v3b.fal.media/files/b/0aa5bc36/KlHmBTmSTFE3WuAXiHI6M_6ceaade6ad374f949d1a1d44b8439ddc.obj",
+    mtl: "https://v3b.fal.media/files/b/0aa5bc36/-WPBmwpxYDxM-QPhmnxLt_material.mtl",
+    targetSize: 2.92,
+    closed: [0, 1.45, 0.08],
+    open: [-0.42, 3.48, 1.08],
+    openRotation: [-0.24, -0.24, -0.14],
+    delay: 0.01,
+    parallax: 0.26,
+    roughness: 0.58,
   },
-] as const;
+];
 
 const PHASES = [
   {
     kicker: "01 · Fechado",
     title: "Primeiro você vê a mordida.",
-    body: "O burger entra montado, pesado e inteiro. O começo segura a tensão antes de abrir a estrutura.",
+    body: "O burger entra montado como um único objeto. Luz, sombra e câmera já tratam cada ingrediente como volume real.",
   },
   {
     kicker: "02 · Pressão",
-    title: "As camadas começam a escapar.",
-    body: "O primeiro movimento ainda é controlado, mas cada ingrediente já ganha direção, profundidade e espaço próprio.",
+    title: "A estrutura começa a ceder.",
+    body: "O brioche abre primeiro, a base responde e as camadas ganham profundidade antes da explosão principal.",
   },
   {
-    kicker: "03 · Explosão",
-    title: "Agora a Brasa se desmonta de verdade.",
-    body: "Brioche, frescor, cheddar, blend e base se afastam com força. A câmera recua enquanto a montagem abre para manter o exploded view inteiro no quadro.",
+    kicker: "03 · Explosão 3D",
+    title: "Agora a Brasa sai do plano.",
+    body: "As cinco peças se separam nos eixos X, Y e Z. A câmera recua, a luz reage ao mouse e o volume permanece inteiro no quadro.",
   },
   {
     kicker: "04 · Assinatura",
-    title: "Tudo aberto. Tudo no quadro.",
-    body: "A composição segura o exploded view completo por alguns instantes e entrega a próxima seção sem um corredor vazio depois da cena.",
+    title: "Tudo aberto. Tudo em profundidade.",
+    body: "O exploded view segura a composição final com espaço, sombra e perspectiva suficientes para ler cada ingrediente como objeto.",
   },
 ] as const;
 
 function phaseFromProgress(value: number) {
-  if (value < 0.18) return 0;
+  if (value < 0.08) return 0;
   if (value < 0.42) return 1;
-  if (value < 0.7) return 2;
+  if (value < 0.84) return 2;
   return 3;
 }
 
@@ -119,6 +133,7 @@ export function BrasaBurgerStory() {
   const reduceMotion = Boolean(useReducedMotion());
   const { pointerX, pointerY } = useCinematicMotion();
   const [phaseIndex, setPhaseIndex] = useState(0);
+  const [mountScene, setMountScene] = useState(false);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
@@ -126,25 +141,32 @@ export function BrasaBurgerStory() {
 
   const burgerProgress = useTransform(
     scrollYProgress,
-    [0, 0.1, 0.22, 0.58, 0.82, 1],
-    [0, 0, 0.08, 0.72, 1, 1],
+    [0, 0.08, 0.18, 0.56, 0.84, 1],
+    [0, 0, 0.12, 0.78, 1, 1],
     { clamp: true },
   );
-  const sceneRotateY = useTransform(pointerX, [-1, 1], reduceMotion ? [0, 0] : [-7, 7]);
-  const sceneRotateX = useTransform(pointerY, [-1, 1], reduceMotion ? [0, 0] : [4, -4]);
-  const sceneX = useTransform(pointerX, [-1, 1], reduceMotion ? [0, 0] : [-14, 14]);
-  const sceneY = useTransform(pointerY, [-1, 1], reduceMotion ? [0, 0] : [-9, 9]);
-  const sceneScale = useTransform(
-    burgerProgress,
-    [0, 0.22, 0.52, 0.82, 1],
-    [0.98, 1, 0.94, 0.82, 0.78],
-  );
-  const glowScale = useTransform(burgerProgress, [0, 0.5, 1], [0.82, 1.08, 1.28]);
-  const glowOpacity = useTransform(burgerProgress, [0, 0.45, 1], [0.2, 0.44, 0.68]);
-  const shadowScale = useTransform(burgerProgress, [0, 0.45, 1], [0.7, 0.98, 1.32]);
-  const shadowOpacity = useTransform(burgerProgress, [0, 0.55, 1], [0.56, 0.4, 0.24]);
 
-  useMotionValueEvent(scrollYProgress, "change", (value) => {
+  useEffect(() => {
+    const target = sectionRef.current;
+    if (!target || typeof IntersectionObserver === "undefined") {
+      setMountScene(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        setMountScene(true);
+        observer.disconnect();
+      },
+      { rootMargin: "120% 0px 120% 0px" },
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, []);
+
+  useMotionValueEvent(burgerProgress, "change", (value) => {
     const next = phaseFromProgress(value);
     setPhaseIndex((current) => (current === next ? current : next));
   });
@@ -155,12 +177,12 @@ export function BrasaBurgerStory() {
     <section
       ref={sectionRef}
       aria-labelledby="brasa-burger-story-title"
-      className="relative h-[310svh] border-y border-orange-200/10 bg-[#0d0806] sm:h-[300svh] lg:h-[285svh]"
+      className="relative h-[320svh] border-y border-orange-200/10 bg-[#0d0806] sm:h-[310svh] lg:h-[300svh]"
     >
       <div className="sticky top-16 h-[calc(100svh-4rem)] overflow-hidden">
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-[radial-gradient(circle_at_72%_48%,rgba(241,90,36,.2),transparent_31%),radial-gradient(circle_at_42%_88%,rgba(255,155,65,.09),transparent_38%),linear-gradient(140deg,#0b0705_0%,#160b06_48%,#0c0806_100%)]"
+          className="absolute inset-0 bg-[radial-gradient(circle_at_73%_47%,rgba(241,90,36,.24),transparent_29%),radial-gradient(circle_at_48%_91%,rgba(255,155,65,.1),transparent_35%),linear-gradient(140deg,#090605_0%,#180c07_48%,#0b0705_100%)]"
         />
         <div
           aria-hidden="true"
@@ -172,49 +194,31 @@ export function BrasaBurgerStory() {
           style={{ scaleX: burgerProgress }}
         />
 
-        <div className="absolute inset-x-0 bottom-7 top-[27%] sm:top-[23%] lg:inset-y-0 lg:left-[37%] lg:right-[2%]">
-          <motion.div
+        <div className="absolute inset-x-0 bottom-8 top-[29%] sm:top-[24%] lg:inset-y-0 lg:left-[37%] lg:right-[1%]">
+          <div
             aria-hidden="true"
-            className="absolute inset-[8%] rounded-[50%] bg-[radial-gradient(circle,rgba(244,102,33,.34)_0%,rgba(244,102,33,.14)_38%,transparent_72%)] blur-3xl"
-            style={{ scale: glowScale, opacity: glowOpacity }}
+            className="absolute inset-[5%] rounded-[50%] bg-[radial-gradient(circle,rgba(244,102,33,.28)_0%,rgba(244,102,33,.12)_39%,transparent_70%)] blur-3xl"
           />
-          <motion.div
-            className="absolute inset-0 flex items-center justify-center"
-            style={{
-              perspective: 1500,
-              rotateX: sceneRotateX,
-              rotateY: sceneRotateY,
-              x: sceneX,
-              y: sceneY,
-              scale: sceneScale,
-              transformStyle: "preserve-3d",
-            }}
-          >
-            <div className="relative h-[34rem] w-[22rem] origin-center scale-[0.68] sm:h-[38rem] sm:w-[28rem] sm:scale-[0.78] lg:h-[34rem] lg:w-[34rem] lg:scale-[0.94] xl:scale-100">
-              <motion.div
-                aria-hidden="true"
-                className="absolute left-1/2 top-[76%] h-16 w-[64%] -translate-x-1/2 rounded-[50%] bg-black/65 blur-2xl"
-                style={{ scaleX: shadowScale, opacity: shadowOpacity }}
-              />
-              {BURGER_LAYERS.map((layer) => (
-                <PhotoBurgerLayer
-                  key={layer.key}
-                  layer={layer}
-                  progress={burgerProgress}
-                  pointerX={pointerX}
-                  pointerY={pointerY}
-                  reduceMotion={reduceMotion}
-                />
-              ))}
+          {mountScene ? (
+            <BurgerCanvas
+              progress={burgerProgress}
+              pointerX={pointerX}
+              pointerY={pointerY}
+              reduceMotion={reduceMotion}
+            />
+          ) : (
+            <div className="absolute inset-0 grid place-items-center">
+              <div className="h-40 w-40 animate-pulse rounded-full border border-orange-400/25 shadow-[0_0_90px_rgba(241,90,36,.18)]" />
             </div>
-          </motion.div>
+          )}
+          {mountScene && <SceneLoadIndicator />}
         </div>
 
         <div className="pointer-events-none relative z-10 mx-auto grid h-full max-w-7xl px-5 py-5 sm:px-8 sm:py-7 lg:grid-cols-[0.8fr_1.2fr] lg:items-center lg:px-12">
           <div className="self-start pt-3 sm:pt-6 lg:self-center lg:pt-0">
             <div className="inline-flex items-center gap-2 border border-orange-300/20 bg-black/30 px-3 py-2 text-[9px] font-black uppercase tracking-[0.3em] text-orange-300 backdrop-blur-xl">
               <Layers3 className="h-3.5 w-3.5" />
-              Raio-X da Brasa
+              Raio-X 3D da Brasa
             </div>
 
             <h2
@@ -256,11 +260,11 @@ export function BrasaBurgerStory() {
                           y: phaseIndex >= Math.min(index, 3) ? -4 : 0,
                           borderColor:
                             phaseIndex >= Math.min(index, 3)
-                              ? "rgba(251,146,60,.42)"
+                              ? "rgba(251,146,60,.5)"
                               : "rgba(255,255,255,.08)",
                         }
                   }
-                  className="border border-white/10 bg-black/20 px-2 py-3 text-center text-[8px] font-black uppercase tracking-[0.12em] text-white/48 backdrop-blur"
+                  className="border border-white/10 bg-black/25 px-2 py-3 text-center text-[8px] font-black uppercase tracking-[0.12em] text-white/52 backdrop-blur"
                 >
                   {layer.label}
                 </motion.div>
@@ -269,17 +273,17 @@ export function BrasaBurgerStory() {
           </div>
 
           <div className="self-end pb-8 text-right lg:self-center lg:pb-0">
-            <div className="ml-auto hidden w-fit items-center gap-2 text-[9px] font-bold uppercase tracking-[0.22em] text-orange-100/36 sm:inline-flex">
+            <div className="ml-auto hidden w-fit items-center gap-2 text-[9px] font-bold uppercase tracking-[0.22em] text-orange-100/40 sm:inline-flex">
               <MousePointer2 className="h-3.5 w-3.5 text-orange-400" />
-              Mouse dá profundidade · scroll desmonta
+              Mouse move a luz e a câmera · scroll explode em 3D
             </div>
           </div>
         </div>
 
         <div className="absolute inset-x-5 bottom-3 z-20 flex items-center gap-3 sm:inset-x-8 sm:bottom-4 lg:inset-x-12">
-          <span className="inline-flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.2em] text-orange-200/52 sm:text-[9px]">
+          <span className="inline-flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.2em] text-orange-200/55 sm:text-[9px]">
             <Flame className="h-3.5 w-3.5 fill-orange-500 text-orange-500" />
-            Brasa em camadas
+            Brasa em profundidade
           </span>
           <div className="h-px flex-1 overflow-hidden bg-white/10">
             <motion.div
@@ -287,9 +291,9 @@ export function BrasaBurgerStory() {
               style={{ scaleX: burgerProgress }}
             />
           </div>
-          <span className="hidden items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-white/30 sm:inline-flex">
+          <span className="hidden items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-white/34 sm:inline-flex">
             <Sparkles className="h-3 w-3 text-orange-400" />
-            imagem fotorealista
+            geometria 3D · luz física
           </span>
         </div>
       </div>
@@ -297,108 +301,275 @@ export function BrasaBurgerStory() {
   );
 }
 
-type Layer = (typeof BURGER_LAYERS)[number];
-
-type PhotoBurgerLayerProps = {
-  layer: Layer;
+type SceneProps = {
   progress: MotionValue<number>;
   pointerX: MotionValue<number>;
   pointerY: MotionValue<number>;
   reduceMotion: boolean;
 };
 
-function PhotoBurgerLayer({
+function BurgerCanvas(props: SceneProps) {
+  return (
+    <div className="pointer-events-none absolute inset-0">
+      <Canvas
+        dpr={[1, 1.65]}
+        shadows
+        camera={{ position: [0, 0.15, 7.8], fov: 34, near: 0.1, far: 80 }}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        onCreated={({ gl }) => {
+          gl.toneMapping = THREE.ACESFilmicToneMapping;
+          gl.toneMappingExposure = 1.16;
+          gl.outputColorSpace = THREE.SRGBColorSpace;
+        }}
+      >
+        <ambientLight intensity={0.55} />
+        <hemisphereLight args={["#ffd2a8", "#190804", 1.35]} />
+        <directionalLight
+          castShadow
+          color="#ffd3aa"
+          intensity={4.2}
+          position={[4.5, 6.4, 5.2]}
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+          shadow-bias={-0.0002}
+        />
+        <pointLight color="#f15a24" intensity={22} distance={11} position={[-3.2, 0.6, 3.4]} />
+        <ReactiveKeyLight pointerX={props.pointerX} pointerY={props.pointerY} />
+        <Suspense fallback={null}>
+          <BurgerAssembly {...props} />
+          <ContactShadows
+            position={[0, -3.75, 0]}
+            opacity={0.5}
+            scale={9}
+            blur={2.7}
+            far={8}
+            resolution={512}
+            color="#080302"
+          />
+        </Suspense>
+        <CameraRig {...props} />
+      </Canvas>
+    </div>
+  );
+}
+
+function SceneLoadIndicator() {
+  const { active, progress } = useProgress();
+  if (!active) return null;
+
+  return (
+    <div className="pointer-events-none absolute bottom-7 right-4 z-20 border border-orange-300/15 bg-black/45 px-3 py-2 text-[8px] font-black uppercase tracking-[0.22em] text-orange-200/65 backdrop-blur sm:right-7">
+      Construindo volume · {Math.round(progress)}%
+    </div>
+  );
+}
+
+function BurgerAssembly(props: SceneProps) {
+  const groupRef = useRef<THREE.Group>(null);
+  const viewportWidth = useThree((state) => state.size.width);
+  const compact = viewportWidth < 720;
+
+  useFrame((_, delta) => {
+    const group = groupRef.current;
+    if (!group) return;
+
+    const p = props.reduceMotion ? 0 : props.progress.get();
+    const px = props.reduceMotion ? 0 : props.pointerX.get();
+    const py = props.reduceMotion ? 0 : props.pointerY.get();
+    const openEase = THREE.MathUtils.smootherstep(p, 0.08, 1);
+    const targetScale = (compact ? 0.72 : 0.96) * THREE.MathUtils.lerp(1, 0.92, openEase);
+
+    group.rotation.y = THREE.MathUtils.damp(group.rotation.y, -0.08 + px * 0.19, 5, delta);
+    group.rotation.x = THREE.MathUtils.damp(group.rotation.x, py * -0.075, 5, delta);
+    group.rotation.z = THREE.MathUtils.damp(group.rotation.z, px * 0.025, 5, delta);
+    const scale = THREE.MathUtils.damp(group.scale.x, targetScale, 5, delta);
+    group.scale.setScalar(scale);
+  });
+
+  return (
+    <group ref={groupRef}>
+      <DepthRings progress={props.progress} pointerX={props.pointerX} reduceMotion={props.reduceMotion} />
+      {BURGER_LAYERS.map((layer) => (
+        <IngredientLayer key={layer.key} layer={layer} {...props} />
+      ))}
+    </group>
+  );
+}
+
+function IngredientLayer({
   layer,
   progress,
   pointerX,
   pointerY,
   reduceMotion,
-}: PhotoBurgerLayerProps) {
-  const travelY = layer.openY - layer.closedY;
-  const y = useTransform(
-    progress,
-    [0, 0.08, 0.3, 0.62, 1],
-    [
-      layer.closedY,
-      layer.closedY + travelY * 0.02,
-      layer.closedY + travelY * 0.22,
-      layer.closedY + travelY * 0.74,
-      layer.openY,
-    ],
-  );
-  const x = useTransform(
-    progress,
-    [0, 0.08, 0.3, 0.62, 1],
-    [0, layer.openX * 0.03, layer.openX * 0.24, layer.openX * 0.72, layer.openX],
-  );
-  const rotate = useTransform(
-    progress,
-    [0, 0.08, 0.3, 0.62, 1],
-    [0, layer.openRotate * 0.03, layer.openRotate * 0.22, layer.openRotate * 0.72, layer.openRotate],
-  );
-  const z = useTransform(
-    progress,
-    [0, 0.08, 0.3, 0.62, 1],
-    [0, layer.depth * 0.03, layer.depth * 0.24, layer.depth * 0.74, layer.depth],
-  );
-  const scale = useTransform(
-    progress,
-    [0, 0.18, 0.55, 1],
-    [1, 1, 1 + (layer.openScale - 1) * 0.45, layer.openScale],
-  );
-  const opacity = useTransform(progress, [0, 0.04, 1], [0.98, 1, 1]);
-  const pointerLayerX = useTransform(
-    pointerX,
-    [-1, 1],
-    reduceMotion ? [0, 0] : [-layer.parallaxX, layer.parallaxX],
-  );
-  const pointerLayerY = useTransform(
-    pointerY,
-    [-1, 1],
-    reduceMotion ? [0, 0] : [layer.parallaxY, -layer.parallaxY],
-  );
-  const pointerRotateY = useTransform(
-    pointerX,
-    [-1, 1],
-    reduceMotion ? [0, 0] : [-layer.parallaxX * 0.18, layer.parallaxX * 0.18],
-  );
-  const pointerRotateX = useTransform(
-    pointerY,
-    [-1, 1],
-    reduceMotion ? [0, 0] : [layer.parallaxY * 0.14, -layer.parallaxY * 0.14],
-  );
+}: SceneProps & { layer: Layer3D }) {
+  const groupRef = useRef<THREE.Group>(null);
+
+  useFrame((_, delta) => {
+    const group = groupRef.current;
+    if (!group) return;
+
+    const p = reduceMotion ? 0 : progress.get();
+    const raw = THREE.MathUtils.clamp((p - layer.delay) / Math.max(0.001, 1 - layer.delay), 0, 1);
+    const e = THREE.MathUtils.smootherstep(raw, 0, 1);
+    const px = reduceMotion ? 0 : pointerX.get();
+    const py = reduceMotion ? 0 : pointerY.get();
+    const pointerStrength = (0.22 + e * 0.78) * layer.parallax;
+
+    const x = THREE.MathUtils.lerp(layer.closed[0], layer.open[0], e) + px * pointerStrength;
+    const y = THREE.MathUtils.lerp(layer.closed[1], layer.open[1], e) - py * pointerStrength * 0.62;
+    const z = THREE.MathUtils.lerp(layer.closed[2], layer.open[2], e) + Math.abs(px) * pointerStrength * 0.28;
+
+    group.position.x = THREE.MathUtils.damp(group.position.x, x, 6.2, delta);
+    group.position.y = THREE.MathUtils.damp(group.position.y, y, 6.2, delta);
+    group.position.z = THREE.MathUtils.damp(group.position.z, z, 6.2, delta);
+    group.rotation.x = THREE.MathUtils.damp(group.rotation.x, layer.openRotation[0] * e - py * 0.035, 6, delta);
+    group.rotation.y = THREE.MathUtils.damp(group.rotation.y, layer.openRotation[1] * e + px * 0.05, 6, delta);
+    group.rotation.z = THREE.MathUtils.damp(group.rotation.z, layer.openRotation[2] * e + px * 0.02, 6, delta);
+  });
 
   return (
-    <motion.div
-      aria-hidden="true"
-      className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[95%] -ml-[47.5%] -mt-[47.5%] select-none"
-      style={{
-        y,
-        x,
-        z,
-        rotate,
-        scale,
-        opacity,
-        zIndex: layer.zIndex,
-        transformStyle: "preserve-3d",
-        willChange: "transform",
-      }}
-    >
-      <motion.img
-        src={layer.src}
-        alt=""
-        draggable={false}
-        decoding="async"
-        className="h-full w-full object-contain [filter:drop-shadow(0_22px_28px_rgba(0,0,0,.32))]"
-        style={{
-          x: pointerLayerX,
-          y: pointerLayerY,
-          rotateX: pointerRotateX,
-          rotateY: pointerRotateY,
-          transformStyle: "preserve-3d",
-          willChange: "transform",
-        }}
-      />
-    </motion.div>
+    <group ref={groupRef} position={layer.closed}>
+      <NormalizedIngredient layer={layer} />
+    </group>
+  );
+}
+
+function NormalizedIngredient({ layer }: { layer: Layer3D }) {
+  const materials = useLoader(MTLLoader, layer.mtl);
+  materials.preload();
+  const loaded = useLoader(OBJLoader, layer.obj, (loader) => {
+    loader.setMaterials(materials);
+  });
+  const gl = useThree((state) => state.gl);
+
+  const object = useMemo(() => {
+    const clone = loaded.clone(true);
+    const maxAnisotropy = gl.capabilities.getMaxAnisotropy();
+
+    clone.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return;
+
+      child.castShadow = true;
+      child.receiveShadow = true;
+
+      const sourceMaterials = Array.isArray(child.material) ? child.material : [child.material];
+      const upgraded = sourceMaterials.map((source) => {
+        const sourceMaterial = source as THREE.MeshPhongMaterial;
+        const material = new THREE.MeshStandardMaterial({
+          color: sourceMaterial.color ?? new THREE.Color("white"),
+          map: sourceMaterial.map ?? null,
+          transparent: sourceMaterial.transparent,
+          opacity: sourceMaterial.opacity,
+          alphaTest: sourceMaterial.alphaTest,
+          side: THREE.FrontSide,
+          metalness: 0,
+          roughness: layer.roughness,
+        });
+
+        if (material.map) {
+          material.map.colorSpace = THREE.SRGBColorSpace;
+          material.map.anisotropy = maxAnisotropy;
+          material.map.needsUpdate = true;
+        }
+
+        return material;
+      });
+
+      child.material = Array.isArray(child.material) ? upgraded : upgraded[0];
+    });
+
+    const box = new THREE.Box3().setFromObject(clone);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    clone.position.sub(center);
+    const longest = Math.max(size.x, size.y, size.z, 0.001);
+    clone.scale.setScalar(layer.targetSize / longest);
+
+    return clone;
+  }, [gl, layer.roughness, layer.targetSize, loaded]);
+
+  return <primitive object={object} />;
+}
+
+function CameraRig({ progress, pointerX, pointerY, reduceMotion }: SceneProps) {
+  const { camera } = useThree();
+  const lookTarget = useMemo(() => new THREE.Vector3(0, 0.12, 0), []);
+
+  useFrame((_, delta) => {
+    const p = reduceMotion ? 0 : progress.get();
+    const px = reduceMotion ? 0 : pointerX.get();
+    const py = reduceMotion ? 0 : pointerY.get();
+    const e = THREE.MathUtils.smootherstep(p, 0.14, 1);
+    const targetZ = THREE.MathUtils.lerp(7.8, 10.65, e);
+
+    camera.position.x = THREE.MathUtils.damp(camera.position.x, px * 0.42, 4.2, delta);
+    camera.position.y = THREE.MathUtils.damp(camera.position.y, 0.12 - py * 0.24, 4.2, delta);
+    camera.position.z = THREE.MathUtils.damp(camera.position.z, targetZ, 4.2, delta);
+    camera.lookAt(lookTarget);
+  });
+
+  return null;
+}
+
+function ReactiveKeyLight({
+  pointerX,
+  pointerY,
+}: {
+  pointerX: MotionValue<number>;
+  pointerY: MotionValue<number>;
+}) {
+  const lightRef = useRef<THREE.PointLight>(null);
+
+  useFrame((_, delta) => {
+    const light = lightRef.current;
+    if (!light) return;
+
+    light.position.x = THREE.MathUtils.damp(light.position.x, 2.7 + pointerX.get() * 2.1, 5, delta);
+    light.position.y = THREE.MathUtils.damp(light.position.y, 2.8 - pointerY.get() * 1.4, 5, delta);
+  });
+
+  return <pointLight ref={lightRef} color="#ffb16a" intensity={18} distance={10} position={[2.7, 2.8, 3.8]} />;
+}
+
+function DepthRings({
+  progress,
+  pointerX,
+  reduceMotion,
+}: {
+  progress: MotionValue<number>;
+  pointerX: MotionValue<number>;
+  reduceMotion: boolean;
+}) {
+  const outerRef = useRef<THREE.Mesh>(null);
+  const innerRef = useRef<THREE.Mesh>(null);
+
+  useFrame((_, delta) => {
+    const p = reduceMotion ? 0 : progress.get();
+    const px = reduceMotion ? 0 : pointerX.get();
+    const outer = outerRef.current;
+    const inner = innerRef.current;
+
+    if (outer) {
+      outer.rotation.z = THREE.MathUtils.damp(outer.rotation.z, p * 0.65 + px * 0.12, 2.8, delta);
+      outer.rotation.y = THREE.MathUtils.damp(outer.rotation.y, px * 0.08, 2.8, delta);
+    }
+    if (inner) {
+      inner.rotation.z = THREE.MathUtils.damp(inner.rotation.z, -p * 0.9 - px * 0.16, 2.8, delta);
+      inner.rotation.x = THREE.MathUtils.damp(inner.rotation.x, 0.18 + p * 0.08, 2.8, delta);
+    }
+  });
+
+  return (
+    <group position={[0, 0.12, -2.35]}>
+      <mesh ref={outerRef} scale={[1.08, 1.08, 1]}>
+        <torusGeometry args={[3.45, 0.012, 8, 128]} />
+        <meshBasicMaterial color="#f15a24" transparent opacity={0.2} depthWrite={false} />
+      </mesh>
+      <mesh ref={innerRef} rotation={[0.18, 0.08, 0]}>
+        <torusGeometry args={[2.78, 0.009, 8, 128]} />
+        <meshBasicMaterial color="#ffb25b" transparent opacity={0.12} depthWrite={false} />
+      </mesh>
+    </group>
   );
 }
