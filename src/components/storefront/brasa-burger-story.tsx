@@ -25,6 +25,7 @@ type Layer3D = {
   mtl?: string;
   targetSize: number;
   modelScale?: [number, number, number];
+  cropY?: [number, number];
   closed: [number, number, number];
   open: [number, number, number];
   openRotation: [number, number, number];
@@ -42,12 +43,12 @@ type FoodProfile = {
 };
 
 const MATERIAL_PROFILES: Record<IngredientKey, FoodProfile> = {
-  bottom: { base: "#743313", accent: "#bd6829", dark: "#351006", roughness: 0.74, bump: 0.052, repeat: 3.2 },
-  patty: { base: "#35170f", accent: "#693421", dark: "#120504", roughness: 0.84, bump: 0.11, repeat: 5.4 },
-  cheese: { base: "#d9820f", accent: "#ffc947", dark: "#9f4f08", roughness: 0.53, bump: 0.024, repeat: 2.2 },
-  tomato: { base: "#a91f20", accent: "#e84a3d", dark: "#6f1014", roughness: 0.62, bump: 0.026, repeat: 2.4 },
-  lettuce: { base: "#244f1d", accent: "#708d35", dark: "#0e2812", roughness: 0.76, bump: 0.065, repeat: 4.2 },
-  top: { base: "#783615", accent: "#c6722e", dark: "#3b1407", roughness: 0.7, bump: 0.055, repeat: 3.2 },
+  bottom: { base: "#8b431d", accent: "#d08337", dark: "#4d1d0a", roughness: 0.69, bump: 0.03, repeat: 2.35 },
+  patty: { base: "#2d130d", accent: "#75402c", dark: "#100403", roughness: 0.82, bump: 0.07, repeat: 4.1 },
+  cheese: { base: "#df8c12", accent: "#ffd052", dark: "#a94d05", roughness: 0.48, bump: 0.012, repeat: 1.8 },
+  tomato: { base: "#b51d25", accent: "#ef5947", dark: "#761018", roughness: 0.55, bump: 0.012, repeat: 1.9 },
+  lettuce: { base: "#2e641f", accent: "#88ae43", dark: "#123117", roughness: 0.72, bump: 0.045, repeat: 3.25 },
+  top: { base: "#8f471f", accent: "#d78b3e", dark: "#51200c", roughness: 0.67, bump: 0.03, repeat: 2.35 },
 };
 
 function hashNoise(x: number, y: number, seed: number) {
@@ -60,7 +61,7 @@ function makeFoodMaps(key: IngredientKey) {
   const base = new THREE.Color(profile.base);
   const accent = new THREE.Color(profile.accent);
   const dark = new THREE.Color(profile.dark);
-  const size = 256;
+  const size = 384;
   const colorData = new Uint8Array(size * size * 4);
   const bumpData = new Uint8Array(size * size * 4);
   const roughnessData = new Uint8Array(size * size * 4);
@@ -72,14 +73,14 @@ function makeFoodMaps(key: IngredientKey) {
       const fine = hashNoise(x * 0.94, y * 0.94, seed);
       const medium = hashNoise(x * 0.21, y * 0.21, seed + 5);
       const broad = hashNoise(x * 0.055, y * 0.055, seed + 13);
-      const grain = fine * 0.32 + medium * 0.43 + broad * 0.25;
-      const char = key === "patty" && hashNoise(x * 0.09, y * 0.6, seed + 31) > 0.84;
-      const vein = key === "lettuce" && Math.abs(Math.sin((x + medium * 20) * 0.115)) > 0.92;
-      const pore = (key === "bottom" || key === "top") && fine > 0.91;
+      const grain = fine * 0.18 + medium * 0.42 + broad * 0.4;
+      const char = key === "patty" && Math.sin((x + y * 0.2) * 0.105 + broad * 1.4) > 0.975;
+      const vein = key === "lettuce" && Math.abs(Math.sin((x + medium * 14) * 0.08)) > 0.975;
+      const pore = (key === "bottom" || key === "top") && fine > 0.972;
 
-      const color = base.clone().lerp(accent, 0.12 + grain * 0.72);
-      if (char || pore) color.lerp(dark, char ? 0.72 : 0.32);
-      if (vein) color.lerp(accent, 0.48);
+      const color = base.clone().lerp(accent, 0.16 + grain * 0.43);
+      if (char || pore) color.lerp(dark, char ? 0.7 : 0.22);
+      if (vein) color.lerp(accent, 0.32);
 
       const outputColor = color.clone().convertLinearToSRGB();
       colorData[i] = Math.round(outputColor.r * 255);
@@ -87,10 +88,10 @@ function makeFoodMaps(key: IngredientKey) {
       colorData[i + 2] = Math.round(outputColor.b * 255);
       colorData[i + 3] = 255;
 
-      const relief = THREE.MathUtils.clamp(70 + grain * 145 + (char ? 28 : 0) + (vein ? 38 : 0), 0, 255);
+      const relief = THREE.MathUtils.clamp(86 + grain * 112 + (char ? 34 : 0) + (vein ? 24 : 0), 0, 255);
       bumpData[i] = bumpData[i + 1] = bumpData[i + 2] = Math.round(relief);
       bumpData[i + 3] = 255;
-      const rough = THREE.MathUtils.clamp(profile.roughness * 255 + (fine - 0.5) * 34, 0, 255);
+      const rough = THREE.MathUtils.clamp(profile.roughness * 255 + (fine - 0.5) * 20, 0, 255);
       roughnessData[i] = roughnessData[i + 1] = roughnessData[i + 2] = Math.round(rough);
       roughnessData[i + 3] = 255;
     }
@@ -116,10 +117,11 @@ const BURGER_LAYERS: Layer3D[] = [
     obj: "https://v3b.fal.media/files/b/0aa5bc39/ZnnAAKl2M4BL8b39EWROu_279c9e64555dd1af68bcce588f6fe692.obj",
     mtl: "https://v3b.fal.media/files/b/0aa5bc39/k__sqzPd1N06zYxVOWro-_material.mtl",
     targetSize: 2.72,
-    modelScale: [1.05, 0.58, 1.05],
-    closed: [0, -0.81, 0],
-    open: [-0.72, -2.55, -0.9],
-    openRotation: [-0.2, -0.5, -0.12],
+    modelScale: [1.04, 0.66, 1.04],
+    cropY: [0.43, 1],
+    closed: [0, -0.9, 0],
+    open: [-0.62, -2.2, -0.64],
+    openRotation: [-0.1, -0.38, -0.09],
     delay: 0.04,
     parallax: 0.12,
   },
@@ -129,10 +131,10 @@ const BURGER_LAYERS: Layer3D[] = [
     obj: "https://v3b.fal.media/files/b/0aa5bc38/zAoPvOz9YZ_gnm4K9vOMC_90293462e8dddfad0e739bd4d0a393c4.obj",
     mtl: "https://v3b.fal.media/files/b/0aa5bc38/eklM6XDuNtK0jEPuiU_yG_material.mtl",
     targetSize: 2.72,
-    modelScale: [1.04, 0.76, 1.04],
-    closed: [0, -0.33, 0.03],
-    open: [0.72, -1.55, 0.3],
-    openRotation: [0.18, 0.44, 0.13],
+    modelScale: [1.03, 0.58, 1.03],
+    closed: [0, -0.49, 0.03],
+    open: [0.56, -1.35, 0.28],
+    openRotation: [0.06, 0.12, 0.08],
     delay: 0.11,
     parallax: 0.15,
   },
@@ -140,9 +142,9 @@ const BURGER_LAYERS: Layer3D[] = [
     key: "cheese",
     label: "Cheddar",
     targetSize: 2.76,
-    closed: [0, 0.12, 0.08],
-    open: [-0.9, -0.42, 1.15],
-    openRotation: [-0.24, -0.55, -0.26],
+    closed: [0, -0.23, 0.08],
+    open: [-0.76, -0.45, 0.78],
+    openRotation: [-0.16, -0.35, -0.16],
     delay: 0.18,
     parallax: 0.19,
   },
@@ -150,9 +152,9 @@ const BURGER_LAYERS: Layer3D[] = [
     key: "tomato",
     label: "Tomate",
     targetSize: 2.58,
-    closed: [0, 0.22, 0.06],
-    open: [0.88, 0.68, 0.56],
-    openRotation: [0.12, 0.66, 0.22],
+    closed: [0, -0.08, 0.06],
+    open: [0.72, 0.42, 0.4],
+    openRotation: [0.08, 0.5, 0.12],
     delay: 0.09,
     parallax: 0.22,
   },
@@ -162,10 +164,11 @@ const BURGER_LAYERS: Layer3D[] = [
     obj: "https://v3b.fal.media/files/b/0aa5bc3d/EaQLxWhMpBjDc9CzbSLH5_6e4dd5c97af8801cec67afc39a46cdcc.obj",
     mtl: "https://v3b.fal.media/files/b/0aa5bc3d/s6hp4ZxEBLbble1_R13sP_material.mtl",
     targetSize: 2.76,
-    modelScale: [1.03, 0.72, 1.03],
-    closed: [0, 0.43, 0.08],
-    open: [-0.78, 1.63, 0.98],
-    openRotation: [-0.16, -0.62, -0.21],
+    modelScale: [1.03, 0.56, 1.03],
+    cropY: [0.61, 1],
+    closed: [0, 0.1, 0.08],
+    open: [-0.62, 1.18, 0.72],
+    openRotation: [-0.08, -0.38, -0.12],
     delay: 0.14,
     parallax: 0.25,
   },
@@ -175,10 +178,11 @@ const BURGER_LAYERS: Layer3D[] = [
     obj: "https://v3b.fal.media/files/b/0aa5bc36/KlHmBTmSTFE3WuAXiHI6M_6ceaade6ad374f949d1a1d44b8439ddc.obj",
     mtl: "https://v3b.fal.media/files/b/0aa5bc36/-WPBmwpxYDxM-QPhmnxLt_material.mtl",
     targetSize: 2.92,
-    modelScale: [1, 1, 1],
-    closed: [0, 0.88, 0.03],
-    open: [0.58, 2.42, 0.72],
-    openRotation: [-0.26, -0.78, -0.2],
+    modelScale: [1, 0.9, 1],
+    cropY: [0.25, 1],
+    closed: [0, 0.69, 0.03],
+    open: [0.46, 2.08, 0.54],
+    openRotation: [-0.16, -0.52, -0.12],
     delay: 0.02,
     parallax: 0.29,
   },
@@ -291,7 +295,7 @@ export function BrasaBurgerStory() {
               ))}
             </div>
           </div>
-          <div className="self-end pb-8 text-right lg:self-center lg:pb-0">
+          <div className="self-end pb-8 text-right lg:self-end lg:pb-20">
             <div className="ml-auto hidden w-fit items-center gap-2 text-[9px] font-bold uppercase tracking-[0.22em] text-orange-100/40 sm:inline-flex">
               <MousePointer2 className="h-3.5 w-3.5 text-orange-400" /> Mouse move a luz e a câmera · scroll explode em 3D
             </div>
@@ -318,7 +322,7 @@ type SceneProps = {
 function BurgerCanvas(props: SceneProps) {
   return (
     <div className="pointer-events-none absolute inset-0">
-      <Canvas dpr={[1, 1.75]} shadows camera={{ position: [0, -0.05, 8.4], fov: 34, near: 0.1, far: 80 }} gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }} onCreated={({ gl }) => {
+      <Canvas dpr={[1.25, 2]} shadows camera={{ position: [0, -0.05, 8.4], fov: 34, near: 0.1, far: 80 }} gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }} onCreated={({ gl }) => {
         gl.toneMapping = THREE.ACESFilmicToneMapping;
         gl.toneMappingExposure = 1.04;
         gl.outputColorSpace = THREE.SRGBColorSpace;
@@ -326,7 +330,7 @@ function BurgerCanvas(props: SceneProps) {
         <NaturalLighting {...props} />
         <Suspense fallback={null}>
           <BurgerAssembly {...props} />
-          <ContactShadows position={[0, -3.15, 0]} opacity={0.5} scale={9.5} blur={2.7} far={8} resolution={512} color="#080302" />
+          <ContactShadows position={[0, -2.82, 0]} opacity={0.46} scale={9.5} blur={2.8} far={8} resolution={768} color="#080302" />
         </Suspense>
         <CameraRig {...props} />
       </Canvas>
@@ -357,7 +361,7 @@ function BurgerAssembly(props: SceneProps) {
     const breathe = props.reduceMotion ? 0 : Math.sin(state.clock.elapsedTime * 0.75) * 0.015 * openEase;
 
     group.position.y = THREE.MathUtils.damp(group.position.y, -0.1 - openEase * 0.1 + breathe, 4.6, delta);
-    group.rotation.y = THREE.MathUtils.damp(group.rotation.y, -0.1 + cinematicSpin * 0.66 + px * 0.21, 4.6, delta);
+    group.rotation.y = THREE.MathUtils.damp(group.rotation.y, -0.08 + cinematicSpin * 0.48 + px * 0.19, 4.6, delta);
     group.rotation.x = THREE.MathUtils.damp(group.rotation.x, -0.02 + cinematicSpin * 0.075 - py * 0.075, 4.8, delta);
     group.rotation.z = THREE.MathUtils.damp(group.rotation.z, Math.sin(cinematicSpin * Math.PI) * 0.075 + px * 0.03, 4.6, delta);
     const scale = THREE.MathUtils.damp(group.scale.x, targetScale, 4.5, delta);
@@ -405,16 +409,60 @@ function IngredientLayer({ layer, progress, pointerX, pointerY, reduceMotion }: 
     <group ref={groupRef} position={layer.closed}>
       {layer.key === "cheese" && <CheeseIngredient />}
       {layer.key === "tomato" && <TomatoIngredient />}
-      {(layer.key === "bottom" || layer.key === "patty" || layer.key === "lettuce" || layer.key === "top") && (
+      {layer.key === "patty" && <PattyIngredient />}
+      {(layer.key === "bottom" || layer.key === "lettuce" || layer.key === "top") && (
         <DetailedModelIngredient layer={layer} />
       )}
     </group>
   );
 }
 
+function cropGeometryByY(geometry: THREE.BufferGeometry, range: [number, number]) {
+  const source = geometry.index ? geometry.toNonIndexed() : geometry.clone();
+  source.computeBoundingBox();
+  const bounds = source.boundingBox;
+  const position = source.getAttribute("position");
+  if (!bounds || !position || position.count < 3) return source;
+
+  const height = Math.max(0.0001, bounds.max.y - bounds.min.y);
+  const kept = new Map<string, { itemSize: number; normalized: boolean; values: number[] }>();
+  for (const [name, attribute] of Object.entries(source.attributes)) {
+    kept.set(name, { itemSize: attribute.itemSize, normalized: attribute.normalized, values: [] });
+  }
+
+  const triangleCount = Math.floor(position.count / 3);
+  for (let triangle = 0; triangle < triangleCount; triangle += 1) {
+    const first = triangle * 3;
+    const centerY = (position.getY(first) + position.getY(first + 1) + position.getY(first + 2)) / 3;
+    const normalizedY = (centerY - bounds.min.y) / height;
+    if (normalizedY < range[0] || normalizedY > range[1]) continue;
+
+    for (const [name, target] of kept) {
+      const attribute = source.getAttribute(name);
+      const values = attribute.array as ArrayLike<number>;
+      for (let vertex = 0; vertex < 3; vertex += 1) {
+        const offset = (first + vertex) * attribute.itemSize;
+        for (let component = 0; component < attribute.itemSize; component += 1) {
+          target.values.push(Number(values[offset + component]));
+        }
+      }
+    }
+  }
+
+  const cropped = new THREE.BufferGeometry();
+  for (const [name, attribute] of kept) {
+    cropped.setAttribute(name, new THREE.Float32BufferAttribute(attribute.values, attribute.itemSize, attribute.normalized));
+  }
+  if (!cropped.getAttribute("normal")) cropped.computeVertexNormals();
+  cropped.computeBoundingBox();
+  cropped.computeBoundingSphere();
+  source.dispose();
+  return cropped;
+}
+
 function DetailedModelIngredient({ layer }: { layer: Layer3D }) {
   const modelLayer = layer as Layer3D & {
-    key: "bottom" | "patty" | "lettuce" | "top";
+    key: "bottom" | "lettuce" | "top";
     obj: string;
     mtl: string;
   };
@@ -432,6 +480,7 @@ function DetailedModelIngredient({ layer }: { layer: Layer3D }) {
       if (!(child instanceof THREE.Mesh)) return;
       child.castShadow = true;
       child.receiveShadow = true;
+      if (modelLayer.cropY) child.geometry = cropGeometryByY(child.geometry, modelLayer.cropY);
 
       const sourceMaterials = Array.isArray(child.material) ? child.material : [child.material];
       const upgraded = sourceMaterials.map((source) => {
@@ -460,8 +509,8 @@ function DetailedModelIngredient({ layer }: { layer: Layer3D }) {
           side: THREE.FrontSide,
           metalness: 0,
           roughness: fallback.profile.roughness,
-          clearcoat: modelLayer.key === "patty" ? 0.018 : modelLayer.key === "lettuce" ? 0.012 : 0.028,
-          clearcoatRoughness: modelLayer.key === "patty" ? 0.6 : 0.78,
+          clearcoat: modelLayer.key === "lettuce" ? 0.012 : 0.028,
+          clearcoatRoughness: 0.78,
           sheen: modelLayer.key === "lettuce" ? 0.2 : 0,
           sheenRoughness: 0.82,
           sheenColor: new THREE.Color(modelLayer.key === "lettuce" ? "#527d34" : "#000000"),
@@ -474,15 +523,56 @@ function DetailedModelIngredient({ layer }: { layer: Layer3D }) {
     const box = new THREE.Box3().setFromObject(clone);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
-    clone.position.sub(center);
     const longest = Math.max(size.x, size.y, size.z, 0.001);
-    clone.scale.setScalar(modelLayer.targetSize / longest);
+    const uniformScale = modelLayer.targetSize / longest;
+    clone.scale.setScalar(uniformScale);
+    clone.position.copy(center).multiplyScalar(-uniformScale);
     return clone;
-  }, [fallback, gl, loaded, modelLayer.key, modelLayer.targetSize]);
+  }, [fallback, gl, loaded, modelLayer.cropY, modelLayer.key, modelLayer.targetSize]);
 
   return (
     <group scale={modelLayer.modelScale ?? [1, 1, 1]}>
       <primitive object={object} />
+    </group>
+  );
+}
+
+function makePattyGeometry() {
+  const geometry = new THREE.CylinderGeometry(1.2, 1.23, 0.4, 160, 16, false);
+  const position = geometry.attributes.position as THREE.BufferAttribute;
+  for (let index = 0; index < position.count; index += 1) {
+    const x = position.getX(index);
+    const y = position.getY(index);
+    const z = position.getZ(index);
+    const radius = Math.hypot(x, z);
+    const angle = Math.atan2(z, x);
+    const edgeNoise = Math.sin(angle * 7.2 + y * 13) * 0.022 + Math.sin(angle * 15.7 - y * 9) * 0.011;
+    const topNoise = Math.sin(x * 7.5 + z * 2.9) * 0.012 + Math.cos(z * 9.2 - x * 2.4) * 0.009;
+    const radialScale = 1 + edgeNoise * THREE.MathUtils.smoothstep(radius, 0.72, 1.23);
+    position.setX(index, x * radialScale);
+    position.setZ(index, z * radialScale);
+    position.setY(index, y + topNoise * THREE.MathUtils.smoothstep(Math.abs(y), 0.12, 0.2));
+  }
+  position.needsUpdate = true;
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function PattyIngredient() {
+  const geometry = useMemo(makePattyGeometry, []);
+  const food = useMemo(() => makeFoodMaps("patty"), []);
+  const grillMarks = [-0.42, -0.14, 0.14, 0.42];
+  return (
+    <group scale={[1.08, 1, 0.96]}>
+      <mesh geometry={geometry} castShadow receiveShadow>
+        <meshPhysicalMaterial color="#fff7ee" map={food.map} bumpMap={food.bumpMap} bumpScale={food.profile.bump} roughnessMap={food.roughnessMap} roughness={food.profile.roughness} metalness={0} clearcoat={0.018} clearcoatRoughness={0.72} />
+      </mesh>
+      {grillMarks.map((offset) => (
+        <mesh key={offset} position={[offset, 0.207, 0]} rotation={[Math.PI / 2, 0.62, 0]} scale={[1, 1, 0.55]} castShadow>
+          <capsuleGeometry args={[0.025, 0.82, 5, 10]} />
+          <meshStandardMaterial color="#170605" roughness={0.9} />
+        </mesh>
+      ))}
     </group>
   );
 }
@@ -574,7 +664,7 @@ function NaturalLighting({ progress, pointerX, pointerY, reduceMotion }: ScenePr
       directionalRef.current.intensity = THREE.MathUtils.damp(directionalRef.current.intensity, THREE.MathUtils.lerp(3.4, 3.75, finish), 4.2, delta);
       directionalRef.current.color.copy(neutralDirectional).lerp(warmDirectional, finish * 0.2);
     }
-    if (rimRef.current) rimRef.current.intensity = THREE.MathUtils.damp(rimRef.current.intensity, THREE.MathUtils.lerp(1.9, 2.8, finish), 4.2, delta);
+    if (rimRef.current) rimRef.current.intensity = THREE.MathUtils.damp(rimRef.current.intensity, THREE.MathUtils.lerp(0.8, 1.35, finish), 4.2, delta);
     if (keyRef.current) {
       keyRef.current.intensity = THREE.MathUtils.damp(keyRef.current.intensity, THREE.MathUtils.lerp(8.6, 9.4, finish), 4.2, delta);
       keyRef.current.color.copy(neutralKey).lerp(warmKey, finish * 0.18);
@@ -589,7 +679,7 @@ function NaturalLighting({ progress, pointerX, pointerY, reduceMotion }: ScenePr
       <ambientLight ref={ambientRef} intensity={0.54} />
       <hemisphereLight ref={hemisphereRef} args={["#fff8ef", "#180b07", 0.9]} />
       <directionalLight ref={directionalRef} castShadow color="#fff8ef" intensity={3.4} position={[4.7, 6.5, 5.5]} shadow-mapSize-width={1024} shadow-mapSize-height={1024} shadow-bias={-0.0002} />
-      <pointLight ref={rimRef} color="#f15a24" intensity={1.9} distance={12} position={[-3.5, 0.7, 3.2]} />
+      <pointLight ref={rimRef} color="#f15a24" intensity={0.8} distance={12} position={[-3.5, 0.7, 3.2]} />
       <pointLight ref={keyRef} color="#fff5e8" intensity={8.6} distance={11} position={[2.8, 3, 3.9]} />
     </>
   );
