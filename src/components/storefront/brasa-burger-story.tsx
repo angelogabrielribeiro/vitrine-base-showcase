@@ -8,6 +8,7 @@ import {
 } from "framer-motion";
 import { Flame, Layers3, MousePointer2, Sparkles } from "lucide-react";
 import { useAdaptiveQuality } from "@/hooks/use-adaptive-quality";
+import { useInView } from "@/hooks/use-in-view";
 
 const BrasaBurgerCanvas = lazy(() => import("@/components/storefront/brasa-burger-scene"));
 
@@ -43,6 +44,11 @@ function phaseFromProgress(value: number) {
 
 export function BrasaBurgerStory() {
   const sectionRef = useRef<HTMLElement>(null);
+  const { ref: sceneGateRef, inView: sceneReady } = useInView<HTMLDivElement>({
+    amount: 0,
+    rootMargin: "60% 0px",
+    once: true,
+  });
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
@@ -56,7 +62,7 @@ export function BrasaBurgerStory() {
     setPhaseIndex((current) => (current === next ? current : next));
   });
 
-  const phase = PHASES[phaseIndex];
+  const phase = PHASES[phaseIndex] ?? PHASES[0];
   const canRender3D = adaptive.tier !== "off";
   const compact = adaptive.isMobile;
 
@@ -81,8 +87,8 @@ export function BrasaBurgerStory() {
           style={{ scaleX: scrollYProgress }}
         />
 
-        <div className="absolute inset-0 lg:left-[34%]">
-          {canRender3D ? (
+        <div ref={sceneGateRef} className="absolute inset-0 lg:left-[34%]">
+          {sceneReady && canRender3D ? (
             <Suspense fallback={null}>
               <BrasaBurgerCanvas
                 progress={scrollYProgress}
@@ -94,10 +100,17 @@ export function BrasaBurgerStory() {
             </Suspense>
           ) : (
             <div className="absolute inset-0 grid place-items-center">
-              <div className="relative h-[52vh] w-[52vh] max-h-[34rem] max-w-[34rem] rounded-full border border-orange-300/20 bg-[radial-gradient(circle,rgba(241,90,36,.18),transparent_68%)]">
+              <motion.div
+                animate={reduceMotion ? undefined : { rotate: 360, scale: [0.96, 1.04, 0.96] }}
+                transition={{
+                  rotate: { duration: 24, repeat: Number.POSITIVE_INFINITY, ease: "linear" },
+                  scale: { duration: 4.6, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" },
+                }}
+                className="relative h-[52vh] w-[52vh] max-h-[34rem] max-w-[34rem] rounded-full border border-orange-300/20 bg-[radial-gradient(circle,rgba(241,90,36,.18),transparent_68%)]"
+              >
                 <div className="absolute inset-[16%] rounded-full border border-orange-300/15" />
                 <div className="absolute inset-[31%] rounded-full bg-orange-500/10 blur-3xl" />
-              </div>
+              </motion.div>
             </div>
           )}
         </div>
