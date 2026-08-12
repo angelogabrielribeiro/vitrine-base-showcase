@@ -251,6 +251,133 @@ function ImmersiveChapter({ universe, index }: { universe: Universe; index: numb
   );
 }
 
+function MobileImmersiveChapter({ universe, index }: { universe: Universe; index: number }) {
+  const chapterRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: chapterRef,
+    offset: ["start start", "end end"],
+  });
+  const sceneOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.1, 0.8, 0.95, 1],
+    [0.2, 1, 1, 0.45, 0],
+  );
+  const imageScale = useTransform(scrollYProgress, [0, 0.24, 0.72, 1], [1.12, 1.035, 1.02, 1.08]);
+  const imageX = useTransform(
+    scrollYProgress,
+    [0, 0.28, 0.72, 1],
+    [index % 2 === 0 ? -26 : 26, 0, 0, index % 2 === 0 ? 12 : -12],
+  );
+  const copyX = useTransform(
+    scrollYProgress,
+    [0.08, 0.25, 0.72, 0.92],
+    [index % 2 === 0 ? 28 : -28, 0, 0, index % 2 === 0 ? -16 : 16],
+  );
+  const copyOpacity = useTransform(scrollYProgress, [0.08, 0.2, 0.76, 0.92], [0, 1, 1, 0]);
+  const chipOpacity = useTransform(scrollYProgress, [0.2, 0.34, 0.74, 0.88], [0, 1, 1, 0]);
+  const stageProgress = useTransform(scrollYProgress, [0.08, 0.9], ["0%", "100%"]);
+
+  return (
+    <section
+      ref={chapterRef}
+      data-testid="universe-chapter-mobile"
+      className="relative min-h-[182svh] border-b border-white/10 bg-vb-deep sm:min-h-[195svh]"
+      aria-labelledby={"universe-title-mobile-" + universe.slug}
+    >
+      <div className="sticky top-16 h-[calc(100svh-4rem)] overflow-hidden">
+        <motion.div className="absolute inset-0" style={{ opacity: sceneOpacity }}>
+          <motion.img
+            src={universe.image}
+            alt=""
+            aria-hidden="true"
+            loading={index === 0 ? "eager" : "lazy"}
+            className="h-full w-full object-cover"
+            style={{ scale: imageScale, x: imageX }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/58 via-black/48 to-black/92" />
+          <div
+            className="absolute inset-0 mix-blend-screen opacity-70"
+            style={{
+              background:
+                "radial-gradient(circle at " +
+                (index % 2 === 0 ? "78%" : "22%") +
+                " 34%, " +
+                universe.accent +
+                "45, transparent 48%)",
+            }}
+          />
+        </motion.div>
+
+        <div className="relative mx-auto flex h-full max-w-xl items-end px-5 pb-[calc(5.75rem+env(safe-area-inset-bottom))] pt-7 sm:px-8">
+          <motion.div className="w-full" style={{ opacity: copyOpacity, x: copyX }}>
+            <div className="flex items-center gap-3">
+              <span
+                className="text-[10px] font-bold uppercase tracking-[0.22em]"
+                style={{ color: universe.accent }}
+              >
+                Capítulo {universe.number}
+              </span>
+              <span className="h-px flex-1 bg-white/18" aria-hidden="true" />
+              <span className="text-[10px] uppercase tracking-[0.16em] text-white/45">
+                {universe.label}
+              </span>
+            </div>
+
+            <h3
+              id={"universe-title-mobile-" + universe.slug}
+              className="mt-4 max-w-[9ch] font-display text-[clamp(2.7rem,13vw,4.5rem)] font-semibold leading-[0.88] tracking-[-0.055em] text-white"
+            >
+              {universe.name}
+            </h3>
+            <p className="mt-4 max-w-[34rem] text-sm leading-6 text-white/72 sm:text-base sm:leading-7">
+              {universe.solution}
+            </p>
+
+            <motion.div className="mt-5 flex flex-wrap gap-2" style={{ opacity: chipOpacity }}>
+              {universe.capabilities.slice(0, 3).map((capability) => (
+                <span
+                  key={capability.kind}
+                  className="inline-flex min-h-9 items-center gap-2 rounded-full border border-white/12 bg-black/38 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.13em] text-white/72 backdrop-blur-lg"
+                >
+                  <capability.icon className="h-3.5 w-3.5" style={{ color: universe.accent }} aria-hidden="true" />
+                  {capability.label}
+                </span>
+              ))}
+            </motion.div>
+
+            <div className="mt-5 flex items-center gap-3">
+              <Link
+                to="/demo/$storeSlug"
+                params={{ storeSlug: universe.slug }}
+                className="vb-button-primary inline-flex min-h-11 flex-1 items-center justify-center gap-2 px-4 py-3 text-sm sm:max-w-[18rem]"
+              >
+                Abrir demo
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <span className="hidden items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-white/42 min-[390px]:inline-flex">
+                <MousePointer2 className="h-3.5 w-3.5" style={{ color: universe.accent }} />
+                Role
+              </span>
+            </div>
+          </motion.div>
+        </div>
+
+        <div className="absolute inset-x-5 bottom-[calc(1.25rem+env(safe-area-inset-bottom))] flex items-center gap-3 sm:inset-x-8">
+          <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/45">
+            {universe.number}/04
+          </span>
+          <div className="h-px flex-1 overflow-hidden bg-white/14">
+            <motion.div
+              className="h-full origin-left"
+              style={{ width: stageProgress, background: universe.accent }}
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function UniverseJourney({ proposalUrl }: UniverseJourneyProps) {
   const { capabilities } = useCinematicMotion();
   const desktopReduced =
@@ -264,13 +391,13 @@ export function UniverseJourney({ proposalUrl }: UniverseJourneyProps) {
       data-testid="universe-storytelling"
       className="relative scroll-mt-20 bg-vb-deep text-white"
     >
-      <div className="relative mx-auto max-w-[90rem] px-5 py-24 text-center sm:px-8 sm:py-32 lg:px-12">
+      <div className="relative mx-auto max-w-[90rem] px-5 py-20 text-center sm:px-8 sm:py-32 lg:px-12">
         <p className="vb-kicker">Uma jornada, não uma grade</p>
-        <h2 className="mx-auto mt-6 max-w-6xl font-display text-5xl font-semibold leading-[0.88] tracking-[-0.06em] sm:text-7xl lg:text-[7.2rem]">
+        <h2 className="mx-auto mt-6 max-w-6xl font-display text-[clamp(2.75rem,12vw,4.75rem)] font-semibold leading-[0.9] tracking-[-0.055em] sm:text-7xl lg:text-[7.2rem] lg:leading-[0.88] lg:tracking-[-0.06em]">
           Quatro operações.
           <span className="block text-vb-gold">Quatro leis de movimento.</span>
         </h2>
-        <p className="mx-auto mt-7 max-w-2xl text-base leading-8 text-white/58">
+        <p className="mx-auto mt-6 max-w-2xl text-sm leading-7 text-white/58 sm:mt-7 sm:text-base sm:leading-8">
           Cada capítulo segura a cena tempo suficiente para você perceber como identidade, conteúdo
           e operação mudam juntos.
         </p>
@@ -281,7 +408,7 @@ export function UniverseJourney({ proposalUrl }: UniverseJourneyProps) {
           mobileReduced ? (
             <StaticChapter key={universe.slug} universe={universe} />
           ) : (
-            <ImmersiveChapter key={universe.slug} universe={universe} index={index} />
+            <MobileImmersiveChapter key={universe.slug} universe={universe} index={index} />
           ),
         )}
       </div>
@@ -300,7 +427,7 @@ export function UniverseJourney({ proposalUrl }: UniverseJourneyProps) {
         )}
       </div>
 
-      <div className="relative overflow-hidden border-b border-white/10 px-5 py-24 text-center sm:px-8">
+      <div className="relative overflow-hidden border-b border-white/10 px-5 py-20 text-center sm:px-8 sm:py-24">
         <div
           aria-hidden="true"
           className="absolute inset-0 opacity-35"
@@ -311,14 +438,14 @@ export function UniverseJourney({ proposalUrl }: UniverseJourneyProps) {
         />
         <div className="relative mx-auto max-w-4xl">
           <Check className="mx-auto h-6 w-6 text-vb-gold" aria-hidden="true" />
-          <h3 className="mt-6 font-display text-4xl font-semibold tracking-[-0.045em] sm:text-6xl">
+          <h3 className="mx-auto mt-6 max-w-[12ch] font-display text-[clamp(2.25rem,10vw,3.5rem)] font-semibold leading-[0.94] tracking-[-0.045em] sm:max-w-none sm:text-6xl">
             A tecnologia é a base. A experiência é feita para o negócio.
           </h3>
           <a
             href={proposalUrl}
             target="_blank"
             rel="noreferrer"
-            className="vb-button-primary mt-9 inline-flex min-h-14 items-center gap-3 px-7 py-4"
+            className="vb-button-primary mx-auto mt-8 inline-flex min-h-12 w-full max-w-[20rem] items-center justify-center gap-3 px-6 py-3 sm:mt-9 sm:min-h-14 sm:w-auto sm:max-w-none sm:px-7 sm:py-4"
           >
             Desenhar meu universo
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
