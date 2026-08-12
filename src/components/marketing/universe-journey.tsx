@@ -253,12 +253,17 @@ function ImmersiveChapter({ universe, index }: { universe: Universe; index: numb
 
 export function UniverseJourney({ proposalUrl }: UniverseJourneyProps) {
   const { capabilities } = useCinematicMotion();
-  const reduced =
+  const desktopReduced =
     capabilities.hydrated &&
     (capabilities.reducedMotion || capabilities.coarsePointer || capabilities.quality === "economy");
+  const mobileReduced = capabilities.hydrated && capabilities.reducedMotion;
 
   return (
-    <section id="experiencia" data-testid="universe-journey" className="relative scroll-mt-20 bg-vb-deep text-white">
+    <section
+      id="experiencia"
+      data-testid="universe-storytelling"
+      className="relative scroll-mt-20 bg-vb-deep text-white"
+    >
       <div className="relative mx-auto max-w-[90rem] px-5 py-24 text-center sm:px-8 sm:py-32 lg:px-12">
         <p className="vb-kicker">Uma jornada, não uma grade</p>
         <h2 className="mx-auto mt-6 max-w-6xl font-display text-5xl font-semibold leading-[0.88] tracking-[-0.06em] sm:text-7xl lg:text-[7.2rem]">
@@ -271,9 +276,23 @@ export function UniverseJourney({ proposalUrl }: UniverseJourneyProps) {
         </p>
       </div>
 
-      <div aria-label="Capítulos dos quatro universos" className="hidden lg:block">
+      <div aria-label="Capítulos dos quatro universos" className="lg:hidden">
         {UNIVERSES.map((universe, index) =>
-          reduced ? (
+          mobileReduced ? (
+            <StaticChapter key={universe.slug} universe={universe} />
+          ) : (
+            <ImmersiveChapter key={universe.slug} universe={universe} index={index} />
+          ),
+        )}
+      </div>
+
+      <div
+        data-testid="universe-journey"
+        aria-label="Capítulos dos quatro universos"
+        className="hidden lg:block"
+      >
+        {UNIVERSES.map((universe, index) =>
+          desktopReduced ? (
             <StaticChapter key={universe.slug} universe={universe} />
           ) : (
             <ImmersiveChapter key={universe.slug} universe={universe} index={index} />
