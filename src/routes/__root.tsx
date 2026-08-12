@@ -10,6 +10,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import mobileVitrineCss from "../mobile-vitrine-overrides.css?url";
+import mobileHomeShowcaseCss from "../mobile-home-showcase.css?url";
 import novaCoreClientPolishCss from "../novacore-client-polish.css?url";
 import mobileShowroomPerformanceCss from "../mobile-showroom-performance.css?url";
 import barberNoirRefinementCss from "../barber-noir-refinement.css?url";
@@ -93,6 +94,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: mobileVitrineCss,
+      },
+      {
+        rel: "stylesheet",
+        href: mobileHomeShowcaseCss,
       },
       {
         rel: "stylesheet",
