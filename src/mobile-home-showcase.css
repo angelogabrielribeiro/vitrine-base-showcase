@@ -1,0 +1,148 @@
+@media (max-width: 1023px) {
+  /* A seção de projetos também faz parte da experiência mobile. Esta regra vem
+     depois dos overrides legados que escondiam #demonstracoes por completo. */
+  #demonstracoes {
+    display: block !important;
+    overflow-x: clip;
+  }
+
+  #demonstracoes .hidden.divide-y {
+    display: block !important;
+  }
+
+  #demonstracoes > div.relative > p.mt-8 {
+    display: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  #demonstracoes > div.relative {
+    padding-top: 5rem !important;
+    padding-bottom: 5rem !important;
+  }
+
+  #demonstracoes > div.relative > div:first-of-type {
+    gap: 1.5rem !important;
+  }
+
+  #demonstracoes h2 {
+    max-width: 10ch;
+    font-size: clamp(2.55rem, 11.4vw, 4.15rem) !important;
+    line-height: 0.92 !important;
+    letter-spacing: -0.052em !important;
+    overflow-wrap: normal;
+  }
+
+  #demonstracoes > div.relative > div:first-of-type > p {
+    max-width: 36ch;
+    font-size: 0.925rem !important;
+    line-height: 1.7 !important;
+  }
+
+  #demonstracoes .hidden.divide-y {
+    margin-top: 3rem !important;
+  }
+
+  #demonstracoes article {
+    gap: 1.35rem !important;
+    padding-block: 3rem !important;
+  }
+
+  #demonstracoes article > div:first-child > div {
+    border-radius: 1.45rem !important;
+    padding: 0.35rem !important;
+  }
+
+  #demonstracoes article > div:first-child [class*="aspect-[16/10]"] {
+    border-radius: 1.15rem !important;
+  }
+
+  #demonstracoes article > div:first-child img {
+    object-position: center;
+  }
+
+  #demonstracoes article > div:nth-child(2) > div:first-child {
+    gap: 0.8rem !important;
+  }
+
+  #demonstracoes article > div:nth-child(2) > div:first-child > span:first-child {
+    font-size: 2.45rem !important;
+  }
+
+  #demonstracoes article h3 {
+    margin-top: 1rem !important;
+    font-size: clamp(2rem, 9vw, 3rem) !important;
+    line-height: 0.96 !important;
+  }
+
+  #demonstracoes article p {
+    line-height: 1.65 !important;
+  }
+
+  #demonstracoes article [class*="mt-8"][class*="flex-wrap"] {
+    margin-top: 1.35rem !important;
+    gap: 0.65rem !important;
+  }
+
+  #demonstracoes article [class*="mt-8"][class*="flex-wrap"] a {
+    min-height: 2.75rem !important;
+    padding: 0.7rem 0.9rem !important;
+    font-size: 0.78rem !important;
+  }
+}
+
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    #demonstracoes article > div:first-child {
+      animation: sav-demo-enter-left linear both;
+      animation-timeline: view(block);
+      animation-range: entry 5% cover 34%;
+      will-change: transform, opacity;
+    }
+
+    #demonstracoes article > div:nth-child(2) {
+      animation: sav-demo-enter-right linear both;
+      animation-timeline: view(block);
+      animation-range: entry 8% cover 38%;
+      will-change: transform, opacity;
+    }
+
+    #demonstracoes article:nth-child(even) > div:first-child {
+      animation-name: sav-demo-enter-right;
+    }
+
+    #demonstracoes article:nth-child(even) > div:nth-child(2) {
+      animation-name: sav-demo-enter-left;
+    }
+  }
+}
+
+@keyframes sav-demo-enter-left {
+  from {
+    opacity: 0.2;
+    transform: translate3d(-13vw, 0, 0) scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes sav-demo-enter-right {
+  from {
+    opacity: 0.2;
+    transform: translate3d(13vw, 0, 0) scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #demonstracoes article > div:first-child,
+  #demonstracoes article > div:nth-child(2) {
+    animation: none !important;
+    transform: none !important;
+  }
+}
