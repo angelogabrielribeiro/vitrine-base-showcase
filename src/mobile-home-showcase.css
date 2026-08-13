@@ -114,6 +114,14 @@
     #demonstracoes article:nth-child(even) > div:nth-child(2) {
       animation-name: sav-demo-enter-left;
     }
+
+    /* NovaCore é o último projeto. O deslocamento lateral do texto não conseguia
+       completar antes do fim da seção e deixava o conteúdo preso fora da viewport.
+       Mantemos a entrada animada, mas sem translação horizontal apenas neste bloco. */
+    #demonstracoes article:last-child > div:nth-child(2) {
+      animation-name: sav-demo-enter-up;
+      animation-range: entry 4% cover 24%;
+    }
   }
 }
 
@@ -132,6 +140,17 @@
   from {
     opacity: 0.2;
     transform: translate3d(13vw, 0, 0) scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes sav-demo-enter-up {
+  from {
+    opacity: 0.3;
+    transform: translate3d(0, 1rem, 0) scale(0.985);
   }
   to {
     opacity: 1;
