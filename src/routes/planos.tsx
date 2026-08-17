@@ -8,13 +8,13 @@ export const Route = createFileRoute("/planos")({
       {
         name: "description",
         content:
-          "Compare os projetos da SAV Digital na Vitrine Base: criação a partir de R$ 1.190, domínio .com.br do primeiro ano incluído e infraestrutura mensal a partir de R$ 249 somente quando o projeto usa sistema, banco, login ou painel.",
+          "Compare os projetos da SAV Digital: site profissional e animado a partir de R$ 940, domínio .com.br do primeiro ano, SEO, Analytics e Search Console incluídos. Infraestrutura mensal só quando houver sistema, banco, login ou painel.",
       },
       { property: "og:title", content: "Planos e investimento | SAV Digital · Vitrine Base" },
       {
         property: "og:description",
         content:
-          "Sites, mensuração e operação sob medida pela SAV Digital. Site vitrine pode operar sem mensalidade técnica; projetos com sistema usam infraestrutura de produção.",
+          "Sites profissionais e animados a partir de R$ 940. O Essencial já inclui direção visual, SEO, Analytics, Search Console, domínio e publicação; sistema só paga infraestrutura quando precisa.",
       },
     ],
   }),

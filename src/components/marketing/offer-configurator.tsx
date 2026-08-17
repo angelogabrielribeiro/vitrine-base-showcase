@@ -42,11 +42,11 @@ const GOALS: Goal[] = [
     id: "vender",
     label: "Vender online",
     question: "Quero transformar produto em pedido",
-    description: "Vitrine, catálogo, carrinho e atendimento organizados numa jornada de compra.",
+    description: "Páginas, catálogo, chamadas e atendimento organizados numa jornada de compra.",
     icon: Store,
     accent: "#d58c9a",
     recommendedPlan: 1,
-    extra: "Catálogo, checkout e painel entram no centro da experiência.",
+    extra: "O plano Comercial organiza ofertas, conversões e checkout externo sem inflar o projeto.",
   },
   {
     id: "agendar",
@@ -65,8 +65,8 @@ const GOALS: Goal[] = [
     description: "Direção visual, conteúdo e movimento próprios para posicionar o negócio.",
     icon: Sparkles,
     accent: "#9275f5",
-    recommendedPlan: 1,
-    extra: "Identidade, narrativa e componentes exclusivos conduzem o projeto.",
+    recommendedPlan: 0,
+    extra: "Direção visual, animações e uma experiência marcante já entram no Essencial.",
   },
   {
     id: "operacao",
@@ -83,49 +83,53 @@ const GOALS: Goal[] = [
 const PLANS: Plan[] = [
   {
     name: "Essencial",
-    eyebrow: "Começar com estrutura",
-    price: "1.190",
+    eyebrow: "Presença completa e animada",
+    price: "940",
     description:
-      "Para uma operação direta, com uma unidade, catálogo menor e tudo o que precisa para funcionar bem.",
+      "Para apresentar a empresa com personalidade, aparecer no Google e transformar visitas em contatos.",
     features: [
-      "Identidade visual adaptada ao negócio",
-      "Site responsivo para celular e computador",
+      "Até 8 páginas ou rotas no mesmo sistema visual",
+      "Direção visual, animações e microinterações",
+      "Experiência visual de destaque",
+      "Celular, tablet e computador",
+      "Domínio .com.br por 1 ano + publicação e SSL",
       "Google Analytics 4 + Google Search Console",
-      "Medição de visitas, origem do tráfego e cliques principais",
-      "Painel e catálogo quando aplicáveis",
-      "WhatsApp, pedidos e pagamento conforme escopo",
+      "WhatsApp, formulário ou catálogo simples",
+      "SEO técnico e envio para indexação",
       "Até 2 rodadas de ajustes",
     ],
   },
   {
-    name: "Recomendado",
-    eyebrow: "Equilíbrio para crescer",
-    price: "1.590",
+    name: "Comercial",
+    eyebrow: "Mais estrutura para vender",
+    price: "1.390",
     description:
-      "Mais profundidade visual, conteúdo e controle para transformar o site em uma operação comercial completa.",
+      "Para negócios com mais ofertas, produtos ou etapas comerciais que precisam conduzir melhor cada visita.",
     features: [
       "Tudo do plano Essencial",
-      "Mais páginas, seções e produtos",
-      "Personalização visual aprofundada",
-      "Eventos principais de conversão configurados conforme o projeto",
-      "Painel e fluxos mais completos",
+      "Mais páginas, seções, serviços ou produtos conforme a proposta",
+      "Catálogo e navegação comercial mais completos",
+      "Carrinho ou checkout externo quando fizer sentido",
+      "Eventos principais de conversão configurados",
+      "Integrações essenciais previstas no escopo",
       "Até 3 rodadas de ajustes",
     ],
   },
   {
-    name: "Premium",
-    eyebrow: "Operações avançadas",
+    name: "Sistema",
+    eyebrow: "Dados, acesso e automação",
     prefix: "A partir de",
     price: "2.190",
     description:
-      "Para múltiplas unidades, agendamento próprio, perfis de acesso e integrações que exigem projeto dedicado.",
+      "Para agenda, pedidos, login, painel, múltiplas unidades ou qualquer operação que precise guardar dados.",
     features: [
-      "Tudo do plano Recomendado",
+      "Tudo do plano Comercial",
+      "Backend e banco de dados de produção",
+      "Login, perfis e políticas de acesso quando necessários",
+      "Painel, agenda, pedidos ou regras personalizadas",
       "Múltiplas unidades ou profissionais",
-      "Agendamento e regras personalizadas",
-      "Perfis de acesso e integrações adicionais",
-      "Mensuração avançada e integrações de conversão previstas em escopo",
-      "Componentes e movimento exclusivos",
+      "Mensuração avançada, integrações e automações previstas no escopo",
+      "Infraestrutura a partir de R$ 249/mês quando necessária",
     ],
   },
 ];
@@ -190,17 +194,17 @@ export function OfferConfigurator({ proposalUrl }: OfferConfiguratorProps) {
       <div className="relative mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-12">
         <div className="grid gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
           <div>
-            <p className="vb-kicker">Monte o núcleo do projeto</p>
+            <p className="vb-kicker">Escolha pelo que o negócio precisa</p>
             <h2 className="mt-5 font-display text-5xl font-semibold leading-[0.9] tracking-[-0.06em] sm:text-7xl">
-              Não escolha um card.
+              O movimento já está incluído.
               <span className="block" style={{ color: goal.accent }}>
-                Configure uma direção.
+                O escopo cresce com a operação.
               </span>
             </h2>
           </div>
           <p className="max-w-2xl text-base leading-8 text-white/58">
-            Selecione o objetivo e o nível de escopo. A interface reorganiza o projeto para mostrar
-            o que passa a ser prioridade — sem inventar preço, prazo ou funcionalidade.
+            O Essencial entrega presença profissional por R$ 940. Comercial acrescenta estrutura
+            de venda; Sistema entra quando o negócio precisa guardar dados ou automatizar processos.
           </p>
         </div>
 
@@ -439,7 +443,7 @@ export function OfferConfigurator({ proposalUrl }: OfferConfiguratorProps) {
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>
             <p className="mt-4 text-center text-[11px] leading-5 text-white/35">
-              Prazo e composição final são definidos depois do escopo.
+              Preço final, prazo e itens extras são confirmados por escrito antes do início.
             </p>
           </div>
         </div>

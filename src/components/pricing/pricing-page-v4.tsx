@@ -29,63 +29,69 @@ type CardData = {
 const CREATION: CardData[] = [
   {
     name: "Essencial",
-    price: "1.190",
-    description: "Site profissional, animado e responsivo para uma operação mais enxuta.",
+    price: "940",
+    description:
+      "Site institucional completo, animado e pronto para aparecer no Google e receber contatos.",
     features: [
+      "Até 8 páginas ou rotas no mesmo sistema visual",
       "Direção visual adaptada ao negócio",
-      "Animações e microinterações",
-      "Celular + computador",
-      "Domínio .com.br por 1 ano",
-      "Publicação e configuração inicial",
+      "Animações, transições e microinterações",
+      "Uma experiência visual de destaque, inclusive 3D leve quando fizer sentido",
+      "Celular, tablet e computador",
+      "Domínio .com.br por 1 ano + publicação inicial",
       "Google Analytics 4 + Google Search Console",
-      "Medição de visitas, origem do tráfego e cliques principais",
-      "WhatsApp, formulários e catálogo conforme o escopo",
-      "SEO técnico essencial",
+      "Medição de visitas, cliques e conversas pelo WhatsApp",
+      "WhatsApp, formulário ou catálogo simples",
+      "SEO técnico e envio para indexação no Google",
       "Até 2 rodadas de ajustes",
+      "Correções técnicas por 30 dias após a publicação",
     ],
   },
   {
-    name: "Recomendado",
-    price: "1.590",
+    name: "Comercial",
+    price: "1.390",
     badge: "Mais escolhido",
-    description: "Mais profundidade visual, conteúdo e jornada comercial para vender melhor.",
+    description:
+      "Para apresentar mais ofertas, organizar a jornada comercial e transformar visitas em conversas ou vendas.",
     features: [
       "Tudo do Essencial",
-      "Mais páginas, seções e produtos",
-      "Animações e experiência mais elaboradas",
-      "Carrinho e checkout externo conforme o escopo",
-      "Eventos de conversão principais conforme o projeto",
-      "Estrutura orientada para conversão",
+      "Mais páginas, seções, serviços ou produtos conforme a proposta",
+      "Catálogo e navegação comercial mais completos",
+      "Carrinho ou checkout externo quando fizer sentido",
+      "Eventos principais de conversão configurados",
+      "Conteúdo e chamadas organizados para vender",
       "Integrações essenciais previstas em proposta",
       "Até 3 rodadas de ajustes",
     ],
   },
   {
-    name: "Premium",
+    name: "Sistema",
     prefix: "A partir de",
     price: "2.190",
-    description: "Para projetos com sistema, agenda, painel, contas ou regras próprias de operação.",
+    description:
+      "Quando o negócio precisa guardar dados, organizar agenda, receber pedidos, usar login ou controlar a operação.",
     features: [
-      "Tudo do Recomendado",
-      "Agendamento e regras personalizadas",
-      "Painel administrativo quando necessário",
-      "Contas, histórico e perfis de acesso",
+      "Tudo do Comercial",
+      "Backend e banco de dados de produção",
+      "Login e políticas de acesso quando necessários",
+      "Painel administrativo conforme o projeto",
+      "Agendamento, pedidos ou regras personalizadas",
       "Múltiplos profissionais ou unidades",
-      "Mensuração avançada e integrações de conversão previstas em escopo",
-      "Automações e integrações adicionais",
-      "Componentes e interações exclusivas",
+      "Mensuração avançada e integrações previstas no escopo",
+      "Automações e componentes exclusivos",
+      "Infraestrutura a partir de R$ 249/mês quando necessária",
     ],
   },
 ];
 
 const RECURRING: CardData[] = [
   {
-    name: "Vitrine sem sistema",
+    name: "Site sem sistema",
     price: "0",
     description: "Para site, catálogo ou cardápio que não precisa guardar pedidos, contas ou agenda em banco próprio.",
     features: [
       "Sem mensalidade técnica",
-      "Hospedagem estática adequada ao escopo",
+      "Hospedagem adequada para site sem banco próprio",
       "Não depende de banco gratuito sujeito a pausa",
       "Google Analytics e Search Console continuam disponíveis",
       "Venda por WhatsApp ou checkout externo",
@@ -177,7 +183,7 @@ function Card({ data, recurring = false }: { data: CardData; recurring?: boolean
           {recurring ? "por mês" : "50% no início · 50% antes da publicação"}
         </p>
       </div>
-      <ul className="space-y-3 text-sm leading-6 text-white/70">
+      <ul className="flex-1 space-y-3 text-sm leading-6 text-white/70">
         {data.features.map((feature) => (
           <li key={feature} className="flex gap-2.5">
             <Check className="mt-1 h-4 w-4 shrink-0 text-amber-300" />
@@ -185,6 +191,17 @@ function Card({ data, recurring = false }: { data: CardData; recurring?: boolean
           </li>
         ))}
       </ul>
+      {!recurring && (
+        <a
+          href={PROPOSAL_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-7 inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-cyan-200/30 bg-cyan-200 px-5 text-sm font-bold text-slate-950 transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200"
+        >
+          Falar sobre o {data.name}
+          <Instagram className="h-4 w-4" aria-hidden="true" />
+        </a>
+      )}
     </article>
   );
 }
@@ -249,13 +266,13 @@ export function PricingPageV4() {
               </span>
             </div>
             <p className="mt-6 text-xs font-bold uppercase tracking-[0.26em] text-cyan-200">
-              Preço claro · infraestrutura só quando precisa
+              Preço justo · movimento incluído · sistema só quando precisa
             </p>
             <h1 className="mx-auto mt-6 max-w-4xl font-display text-5xl font-semibold leading-[0.95] tracking-[-0.055em] sm:text-7xl">
-              Site vitrine pode ficar sem mensalidade. Sistema com dados usa infraestrutura de produção.
+              Animação está em todos os planos. Você só paga mais quando o negócio precisa vender, automatizar ou guardar dados.
             </h1>
             <p className="mx-auto mt-7 max-w-3xl text-base leading-8 text-white/60">
-              A SAV Digital separa criação, operação e crescimento para você pagar somente pelo que o projeto realmente precisa.
+              Três níveis claros para começar sem inflar o orçamento: presença profissional, estrutura comercial ou sistema sob medida.
             </p>
           </div>
         </section>
@@ -266,10 +283,10 @@ export function PricingPageV4() {
               <div className="mx-auto max-w-3xl text-center">
                 <p className="text-xs font-bold uppercase tracking-[0.26em] text-cyan-200">Criação</p>
                 <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.04em] sm:text-6xl">
-                  Todos são profissionais, responsivos e animados.
+                  O visual continua forte. O preço muda com a operação.
                 </h2>
                 <p className="mt-5 text-sm leading-7 text-white/55">
-                  O que muda é a profundidade visual e a complexidade da operação. Google Analytics 4 e Search Console já entram na base para medir visitas, origem do tráfego e ações importantes.
+                  O Essencial de R$ 940 já inclui movimento, presença no Google e mensuração. Os planos maiores acrescentam catálogo, jornada de venda, dados e automação — não cobram animação como luxo.
                 </p>
               </div>
             </Reveal>
@@ -280,6 +297,10 @@ export function PricingPageV4() {
                 </Reveal>
               ))}
             </div>
+            <p className="mx-auto mt-8 max-w-3xl text-center text-xs leading-6 text-white/42">
+              Valores válidos para o escopo descrito. Funcionalidades extras ou mudanças depois da
+              aprovação só entram com orçamento e autorização prévios.
+            </p>
           </div>
         </section>
 
@@ -294,7 +315,7 @@ export function PricingPageV4() {
               {
                 icon: Database,
                 title: "Banco só quando precisa",
-                text: "Pedidos, contas, agenda e painel usam backend de produção. Site vitrine não.",
+                text: "Pedidos, contas, agenda e painel usam backend de produção. Site institucional sem sistema próprio não.",
               },
               {
                 icon: CircleDollarSign,
