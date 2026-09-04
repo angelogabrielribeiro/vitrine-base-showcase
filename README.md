@@ -1,63 +1,79 @@
 # Vitrine Base Showcase
 
-Plataforma white-label de e-commerce criada para demonstrar como um mesmo núcleo técnico pode atender negócios de nichos diferentes sem reconstruir toda a aplicação.
+Plataforma demonstrativa de **e-commerce white-label** com quatro experiências comerciais visualmente distintas sobre uma base técnica compartilhada.
 
-🔗 **Demo:** https://vitrine-base-showcase.lovable.app
+**Demo:** https://vitrine-base-showcase.lovable.app
 
-## Sobre o projeto
+## Visão geral
 
-A Vitrine Base reúne três experiências comerciais dentro da mesma aplicação:
+A Vitrine Base nasceu como uma base reutilizável para apresentar soluções digitais a pequenos negócios. O projeto combina catálogo, carrinho, checkout demonstrativo, painel administrativo e diferentes direções de arte sem reconstruir toda a aplicação para cada nicho.
 
-- moda feminina;
-- empório/mercearia;
-- restaurante/delivery.
+A arquitetura separa configuração, dados e interface para permitir que cada demonstração tenha identidade própria mantendo o mesmo núcleo de comércio.
 
-Cada loja possui identidade visual, catálogo e regras próprias, mas compartilha a mesma arquitetura de produtos, carrinho, checkout, pedidos e painel administrativo demonstrativo.
+## Demonstrações
 
-## Principais recursos
+A versão atual inclui quatro experiências:
 
-- Arquitetura white-label configurável
-- Catálogo com busca, filtros e categorias
-- Produtos com variantes e estoque
-- Carrinho persistente por loja
-- Checkout demonstrativo
-- Fluxo de pedidos
-- Painel administrativo demonstrativo
-- Cadastro e edição local de produtos
-- Configurações específicas por estabelecimento
-- Integração de contato via WhatsApp
-- Importação e manipulação de dados tabulares
-- Layout mobile-first e responsivo
+1. **Maison Belle** — moda feminina, com direção editorial e foco em produto;
+2. **Barber Noir** — barbearia e grooming, com serviços, produtos e agendamento demonstrativo;
+3. **Brasa Urbana** — restaurante/hamburgueria, com cardápio, adicionais e fluxo de pedido;
+4. **NovaCore Electronics** — eletrônicos, com experiência espacial, interações 3D e catálogo tecnológico.
+
+Cada demo possui paleta, tipografia, composição, animações e narrativa visual próprias.
+
+## Funcionalidades
+
+- catálogo e busca de produtos;
+- categorias, filtros e variantes;
+- carrinho persistido por loja;
+- checkout demonstrativo;
+- criação local de pedidos;
+- painel administrativo demonstrativo;
+- cadastro e edição de produtos;
+- upload e tratamento visual de imagens;
+- estoque e status de pedidos;
+- configurações específicas por loja;
+- integração de contato por WhatsApp;
+- rotas institucionais;
+- experiência responsiva desktop/mobile;
+- suporte a `prefers-reduced-motion`;
+- cenas WebGL/3D e motion design em áreas específicas.
+
+## Arquitetura white-label
+
+As lojas são definidas por configuração tipada, incluindo identidade visual, conteúdo, categorias, dados de contato, regras de entrega, checkout e mensagens comerciais. Isso reduz valores hardcoded nos componentes e permite reutilizar o núcleo da aplicação em diferentes nichos.
+
+A camada de dados demonstrativa é abstraída para que uma implementação futura com backend possa substituir o armazenamento local sem exigir a reconstrução das páginas.
 
 ## Stack
 
 - React 19
 - TypeScript
-- TanStack Start / Router / Query
+- TanStack Start
+- TanStack Router
+- TanStack Query
 - Vite
 - Tailwind CSS
 - Framer Motion
 - GSAP
-- Three.js / React Three Fiber
+- Three.js
+- React Three Fiber
+- Drei
 - Zod
 - React Hook Form
-- ExcelJS
-- Papa Parse
+- Recharts
+- ExcelJS / PapaParse
 
-## Arquitetura
+## Estado dos dados
 
-Os dados de cada negócio são centralizados em configurações tipadas. A camada de acesso a dados é separada da interface para permitir a substituição do armazenamento local por uma implementação com Supabase ou outro backend no futuro.
+A versão pública é **demonstrativa**. Produtos, configurações e pedidos utilizam dados locais e `localStorage` onde aplicável. Não existe processamento real de cartão nem backend de produção nesta demonstração.
 
-Isso permite adaptar marca, catálogo, regras comerciais e experiência visual sem duplicar o núcleo da aplicação.
+Essa separação é intencional: o objetivo do showcase é validar experiência, arquitetura white-label e fluxos comerciais antes de conectar infraestrutura real de autenticação, banco de dados e pagamentos.
 
-## Segurança da demonstração
-
-A versão pública não processa pagamentos reais nem deve armazenar dados sensíveis. Autenticação, checkout e pedidos são apresentados em modo demonstrativo para permitir a validação do fluxo comercial antes da integração de serviços de produção.
-
-## Rodando localmente
+## Executando localmente
 
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/angelogabrielribeiro/vitrine-base-showcase.git
 cd vitrine-base-showcase
 npm install
 npm run dev
@@ -65,8 +81,12 @@ npm run dev
 
 ## Status
 
-✅ **Showcase funcional publicado.** O projeto serve como base técnica e comercial para futuras implementações personalizadas.
+**Showcase funcional e publicado.** O projeto continua recebendo melhorias de experiência, responsividade e arquitetura para futura adaptação a projetos comerciais reais.
 
 ## Objetivos técnicos
 
-O projeto explora arquitetura reutilizável, configuração white-label, tipagem de domínio, persistência local, fluxos de e-commerce, responsividade e construção de sistemas que possam evoluir de demonstração para produto real.
+Este projeto explora arquitetura configurável, reutilização de componentes, modelagem de e-commerce, persistência local, UX de checkout/admin, interfaces altamente interativas e integração de Three.js/WebGL em experiências comerciais.
+
+---
+
+Desenvolvido por **Angelo Gabriel Ribeiro Santos**.
